@@ -95,7 +95,7 @@ CREATE TABLE tx_kesearch_indexerconfig (
 	sysfolder text,
 	index_content_with_restrictions text,
 	index_passed_events text,
-	type varchar(6) DEFAULT '' NOT NULL,
+	type varchar(90) DEFAULT '' NOT NULL,
 	index_dam_categories text,
 	index_dam_categories_recursive tinyint(3) DEFAULT '0' NOT NULL,
 
