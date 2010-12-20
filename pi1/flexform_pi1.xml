@@ -1,0 +1,372 @@
+<T3DataStructure>
+	<meta>
+	    <!-- <langDisable>1</langDisable> -->
+	</meta>
+	<sheets>
+		<MAIN>
+			<ROOT>
+				<TCEforms>
+					<sheetTitle>LLL:EXT:ke_search/pi1/locallang.xml:ff.main</sheetTitle>
+				</TCEforms>
+				<type>array</type>
+				<el>
+					
+					<mode>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.mode</label>
+							<onChange>reload</onChange>
+							<config>
+								<type>select</type>
+								<items>
+									<numIndex index="0">
+										<numIndex index="0">LLL:EXT:ke_search/pi1/locallang.xml:ff.mode.I.0</numIndex>
+										<numIndex index="1">0</numIndex>
+									</numIndex>
+									<numIndex index="1">
+										<numIndex index="0">LLL:EXT:ke_search/pi1/locallang.xml:ff.mode.I.1</numIndex>
+										<numIndex index="1">1</numIndex>
+									</numIndex>
+								</items>
+								<size>1</size>
+							</config>
+						</TCEforms>
+					</mode>
+					
+					<resultChars>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.resultChars</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>input</type>
+								<size>4</size>
+								<eval>int</eval>
+								<range type="array">
+									<upper>9999</upper>
+									<lower>0</lower>
+								</range>
+								<default>200</default>
+							</config>
+						</TCEforms>
+					</resultChars>
+					
+					<resultsNumeration>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.resultsNumeration</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>check</type>
+								<default>1</default>
+							</config>
+						</TCEforms>
+					</resultsNumeration>
+					
+					
+					<highlightSword>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.highlightSword</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>check</type>
+								<default>1</default>
+							</config>
+						</TCEforms>
+					</highlightSword>
+					
+					<resultsPerPage>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.resultsPerPage</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>input</type>
+								<size>2</size>
+								<eval>int</eval>
+								<range type="array">
+									<upper>99</upper>
+									<lower>1</lower>
+								</range>
+								<default>10</default>
+							</config>
+						</TCEforms>
+					</resultsPerPage>
+					
+					<maxPagesInPagebrowser>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.maxPagesInPagebrowser</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>input</type>
+								<size>2</size>
+								<eval>int</eval>
+								<range type="array">
+									<upper>99</upper>
+									<lower>1</lower>
+								</range>
+								<default>10</default>
+							</config>
+						</TCEforms>
+					</maxPagesInPagebrowser>
+					
+					<filters>
+						<TCEforms>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<exclude>1</exclude>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.filters</label>
+							<config type="array">
+								<type>select</type>
+								<multiple>1</multiple>
+								<maxitems>100</maxitems>
+								<size>5</size>
+								<allownonidvalues>1</allownonidvalues>
+								<items type="array"></items>
+								<itemsProcFunc>user_filterlist->getListOfAvailableFiltersForFlexforms</itemsProcFunc>
+							</config>
+						</TCEforms>
+					</filters>
+					
+					<preselected_filters>
+						<TCEforms>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<exclude>1</exclude>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.preselected_filters</label>
+							<config type="array">
+								<type>select</type>
+								<multiple>1</multiple>
+								<maxitems>100</maxitems>
+								<size>5</size>
+								<allownonidvalues>1</allownonidvalues>
+								<items type="array"></items>
+								<itemsProcFunc>user_filterlist->getListOfAvailableFilteroptionsForFlexforms</itemsProcFunc>
+							</config>
+						</TCEforms>
+					</preselected_filters>
+					
+					
+					<resultPage>
+						<TCEforms>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<exclude>1</exclude>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.resultPage</label>
+							<config>
+								<type>group</type>
+								<internal_type>db</internal_type>
+								<allowed>pages</allowed>
+								<size>1</size>
+								<maxitems>1</maxitems>
+								<minitems>1</minitems>
+							</config>
+						</TCEforms>
+					</resultPage>
+					
+					
+					<pagebrowserOnTop>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.pagebrowserOnTop</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>check</type>
+								<default>0</default>
+							</config>
+						</TCEforms>
+					</pagebrowserOnTop>
+					
+					<pagebrowserAtBottom>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.pagebrowserAtBottom</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>check</type>
+								<default>1</default>
+							</config>
+						</TCEforms>
+					</pagebrowserAtBottom>
+					
+					<showTypeIcon>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showTypeIcon</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>check</type>
+								<default>1</default>
+							</config>
+						</TCEforms>
+					</showTypeIcon>
+					
+					<showResultUrl>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showResultUrl</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>check</type>
+								<default>1</default>
+							</config>
+						</TCEforms>
+					</showResultUrl>
+					
+					<showScore>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showScore</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>check</type>
+								<default>0</default>
+							</config>
+						</TCEforms>
+					</showScore>
+					
+					<showPercentalScore>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showPercentalScore</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>check</type>
+								<default>1</default>
+							</config>
+						</TCEforms>
+					</showPercentalScore>
+					
+					<showScoreScale>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showScoreScale</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>check</type>
+								<default>1</default>
+							</config>
+						</TCEforms>
+					</showScoreScale>
+					
+					<resetFiltersOnSubmit>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.resetFiltersOnSubmit</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>check</type>
+								<default>1</default>
+							</config>
+						</TCEforms>
+					</resetFiltersOnSubmit>
+					
+					<redirectOnFilterChange>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.redirectOnFilterChange</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>check</type>
+								<default>0</default>
+							</config>
+						</TCEforms>
+					</redirectOnFilterChange>
+					
+					<checkFilterCondition>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.checkFilterCondition</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>select</type>
+								<items>
+									<numIndex index="0">
+										<numIndex index="0">LLL:EXT:ke_search/pi1/locallang.xml:ff.checkFilterCondition.I.0</numIndex>
+										<numIndex index="1">multi</numIndex>
+									</numIndex>
+									<numIndex index="1">
+										<numIndex index="0">LLL:EXT:ke_search/pi1/locallang.xml:ff.checkFilterCondition.I.1</numIndex>
+										<numIndex index="1">single</numIndex>
+									</numIndex>
+									<numIndex index="2">
+										<numIndex index="0">LLL:EXT:ke_search/pi1/locallang.xml:ff.checkFilterCondition.I.2</numIndex>
+										<numIndex index="1">none</numIndex>
+									</numIndex>
+								</items>
+								<size>1</size>
+							</config>
+						</TCEforms>
+					</checkFilterCondition>
+					
+					<resultLinkTarget>
+						<TCEforms>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.resultLinkTarget</label>
+							<config>
+								<type>select</type>
+								<items>
+									<numIndex index="0">
+										<numIndex index="0">LLL:EXT:ke_search/pi1/locallang.xml:ff.resultLinkTarget.I.0</numIndex>
+										<numIndex index="1">_blank</numIndex>
+									</numIndex>
+									<numIndex index="1">
+										<numIndex index="0">LLL:EXT:ke_search/pi1/locallang.xml:ff.resultLinkTarget.I.1</numIndex>
+										<numIndex index="1">_self</numIndex>
+									</numIndex>
+								</items>
+								<size>1</size>
+							</config>
+						</TCEforms>
+					</resultLinkTarget>
+					
+					<showQueryTime>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showQueryTime</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>check</type>
+								<default>0</default>
+							</config>
+						</TCEforms>
+					</showQueryTime>
+					
+					<showTags>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showTags</label>
+							<!-- <displayCond>FIELD:mode:=:0</displayCond> -->
+							<displayCond>HIDE_FOR_NON_ADMINS</displayCond>
+							<config>
+								<type>check</type>
+								<default>0</default>
+							</config>
+						</TCEforms>
+					</showTags>
+					
+					<showQuery>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showQuery</label>
+							<displayCond>HIDE_FOR_NON_ADMINS</displayCond>
+							<!-- <displayCond>FIELD:mode:=:0</displayCond> -->
+							<config>
+								<type>check</type>
+								<default>0</default>
+							</config>
+						</TCEforms>
+					</showQuery>
+					
+					<showTaggedContentOnly>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showTaggedContentOnly</label>
+							<displayCond>HIDE_FOR_NON_ADMINS</displayCond>
+							<!-- <displayCond>FIELD:mode:=:0</displayCond> -->
+							<config>
+								<type>check</type>
+								<default>0</default>
+							</config>
+						</TCEforms>
+					</showTaggedContentOnly>
+					
+					<loadFlexformsFromOtherCE>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.loadFlexformsFromOtherCE</label>
+							<displayCond>FIELD:mode:=:1</displayCond>
+							<config>
+								<type>group</type>
+								<internal_type>db</internal_type>
+								<allowed>tt_content</allowed>
+								<size>1</size>
+								<maxitems>1</maxitems>
+								<minitems>1</minitems>
+							</config>
+						</TCEforms>
+					</loadFlexformsFromOtherCE>
+					
+				</el>
+			</ROOT>
+		</MAIN>
+	</sheets>
+</T3DataStructure>

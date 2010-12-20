@@ -1,0 +1,171 @@
+.tx-kesearch-pi1 {
+    background: #fcfcfc;
+    border: 1px solid black;
+    padding: 5px;
+}
+
+/* Clearer */
+.tx-kesearch-pi1 .clearer {
+    display: block;
+    height: 1px;
+    line-height: 1px;
+    clear: both;
+}
+
+/* Results */
+.tx-kesearch-pi1 #kesearch_results {
+    margin:0 10px 0 10px;
+}
+
+.tx-kesearch-pi1 #kesearch_results .teaser_icon img {
+    float:left;
+    margin-top:2px;
+    margin-right:5px;
+}
+
+.tx-kesearch-pi1 #kesearch_results li {
+    margin-bottom: 20px;
+    list-style-type:none;
+    list-style-position:inside;
+    margin:0 0 20px 0;
+}
+
+.tx-kesearch-pi1 #kesearch_results li .hit {
+    color: red;
+    font-weight: bold;
+}
+.tx-kesearch-pi1 #kesearch_results li .add-info {
+    font-size: 80%;
+    background: #EEE;
+}
+
+
+/* Query time */
+.tx-kesearch-pi1 #kesearch_query_time {
+    font-style: italic;
+    text-align: center;
+    font-size: 80%;
+}
+
+/* Searchbox */
+.tx-kesearch-pi1 .searchbox {
+    
+}
+.tx-kesearch-pi1 .searchbox input {
+    margin-left: 0;
+    width: 145px;
+}
+
+.tx-kesearch-pi1 .searchbox input.submit {
+    margin: 0 0 0 0;
+    width: 18px;
+    height: 18px;
+    border: none;
+    background: none;
+    padding: 0;
+    position: absolute;
+    right:15px;
+}
+
+/* Filters */
+
+.tx-kesearch-pi1 #kesearch_filters {
+    margin-top: 20px;
+}
+
+.tx-kesearch-pi1 #kesearch_filters select {
+    width: 145px;
+}
+
+
+/* Spinner / updating */
+.tx-kesearch-pi1 #kesearch_updating_filters,
+.tx-kesearch-pi1 #kesearch_updating_results {
+    display:none;
+    margin: 20px 0 20px 0;
+}
+
+.tx-kesearch-pi1 #testbox {
+    margin-top: 100px;
+    /* margin-bottom: 50px; */
+    border: 1px solid red;
+}
+
+
+
+/* General Message */
+.tx-kesearch-pi1 .general-message {
+    /* border: 2px dashed red; */
+    padding: 5px;
+}
+.tx-kesearch-pi1 .general-message .image {
+    float:left;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+.tx-kesearch-pi1 .general-message .message {
+    font-weight: bold;
+}
+
+
+
+/*Pagebrowser*/
+.tx-kesearch-pi1 #kesearch_pagebrowser_top,
+.tx-kesearch-pi1 #kesearch_pagebrowser_bottom {
+   clear:both;
+   text-align: center;
+   padding: 10px;
+}
+.tx-kesearch-pi1 #kesearch_pagebrowser_top .pages_total {
+    border-bottom: 1px dashed #666;
+    margin-bottom: 20px;
+}
+.tx-kesearch-pi1 #kesearch_pagebrowser_bottom .pages_total {
+    border-top: 1px dashed #666;
+}
+
+.tx-kesearch-pi1 #kesearch_pagebrowser_top a,
+.tx-kesearch-pi1 #kesearch_pagebrowser_bottom a {
+    padding: 3px;
+}
+
+.tx-kesearch-pi1 #kesearch_pagebrowser_top a:hover,
+.tx-kesearch-pi1 #kesearch_pagebrowser_bottom a:hover {
+    cursor:pointer;
+}
+
+.tx-kesearch-pi1 #kesearch_pagebrowser_top a.current,
+.tx-kesearch-pi1 #kesearch_pagebrowser_bottom  a.current {
+   font-weight: bold;
+   color:#000;
+   text-decoration:none;
+}
+
+.tx-kesearch-pi1 #kesearch_pagebrowser_top .browser,
+.tx-kesearch-pi1 #kesearch_pagebrowser_bottom .browser{
+    border:1px solid;
+}
+
+.tx-kesearch-pi1 #kesearch_pagebrowser_top .pages_total,
+.tx-kesearch-pi1 #kesearch_pagebrowser_bottom .pages_total{
+    height:55px;
+    padding-top:10px;
+    background:none repeat scroll 0 0 #F5F6F6;
+}
+
+.tx-kesearch-pi1 #kesearch_pagebrowser_top table,
+.tx-kesearch-pi1 #kesearch_pagebrowser_bottom table {
+    margin:0 auto 5px
+}
+
+.tx-kesearch-pi1 .next, .tx-kesearch-pi1 .prev {
+    display:inline-block;
+    width:24px;
+    height:29px;
+    color:transparent;
+    text-decoration:none;
+}
+
+.tx-kesearch-pi1 .next{background: transparent url('img/arrow-next.gif') no-repeat left 5px;}
+.tx-kesearch-pi1 .prev{background: transparent url('img/arrow-prev.gif') no-repeat right 5px;}
+

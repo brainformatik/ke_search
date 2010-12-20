@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>module</type>
+		<description>Language labels for plugin &quot;tx_kesearch_pi1&quot;</description>
+	</meta>
+	<data type="array">
+		<!-- DEFAULT -->
+		<languageKey index="default" type="array">
+			<label index="ff.main">General</label>
+			<label index="ff.mode">Plugin Mode</label>
+			<label index="ff.mode.I.0">Searchbox and Filters</label>
+			<label index="ff.mode.I.1">Results List</label>
+			<label index="ff.filters">Filters</label>
+			<label index="ff.preselected_filters">Preselected filters</label>
+			<label index="ff.resultPage">Page with result list</label>
+			<label index="ff.resultChars">Number of chars used by result preview</label>
+			<label index="ff.resultsNumeration">Number results consecutively?</label>
+			<label index="ff.highlightSword">Highlight search word in result preview</label>
+			<label index="ff.resultsPerPage">Results per page</label>
+			<label index="ff.maxPagesInPagebrowser">Number of pages shown in pagebrowser</label>
+			<label index="ff.pagebrowserOnTop">Show pagebrowser on top of result list</label>
+			<label index="ff.pagebrowserAtBottom">Show pagebrowser at the bottom of the result list</label>
+			<label index="ff.showTypeIcon">Show result type icon?</label>
+			<label index="ff.showResultUrl">Show result URL?</label>
+			<label index="ff.showScore">Show score?</label>
+			<label index="ff.showPercentalScore">Show percental score?</label>
+			<label index="ff.showScoreScale">Show score scale?</label>
+			<label index="ff.resetFiltersOnSubmit">Reset filters when submitting searchbox?</label>
+			<label index="ff.redirectOnFilterChange">Redirect to result page when filters are changed?</label>
+			<label index="ff.checkFilterCondition">Availability check for filter options</label>
+			<label index="ff.checkFilterCondition.I.0">Check in condition to other filters</label>
+			<label index="ff.checkFilterCondition.I.1">Check without condition to other filters</label>
+			<label index="ff.checkFilterCondition.I.2">no check</label>
+			<label index="ff.resultLinkTarget">Target for result link</label>
+			<label index="ff.resultLinkTarget.I.0">Open in new window</label>
+			<label index="ff.resultLinkTarget.I.1">Open in same window</label>
+			<label index="ff.showQueryTime">Show query process duration?</label>
+			<label index="ff.showTags">Show tags? (for debugging)</label>
+			<label index="ff.showQuery">Show query? (for debugging)</label>
+			<label index="ff.showTaggedContentOnly">Show tagged content only? (for debugging)</label>
+			<label index="ff.loadFlexformsFromOtherCE">Load flexforms config from other CE</label>
+			<label index="ff.templateFile">Template File</label>
+			<label index="ff.cssFile">CSS File</label>
+			
+			<label index="results">Search results</label>
+			<label index="until">until</label>
+			<label index="of">of</label>
+			<label index="no_results_found">No results found</label>
+			<label index="no_results_refine">This search term is not specific enough. Please choose another.</label>
+			
+			<label index="label_resulturl">URL</label>
+			<label index="label_score">Score</label>
+			<label index="label_score_percent">Percental score</label>
+			<label index="label_score_scale">Score scale</label>
+			<label index="label_tags">Tags</label>
+			<label index="label_query">DB-Query</label>
+			
+			<label index="loading">Loading</label>
+			<label index="all_options">ALL</label>
+			<label index="no_options">---</label>
+			<label index="message_before_search">Please choose your search parameters.</label>
+			<label index="query_time">The search query was processed in %s ms.</label>
+			<label index="reset_button">Reset</label>
+			<label index="submit">Submit</label>
+			
+		</languageKey>
+		
+		<!-- GERMAN -->
+		<languageKey index="de" type="array">
+			<label index="ff.main">Allgemein</label>
+			<label index="ff.mode">Plugin Modus</label>
+			<label index="ff.mode.I.0">Suchbox und Filter</label>
+			<label index="ff.mode.I.1">Ergebnisliste</label>
+			<label index="ff.filters">Filter</label>
+			<label index="ff.preselected_filters">Vorausgewählte Filter</label>
+			<label index="ff.resultPage">Suchergebnis-Seite</label>
+			<label index="ff.resultChars">Anzahl Zeichen für Ergebnisvorschau</label>
+			<label index="ff.resultsNumeration">Ergebnisse fortlaufend nummerieren?</label>
+			<label index="ff.highlightSword">Highlighten des Suchwort in Ergebnisvorschau?</label>
+			<label index="ff.resultsPerPage">Ergebnisse pro Seite</label>
+			<label index="ff.maxPagesInPagebrowser">max. Anzahl Seiten in Pagebrowser</label>
+			<label index="ff.pagebrowserOnTop">Pagebrowser am Anfang der Ergebnisliste anzeigen?</label>
+			<label index="ff.pagebrowserAtBottom">Pagebrowser am Ende der Ergebnisliste anzeigen?</label>
+			<label index="ff.showTypeIcon">Zeige Ergebnistyp-Icon?</label>
+			<label index="ff.showResultUrl">Ergebnis-URL anzeigen?</label>
+			<label index="ff.showScore">Zeige Relevanz?</label>
+			<label index="ff.showPercentalScore">Zeige Prozentuale Relevanz?</label>
+			<label index="ff.showScoreScale">Zeige Relevanz-Skala?</label>
+			<label index="ff.resetFiltersOnSubmit">Filter beim Abschicken der Suchbox zurücksetzen?</label>
+			<label index="ff.redirectOnFilterChange">Auf Ergebnisseite weiterleiten wenn Filter geändert werden?</label>
+			<label index="ff.checkFilterCondition">Verfügbarkeitsprüfung für Filter</label>
+			<label index="ff.checkFilterCondition.I.0">Prüfung mit Abhängigkeit zu anderen Filtern</label>
+			<label index="ff.checkFilterCondition.I.1">Prüfung ohne Abhängigkeit zu anderen Filtern</label>
+			<label index="ff.checkFilterCondition.I.2">keine Verfügbarkeitsprüfung</label>
+			<label index="ff.resultLinkTarget">Ziel für Ergebnislink</label>
+			<label index="ff.resultLinkTarget.I.0">In neuem Fenster öffnen</label>
+			<label index="ff.resultLinkTarget.I.1">Im gleichen Fenster öffnen</label>
+			<label index="ff.showQueryTime">Benötigte Zeit für Suchabfrage anzeigen?</label>
+			<label index="ff.showTags">Zeige Tags? (Debugging)</label>
+			<label index="ff.showQuery">Zeige Such-Query? (Debugging)</label>
+			<label index="ff.showTaggedContentOnly">Nur getaggte Inhalte zeigen? (Debugging)</label>
+			<label index="ff.loadFlexformsFromOtherCE">Flexform-Konfiguration von anderem CE laden</label>
+			<label index="ff.templateFile">Template-Datei</label>
+			<label index="ff.cssFile">CSS-Datei</label>
+			
+			<label index="results">Suchergebnisse</label>
+			<label index="until">bis</label>
+			<label index="of">von</label>
+			<label index="no_results_found">Keine Ergebnisse gefunden</label>
+			<label index="no_results_refine">Ihr Suchbegriff ist zu allgemein gehalten und kommt auf mehr als 50 Prozent aller Seiten vor. Bitte waehlen Sie einen anderen Suchbegriff.</label>
+			
+			<label index="label_resulturl">URL</label>
+			<label index="label_score">Relevanz</label>
+			<label index="label_score_percent">Prozentuale Relevanz</label>
+			<label index="label_score_scale">Relevanz-Skala</label>
+			<label index="label_tags">Tags</label>
+			<label index="label_query">DB-Query</label>
+			
+			<label index="loading">lädt</label>
+			<label index="all_options">Alle</label>
+			<label index="no_options">-----</label>
+			<label index="message_before_search">Bitte geben Sie Ihre Suchkriterien an.</label>
+			<label index="query_time">Die Suchabfrage hat %s ms in Anspruch genommen.</label>
+			<label index="reset_button">Alle Eingaben löschen</label>
+			<label index="submit">Schnellsuche starten</label>
+		</languageKey>
+		
+	</data>
+</T3locallang>
