@@ -135,13 +135,13 @@ class tx_kesearch_indexer {
 					AND ((
 						tx_keyacproducts_type<>"product"
 						AND (startdat >= "'.time().'" OR enddat >= "'.time().'")
-					) OR (tx_keyacproducts_type="product" AND tx_keyacproducts_product<>""))'; 
+					) OR (tx_keyacproducts_type="product" AND tx_keyacproducts_product<>""))';
 			} else {
 				// "normal" YAC events
 				$where .= ' AND (startdat >= "'.time().'" OR enddat >= "'.time().'")';
 			}
 		}
-		
+
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
 		$resCount = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 
@@ -149,8 +149,8 @@ class tx_kesearch_indexer {
 			while ($yacRecord = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 				// prepare content for storing in index table
 				$title = strip_tags($yacRecord['title']);
-				$tags = ''; 
-				$params = '&tx_keyac_pi1[showUid]='.intval($yacRecord['uid']); 
+				$tags = '';
+				$params = '&tx_keyac_pi1[showUid]='.intval($yacRecord['uid']);
 				$abstract = str_replace('<br />', chr(13), $yacRecord['teaser']);
 				$abstract = str_replace('<br>', chr(13), $abstract);
 				$abstract = str_replace('</p>', chr(13), $abstract);
@@ -172,7 +172,7 @@ class tx_kesearch_indexer {
 
 				// add clearText Tags to content
 				if (!empty($clearTextTags)) $fullContent .= chr(13).$clearTextTags;
-				
+
 				// hook for custom modifications of the indexed data, e. g. the tags
 				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyYACIndexEntry'])) {
 					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyYACIndexEntry'] as $_classRef) {
@@ -232,13 +232,13 @@ class tx_kesearch_indexer {
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='1');
 		$anz = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 		$row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
-		
+
 		if ($clearText) {
 			return $row['title'];
 		} else {
 			return $row['tag'];
 		}
-		
+
 	}
 
 
@@ -608,10 +608,10 @@ class tx_kesearch_indexer {
 				$tagsContent .= '#'.$row2['tag'].'#';
 			}
 		}
-		
+
 		// check if rootline Tags have to be set
 		$tagsContent = $this->setRootlineTags($pid, $this->rootlineTags, $tagsContent);
-		
+
 		return $tagsContent;
 	}
 
@@ -744,8 +744,6 @@ class tx_kesearch_indexer {
 		$where .= t3lib_befunc::deleteClause('tx_dam',$inv=0);
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
 		while ($damRecord=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-			// t3lib_div::debug($damRecord['title'],1);
-
 
 			// prepare content for storing in index table
 			$title = strip_tags($damRecord['title']);
@@ -762,11 +760,32 @@ class tx_kesearch_indexer {
 			$targetPID = $indexerConfig['targetpid'];
 
 			// get tags for this record
-			$damRecordTags = t3lib_div::trimExplode(',',$damRecord['tx_kesearchdamtags_tags'], true);
-			$tags = '';
-			if (count($damRecordTags)) {
-				foreach ($damRecordTags as $key => $tagUid)  {
-					$tags .= '#'.$this->getTag($tagUid).'#';
+			// needs extension ke_search_dam_tags
+			if (t3lib_extMgm::isLoaded('ke_search_dam_tags')) {
+				$damRecordTags = t3lib_div::trimExplode(',',$damRecord['tx_kesearchdamtags_tags'], true);
+				$tags = '';
+				if (count($damRecordTags)) {
+					foreach ($damRecordTags as $key => $tagUid)  {
+						$tags .= '#'.$this->getTag($tagUid).'#';
+					}
+				}
+			} else {
+				$tags = '';
+			}
+
+			// hook for custom modifications of the indexed data, e. g. the tags
+			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyDAMIndexEntry'])) {
+				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyDAMIndexEntry'] as $_classRef) {
+					$_procObj = & t3lib_div::getUserObj($_classRef);
+					$_procObj->modifyDAMIndexEntry(
+						$title,
+						$abstract,
+						$fullContent,
+						$params,
+						$tags,
+						$damRecord,
+						$targetPID
+					);
 				}
 			}
 
