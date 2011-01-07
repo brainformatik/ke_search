@@ -34,6 +34,7 @@
 
 
 <!-- ###RESULT_LIST### start -->
+    <span id="kesearch_error"></span>
     <div id="kesearch_pagebrowser_top">###PAGEBROWSER_TOP###</div>
     <ul id="kesearch_results"><li>###MESSAGE###</li></ul>
     ###ONLOAD_IMAGE_RESULTS###

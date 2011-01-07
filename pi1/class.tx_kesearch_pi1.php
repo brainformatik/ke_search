@@ -347,6 +347,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 						$optionsCount = 0;
 						
 						// check filter availability?
+						//t3lib_div::debug($this->ffdata['checkFilterCondition'],'check');
 						if ($this->ffdata['checkFilterCondition'] != 'none') {
 							if ($this->checkIfTagMatchesRecords($row['tag'],$this->ffdata['checkFilterCondition'], $filterUid)) {
 								// process check in condition to other filters or without condition
@@ -371,7 +372,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 							}
 						} else {
 							// do not process check; show all filters
-							
 							$options[] = array(
 								'title' => $row['title'],
 								'value' => $row['tag'],
@@ -423,10 +423,13 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		
 		// loop through options 
 		if (is_array($options)) {
+			
 			foreach ($options as $key => $data) {
 				$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###ONCLICK###', $this->onclickFilter);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $data['title']);
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###VALUE###', $data['value']);
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###SELECTED###', $data['selected'] ? ' selected="selected" ' : '');
 				$optionsCount++;
 			}
 		}
@@ -572,6 +575,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		
 		// extend against-clause for multi check (in condition with other selected filters)
 		if ($mode == 'multi' && is_array($filterList)) {
+			t3lib_div::devLog('multi', $extKey, $severity=0, $dataVar=FALSE);
 			// andere filter aufrufen
 			foreach ($filterList as $key => $foreignFilterId) {
 				if ($foreignFilterId != $filterId) {
@@ -594,7 +598,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$where .= $this->cObj->enableFields($table);
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,'','',1);
 		$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields,$table,$where,'','',1);
-		if ($filterId==5)t3lib_div::devLog($query, $this->extKey, $severity=0, '');
+		if ($filterId==2)t3lib_div::devLog($query, $this->extKey, $severity=0, '');
 		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 		return $numResults;
 	}
@@ -1189,6 +1193,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$tempContent = $this->cObj->getSubpart($this->templateCode,'###RESULT_ROW###');
 			if (!empty($row['abstract'])) {
 				$teaserContent = nl2br($row['abstract']);
+				// t3lib_div::debug($teaserContent,1);
 				// highlight hits?
 				if ($this->ffdata['highlightSword'] && count($swords)) {
 					foreach ($swords as $word) {
