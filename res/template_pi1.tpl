@@ -1,11 +1,19 @@
+
+
+
+
 <!-- ###SEARCHBOX### start -->
     <form id="xajax_form_kesearch_pi1" name="xajax_form_kesearch_pi1" method="post" onsubmit="return false;">
 	<div class="searchbox">
-	    <input type="text" name="tx_kesearch_pi1[sword]" value="###SWORD_VALUE###" onkeypress="keyPressAction(event);" />
+	    <span class="headline">Suche</span><br />
+	    <input type="text" name="tx_kesearch_pi1[sword]" id="ke_search_sword" value="###SWORD_VALUE###" onkeypress="keyPressAction(event);" />
 	    <input type="image" src="typo3conf/ext/ke_search/res/img/go.gif" id="kesearch_submit" name="tx_kesearch_pi1[submit]" class="submit" value="###SUBMIT_VALUE###" onclick="document.getElementById('pagenumber').value=1; ###ONCLICK###" />
 	    <input id="pagenumber" type="hidden" name="tx_kesearch_pi1[page]" value="###HIDDEN_PAGE_VALUE###">
 	    <input id="resetFilters" type="hidden" name="tx_kesearch_pi1[resetFilters]" value="0">
 	</div>
+	
+	<!-- ###RESET### -->
+	
 	<div id="kesearch_filters">
 	    ###FILTER###
 	</div>
@@ -15,9 +23,15 @@
 		<!-- <b>###LOADING###</b> -->
 	    </center>
 	</div>
+	
+	
+	
+	<!-- <div id="testbox">--DEBUG BOX --</div> -->
+	
     </form>
     
 <!-- ###SEARCHBOX### end -->
+
 
 <!-- ###RESULT_LIST### start -->
     <div id="kesearch_pagebrowser_top">###PAGEBROWSER_TOP###</div>
@@ -90,6 +104,8 @@
 <!-- ###GENERAL_MESSAGE### end -->
 
 
+
+
 <!-- ###SUB_FILTER_SELECT### start -->
     <div>
 	<!-- <b>###FILTERTITLE###:</b><br /> -->
@@ -101,3 +117,26 @@
 	<br /><br />
     </div>
 <!-- ###SUB_FILTER_SELECT### end -->
+
+
+
+
+<!-- ###SUB_FILTER_LIST### start -->
+    <div class="list" id="list_###FILTERID###">
+	<span class="head">
+	    ###BULLET###
+	    <a href="javascript:switchArea('###FILTERID###');">###FILTERTITLE###</a>
+	</span>
+	<ul id="options_###FILTERID###" class="###LISTCSSCLASS###">
+	    <span class="###SPECIAL_CSS_CLASS###">
+		<!-- ###SUB_FILTER_LIST_OPTION### start -->
+		<li class="###OPTIONCSSCLASS###" onclick="###ONCLICK###">###TITLE###</li>
+		<!-- ###SUB_FILTER_LIST_OPTION### end -->
+	    </span>
+	    <span class="resetlink" onclick="document.getElementById('###FILTERID###').value=''; ###ONCLICK_RESET###">Filter zur&uuml;cksetzen</span>
+	</ul>
+	
+	<input type="hidden" name="###FILTERNAME###" id="###FILTERID###" value="###VALUE###">
+	
+    </div>
+<!-- ###SUB_FILTER_LIST### end -->

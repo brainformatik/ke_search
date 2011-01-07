@@ -1,10 +1,11 @@
 <?php
 if (!defined ('TYPO3_MODE')) 	die ('Access denied.');
 
+$TCA['tx_kesearch_filters']['ctrl']['requestUpdate'] = 'rendertype';
 $TCA['tx_kesearch_filters'] = array (
 	'ctrl' => $TCA['tx_kesearch_filters']['ctrl'],
 	'interface' => array (
-		'showRecordFieldList' => 'hidden,title,options'
+		'showRecordFieldList' => 'hidden,title,options,rendertype'
 	),
 	'feInterface' => $TCA['tx_kesearch_filters']['feInterface'],
 	'columns' => array (
@@ -24,21 +25,62 @@ $TCA['tx_kesearch_filters'] = array (
 				'size' => '30',
 			)
 		),
+		'rendertype' => array (
+			'exclude' => 0,
+			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.rendertype',
+			'config' => array (
+				'type' => 'select',
+				'items' => array (
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.rendertype.I.0', 'select'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.rendertype.I.1', 'list'),
+				),
+				'size' => 1,
+				'maxitems' => 1,
+			)
+		),
+		
+		'cssclass' => array (
+			'displayCond' => 'FIELD:rendertype:=:list',
+			'exclude' => 0,
+			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.cssclass',
+			'config' => array (
+				'type' => 'select',
+				'items' => array (
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.cssclass.I.0', ''),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.cssclass.I.1', 'small'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.cssclass.I.2', 'larger'),
+				),
+				'size' => 1,
+				'maxitems' => 1,
+			)
+		),
+		
+		'expandbydefault' => array (
+			'exclude' => 0,
+			'displayCond' => 'FIELD:rendertype:=:list',
+			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.expandbydefault',
+			'config' => array (
+				'type'    => 'check',
+				'default' => '0'
+			)
+		),
 		'options' => array (
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.options',
 			'config' => Array(
 				'type' => 'inline',
 				'foreign_table' => 'tx_kesearch_filteroptions',
+				'foreign_sortby' => 'sorting',
 				'maxitems' => 100,
 				'appearance' => Array(
 					'collapseAll' => 0,
 					'expandSingle' => 0,
+					'useSortable' => 1,
 				),
 			),
 		),
 	),
 	'types' => array (
-		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, options;;;;3-3-3')
+		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, expandbydefault, cssclass, options;;;;4-4-4')
 	),
 	'palettes' => array (
 		'1' => array('showitem' => '')
@@ -90,6 +132,7 @@ $TCA['tx_kesearch_filteroptions'] = array (
 				'maxitems' => 1,
 			)
 		),
+
 	),
 	'types' => array (
 		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, tag;;;;3-3-3, automated_tagging;;;;4-4-4')
@@ -267,6 +310,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'storagepid' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.storagepid',
+			// 'displayCond' => 'FIELD:type:!=:xtypocommerce',
 			'config' => array (
 				'type' => 'group',
 				'internal_type' => 'db',
@@ -277,7 +321,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 			)
 		),
 		'targetpid' => array (
-			'displayCond' => 'FIELD:type:IN:ke_yac,ttnews,dam',
+			'displayCond' => 'FIELD:type:IN:ke_yac,ttnews,dam,xtypocommerce',
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.targetpid',
 			'config' => array (
@@ -299,6 +343,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.1', 'ke_yac', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_1.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.2', 'ttnews', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_2.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.3', 'dam', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_3.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.4', 'xtypocommerce', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_4.gif'),
 				),
 				'size' => 1,
 				'maxitems' => 1,

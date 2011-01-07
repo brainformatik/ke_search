@@ -88,6 +88,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 						document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
 						document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
 						document.getElementById(\'kesearch_query_time\').style.display=\'none\';
+						document.getElementById(\'pagenumber\').value="1";
 					}
 					
 					function refreshFiltersOnly() {
@@ -190,7 +191,18 @@ class tx_kesearch_pi1 extends tslib_pibase {
 							'.$this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
 							submitAction();}';
 			}
+			
 			$jsContent .= '
+					}
+					
+					function switchArea(objid) {
+						if (document.getElementById(\'options_\' + objid).className == \'expanded\') {
+							document.getElementById(\'options_\' + objid).className = \'closed\';
+							document.getElementById(\'bullet_\' + objid).src=\''.t3lib_extMgm::siteRelPath($this->extKey).'res/img/list-head-closed.gif\';
+						} else {
+							document.getElementById(\'options_\' + objid).className = \'expanded\';
+							document.getElementById(\'bullet_\' + objid).src=\''.t3lib_extMgm::siteRelPath($this->extKey).'res/img/list-head-expanded.gif\';
+						}
 					}
 				</script>';
 			
@@ -219,7 +231,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				$this->onclickFilter = $this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); refreshFiltersOnly(); ';
 			}
 		} else {
-			$this->onclickFilter = $this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); submitAction(); ';
+			$this->onclickFilter = 'submitAction(); '.$this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));  ';
 		}
 		
 		$this->onclickPagebrowser = $this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); pagebrowserAction(); ';
@@ -255,7 +267,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				$content = $this->cObj->substituteMarker($content,'###QUERY_TIME###', '');
 				// onload image for reloading results by ajax
 				$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
-				$onloadImageResults = '<img src="'.$onloadSrc.'?ts='.time().'" onload="onloadResults();" alt="" /> ';
+				$onloadImageResults = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadResults();" alt="" /> ';
 				$content = $this->cObj->substituteMarker($content,'###ONLOAD_IMAGE_RESULTS###', $onloadImageResults);
 				
 				break;
@@ -288,8 +300,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$content = $this->cObj->substituteMarker($content,'###FILTER###',$this->renderFilters());
 		
 		// get reset button
-		$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/reset.gif';
-		$resetButton=$this->cObj->IMAGE($imageConf);
+		// $imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/reset.gif';
+		// $resetButton=$this->cObj->IMAGE($imageConf);
 		// $resetLink = '<div onclick="resetSearchboxAndFilters();" class="resetButton"><span>&nbsp;</span>'.$resetButton.'</div>';
 		$resetLink = '<div onclick="resetSearchboxAndFilters();" class="resetButton"><span>'.$this->pi_getLL('reset_button').'</span>'.$resetButton.'</div>';
 		
@@ -308,144 +320,256 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// get filters from db
 		$this->filters = $this->getFilters();
-
+		//t3lib_div::debug($this->filters,1);
+		
 		if (!empty($this->ffdata['filters'])) {
 			$filterList = explode(',',$this->ffdata['filters']);
 
-			foreach ($filterList as $key => $uid) {
-
-				// reset options content
-				$optionsContent = '';
-
-				// add standard option "all"
-				$optionsContent .= $this->cObj->getSubpart($this->templateCode,'###SUB_FILTER_SELECT_OPTION###');
-				// $optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $this->pi_getLL('all_options'));
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $this->filters[$uid]['title']);
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###VALUE###', '');
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###SELECTED###','');
+			foreach ($filterList as $key => $filterUid) {
 				
-				if (!empty($this->filters[$uid]['options'])) {
+				unset($options);
+				
+				// current filter hast options
+				if (!empty($this->filters[$filterUid]['options'])) {
+					
 					// get filter options
 					$fields = '*';
 					$table = 'tx_kesearch_filteroptions';
-					$where = 'uid in ('.$this->filters[$uid]['options'].')';
+					$where = 'uid in ('.$this->filters[$filterUid]['options'].')';
 					$where .= ' AND pid in ('.$this->pids.')';
 					$where .= $this->cObj->enableFields($table);
-					$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='title',$limit='');
-					// loop through filteroptions
-					$optionsCount = 0;
+					$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='sorting',$limit='');
 					
+					// loop through filteroptions
 					while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-	
+						
+						// reset options count
+						$optionsCount = 0;
+						
 						// check filter availability?
 						if ($this->ffdata['checkFilterCondition'] != 'none') {
-							if ($this->checkIfTagMatchesRecords($row['tag'],$this->ffdata['checkFilterCondition'], $uid)) {
+							if ($this->checkIfTagMatchesRecords($row['tag'],$this->ffdata['checkFilterCondition'], $filterUid)) {
 								// process check in condition to other filters or without condition
 								
-								// build filter option
-								$optionsContent .= $this->cObj->getSubpart($this->templateCode,'###SUB_FILTER_SELECT_OPTION###');
-								$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $row['title']);
-								$optionsContent = $this->cObj->substituteMarker($optionsContent,'###VALUE###', $row['tag']);
-	
 								// selected / preselected?
-								$selected = '';
-								if ($this->piVars['filter'][$uid] == $row['tag']) {
-									$selected = 'selected="selected" ';
+								$selected = 0;
+								if ($this->piVars['filter'][$filterUid] == $row['tag']) {
+									$selected = 1;
 								}
-								// else if (!isset($this->piVars['filter'][$uid]) && $this->ffdata['resetFiltersOnSubmit']) {
-								else if (!isset($this->piVars['filter'][$uid])) {
+								else if (!isset($this->piVars['filter'][$filterUid])) {
 									if (is_array($this->preselectedFilter) && in_array($row['tag'], $this->preselectedFilter)) {
-										$selected = 'selected="selected" ';
-										$this->piVars['filter'][$uid] = $row['tag'];
+										$selected = 1;
+										$this->piVars['filter'][$filterUid] = $row['tag'];
 									}
 								}
-								else $selected = '';
-	
-								$optionsContent = $this->cObj->substituteMarker($optionsContent,'###SELECTED###',$selected);
+								$options[] = array(
+									'title' => $row['title'],
+									'value' => $row['tag'],
+									'selected' => $selected,
+								);
 								$optionsCount++;
 							}
 						} else {
 							// do not process check; show all filters
-							$optionsContent .= $this->cObj->getSubpart($this->templateCode,'###SUB_FILTER_SELECT_OPTION###');
-							$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $row['title']);
-							$optionsContent = $this->cObj->substituteMarker($optionsContent,'###VALUE###', $row['tag']);
-							$selected = $this->piVars['filter'][$uid] == $row['tag'] ? 'selected="selected"' : '';
-							$optionsContent = $this->cObj->substituteMarker($optionsContent,'###SELECTED###',$selected);
+							
+							$options[] = array(
+								'title' => $row['title'],
+								'value' => $row['tag'],
+								'selected' => $selected,
+							);
 							$optionsCount++;
 						}
-					}	
-				}
-				
-				// modify filter options by hook
-				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'])) {
-					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'] as $_classRef) {
-						$_procObj = & t3lib_div::getUserObj($_classRef);
-						$optionsContent .= $_procObj->modifyFilterOptions(
-							$uid,
-							$optionsContent,
-							$optionsCount,
-							$this
-						);
 					}
+					// t3lib_div::debug($options,1);
+					
 				}
-
-				// get subpart
-				$filterContent .= $this->cObj->getSubpart($this->templateCode,'###SUB_FILTER_SELECT###');
-
-				// set disabled if no options but "all"
-				if (!$optionsCount) {
-					// add empty element with special text and "disabled" mode if no options but "all"
-					$optionsContent = $this->cObj->getSubpart($this->templateCode,'###SUB_FILTER_SELECT_OPTION###');
-					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $this->pi_getLL('no_options'));
-					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###VALUE###', '');
-					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###SELECTED###','');
+				// get subparts corresponding to render type
+				switch ($this->filters[$filterUid]['rendertype']) {
+					
+					case 'select':
+					default:
+						$filterContent .= $this->renderSelect($filterUid, $options);
+						break;
+					
+					case 'list':
+						$filterContent .= $this->renderList($filterUid, $options);
+						break;
 				}
-				
-				// fill markers
-				$filterContent = $this->cObj->substituteSubpart ($filterContent, '###SUB_FILTER_SELECT_OPTION###', $optionsContent, $recursive=1);
-				$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $this->filters[$uid]['title']);
-				$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERNAME###', 'tx_kesearch_pi1[filter]['.$uid.']');
-				$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERID###', 'filter['.$uid.']');
-				$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCHANGE###', $this->onclickFilter);
-				$filterContent = $this->cObj->substituteMarker($filterContent,'###DISABLED###', $optionsCount > 0 ? '' : ' disabled="disabled" ');
 			}
-
 		}
 		return $filterContent;
-		//.'<br /><br /><br />'.t3lib_div::view_array($this->piVars);
 	}
 
 
-
+	
+	/*
+	 * function renderSelect
+	 * @param $arg
+	 */
+	function renderSelect($filterUid, $options) {
+		
+		// t3lib_div::debug($filterUid,1);
+		// t3lib_div::debug($options,'select');
+		
+		$filterSubpart = '###SUB_FILTER_SELECT###';
+		$optionSubpart = '###SUB_FILTER_SELECT_OPTION###';
+		
+		// add standard option "all"
+		$optionsContent .= $this->cObj->getSubpart($this->templateCode,$optionSubpart);
+		// $optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $this->pi_getLL('all_options'));
+		$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $this->filters[$filterUid]['title']);
+		$optionsContent = $this->cObj->substituteMarker($optionsContent,'###VALUE###', '');
+		$optionsContent = $this->cObj->substituteMarker($optionsContent,'###SELECTED###','');
+		
+		// loop through options 
+		if (is_array($options)) {
+			foreach ($options as $key => $data) {
+				$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###ONCLICK###', $this->onclickFilter);
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $data['title']);
+				$optionsCount++;
+			}
+		}
+		
+		
+		// modify filter options by hook
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$optionsContent .= $_procObj->modifyFilterOptions(
+					$filterUid,
+					$optionsContent,
+					$optionsCount,
+					$this
+				);
+			}
+		}
+		
+		
+		// fill markers
+		$filterContent = $this->cObj->getSubpart($this->templateCode, $filterSubpart);
+		$filterContent = $this->cObj->substituteSubpart ($filterContent, $optionSubpart, $optionsContent, $recursive=1);
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $this->filters[$filterUid]['title']);
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERNAME###', 'tx_kesearch_pi1[filter]['.$filterUid.']');
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERID###', 'filter['.$filterUid.']');
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCHANGE###', $this->onclickFilter);
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###DISABLED###', $optionsCount > 0 ? '' : ' disabled="disabled" ');
+		
+		
+		return $filterContent;
+		
+		
+	}
+	
+	
+	/*
+	 * function renderList
+	 * @param $arg
+	 */
+	function renderList($filterUid, $options) {
+		
+		$filterSubpart = '###SUB_FILTER_LIST###';
+		$optionSubpart = '###SUB_FILTER_LIST_OPTION###';
+		
+		$optionsCount = 0;
+		
+		// loop through options
+		if (is_array($options)) {
+			foreach ($options as $key => $data) {
+				
+				$onclick = 'document.getElementById(\'filter['.$filterUid.']\').value=\''.$data['value'].'\'; ';
+				$onclick .= $this->onclickFilter;
+				
+				$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###ONCLICK###', $onclick);
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $data['title']);
+				$cssClass = 'option ';
+				$cssClass .= $data['selected'] ? 'selected' : '';
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONCSSCLASS###', $cssClass);
+				
+				$optionsCount++;
+				
+			}
+		}
+		
+		// modify filter options by hook
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$optionsContent .= $_procObj->modifyFilterOptions(
+					$filterUid,
+					$optionsContent,
+					$optionsCount,
+					$this
+				);
+			}
+		}
+		
+		// fill markers
+		$filterContent = $this->cObj->getSubpart($this->templateCode, $filterSubpart);
+		$filterContent = $this->cObj->substituteSubpart ($filterContent, $optionSubpart, $optionsContent);
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', utf8_encode($this->filters[$filterUid]['title']));
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERNAME###', 'tx_kesearch_pi1[filter]['.$filterUid.']');
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERID###', 'filter['.$filterUid.']');
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCHANGE###', $this->onclickFilter);
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCLICK_RESET###', $this->onclickFilter);
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###DISABLED###', $optionsCount > 0 ? '' : ' disabled="disabled" ');
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###VALUE###', $this->piVars['filter'][$filterUid]);
+		
+		// bullet
+		unset($imageConf);
+		$bulletSrc = $this->filters[$filterUid]['expandbydefault'] ? 'list-head-expanded.gif' : 'list-head-closed.gif';
+		$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/'.$bulletSrc;
+		$imageConf['params'] = 'class="bullet" id="bullet_filter['.$filterUid.']" ';
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###BULLET###', $this->cObj->IMAGE($imageConf));
+		
+		// expand by default ?
+		$class = $this->filters[$filterUid]['expandbydefault'] || !empty($this->piVars['filter'][$filterUid]) ? 'expanded' : 'closed';
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###LISTCSSCLASS###', $class);
+		
+		// special css class (outer options list for scrollbox)
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###SPECIAL_CSS_CLASS###', $this->filters[$filterUid]['cssclass'] ? $this->filters[$filterUid]['cssclass'] : '');
+		
+		return $filterContent;
+		
+	}
+	
+	
+	
 
 	/*
 	 * function checkIfFilterMatchesRecords
 	 */
 	function checkIfTagMatchesRecords($tag, $mode='multi', $filterId) {
-
+		
 		// prepare searchword for query
 		$sword = $this->removeXSS($this->piVars['sword']);
+		// replace plus and minus chars
+		$sword = str_replace('-', ' ', $sword);
+		$sword = str_replace('+', ' ', $sword);
 		// split several words
 		$swords = t3lib_div::trimExplode(' ', $sword, true);
-
+		
 		// build words searchphrase
-		$against = '';
 		$againstBoolean = '';
 		// build against clause for all searchwords
 		if (count($swords)) {
-			foreach ($swords as $word) {
-				$against .=  $word.' ';
-				$againstBoolean .= '+*'.$word.'* ';
+			foreach ($swords as $key => $word) {
+				// ignore words under length of 4 chars
+				if (strlen($word) > 3) {
+					$againstBoolean .= '+*'.utf8_decode($word).'* ';
+				} else {
+					unset ($swords[$key]);
+				}
 			}
-			$against = trim($against);
-			$againstBoolean = trim($againstBoolean);
 		}
-
+		// if ($filterId == 4 && $tag=="language_deutsch" ) $this->debugMail($swords);
 		$filterList = explode(',', $this->ffdata['filters']);
-
+		
 		// against-clause for single check (not in condition with other selected filters)
-		$againstClause = ' +"#'.$tag.'#" ';
-
+		// $against = ' +"#'.$tag.'#" ';
+		$againstBoolean .= ' +"#'.$tag.'#" ';
+		
 		// extend against-clause for multi check (in condition with other selected filters)
 		if ($mode == 'multi' && is_array($filterList)) {
 			// andere filter aufrufen
@@ -453,21 +577,26 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				if ($foreignFilterId != $filterId) {
 					// filter wurde gewählt
 					if (!empty($this->piVars['filter'][$foreignFilterId])) {
-						$againstClause .= ' +"#'.$this->piVars['filter'][$foreignFilterId].'#" ';
+						$againstBoolean .= ' +"#'.$this->piVars['filter'][$foreignFilterId].'#" ';
+						$tags = true;
 					}
 				}
 			}
 		}
-
+		
+		// set cols for query
+		$againstCols = (count($swords) ? 'content,tags' : 'tags');
+		
 		// build query
 		$fields = 'uid';
 		$table = 'tx_kesearch_index';
-		$where = ' MATCH(tags) AGAINST (\''.$againstClause.'\' IN BOOLEAN MODE) ';
-		if (count($swords)) $where .= ' AND MATCH(content) AGAINST (\''.$againstBoolean.'\' IN BOOLEAN MODE)';
+		$where = ' MATCH('.$againstCols.') AGAINST (\''.$againstBoolean.'\' IN BOOLEAN MODE) ';
 		$where .= $this->cObj->enableFields($table);
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,'','',1);
-		$anz = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-		return $anz;
+		$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields,$table,$where,'','',1);
+		if ($filterId==5)t3lib_div::devLog($query, $this->extKey, $severity=0, '');
+		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
+		return $numResults;
 	}
 
 
@@ -476,7 +605,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 */
 	function getFilters() {
 		if (!empty($this->ffdata['filters'])) {
-			$fields = 'uid,title,options';
+			$fields = '*';
 			$table = 'tx_kesearch_filters';
 			$where = 'pid in ('.$this->pids.')';
 			$where .= 'AND uid in ('.$this->ffdata['filters'].')';
@@ -576,7 +705,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				$this->onclickFilter = $this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); refreshFiltersOnly(); ';
 			}
 		} else {
-			$this->onclickFilter = $this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); submitAction(); ';
+			$this->onclickFilter = 'submitAction(); '.$this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));  ';
 		}
 		
 		/*
@@ -653,7 +782,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				$this->onclickFilter = $this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); refreshFiltersOnly(); ';
 			}
 		} else {
-			$this->onclickFilter = $this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); submitAction(); ';
+			$this->onclickFilter = 'submitAction(); '.$this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));  ';
 		}
 		
 		$this->onclickPagebrowser = $this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); pagebrowserAction(); ';
@@ -664,25 +793,14 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// reset filters?
 		if ($this->piVars['resetFilters'] && is_array($this->piVars['filter'])) {
 			foreach ($this->piVars['filter'] as $key => $value) {
-				//$testcontent .= '<p>'.$key.': '.$value; 
 				// do not reset the preselected filters
-				
 				if ($this->preselectedFilter[$key]) {
-					//$testcontent .= ' : '.$this->preselectedFilter[$key].'</p>';
 					$this->piVars['filter'][$key] = $this->preselectedFilter[$key];
 				}
-				/*
-				if ((is_array($this->preselectedFilter) && in_array($value, $this->preselectedFilter))) {
-					// do not reset filter
-					$this->piVars['filter'][$key] = $value;
-				}
-				*/
 				else {
-					// reset filter value to 'all'
 					$this->piVars['filter'][$key] = '';
 				}
 			}
-			//$testcontent .= t3lib_div::view_array($this->preselectedFilter);
 		}
 
 		// make xajax response object
@@ -692,7 +810,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$this->numberOfResults = $this->getSearchResults(true);
 
 		// set pagebrowser
-		
 		if ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) {
 			if ($this->ffdata['pagebrowserOnTop'] || $this->ffdata['pagebrowserAtBottom']) {
 				$pagebrowserContent = $this->renderPagebrowser();
@@ -727,15 +844,31 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$queryTime = $endMS - $startMS;
 			$objResponse->addAssign("kesearch_query_time", "innerHTML", sprintf($this->pi_getLL('query_time'), $queryTime));
 		}
-
+		
+		// Show error message
+			if ($this->showShortMessage) {
+				$errorMessage = $this->cObj->getSubpart($this->templateCode,'###GENERAL_MESSAGE###');
+				// attention icon
+				unset($imageConf);
+				$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/attention.gif';
+				$imageConf['altText'] = $this->pi_getLL('searchword_length_error');
+				$errorMessage = $this->cObj->substituteMarker($errorMessage,'###IMAGE###', $this->cObj->IMAGE($imageConf));
+				$errorMessage = $this->cObj->substituteMarker($errorMessage,'###MESSAGE###', $this->pi_getLL('searchword_length_error'));
+				$objResponse->addAssign("kesearch_error", "innerHTML", utf8_encode($errorMessage));
+			} else {
+				$objResponse->addAssign("kesearch_error", "innerHTML", '');
+			}
+		
+		/*
 		// fill testbox
 		$objResponse->addAssign(
 			"testbox",
 			"innerHTML",
 			t3lib_div::view_array($this->piVars).'<br /><br />'
-			.'<b>preselect</b><br />'.t3lib_div::view_array($this->preselectedFilter)
+			// .'<b>preselect</b><br />'.t3lib_div::view_array($this->preselectedFilter)
 		);
-
+		*/
+		
 		// return response xml
 		return $objResponse->getXML();
 
@@ -780,7 +913,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				$this->onclickFilter = $this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); refreshFiltersOnly(); ';
 			}
 		} else {
-			$this->onclickFilter = $this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); submitAction(); ';
+			$this->onclickFilter = 'submitAction(); '.$this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));';
 		}
 
 		
@@ -840,8 +973,10 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			foreach ($this->piVars['filter'] as $key => $tag)  {
 				if (!empty($tag)) 	$against .= ' +"#'.$tag.'#" ';
 			}
-			if (!empty($against)) $tagWhere = ' AND MATCH (tags) AGAINST (\''.$against.'\' IN BOOLEAN MODE)';
-			return $tagWhere;
+			// if (!empty($against)) $tagWhere = ' AND MATCH (content,tags) AGAINST (\''.$against.'\' IN BOOLEAN MODE)';
+			// return $tagWhere;
+			
+			return $against;
 		}
 	}
 
@@ -854,6 +989,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// prepare searchword for query
 		$sword = $this->removeXSS($this->piVars['sword']);
+		// replace plus and minus chars
+		$sword = str_replace('-', ' ', $sword);
+		$sword = str_replace('+', ' ', $sword);
 		// split several words
 		$swords = t3lib_div::trimExplode(' ', $sword, true);
 		
@@ -863,8 +1001,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		}
 
 		// build tag searchphrase
-		$tagWhere = $this->buildTagSearchphrase();
-		
+		$whereAgainst = '';
+		$whereAgainst .= $this->buildTagSearchphrase();
+		$tags = !empty($whereAgainst) ? true : false;
 		
 		// calculate limit (not if num or max score is requested)
 		if ($numOnly || $maxScore) {
@@ -879,48 +1018,50 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		}
 
 		// build words searchphrase
-		$against = '';
-		$againstBoolean = '';
+		$scoreAgainst = '';
 		// build against clause for all searchwords
 		if (count($swords)) {
-			foreach ($swords as $word) {
-				$against .=  $word.' ';
-				$againstBoolean .= '+*'.$word.'* ';
+			foreach ($swords as $key => $word) {
+				// ignore words under length of 4 chars
+				if (strlen($word) > 3) {
+					$scoreAgainst .= utf8_decode($word);
+					$whereAgainst .= '+*'.utf8_decode($word).'* ';
+				} else {
+					unset ($swords[$key]);
+					$this->showShortMessage = true;
+				}
 			}
-			$against = trim($against);
-			$againstBoolean = trim($againstBoolean);
 		}
-
-
-		// get max score only
+		
+		// get max score only (searchword entered)
 		if ($maxScore && count($swords)) {
 			
 			// Generate query for determing the max score
 			// ----------------------------------------------------------
 			// EXAMPLE:
-			// SELECT MAX(MATCH (content) AGAINST ('kind hygiene')) AS maxscore FROM tx_kesearch_index
-			// WHERE MATCH (content) against ('+kind +hygiene' IN BOOLEAN MODE)
+			// SELECT *, MAX(MATCH (content) AGAINST ('+major')) as score FROM tx_kesearch_index
+			// WHERE MATCH (content,tags) AGAINST ('+major +"#category_117#" +"#country_97#"' IN BOOLEAN MODE)
 			
-			$fields = 'MAX(MATCH (content) AGAINST (\''.$against.'\')) AS maxscore';
+			$fields = 'MAX(MATCH (content) AGAINST (\''.$scoreAgainst.'\')) AS maxscore';
 			$table = 'tx_kesearch_index';
-			$where .= 'MATCH (content) AGAINST (\''.$againstBoolean.'\' IN BOOLEAN MODE)';
-			$where .= ' AND pid in ('.$this->pids.') ';
 			
-			// add filter searchphrase
-			if (!empty($tagWhere)) $where .= $tagWhere;
+			$where .= 'MATCH (content,tags) AGAINST (\''.$whereAgainst.'\' IN BOOLEAN MODE)';
+			$where .= ' AND pid in ('.$this->pids.') ';
 			
 			// add "tagged content only" searchphrase
 			if ($this->ffdata['showTaggedContentOnly']) $where .= $taggedOnlyWhere;
 			
+			// add enable fields
 			$where .= $this->cObj->enableFields($table);
+			
+			// process query
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit);
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit);
-			
-			// return $GLOBALS['TYPO3_DB']->SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit);
 			$row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 			
+			// return maximum score
 			return $row['maxscore'];
-		
+			
 		} else if ($maxScore) {
 			
 			// if there is no sword: set max score to 0
@@ -931,33 +1072,37 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// Generate query for matching content
 		// ----------------------------------------------------------
 		// EXAMPLE:
-		// SELECT title,content,tags,MATCH (content) AGAINST ('kind hygiene') AS score FROM tx_kesearch_index
-		// WHERE MATCH (content) against ('+kind +hygiene' IN BOOLEAN MODE) ORDER BY score DESC
+		// SELECT * , MATCH (content) AGAINST ('major') AS score FROM tx_kesearch_index
+		// WHERE MATCH (content, tags) AGAINST ('+major +"#category_117#" +"#country_97#" 'IN BOOLEAN MODE)
+		// AND pid IN ( 1139 ) order by score desc
 		
-		$fields = 'targetpid,title,content,tags,params,type,abstract';
+		$fields = '*';
 		
 		// add score if searchword was entered
-		if (count($swords)) $fields .= ',MATCH (content) AGAINST (\''.$against.'\') AS score ';
+		if (count($swords)) $fields .= ',MATCH (content) AGAINST (\''.$scoreAgainst.'\') AS score ';
 		
 		$table = 'tx_kesearch_index';
 		
-		// add boolean where clause for all searchwords
-		if (count($swords)) $where = 'MATCH (content) AGAINST (\''.$againstBoolean.'\' IN BOOLEAN MODE) ';
-		else $where = '1=1 ';
+		// add boolean where clause for all searchwords and/or tags
+		if (!empty($whereAgainst)) {
+			$againstCols = (count($swords) && $tags) ? 'content,tags' : ($tags ? 'tags' : 'content');
+			$where = 'MATCH ('.$againstCols.') AGAINST (\''.$whereAgainst.'\' IN BOOLEAN MODE) ';
+		} else $where = '1=1 ';
 		
+		// restrict to storage page
 		$where .= ' AND pid in ('.$this->pids.') ';
-		
-		// add filter searchphrase
-		if (!empty($tagWhere)) $where .= $tagWhere;
 		
 		// add "tagged content only" searchphrase
 		if ($this->ffdata['showTaggedContentOnly']) $where .= $taggedOnlyWhere;
 		
+		// add enable fields
 		$where .= $this->cObj->enableFields($table);
 		
+		// add sorting if score was calculated
 		if (count($swords)) $orderBy = 'score DESC';
 		else $orderBy = 'uid ASC';
 		
+		// process query
 		$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields,$table,$where,$groupBy='',$orderBy,$limit);
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy,$limit);
 		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
@@ -968,19 +1113,18 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		}
 		else if ($numResults == 0) {
 			
+			// no results found
 			$content = $this->cObj->getSubpart($this->templateCode,'###GENERAL_MESSAGE###');
 			
-			// check if searchword lengts are less then 3 chars
-			/*
-			foreach ($swords as $word) {
-				if (strlen($word) < 4) {
-					// too short searchword
-					$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->pi_getLL('searchword_length_error','wort zu kurz'));
-					return $content;
-				}
+			// check if searchwords were too short 
+			if (!empty($this->piVars['sword']) && !count($swords)) {
+				$content = $this->cObj->substituteMarker($content,'###MESSAGE###', utf8_encode($this->pi_getLL('searchword_length_error')));
 			}
-			*/
+			
+			// $this->debugMail('keine ergebnisse gefunden<br /><br />'.$query);
+			$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->pi_getLL('no_results_found'));
 
+			/*
 			// check if empty result list is caused by 50%-rule of MySQL MATCH() AGAINST() query
 			if (!count($swords) || $this->checkIfFiftyPercentRuleFits($swords) == false) {
 				// 50% rule does not fit
@@ -989,6 +1133,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				// 50% rule fits
 				$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->pi_getLL('no_results_refine'));
 			}
+			*/
 
 			// attention icon
 			unset($imageConf);
@@ -1025,6 +1170,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$linktext = $row['title'];
 			$linktext = strip_tags($linktext);
 			$linktext = $this->removeXSS($linktext);
+			$linktext = htmlentities($linktext);
 			
 			// highlight hits in result title?
 			if ($this->ffdata['highlightSword'] && count($swords)) {
@@ -1032,6 +1178,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					$linktext = preg_replace('/('.$word.')/iu','<span class="hit">\0</span>',$linktext);
 				}
 			}
+			
 			
 			$resultLink = $this->cObj->typoLink($linktext,$linkconf);
 			$resultUrl = t3lib_div::getIndpEnv('TYPO3_SITE_URL').$this->cObj->typoLink_URL($linkconf);
@@ -1126,6 +1273,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			// show tags?
 			if ($this->ffdata['showTags']) {
 				$tags = $row['tags'];
+				$tags = str_replace('#', ' ', $tags);
 				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_TAGS###');
 				$subContent = $this->cObj->substituteMarker($subContent,'###LABEL_TAGS###', $this->pi_getLL('label_tags'));
 				$subContent = $this->cObj->substituteMarker($subContent,'###TAGS###', $tags);
@@ -1153,8 +1301,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			}
 			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_TYPE_ICON###', $subContent, $recursive=1);
 
-
-
 			// add temp content to result list
 			$content .= $tempContent;
 			// $content .= t3lib_div::view_array($row);
@@ -1166,7 +1312,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// add onload image
 		$content .= $this->onloadImage;
 
-		return $content;
+		return utf8_encode($content);
 	}
 
 
@@ -1518,8 +1664,25 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		return $image;
 	}
 
-
-
+	
+	
+	/**
+	* Description: Function for mailing a var(including an Array)
+	*/
+	function debugMail($content='', $subject = 'TYPO3 Debug Mail', $mailto='kiefer@kennziffer.com') {
+		if (is_array($content)) {
+			$content = t3lib_div::view_array($content);
+		}
+		if (is_object($content)) {
+			$content = var_export($content,true);
+		}
+		
+		$header = "MIME-Version: 1.0".chr(10);
+		$header .= "Content-type: text/html; charset=utf-8".chr(10);
+		$header .= "From: KENNZIFFER DEBUG <debug@kennziffer.com>".chr(10);
+		mail($mailto,$subject,$content,$header);
+	}
+	
 
 }
 

@@ -20,6 +20,9 @@ CREATE TABLE tx_kesearch_filters (
 	hidden tinyint(4) DEFAULT '0' NOT NULL,
 	title tinytext,
 	options tinytext,
+	rendertype varchar(90) DEFAULT '' NOT NULL,
+	expandbydefault tinyint(1) DEFAULT '0' NOT NULL,
+	cssclass varchar(90) DEFAULT '' NOT NULL,
 
 	PRIMARY KEY (uid),
 	KEY parent (pid)
@@ -41,6 +44,7 @@ CREATE TABLE tx_kesearch_filteroptions (
 	title tinytext,
 	tag tinytext,
 	automated_tagging text,
+	sorting int(11) DEFAULT '0' NOT NULL,
 	PRIMARY KEY (uid),
 	KEY parent (pid)
 );
@@ -68,8 +72,10 @@ CREATE TABLE tx_kesearch_index (
 	title tinytext,
 	language int(11) DEFAULT '0' NOT NULL,
 	
-	FULLTEXT INDEX content (content),
-	FULLTEXT INDEX tags (tags),
+	FULLTEXT INDEX contentandtags (content,tags),
+	FULLTEXT INDEX tagsonly (tags),
+	FULLTEXT INDEX contentonly (content),
+	
 	PRIMARY KEY (uid),
 	KEY parent (pid)
 );

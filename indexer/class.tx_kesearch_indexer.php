@@ -92,9 +92,15 @@ class tx_kesearch_indexer {
 					$content .= $this->showTime($indexerConfig);
 					break;
 
-				// indexer for ke_downloadshop records (extended dam records)
+				// indexer for dam records (ke_downloadshop)
 				case 'dam':
 					$content .= $this->indexDAMRecords($indexerConfig);
+					$content .= $this->showTime($indexerConfig);
+					break;
+				
+				// indexer for xtypocommerce products
+				case 'xtypocommerce':
+					$content .= $this->indexXTYPOCommerceRecords($indexerConfig);
 					$content .= $this->showTime($indexerConfig);
 					break;
 
@@ -135,13 +141,13 @@ class tx_kesearch_indexer {
 					AND ((
 						tx_keyacproducts_type<>"product"
 						AND (startdat >= "'.time().'" OR enddat >= "'.time().'")
-					) OR (tx_keyacproducts_type="product" AND tx_keyacproducts_product<>""))';
+					) OR (tx_keyacproducts_type="product" AND tx_keyacproducts_product<>""))'; 
 			} else {
 				// "normal" YAC events
 				$where .= ' AND (startdat >= "'.time().'" OR enddat >= "'.time().'")';
 			}
 		}
-
+		
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
 		$resCount = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 
@@ -149,8 +155,8 @@ class tx_kesearch_indexer {
 			while ($yacRecord = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 				// prepare content for storing in index table
 				$title = strip_tags($yacRecord['title']);
-				$tags = '';
-				$params = '&tx_keyac_pi1[showUid]='.intval($yacRecord['uid']);
+				$tags = ''; 
+				$params = '&tx_keyac_pi1[showUid]='.intval($yacRecord['uid']); 
 				$abstract = str_replace('<br />', chr(13), $yacRecord['teaser']);
 				$abstract = str_replace('<br>', chr(13), $abstract);
 				$abstract = str_replace('</p>', chr(13), $abstract);
@@ -172,7 +178,7 @@ class tx_kesearch_indexer {
 
 				// add clearText Tags to content
 				if (!empty($clearTextTags)) $fullContent .= chr(13).$clearTextTags;
-
+				
 				// hook for custom modifications of the indexed data, e. g. the tags
 				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyYACIndexEntry'])) {
 					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyYACIndexEntry'] as $_classRef) {
@@ -232,13 +238,13 @@ class tx_kesearch_indexer {
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='1');
 		$anz = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 		$row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
-
+		
 		if ($clearText) {
 			return $row['title'];
 		} else {
 			return $row['tag'];
 		}
-
+		
 	}
 
 
@@ -331,7 +337,17 @@ class tx_kesearch_indexer {
 		// calculate duration of indexing process
 		$endMicrotime = microtime(true);
 		$duration = ceil(($endMicrotime - $this->startMicrotime) * 1000);
-		return '<p><i>Indexing process for "' . $indexerConfig['title'] . '" took '.$duration.' ms.</i></p>';
+		
+		// show sec or ms?
+		if ($duration > 10000) {
+			$duration /= 1000;
+			$duration = intval($duration);
+			return '<p><i>Indexing process for "' . $indexerConfig['title'] . '" took '.$duration.' s.</i></p>';
+		} else {
+			return '<p><i>Indexing process for "' . $indexerConfig['title'] . '" took '.$duration.' ms.</i></p>';
+		}
+		
+		
 	}
 
 
@@ -367,7 +383,7 @@ class tx_kesearch_indexer {
 
 		// check for errors
 		$errors = array();
-		if (empty($storagepid)) $errors[] = 'No storage PID set';
+		if ($type != 'xtypocommerce' && empty($storagepid)) $errors[] = 'No storage PID set';
 		if (empty($title)) $errors[] = 'No title set';
 		if (empty($type)) $errors[] = 'No type set';
 		if (empty($targetpid)) $errors[] = 'No target PID set';
@@ -377,7 +393,7 @@ class tx_kesearch_indexer {
 			foreach ($errors as $error) {
 				$errorMessage .= $error.chr(10).chr(13);
 			}
-			t3lib_div::debug($errorMessage,'ERROR WHILE STORING INDEX FOR PAGE '.$targetpid);
+			t3lib_div::debug($errorMessage,'ERROR WHILE STORING INDEX FOR PAGE '.$targetpid.' - '.$params);
 		}
 
 
@@ -608,10 +624,10 @@ class tx_kesearch_indexer {
 				$tagsContent .= '#'.$row2['tag'].'#';
 			}
 		}
-
+		
 		// check if rootline Tags have to be set
 		$tagsContent = $this->setRootlineTags($pid, $this->rootlineTags, $tagsContent);
-
+		
 		return $tagsContent;
 	}
 
@@ -744,6 +760,8 @@ class tx_kesearch_indexer {
 		$where .= t3lib_befunc::deleteClause('tx_dam',$inv=0);
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
 		while ($damRecord=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+			// t3lib_div::debug($damRecord['title'],1);
+
 
 			// prepare content for storing in index table
 			$title = strip_tags($damRecord['title']);
@@ -760,32 +778,11 @@ class tx_kesearch_indexer {
 			$targetPID = $indexerConfig['targetpid'];
 
 			// get tags for this record
-			// needs extension ke_search_dam_tags
-			if (t3lib_extMgm::isLoaded('ke_search_dam_tags')) {
-				$damRecordTags = t3lib_div::trimExplode(',',$damRecord['tx_kesearchdamtags_tags'], true);
-				$tags = '';
-				if (count($damRecordTags)) {
-					foreach ($damRecordTags as $key => $tagUid)  {
-						$tags .= '#'.$this->getTag($tagUid).'#';
-					}
-				}
-			} else {
-				$tags = '';
-			}
-
-			// hook for custom modifications of the indexed data, e. g. the tags
-			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyDAMIndexEntry'])) {
-				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyDAMIndexEntry'] as $_classRef) {
-					$_procObj = & t3lib_div::getUserObj($_classRef);
-					$_procObj->modifyDAMIndexEntry(
-						$title,
-						$abstract,
-						$fullContent,
-						$params,
-						$tags,
-						$damRecord,
-						$targetPID
-					);
+			$damRecordTags = t3lib_div::trimExplode(',',$damRecord['tx_kesearchdamtags_tags'], true);
+			$tags = '';
+			if (count($damRecordTags)) {
+				foreach ($damRecordTags as $key => $tagUid)  {
+					$tags .= '#'.$this->getTag($tagUid).'#';
 				}
 			}
 
@@ -831,9 +828,201 @@ class tx_kesearch_indexer {
 		}
 
 	}
+	
+	
+	
+	/*
+	 * function indexXTYPOCommerceRecords
+	 * @param $indexerConfig
+	 */
+	function indexXTYPOCommerceRecords($indexerConfig) {
+		$content = '';
+		
+		// get xtypocommerce products
+		$fields = '*';
+		$table = 'tx_xtypocommerce_products, tx_xtypocommerce_products_description';
+		$where = 'tx_xtypocommerce_products.products_id = tx_xtypocommerce_products_description.products_id';
+		$where .= ' AND tx_xtypocommerce_products_description.products_name <> "" ';
+		$where .= ' AND tx_xtypocommerce_products_description.products_description <> "" ';
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
+		$resCount = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
+		while ($prodRecord=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+			
+			// prepare content for storing in index table
+			$title = strip_tags($prodRecord['products_name']);
+			$tags = ''; 
+			$params = '&xtypocommerce[product]='.intval($prodRecord['products_id']); 
+			$description = strip_tags($prodRecord['products_description']);
+			
+			// keywords
+			$keywordsContent = '';
+			$keywords = t3lib_div::trimExplode(',', $prodRecord['products_keywords'], true);
+			if (is_array($keywords)) {
+				foreach ($keywords as $index => $keyword) {
+					$keywordsContent .= $keyword."\n";
+				}
+			}
+			
+			// build full content 
+			$fullContent = $title . "\n" . $description. "\n" . $keywordsContent;
+			
+			// set target pid
+			$targetPID = $indexerConfig['targetpid'];
 
+			// get tags
+			$tagContent = '';
+			// categories
+			$catRootline = $this->getXTYPOCommerceCategories($prodRecord['products_id']);
+			if (is_array($catRootline)) {
+				foreach ($catRootline as $productId => $categories) {
+					$catArray = t3lib_div::trimExplode(',', $categories);
+					foreach($catArray as $key => $catId)  {
+						$tagContent .= '#category_'.$catId.'#';
+					}
+				}
+			}
+			
+			// regions
+			if (!empty($prodRecord['products_region']) || !empty($prodRecord['products_countries'])) {
+				$tagContent .= $this->getXTYPOCommerceRegionAndCountryTags($prodRecord['products_region'], $prodRecord['products_countries']);
+			}
+			if (!empty($prodRecord['manufacturers_id'])) {
+				// publisher
+				$tagContent .= '#publisher_'.$prodRecord['manufacturers_id'].'#';
+			}
+			if (!empty($prodRecord['products_language'])) {
+				// language
+				$tagContent .= '#language_'.$prodRecord['products_language'].'#';
+			}
+			if (!empty($prodRecord['products_monat']) && !empty($prodRecord['products_jahr'])) {
+				// date
+				$tagContent .= '#year_'.$prodRecord['products_jahr'].'#';
+			}
+			
+			// store in index
+			$this->storeInIndex(
+				$indexerConfig['storagepid'],	// storage PID
+				$title,										// page/record title
+				'xtypocommerce', 					// content type
+				$targetPID,								// target PID: where is the single view?
+				$fullContent, 							// indexed content, includes the title (linebreak after title)
+				$tagContent,				 			// tags
+				$params, 								// typolink params for singleview
+				$abstract,								// abstract
+				0,												// language uid
+				0, 											// starttime
+				0, 											// endtime
+				0, 											// fe_group
+				false										// debug only?
+			);
+			
+		}
+		
+		$content = '<p><b>Indexer "' . $indexerConfig['title'] . '": ' . $resCount . ' Products have been indexed.</b></p>';
+		
+		return $content;
+	}
+	
+	/*
+	 * function getXTYPOCommerceRegionAndCountryTags()
+	 * @param $arg
+	 */
+	function getXTYPOCommerceRegionAndCountryTags($regions, $countries) {
+		$tagContent = '';
+		
+		$regions = t3lib_div::trimExplode(',', $regions, true);
+		if (is_array($regions)) {
+			foreach ($regions as $key => $region) {
+				$tagContent .= '#region_'.$region.'#';
+			}
+		}
+		
+		$countries = t3lib_div::trimExplode(',', $countries, true);
+		if (is_array($countries)) {
+			foreach ($countries as $key => $country) {
+				$tagContent .= '#country_'.$country.'#';
+			}
+		}
+		
+		return $tagContent;
+		
+	}
+		
+	
+	/*
+	 * function getRecursiveXTYPOCommerceCategories
+	 * @param $product_id
+	 */
+	function getXTYPOCommerceCategories($product_id) {
+		// get products' categories
+		$fields = 'categories_id';
+		$table = 'tx_xtypocommerce_products_to_categories';
+		$where = 'products_id = "'.intval($product_id).'" ';
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
+		$anz = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
+		while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+			$categories[] = $row['categories_id'];
+		}
+		
+		// get recursive categories
+		if (is_array($categories)) {
+			foreach ($categories as $index => $catId) {
+				$this->catRoot = '';
+				$this->getXTYPOCommerceParentCat($catId);
+				$this->catRoot = t3lib_div::rm_endcomma($this->catRoot);
+				$catRootline[$catId] = $this->catRoot;
+			}
+			
+		}
+		return $catRootline;
+		
+	}
+	
+	
+	/*
+	 * function getXTYPOCommerceCatRootline
+	 * @param $arg
+	 */
+	function getXTYPOCommerceParentCat($catId) {
+		$fields = '*';
+		$table = 'tx_xtypocommerce_categories';
+		$where = 'categories_id="'.intval($catId).'" ';
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
+		while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+			// t3lib_div::debug($row,1);
+			
+			if ($row['categories_id'] > 0) {
+				$this->catRoot .= $row['categories_id'].',';
+			}
+			if ($row['parent_id'] > 0) {
+				$this->catRoot .= $this->getXTYPOCommerceParentCat($row['parent_id']);
+			}
+		}
+	}
+	
+	
 
-
+	// GET SUBPAGES
+	/*
+	function getRecursivePids($startPid) {
+		// t3lib_div::debug('rec',1);
+		$fields = 'uid, hidden, deleted';
+		$table = 'pages';
+		$where = 'pid='.intval($startPid);
+		// $where .= ' AND hidden=0 AND deleted=0';
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where);
+		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))	{
+			// add to pagelist if not hidden and not deleted
+			if ($row['deleted'] == 0 && $row['hidden'] == 0) {
+				$this->pagelist .= $row['uid'].',';
+			}
+			$this->getRecursivePids($row['uid']);
+		}
+	}
+	*/
+	
+	
+	
 }
 
 

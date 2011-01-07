@@ -48,6 +48,7 @@
 			<label index="of">of</label>
 			<label index="no_results_found">No results found</label>
 			<label index="no_results_refine">This search term is not specific enough. Please choose another.</label>
+			<label index="searchword_length_error">Search words under length of 4 characters are not processed.</label>
 			
 			<label index="label_resulturl">URL</label>
 			<label index="label_score">Score</label>
@@ -109,6 +110,7 @@
 			<label index="of">von</label>
 			<label index="no_results_found">Keine Ergebnisse gefunden</label>
 			<label index="no_results_refine">Ihr Suchbegriff ist zu allgemein gehalten und kommt auf mehr als 50 Prozent aller Seiten vor. Bitte waehlen Sie einen anderen Suchbegriff.</label>
+			<label index="searchword_length_error">Bitte beachten Sie: Suchbegriffe unter einer Länge von vier Buchstaben werden ignoriert.</label>
 			
 			<label index="label_resulturl">URL</label>
 			<label index="label_score">Relevanz</label>
@@ -117,7 +119,7 @@
 			<label index="label_tags">Tags</label>
 			<label index="label_query">DB-Query</label>
 			
-			<label index="loading">lädt</label>
+			<label index="loading">laedt</label>
 			<label index="all_options">Alle</label>
 			<label index="no_options">-----</label>
 			<label index="message_before_search">Bitte geben Sie Ihre Suchkriterien an.</label>

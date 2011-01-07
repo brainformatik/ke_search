@@ -1,7 +1,5 @@
 .tx-kesearch-pi1 {
-    background: #fcfcfc;
-    border: 1px solid black;
-    padding: 5px;
+    
 }
 
 /* Clearer */
@@ -9,7 +7,7 @@
     display: block;
     height: 1px;
     line-height: 1px;
-    clear: both;
+    /* clear: both; */
 }
 
 /* Results */
@@ -18,7 +16,7 @@
 }
 
 .tx-kesearch-pi1 #kesearch_results .teaser_icon img {
-    float:left;
+    /* float:left; */
     margin-top:2px;
     margin-right:5px;
 }
@@ -48,18 +46,29 @@
 }
 
 /* Searchbox */
+.tx-kesearch-pi1 .searchbox .headline {
+    line-height: 20px;
+    color: #734C23;
+    font-weight: bold;
+}
 .tx-kesearch-pi1 .searchbox {
-    
+    background: url(img/searchbox-bgrnd.gif);
+    display:block;
+    border: 1px solid #CFCFCF;
+    padding: 5px;
+    height: 50px;
 }
 .tx-kesearch-pi1 .searchbox input {
     margin-left: 0;
-    width: 145px;
+    width: 100px;
+    height: 21px;
+    padding-left: 2px;
 }
 
 .tx-kesearch-pi1 .searchbox input.submit {
     margin: 0 0 0 0;
-    width: 18px;
-    height: 18px;
+    width: 21px;
+    height: 22px;
     border: none;
     background: none;
     padding: 0;
@@ -198,6 +207,7 @@
 }
 
 
+
 /* Spinner / updating */
 .tx-kesearch-pi1 #kesearch_updating_filters,
 .tx-kesearch-pi1 #kesearch_updating_results {
@@ -232,13 +242,14 @@
 /*Pagebrowser*/
 .tx-kesearch-pi1 #kesearch_pagebrowser_top,
 .tx-kesearch-pi1 #kesearch_pagebrowser_bottom {
-   clear:both;
+   /* clear:both; */3
    text-align: center;
    padding: 10px;
 }
 .tx-kesearch-pi1 #kesearch_pagebrowser_top .pages_total {
     border-bottom: 1px dashed #666;
     margin-bottom: 20px;
+    text-align: center;
 }
 .tx-kesearch-pi1 #kesearch_pagebrowser_bottom .pages_total {
     border-top: 1px dashed #666;
@@ -286,6 +297,6 @@
     text-decoration:none;
 }
 
-.tx-kesearch-pi1 .next{background: transparent url('img/arrow-next.gif') no-repeat left 5px;}
-.tx-kesearch-pi1 .prev{background: transparent url('img/arrow-prev.gif') no-repeat right 5px;}
+.tx-kesearch-pi1 .next{background: transparent url('arrow-next.gif') no-repeat left 5px;}
+.tx-kesearch-pi1 .prev{background: transparent url('arrow-prev.gif') no-repeat right 5px;}
 
