@@ -113,8 +113,7 @@ class tx_kesearch_indexer {
 							$content .= $_procObj->customIndexer($indexerConfig, $this);
 						}
 					}
-
-
+					break;
 			}
 		}
 
