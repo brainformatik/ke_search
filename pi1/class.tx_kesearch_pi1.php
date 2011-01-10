@@ -391,6 +391,17 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					case 'list':
 						$filterContent .= $this->renderList($filterUid, $options);
 						break;
+
+						// use custom render code
+					default:
+							// hook for custom filter renderer
+						if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['customFilterRenderer'])) {
+							foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['customFilterRenderer'] as $_classRef) {
+								$_procObj = & t3lib_div::getUserObj($_classRef);
+								$filterContent .= $_procObj->customFilterRenderer($filterUid, $options, $this);
+							}
+						}
+						break;
 				}
 			}
 		}
@@ -1377,18 +1388,18 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				$cropped = true;
 			}
 		}
-		
+
 		// append dots when cropped
 		if ($startPos > 0) $teaser = '...'.$teaser;
 		$teaser = $this->betterSubstr($teaser, $this->ffdata['resultChars']);
-		
+
 		// highlight hits?
 		if ($this->ffdata['highlightSword'] && count($swords)) {
 			foreach ($swords as $word) {
 				$teaser = preg_replace('/('.$word.')/iu','<span class="hit">\0</span>',$teaser);
 			}
 		}
-		
+
 		return $teaser;
 	}
 
