@@ -320,7 +320,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// get filters from db
 		$this->filters = $this->getFilters();
-		//t3lib_div::debug($this->filters,1);
 
 		if (!empty($this->ffdata['filters'])) {
 			$filterList = explode(',',$this->ffdata['filters']);
@@ -347,7 +346,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 						$optionsCount = 0;
 
 						// check filter availability?
-						//t3lib_div::debug($this->ffdata['checkFilterCondition'],'check');
 						if ($this->ffdata['checkFilterCondition'] != 'none') {
 							if ($this->checkIfTagMatchesRecords($row['tag'],$this->ffdata['checkFilterCondition'], $filterUid)) {
 								// process check in condition to other filters or without condition
@@ -380,7 +378,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 							$optionsCount++;
 						}
 					}
-					// t3lib_div::debug($options,1);
 
 				}
 				// get subparts corresponding to render type
@@ -407,9 +404,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 * @param $arg
 	 */
 	function renderSelect($filterUid, $options) {
-
-		// t3lib_div::debug($filterUid,1);
-		// t3lib_div::debug($options,'select');
 
 		$filterSubpart = '###SUB_FILTER_SELECT###';
 		$optionSubpart = '###SUB_FILTER_SELECT_OPTION###';
@@ -566,7 +560,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				}
 			}
 		}
-		// if ($filterId == 4 && $tag=="language_deutsch" ) $this->debugMail($swords);
 		$filterList = explode(',', $this->ffdata['filters']);
 
 		// against-clause for single check (not in condition with other selected filters)
@@ -1125,7 +1118,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				$content = $this->cObj->substituteMarker($content,'###MESSAGE###', utf8_encode($this->pi_getLL('searchword_length_error')));
 			}
 
-			// $this->debugMail('keine ergebnisse gefunden<br /><br />'.$query);
 			$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->pi_getLL('no_results_found'));
 
 			/*
@@ -1193,7 +1185,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$tempContent = $this->cObj->getSubpart($this->templateCode,'###RESULT_ROW###');
 			if (!empty($row['abstract'])) {
 				$teaserContent = nl2br($row['abstract']);
-				// t3lib_div::debug($teaserContent,1);
 				// highlight hits?
 				if ($this->ffdata['highlightSword'] && count($swords)) {
 					foreach ($swords as $word) {
@@ -1386,17 +1377,18 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				$cropped = true;
 			}
 		}
-
+		
 		// append dots when cropped
 		if ($startPos > 0) $teaser = '...'.$teaser;
 		$teaser = $this->betterSubstr($teaser, $this->ffdata['resultChars']);
-
+		
 		// highlight hits?
 		if ($this->ffdata['highlightSword'] && count($swords)) {
 			foreach ($swords as $word) {
 				$teaser = preg_replace('/('.$word.')/iu','<span class="hit">\0</span>',$teaser);
 			}
 		}
+		
 		return $teaser;
 	}
 
@@ -1667,25 +1659,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/types/'.$type.'.gif';
 		$image=$this->cObj->IMAGE($imageConf);
 		return $image;
-	}
-
-
-
-	/**
-	* Description: Function for mailing a var(including an Array)
-	*/
-	function debugMail($content='', $subject = 'TYPO3 Debug Mail', $mailto='kiefer@kennziffer.com') {
-		if (is_array($content)) {
-			$content = t3lib_div::view_array($content);
-		}
-		if (is_object($content)) {
-			$content = var_export($content,true);
-		}
-
-		$header = "MIME-Version: 1.0".chr(10);
-		$header .= "Content-type: text/html; charset=utf-8".chr(10);
-		$header .= "From: KENNZIFFER DEBUG <debug@kennziffer.com>".chr(10);
-		mail($mailto,$subject,$content,$header);
 	}
 
 
