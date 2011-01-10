@@ -1230,7 +1230,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$linktext = $row['title'];
 			$linktext = strip_tags($linktext);
 			$linktext = $this->removeXSS($linktext);
-			$linktext = htmlentities($linktext);
+			//$linktext = htmlentities($linktext);
 
 			// highlight hits in result title?
 			if ($this->ffdata['highlightSword'] && count($swords)) {
