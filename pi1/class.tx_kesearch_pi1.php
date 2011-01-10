@@ -749,7 +749,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	* @param	type		desc
 	* @return	The content that is displayed on the website
 	*/
-	/*
 	function refreshResultsOnLoad($data) {
 
 		// init Flexforms
@@ -812,7 +811,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// return response xml
 		return $objResponse->getXML();
 	}
-	*/
 
 	/*
 	 * function refresh
