@@ -220,7 +220,11 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 
 		// Spinner Image
-		$spinnerSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/spinner.gif';
+		if ($this->conf['spinnerImageFile']) {
+			$spinnerSrc = $this->conf['spinnerImageFile'];
+		} else {
+			$spinnerSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/spinner.gif';
+		}
 		$this->spinnerImageFilters = '<img id="kesearch_spinner_filters" src="'.$spinnerSrc.'" alt="'.$this->pi_getLL('loading').'" />';
 		$this->spinnerImageResults = '<img id="kesearch_spinner_results" src="'.$spinnerSrc.'" alt="'.$this->pi_getLL('loading').'" />';
 
