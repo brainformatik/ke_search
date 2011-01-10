@@ -51,6 +51,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$this->pi_loadLL();
 		$this->pi_USER_INT_obj = 1;	// Configuring so caching is not expected. This value means that no cHash params are ever set. We do this, because it's a USER_INT object!
 
+		// debug db errors?
+		// $GLOBALS['TYPO3_DB']->debugOutput = true;
+
 		// get html template
 		$this->templateFile = $this->conf['templateFile'] ? $this->conf['templateFile'] : t3lib_extMgm::siteRelPath($this->extKey).'res/template_pi1.tpl';
 		$this->templateCode = $this->cObj->fileResource($this->templateFile);
@@ -59,25 +62,26 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$pages = $this->cObj->data['pages'];
 		$this->pids = $this->pi_getPidList($pages, $this->cObj->data['recursive']);
 
-		// init XAJAX
-		$this->initXajax();
-
-		// $GLOBALS['TYPO3_DB']->debugOutput = true;
-
 		// GET FLEXFORM DATA
 		$this->initFlexforms();
+
+		// init XAJAX?
+		if ($this->ffdata['renderMethod'] != 'static') {
+			$this->initXajax();
+		}
 
 		// get css file (include only in searchbox -> avoid duplicate css)
 		if ($this->ffdata['mode'] == 0) {
 			$cssFile = $this->conf['cssFile'] ? $this->conf['cssFile'] : t3lib_extMgm::siteRelPath($this->extKey).'res/ke_search_pi1.css';
-			$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId.'_css'] = '<link rel="stylesheet" type="text/css" href="'.$cssFile.'" />';
+			$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId.'_css'] = '<link rel="stylesheet" type="text/css" href="'.$cssFile.'" / >';
 		}
 
 		// get preselected filter from rootline
 		$this->getFilterPreselect();
 
 		// set javascript if searchbox is loaded (=load once only )
-		if ($this->ffdata['mode'] == 0) {
+		// do not set in static mode - not used there!
+		if ($this->ffdata['mode'] == 0 && $this->ffdata['renderMethod'] != 'static') {
 			$jsContent = '
 				<script type="text/javascript">
 					function submitAction() {
@@ -213,7 +217,97 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId.'_jsContent'] .= $jsContent;
 		}
 
-		// onclick javascript actions
+
+
+		// Spinner Image
+		$spinnerSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/spinner.gif';
+		$this->spinnerImageFilters = '<img id="kesearch_spinner_filters" src="'.$spinnerSrc.'" alt="'.$this->pi_getLL('loading').'" />';
+		$this->spinnerImageResults = '<img id="kesearch_spinner_results" src="'.$spinnerSrc.'" alt="'.$this->pi_getLL('loading').'" />';
+
+
+		// get content
+		switch ($this->ffdata['mode']) {
+
+			// SEARCHBOX AND FILTERS
+			case 0:
+				$content = $this->getSearchboxContent();
+				$content = $this->cObj->substituteMarker($content,'###SPINNER###',$this->spinnerImageFilters);
+				$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
+
+				// refresh result list
+				if ($this->ffdata['renderMethod'] != 'static') {
+					if ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) $this->refreshResultsOnLoad($_POST);
+				}
+
+				break;
+
+			// SEARCH RESULTS
+			case 1:
+				$content = $this->cObj->getSubpart($this->templateCode,'###RESULT_LIST###');
+
+				// get number of results
+				$this->numberOfResults = $this->getSearchResults(true);
+
+				// render pagebrowser
+				if ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) {
+					if ($this->ffdata['pagebrowserOnTop'] || $this->ffdata['pagebrowserAtBottom']) {
+						$pagebrowserContent = $this->renderPagebrowser();
+						if ($this->ffdata['pagebrowserOnTop']) {
+							$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', $pagebrowserContent);
+						} else {
+							$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', '');
+						}
+						if ($this->ffdata['pagebrowserAtBottom']) {
+							$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###',$pagebrowserContent);
+						} else {
+							$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###','');
+						}
+					}
+				}
+
+				// get max score
+				$this->maxScore = $this->getSearchResults(false, true);
+				$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->getSearchResults());
+				$content = $this->cObj->substituteMarker($content,'###SPINNER###',$this->spinnerImageResults);
+				$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
+				$content = $this->cObj->substituteMarker($content,'###QUERY_TIME###', '');
+				// onload image for reloading results by ajax
+				$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
+
+				// get javascript onclick actions for ajax version
+				if ($this->ffdata['renderMethod'] != 'static') {
+					$this->initOnclickActions();
+				}
+
+
+				if ($this->ffdata['renderMethod'] != 'static') {
+					$onloadImageResults = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadResults();" alt="" /> ';
+					$content = $this->cObj->substituteMarker($content,'###ONLOAD_IMAGE_RESULTS###', $onloadImageResults);
+					$content = $this->cObj->substituteMarker($content,'###ONLOAD_IMAGE###', $this->onloadImage);
+				} else {
+					$content = $this->cObj->substituteMarker($content,'###ONLOAD_IMAGE_RESULTS###', '');
+					$content = $this->cObj->substituteMarker($content,'###ONLOAD_IMAGE###', '');
+				}
+
+
+
+				break;
+
+		}
+
+		return $this->pi_wrapInBaseClass($content);
+	}
+
+
+	/*
+	 * function initOnclickActions
+	 */
+	function initOnclickActions() {
+
+		if ($this->ffdata['renderMethod'] == 'static') {
+			return;
+		}
+
 		if ($GLOBALS['TSFE']->id != $this->ffdata['resultPage']) {
 			 $this->onclickSubmit =  'redirectToResultPage()';
 		} else {
@@ -236,48 +330,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		$this->onclickPagebrowser = $this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); pagebrowserAction(); ';
 
-		// Spinner Image
-		$spinnerSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/spinner.gif';
-		$this->spinnerImageFilters = '<img id="kesearch_spinner_filters" src="'.$spinnerSrc.'" alt="'.$this->pi_getLL('loading').'" />';
-		$this->spinnerImageResults = '<img id="kesearch_spinner_results" src="'.$spinnerSrc.'" alt="'.$this->pi_getLL('loading').'" />';
-
-		switch ($this->ffdata['mode']) {
-
-			// SEARCHBOX AND FILTERS
-			case 0:
-				$content = $this->getSearchboxContent();
-				$content = $this->cObj->substituteMarker($content,'###SPINNER###',$this->spinnerImageFilters);
-				$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
-
-				// refresh result list
-				if ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) $this->refreshResultsOnLoad($_POST);
-
-				break;
-
-			// SEARCH RESULTS
-			case 1:
-				$content = $this->cObj->getSubpart($this->templateCode,'###RESULT_LIST###');
-				$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###','');
-				$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###','');
-				$content = $this->cObj->substituteMarker($content,'###ONLOAD_IMAGE###', $this->onloadImage);
-				$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->pi_getLL('message_before_search'));
-				$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->getSearchResults());
-				$content = $this->cObj->substituteMarker($content,'###SPINNER###',$this->spinnerImageResults);
-				$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
-				$content = $this->cObj->substituteMarker($content,'###QUERY_TIME###', '');
-				// onload image for reloading results by ajax
-				$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
-				$onloadImageResults = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadResults();" alt="" /> ';
-				$content = $this->cObj->substituteMarker($content,'###ONLOAD_IMAGE_RESULTS###', $onloadImageResults);
-
-				break;
-
-		}
-
-		return $this->pi_wrapInBaseClass($content);
 	}
-
-
 
 
 
@@ -287,8 +340,12 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	function getSearchboxContent() {
 
 		// get main template code
-		$content = $this->cObj->getSubpart($this->templateCode,'###SEARCHBOX###');
-		$content = $this->cObj->substituteMarker($content,'###ONCLICK###',$this->onclickSubmit);
+		if ($this->ffdata['renderMethod'] == 'static') {
+			$content = $this->cObj->getSubpart($this->templateCode,'###SEARCHBOX_STATIC###');
+		} else {
+			$content = $this->cObj->getSubpart($this->templateCode,'###SEARCHBOX_AJAX###');
+			$content = $this->cObj->substituteMarker($content,'###ONCLICK###',$this->onclickSubmit);
+		}
 
 		// search word value
 		if (!$this->piVars['page']) $this->piVars['page'] = 1;
@@ -299,11 +356,20 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// get filters
 		$content = $this->cObj->substituteMarker($content,'###FILTER###',$this->renderFilters());
 
-		// get reset button
-		// $imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/reset.gif';
-		// $resetButton=$this->cObj->IMAGE($imageConf);
-		// $resetLink = '<div onclick="resetSearchboxAndFilters();" class="resetButton"><span>&nbsp;</span>'.$resetButton.'</div>';
-		$resetLink = '<div onclick="resetSearchboxAndFilters();" class="resetButton"><span>'.$this->pi_getLL('reset_button').'</span>'.$resetButton.'</div>';
+		// set form action for static mode
+		if ($this->ffdata['renderMethod'] == 'static') {
+			// set form action pid
+			$content = $this->cObj->substituteMarker($content,'###FORM_TARGET_PID###', $this->ffdata['resultPage']);
+
+			// set reset link
+			unset($linkconf);
+			$linkconf['parameter'] = $GLOBALS['TSFE']->id;
+			$resetUrl = $this->cObj->typoLink_URL($linkconf);
+			$resetLink = '<a href="'.$resetUrl.'" class="resetButton"><span>'.$this->pi_getLL('reset_button').'</span></a>';
+		} else {
+			// set reset link
+			$resetLink = '<div onclick="resetSearchboxAndFilters();" class="resetButton"><span>'.$this->pi_getLL('reset_button').'</span>'.$resetButton.'</div>';
+		}
 
 		$content = $this->cObj->substituteMarker($content,'###RESET###',$resetLink);
 
@@ -476,6 +542,10 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 */
 	function renderList($filterUid, $options) {
 
+		if ($this->ffdata['renderMethod'] == 'static') {
+			return $this->renderSelect($filterUid, $options);
+		}
+
 		$filterSubpart = '###SUB_FILTER_LIST###';
 		$optionSubpart = '###SUB_FILTER_LIST_OPTION###';
 
@@ -516,7 +586,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// fill markers
 		$filterContent = $this->cObj->getSubpart($this->templateCode, $filterSubpart);
 		$filterContent = $this->cObj->substituteSubpart ($filterContent, $optionSubpart, $optionsContent);
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', utf8_encode($this->filters[$filterUid]['title']));
+		// $filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', utf8_encode($this->filters[$filterUid]['title']));
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $this->filters[$filterUid]['title']);
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERNAME###', 'tx_kesearch_pi1[filter]['.$filterUid.']');
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERID###', 'filter['.$filterUid.']');
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCHANGE###', $this->onclickFilter);
@@ -565,7 +636,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			foreach ($swords as $key => $word) {
 				// ignore words under length of 4 chars
 				if (strlen($word) > 3) {
-					$againstBoolean .= '+*'.utf8_decode($word).'* ';
+					// $againstBoolean .= '+*'.utf8_decode($word).'* ';
+					$againstBoolean .= '+*'.$word.'* ';
 				} else {
 					unset ($swords[$key]);
 				}
@@ -579,7 +651,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// extend against-clause for multi check (in condition with other selected filters)
 		if ($mode == 'multi' && is_array($filterList)) {
-			t3lib_div::devLog('multi', $extKey, $severity=0, $dataVar=FALSE);
 			// andere filter aufrufen
 			foreach ($filterList as $key => $foreignFilterId) {
 				if ($foreignFilterId != $filterId) {
@@ -602,7 +673,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$where .= $this->cObj->enableFields($table);
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,'','',1);
 		$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields,$table,$where,'','',1);
-		if ($filterId==2)t3lib_div::devLog($query, $this->extKey, $severity=0, '');
 		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 		return $numResults;
 	}
@@ -655,7 +725,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// Register the names of the PHP functions you want to be able to call through xajax
 		$this->xajax->registerFunction(array('refresh', &$this, 'refresh'));
-		$this->xajax->registerFunction(array('refreshResultsOnLoad', &$this, 'refreshResultsOnLoad'));
+		if ($this->ffdata['renderMethod'] != 'static') $this->xajax->registerFunction(array('refreshResultsOnLoad', &$this, 'refreshResultsOnLoad'));
 		$this->xajax->registerFunction(array('resetSearchbox', &$this, 'resetSearchbox'));
 
 		// If this is an xajax request call our registered function, send output and exit
@@ -668,7 +738,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		}
 		$GLOBALS['TSFE']->additionalHeaderData['xajax_search_filters'] = $this->xajax->getJavascript( "typo3conf/ext/xajax/");
 		$GLOBALS['TSFE']->additionalHeaderData['xajax_search_filters'] .= '<script type="text/javascript">function tx_kesearch_pi1refresh(){ return xajax.call("refresh", arguments, 1);}</script>';
-		$GLOBALS['TSFE']->additionalHeaderData['xajax_search_onload'] = '<script type="text/javascript">function tx_kesearch_pi1refreshResultsOnLoad(){ return xajax.call("refreshResultsOnLoad", arguments, 1);}</script>';
+		if ($this->ffdata['renderMethod'] != 'static') $GLOBALS['TSFE']->additionalHeaderData['xajax_search_onload'] = '<script type="text/javascript">function tx_kesearch_pi1refreshResultsOnLoad(){ return xajax.call("refreshResultsOnLoad", arguments, 1);}</script>';
 		$GLOBALS['TSFE']->additionalHeaderData['xajax_search_reset'] = '<script type="text/javascript">function tx_kesearch_pi1resetSearchbox(){ return xajax.call("resetSearchbox", arguments, 1);}</script>';
 	}
 
@@ -679,6 +749,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	* @param	type		desc
 	* @return	The content that is displayed on the website
 	*/
+	/*
 	function refreshResultsOnLoad($data) {
 
 		// init Flexforms
@@ -716,19 +787,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$this->onclickFilter = 'submitAction(); '.$this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));  ';
 		}
 
-		/*
-		// reset filters?
-		if ($this->piVars['resetFilters'] && is_array($this->piVars['filter'])) {
-			foreach ($this->piVars['filter'] as $key => $value)  {
-				// do not reset the preselected filter
-				 if ($this->preselectedFilter != $value) $this->piVars['filter'][$key] = '';
-				if (!is_array($this->preselectedFilter) || !in_array($value, $this->preselectedFilter)) {
-				$this->piVars['filter'][$key] = '';
-				}
-			}
-		}
-		*/
-
 		// generate onload image
 		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
 		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" /> ';
@@ -754,7 +812,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// return response xml
 		return $objResponse->getXML();
 	}
-
+	*/
 
 	/*
 	 * function refresh
@@ -862,7 +920,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				$imageConf['altText'] = $this->pi_getLL('searchword_length_error');
 				$errorMessage = $this->cObj->substituteMarker($errorMessage,'###IMAGE###', $this->cObj->IMAGE($imageConf));
 				$errorMessage = $this->cObj->substituteMarker($errorMessage,'###MESSAGE###', $this->pi_getLL('searchword_length_error'));
-				$objResponse->addAssign("kesearch_error", "innerHTML", utf8_encode($errorMessage));
+				// $objResponse->addAssign("kesearch_error", "innerHTML", utf8_encode($errorMessage));
+				$objResponse->addAssign("kesearch_error", "innerHTML", $errorMessage);
 			} else {
 				$objResponse->addAssign("kesearch_error", "innerHTML", '');
 			}
@@ -997,9 +1056,11 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// prepare searchword for query
 		$sword = $this->removeXSS($this->piVars['sword']);
+
 		// replace plus and minus chars
 		$sword = str_replace('-', ' ', $sword);
 		$sword = str_replace('+', ' ', $sword);
+
 		// split several words
 		$swords = t3lib_div::trimExplode(' ', $sword, true);
 
@@ -1032,8 +1093,10 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			foreach ($swords as $key => $word) {
 				// ignore words under length of 4 chars
 				if (strlen($word) > 3) {
-					$scoreAgainst .= utf8_decode($word);
-					$whereAgainst .= '+*'.utf8_decode($word).'* ';
+					// $scoreAgainst .= utf8_decode($word);
+					$scoreAgainst .= $word;
+					// $whereAgainst .= '+*'.utf8_decode($word).'* ';
+					$whereAgainst .= '+*'.$word.'* ';
 				} else {
 					unset ($swords[$key]);
 					$this->showShortMessage = true;
@@ -1064,6 +1127,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 			// process query
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit);
+			t3lib_div::devLog($query, $this->extKey, $severity=0, $var);
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit);
 			$row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 
@@ -1121,26 +1185,17 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		}
 		else if ($numResults == 0) {
 
-			// no results found
+			// get subpart for general message
 			$content = $this->cObj->getSubpart($this->templateCode,'###GENERAL_MESSAGE###');
 
 			// check if searchwords were too short
 			if (!empty($this->piVars['sword']) && !count($swords)) {
-				$content = $this->cObj->substituteMarker($content,'###MESSAGE###', utf8_encode($this->pi_getLL('searchword_length_error')));
+				$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->pi_getLL('searchword_length_error'));
+				// $content = $this->cObj->substituteMarker($content,'###MESSAGE###', utf8_encode($this->pi_getLL('searchword_length_error')));
 			}
 
+			// no results found
 			$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->pi_getLL('no_results_found'));
-
-			/*
-			// check if empty result list is caused by 50%-rule of MySQL MATCH() AGAINST() query
-			if (!count($swords) || $this->checkIfFiftyPercentRuleFits($swords) == false) {
-				// 50% rule does not fit
-				$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->pi_getLL('no_results_found'));
-			 } else {
-				// 50% rule fits
-				$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->pi_getLL('no_results_refine'));
-			}
-			*/
 
 			// attention icon
 			unset($imageConf);
@@ -1319,7 +1374,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// add onload image
 		$content .= $this->onloadImage;
 
-		return utf8_encode($content);
+		// return utf8_encode($content);
+		return $content;
 	}
 
 
@@ -1486,15 +1542,11 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		$this->onclickPagebrowser = $this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); pagebrowserAction(); ';
 
-		//$numberOfResults = $this->getSearchResults(true);
 		$numberOfResults = $this->numberOfResults;
-		// return $numberOfResults;
-
 		$resultsPerPage = $this->ffdata['resultsPerPage'];
-		// return $resultsPerPage;
 		$maxPages = $this->ffdata['maxPagesInPagebrowser'];
 
-		// set first page if no other is set
+		// set first page if not set
 		if (!isset($this->piVars['page'])) $this->piVars['page'] = 1;
 
 		// get total number of items to show
@@ -1534,9 +1586,28 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// render pages list
 		for ($i=1; $i<=$pagesTotal; $i++) {
 			if ($i >= $startPage && $i <= $endPage) {
-				$tempContent .= '<a onclick="document.getElementById(\'pagenumber\').value=\''.$i.'\'; '.$this->onclickPagebrowser.'"';
-				if ($this->piVars['page'] == $i) $tempContent .= ' class="current" ';
-				$tempContent .= '>'.$i.'</a>';
+				if ($this->ffdata['renderMethod'] == 'static') {
+
+					// render static version
+					unset($linkconf);
+					$linkconf['parameter'] = $GLOBALS['TSFE']->id;
+					$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
+					$linkconf['additionalParams'] .= '&tx_kesearch_pi1[page]='.intval($i);
+					$filterArray = $this->getFilters();
+					foreach($this->piVars['filter'] as $filterId => $data) {
+						$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.']='.$this->piVars['filter'][$filterId];
+					}
+					if ($this->piVars['page'] == $i) $linkconf['ATagParams'] = 'class="current" ';
+					$tempContent .= $this->cObj->typoLink($i, $linkconf);
+
+				} else {
+
+					// render ajax version
+					$tempContent .= '<a onclick="document.getElementById(\'pagenumber\').value=\''.$i.'\'; '.$this->onclickPagebrowser.'"';
+					if ($this->piVars['page'] == $i) $tempContent .= ' class="current" ';
+					$tempContent .= '>'.$i.'</a>';
+
+				}
 			}
 		}
 
@@ -1545,21 +1616,50 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// previous image with link
 		if ($this->piVars['page'] > 1) {
-			// link
+
 			$previousPage = $this->piVars['page']-1;
-			$onclickPrevious = 'document.getElementById(\'pagenumber\').value=\''.$previousPage.'\'; ';
-			$previous = '<a class="prev" onclick="'.$onclickPrevious.$this->onclickPagebrowser.'">&nbsp;</a>';
+			if ($this->ffdata['renderMethod'] == 'static') {
+				// get static version
+				unset($linkconf);
+				$linkconf['parameter'] = $GLOBALS['TSFE']->id;
+				$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
+				$linkconf['additionalParams'] .= '&tx_kesearch_pi1[page]='.intval($previousPage);
+				$filterArray = $this->getFilters();
+				foreach($this->piVars['filter'] as $filterId => $data) {
+					$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.']='.$this->piVars['filter'][$filterId];
+				}
+				$linkconf['ATagParams'] = 'class="prev" ';
+				$previous = $this->cObj->typoLink('', $linkconf);
+			} else {
+				// get ajax version
+				$onclickPrevious = 'document.getElementById(\'pagenumber\').value=\''.$previousPage.'\'; ';
+				$previous = '<a class="prev" onclick="'.$onclickPrevious.$this->onclickPagebrowser.'">&nbsp;</a>';
+			}
 		} else {
 			$previous = '';
 		}
 
 		// next image with link
-		// previous image with link
 		if ($this->piVars['page'] < $pagesTotal) {
-			// link
 			$nextPage = $this->piVars['page']+1;
-			$onclickNext = 'document.getElementById(\'pagenumber\').value=\''.$nextPage.'\'; ';
-			$next  = '<a class="next" onclick="'.$onclickNext.$this->onclickPagebrowser.'">&nbsp;</a>';
+			if ($this->ffdata['renderMethod'] == 'static') {
+				// get static version
+				unset($linkconf);
+				$linkconf['parameter'] = $GLOBALS['TSFE']->id;
+				$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
+				$linkconf['additionalParams'] .= '&tx_kesearch_pi1[page]='.intval($nextPage);
+				$filterArray = $this->getFilters();
+				foreach($this->piVars['filter'] as $filterId => $data) {
+					$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.']='.$this->piVars['filter'][$filterId];
+				}
+				$linkconf['ATagParams'] = 'class="next" ';
+				$next = $this->cObj->typoLink('', $linkconf);
+			} else {
+				// get ajax version
+				$onclickNext = 'document.getElementById(\'pagenumber\').value=\''.$nextPage.'\'; ';
+				$next  = '<a class="next" onclick="'.$onclickNext.$this->onclickPagebrowser.'">&nbsp;</a>';
+			}
+
 		} else {
 			$next = '';
 		}
@@ -1585,6 +1685,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		return $content;
 
 	}
+
 
 
 	/*

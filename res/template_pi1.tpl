@@ -1,55 +1,50 @@
-
-
-
-
-<!-- ###SEARCHBOX### start -->
-    <form id="xajax_form_kesearch_pi1" name="xajax_form_kesearch_pi1" method="post" onsubmit="return false;">
+<!-- ###SEARCHBOX_AJAX### start -->
+    <form id="xajax_form_kesearch_pi1" name="xajax_form_kesearch_pi1" method="post" action="" onsubmit="return false;" >
 	<div class="searchbox">
-	    <span class="headline">Suche</span><br />
+	    <!-- <span class="headline">Suche</span><br /> -->
 	    <input type="text" name="tx_kesearch_pi1[sword]" id="ke_search_sword" value="###SWORD_VALUE###" onkeypress="keyPressAction(event);" />
 	    <input type="image" src="typo3conf/ext/ke_search/res/img/go.gif" id="kesearch_submit" name="tx_kesearch_pi1[submit]" class="submit" value="###SUBMIT_VALUE###" onclick="document.getElementById('pagenumber').value=1; ###ONCLICK###" />
 	    <input id="pagenumber" type="hidden" name="tx_kesearch_pi1[page]" value="###HIDDEN_PAGE_VALUE###">
 	    <input id="resetFilters" type="hidden" name="tx_kesearch_pi1[resetFilters]" value="0">
 	</div>
-	
-	<!-- ###RESET### -->
-	
-	<div id="kesearch_filters">
-	    ###FILTER###
-	</div>
-	<div id="kesearch_updating_filters">
-	    <center>
-		###SPINNER###<br />
-		<!-- <b>###LOADING###</b> -->
-	    </center>
-	</div>
-	
-	
-	
-	<!-- <div id="testbox">--DEBUG BOX --</div> -->
-	
+	###RESET###
+	<div id="kesearch_filters">###FILTER###</div>
+	<div id="kesearch_updating_filters"><center>###SPINNER###<br /></center></div>
+	<!-- <div id="testbox">DEBUG BOX</div> -->
     </form>
-    
-<!-- ###SEARCHBOX### end -->
+<!-- ###SEARCHBOX_AJAX### end -->
+
+
+<!-- ###SEARCHBOX_STATIC### start -->
+    <form method="get" action="">
+	<div class="searchbox">
+	    <input type="hidden" name="id" value="###FORM_TARGET_PID###">
+	    <!-- <span class="headline">Suche</span><br /> -->
+	    <input type="text" name="tx_kesearch_pi1[sword]" id="ke_search_sword" value="###SWORD_VALUE###" />
+	    <input type="submit" />
+	    <input id="pagenumber" type="hidden" name="tx_kesearch_pi1[page]" value="###HIDDEN_PAGE_VALUE###">
+	    <input id="resetFilters" type="hidden" name="tx_kesearch_pi1[resetFilters]" value="0">
+	</div>
+
+	<div id="kesearch_filters">###FILTER###</div>
+	<div id="kesearch_updating_filters"><center>###SPINNER###<br /></center></div>
+
+	###RESET###
+
+	<!-- <div id="testbox">DEBUG BOX<div> -->
+    </form>
+<!-- ###SEARCHBOX_STATIC### end -->
 
 
 <!-- ###RESULT_LIST### start -->
     <span id="kesearch_error"></span>
     <div id="kesearch_pagebrowser_top">###PAGEBROWSER_TOP###</div>
     <ul id="kesearch_results"><li>###MESSAGE###</li></ul>
-    ###ONLOAD_IMAGE_RESULTS###
-    <div id="kesearch_updating_results">
-	<center>
-	    ###SPINNER###<br />
-	    <!-- <b>###LOADING###</b> -->
-	</center>
-    </div>
+    <!-- ###ONLOAD_IMAGE_RESULTS### -->
+    <div id="kesearch_updating_results"><center>###SPINNER###<br /></center></div>
     <div id="kesearch_pagebrowser_bottom">###PAGEBROWSER_BOTTOM###</div>
     <!-- ###SUB_QUERY_TIME### start --><div id="kesearch_query_time">###QUERY_TIME###</div><!-- ###SUB_QUERY_TIME### end -->
     ###ONLOAD_IMAGE###
-    
-    <!-- <div id="testbox">--DEBUG BOX --</div> -->
-    
 <!-- ###RESULT_LIST### end -->
 
 
@@ -136,8 +131,8 @@
 	    </span>
 	    <span class="resetlink" onclick="document.getElementById('###FILTERID###').value=''; ###ONCLICK_RESET###">Filter zur&uuml;cksetzen</span>
 	</ul>
-	
+
 	<input type="hidden" name="###FILTERNAME###" id="###FILTERID###" value="###VALUE###">
-	
+
     </div>
 <!-- ###SUB_FILTER_LIST### end -->

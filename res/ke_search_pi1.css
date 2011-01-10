@@ -172,7 +172,7 @@
     border: 1px solid #CFCFCF;
     background: url("img/list-head-bgrnd.gif") repeat scroll 0 0 transparent;
     padding: 5px;
-    text-align: center; 
+    text-align: center;
 }
 
 .tx-kesearch-pi1 .resetButton:hover {
@@ -288,4 +288,3 @@
 
 .tx-kesearch-pi1 .next{background: transparent url('img/arrow-next.gif') no-repeat left 5px;}
 .tx-kesearch-pi1 .prev{background: transparent url('img/arrow-prev.gif') no-repeat right 5px;}
-

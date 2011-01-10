@@ -10,7 +10,7 @@
 				</TCEforms>
 				<type>array</type>
 				<el>
-					
+
 					<mode>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.mode</label>
@@ -31,7 +31,7 @@
 							</config>
 						</TCEforms>
 					</mode>
-					
+
 					<resultChars>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.resultChars</label>
@@ -48,7 +48,7 @@
 							</config>
 						</TCEforms>
 					</resultChars>
-					
+
 					<resultsNumeration>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.resultsNumeration</label>
@@ -59,8 +59,8 @@
 							</config>
 						</TCEforms>
 					</resultsNumeration>
-					
-					
+
+
 					<highlightSword>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.highlightSword</label>
@@ -71,7 +71,7 @@
 							</config>
 						</TCEforms>
 					</highlightSword>
-					
+
 					<resultsPerPage>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.resultsPerPage</label>
@@ -88,7 +88,7 @@
 							</config>
 						</TCEforms>
 					</resultsPerPage>
-					
+
 					<maxPagesInPagebrowser>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.maxPagesInPagebrowser</label>
@@ -105,7 +105,7 @@
 							</config>
 						</TCEforms>
 					</maxPagesInPagebrowser>
-					
+
 					<filters>
 						<TCEforms>
 							<displayCond>FIELD:mode:=:0</displayCond>
@@ -122,7 +122,7 @@
 							</config>
 						</TCEforms>
 					</filters>
-					
+
 					<preselected_filters>
 						<TCEforms>
 							<displayCond>FIELD:mode:=:0</displayCond>
@@ -139,8 +139,8 @@
 							</config>
 						</TCEforms>
 					</preselected_filters>
-					
-					
+
+
 					<resultPage>
 						<TCEforms>
 							<displayCond>FIELD:mode:=:0</displayCond>
@@ -156,8 +156,8 @@
 							</config>
 						</TCEforms>
 					</resultPage>
-					
-					
+
+
 					<pagebrowserOnTop>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.pagebrowserOnTop</label>
@@ -168,7 +168,7 @@
 							</config>
 						</TCEforms>
 					</pagebrowserOnTop>
-					
+
 					<pagebrowserAtBottom>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.pagebrowserAtBottom</label>
@@ -179,7 +179,7 @@
 							</config>
 						</TCEforms>
 					</pagebrowserAtBottom>
-					
+
 					<showTypeIcon>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showTypeIcon</label>
@@ -190,7 +190,7 @@
 							</config>
 						</TCEforms>
 					</showTypeIcon>
-					
+
 					<showResultUrl>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showResultUrl</label>
@@ -201,7 +201,7 @@
 							</config>
 						</TCEforms>
 					</showResultUrl>
-					
+
 					<showScore>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showScore</label>
@@ -212,7 +212,7 @@
 							</config>
 						</TCEforms>
 					</showScore>
-					
+
 					<showPercentalScore>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showPercentalScore</label>
@@ -223,7 +223,7 @@
 							</config>
 						</TCEforms>
 					</showPercentalScore>
-					
+
 					<showScoreScale>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showScoreScale</label>
@@ -234,7 +234,7 @@
 							</config>
 						</TCEforms>
 					</showScoreScale>
-					
+
 					<resetFiltersOnSubmit>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.resetFiltersOnSubmit</label>
@@ -245,7 +245,7 @@
 							</config>
 						</TCEforms>
 					</resetFiltersOnSubmit>
-					
+
 					<redirectOnFilterChange>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.redirectOnFilterChange</label>
@@ -256,7 +256,7 @@
 							</config>
 						</TCEforms>
 					</redirectOnFilterChange>
-					
+
 					<checkFilterCondition>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.checkFilterCondition</label>
@@ -281,7 +281,7 @@
 							</config>
 						</TCEforms>
 					</checkFilterCondition>
-					
+
 					<resultLinkTarget>
 						<TCEforms>
 							<displayCond>FIELD:mode:=:0</displayCond>
@@ -302,7 +302,33 @@
 							</config>
 						</TCEforms>
 					</resultLinkTarget>
-					
+
+					<renderMethod>
+						<TCEforms>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.renderMethod</label>
+							<config>
+								<type>select</type>
+								<items>
+									<numIndex index="0">
+										<numIndex index="0">LLL:EXT:ke_search/pi1/locallang.xml:ff.renderMethod.I.0</numIndex>
+										<numIndex index="1">static</numIndex>
+									</numIndex>
+									<numIndex index="1">
+										<numIndex index="0">LLL:EXT:ke_search/pi1/locallang.xml:ff.renderMethod.I.1</numIndex>
+										<numIndex index="1">ajax_after_reload</numIndex>
+									</numIndex>
+									<numIndex index="2">
+										<numIndex index="0">LLL:EXT:ke_search/pi1/locallang.xml:ff.renderMethod.I.2</numIndex>
+										<numIndex index="1">ajax</numIndex>
+									</numIndex>
+								</items>
+								<size>1</size>
+								
+							</config>
+						</TCEforms>
+					</renderMethod>
+
 					<showQueryTime>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showQueryTime</label>
@@ -313,7 +339,7 @@
 							</config>
 						</TCEforms>
 					</showQueryTime>
-					
+
 					<showTags>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showTags</label>
@@ -325,7 +351,7 @@
 							</config>
 						</TCEforms>
 					</showTags>
-					
+
 					<showQuery>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showQuery</label>
@@ -337,7 +363,7 @@
 							</config>
 						</TCEforms>
 					</showQuery>
-					
+
 					<showTaggedContentOnly>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showTaggedContentOnly</label>
@@ -349,7 +375,7 @@
 							</config>
 						</TCEforms>
 					</showTaggedContentOnly>
-					
+
 					<loadFlexformsFromOtherCE>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.loadFlexformsFromOtherCE</label>
@@ -364,7 +390,7 @@
 							</config>
 						</TCEforms>
 					</loadFlexformsFromOtherCE>
-					
+
 				</el>
 			</ROOT>
 		</MAIN>
