@@ -258,10 +258,51 @@ class tx_kesearch_indexer {
 
 	}
 
+	/**
+ 	* Helper function for generating tags.
+ 	* Adds tags generated from a db relation (commalist of uids, not mm-table).
+ 	*
+ 	* @param   string $from_table
+ 	* @param   string $titleField
+ 	* @param   string $uidList
+ 	* @return  string list of tags, comma separated
+ 	* @author  Christian Buelter <buelter@kennziffer.com>
+ 	* @since   Mon Jan 10 2011 13:56:24 GMT+0100
+ 	*/
+	public function makeTagsFromDBRelation($from_table, $titleField, $uidList) {
+			// get the data
+		$where_clause = 'uid IN' . '(' . $uidList . ')';
+		$where_clause .= t3lib_BEfunc::deleteClause($from_table);
+		$where_clause .= t3lib_BEfunc::BEenableFields($from_table);
+		$tags = '';
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($titleField, $from_table, $where_clause);
+		if ($GLOBALS['TYPO3_DB']->sql_num_rows($res)) {
+			while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+				$tags .= '#' . $row[$titleField] . '#';
+			}
+		}
+		return $tags;
+	}
 
-
-
-
+	/**
+ 	* Helper function for generating tags.
+ 	* Renders a list of tags from a commalist of text values.
+ 	*
+ 	* @param   string $valuelist list of comma separated values (string values, not list of uids)
+ 	* @return  string list of tags
+ 	* @author  Christian Buelter <buelter@kennziffer.com>
+ 	* @since   Mon Jan 10 2011 14:13:10 GMT+0100
+ 	*/
+	public function makeTagsFromCommalist($valuelist) {
+		$tags = '';
+		$listArray = t3lib_div::trimExplode(',', $valuelist);
+		if (count($listArray)) {
+			foreach($listArray as $value) {
+				$tags .= '#' . $value . '#';
+			}
+		}
+		return $tags;
+	}
 
 	/**
  	* indexes tt_news
