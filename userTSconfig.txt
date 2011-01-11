@@ -1,2 +1,0 @@
-mod.web_list.hideTables := addToList(tx_kesearch_index)
-mod.web_list.hideTables := addToList(tx_kesearch_filteroptions)
