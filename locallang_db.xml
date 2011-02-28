@@ -6,7 +6,7 @@
 	</meta>
 	<data type="array">
 		<languageKey index="default" type="array">
-			<label index="pages.tx_kesearch_tags">Tags</label>
+			<label index="pages.tx_kesearch_tags">Tags for faceted search</label>
 			<label index="tt_content.list_type_pi1">Faceted search</label>
 			<label index="tx_kesearch_filters">Filters</label>
 			<label index="tx_kesearch_filters.title">Title</label>
