@@ -1,0 +1,5 @@
+  # cat=basic//10; type=int [0-120]; label= Cleanup Interval: Index entries that are older than this value (in hours) are deleted when the index is rebuilt
+cleanupInterval = 24
+
+ # cat=basic//20: type=boolean; label= Special mode for sites with wrong charset setup
+useUTF8QuirksMode = 0

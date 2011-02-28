@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>module</type>
+		<description>Language labels for module &quot;web_txkesearchM1&quot;</description>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">
+			<label index="title">Faceted Search</label>
+			<label index="function1">Start indexing</label>
+			<label index="function2">Indexed content</label>
+			<label index="function3">Index table information</label>
+		</languageKey>
+		<languageKey index="de" type="array">
+			<label index="title">Facettierte Suche</label>
+			<label index="function1">Indizierung anstossen</label>
+			<label index="function2">Indizierte Inhalte</label>
+			<label index="function3">Informationen über Index-Tabelle</label>
+		</languageKey>
+	</data>
+</T3locallang>
