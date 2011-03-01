@@ -79,6 +79,15 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$pages = $this->cObj->data['pages'];
 		$this->pids = $this->pi_getPidList($pages, $this->cObj->data['recursive']);
 
+		// get first page in pages list
+		if ($pages) {
+			$pagesList = explode(',', $pages);
+			$this->firstStoragePage = $pagesList[0];
+			unset ($pagesList);
+		} else {
+			$this->firstStoragePage = 0;
+		}
+
 		// GET FLEXFORM DATA
 		$this->initFlexforms();
 
@@ -826,7 +835,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// build words searchphrase
 		$wordsAgainst = '';
 		// build against clause for all searchwords
-	if (count($swords)) {
+		if (count($swords)) {
 			foreach ($swords as $key => $word) {
 				// ignore words under length of 4 chars
 				if (strlen($word) > 3) {
@@ -1377,6 +1386,11 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy,$limit);
 		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 
+			// count searchword with ke_stats
+		if (!$numOnly) {
+			$this->countSearchWord($sword);
+		}
+
 		if ($numOnly) {
 			// get number of records only?
 			return $numResults;
@@ -1619,6 +1633,55 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		else return $content;
 	}
 
+
+	/**
+ 	* Counts searchword and -phrase if ke_stats is installed
+ 	*
+ 	* @param   string $searchphrase
+ 	* @return  void
+ 	* @author  Christian Buelter <buelter@kennziffer.com>
+ 	* @since   Tue Mar 01 2011 12:34:25 GMT+0100
+ 	*/
+	function countSearchWord($searchphrase='') {
+
+		if (t3lib_extMgm::isLoaded('ke_stats')) {
+			$keStatsObj = t3lib_div::getUserObj('EXT:ke_stats/pi1/class.tx_kestats_pi1.php:tx_kestats_pi1');
+			$keStatsObj->initApi();
+
+				// count words
+
+			$wordlist = t3lib_div::trimExplode(' ', $searchphrase, true);
+			foreach ($wordlist as $singleword) {
+				$keStatsObj->increaseCounter(
+					'ke_search Words',
+					'element_title,year,month',
+					$singleword,
+					0,
+					$this->firstStoragePage,
+					$GLOBALS['TSFE']->sys_page->sys_language_uid,
+					0,
+					'extension'
+				);
+			}
+
+				// count phrase
+			$keStatsObj->increaseCounter(
+				'ke_search Phrases',
+				'element_title,year,month',
+				$searchphrase,
+				0,
+				$this->firstStoragePage,
+				$GLOBALS['TSFE']->sys_page->sys_language_uid,
+				0,
+				'extension'
+			);
+
+			unset($wordlist);
+			unset($singleword);
+			unset($keStatsObj);
+		}
+
+	}
 
 
 	/*
