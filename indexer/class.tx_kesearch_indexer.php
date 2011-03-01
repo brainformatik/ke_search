@@ -544,12 +544,12 @@ class tx_kesearch_indexer {
 		$pageContent = $pageRecord['title']."\n\n";
 
 		// get content elements for this page
-		$fields = 'header,bodytext';
+		$fields = 'header,bodytext,CType';
 		$table = 'tt_content';
 		$where = 'pid="'.intval($pid).'" ';
 
 		// index "Text" and "Text with pic" elements
-		$where .= 'AND (CType="text" OR CType="textpic") ';
+		$where .= 'AND (CType="text" OR CType="textpic" OR CType="bullets" OR CType="table" OR CType="html") ';
 
 		// hidden and deleted content elements are not indexed
 		$where .= 'AND hidden=0 AND deleted=0 ';
@@ -567,14 +567,21 @@ class tx_kesearch_indexer {
 		$anz = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 		if ($anz) {
 			while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+
 				// header
 				$pageContent .= strip_tags($row['header'])."\n";
+
 				// bodytext
 				$bodytext = $row['bodytext'];
 				$bodytext = str_replace('<td', ' <td', $bodytext);
 				$bodytext = str_replace('<br', ' <br', $bodytext);
 				$bodytext = str_replace('<p', ' <p', $bodytext);
+				if ($row['CType'] == 'table') {
+					// replace table dividers with whitespace
+					$bodytext = str_replace('|', ' ', $bodytext);
+				}
 				$bodytext = strip_tags($bodytext);
+
 				$pageContent .= $bodytext."\n";
 			}
 		} else {

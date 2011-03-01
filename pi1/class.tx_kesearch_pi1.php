@@ -459,8 +459,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		}
 
-
-
 	}
 
 
