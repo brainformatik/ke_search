@@ -489,6 +489,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$swordValue = $this->piVars['sword'] ? $this->removeXSS($this->piVars['sword']) : '';
 		$content = $this->cObj->substituteMarker($content,'###SWORD_VALUE###', $swordValue);
 
+
 		// get filters
 		if ($this->ffdata['renderMethod'] == 'ajax') $content = $this->cObj->substituteMarker($content,'###FILTER###',$this->renderFilters());
 		else {
@@ -1725,8 +1726,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			}
 		}
 
-		// load flexform config from other ce
+
 		if ($this->ffdata['mode'] == 1 && !empty($this->ffdata['loadFlexformsFromOtherCE'])) {
+			// load flexform config from other ce
 			$fields = 'pi_flexform';
 			$table = 'tt_content';
 			$where = 'uid="'.intval($this->ffdata['loadFlexformsFromOtherCE']).'"  ';
@@ -1743,6 +1745,14 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					}
 				}
 			}
+
+			// load startingpoint from other CE
+			$fields = 'pages, recursive';
+			$table = 'tt_content';
+			$where = 'uid="'.intval($this->ffdata['loadFlexformsFromOtherCE']).'"  ';
+			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='1');
+			$row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+			$this->pids = $this->pi_getPidList($row['pages'], $row['recursive']);
 		}
 
 	}
