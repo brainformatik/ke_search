@@ -22,18 +22,6 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-/*
- static
-	no ajax, no javascript; every action is processed as a page load
-	--> accessibility
-	--> results reachable per url (get-params)
- ajax_after_reload
-	every action is processed as page reload, ajax calls are done onLoad
-	--> look and feel of an ajax application
-	--> back-button can be used to get back to earlier results
-	--> results reachable per url (get-params)
- ajax
-*/
 
 require_once(PATH_tslib.'class.tslib_pibase.php');
 
@@ -968,6 +956,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// set pivars
 		$this->piVars = $data[$this->prefixId];
+		$this->piVars['sword'] = $this->removeXSS($this->piVars['sword']);
 
 		// make xajax response object
 		$objResponse = new tx_xajax_response();
