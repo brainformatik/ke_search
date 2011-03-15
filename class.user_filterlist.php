@@ -41,13 +41,13 @@ class user_filterlist {
 		} else {
 			$intString = intval($config['row']['pages']);
 		}
-		
+
 		// print message if no startingpoint is set in plugin config
 		if (empty($intString)) {
 			$config['items'][] = array('[SET STARTINGPOINT FIRST!]', '');
 		}
-		
-		// get filters 
+
+		// get filters
 		$fields = '*';
 		$table = 'tx_kesearch_filters';
 		$where = 'pid IN('.$intString.') ';
@@ -58,12 +58,12 @@ class user_filterlist {
 		while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 			$config['items'][] = array($row['title'], $row['uid']);
 		}
-		
+
 	}
-	
-	
+
+
 	function getListOfAvailableFiltersForTCA(&$config) {
-		
+
 		// get current pid
 		if ($config['table'] == 'pages') {
 			$currentPid = $config['row']['uid'];
@@ -71,16 +71,16 @@ class user_filterlist {
 			$currentPid = $config['row']['pid'];
 		}
 		// t3lib_div::debug($currentPid,'pid');
-		
+
 		// get the page TSconfig
         $this->pageTSconfig=t3lib_BEfunc::GetPagesTSconfig($currentPid);
         $this->modTSconfig=$this->pageTSconfig['ke_search.'];
 		// t3lib_div::debug($this->modTSconfig,'modTSConfig');
-		
-		// get filters 
+
+		// get filters
 		$fields = '*';
 		$table = 'tx_kesearch_filters';
-		
+
 		// storage pid for filter options
 		if (!empty($this->modTSconfig['filterStorage'])) {
 			// storage pid is set in page ts config
@@ -89,14 +89,14 @@ class user_filterlist {
 			// no storage pid set in page ts config
 			$where = '1=1 ';
 		}
-		
-		
+
+
 		$where .= t3lib_befunc::BEenableFields($table,$inv=0);
 		$where .= t3lib_befunc::deleteClause($table,$inv=0);
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
 		$anz = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 		while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-			
+
 			if (!empty($row['options'])) {
 				$fields2 = '*';
 				$table2 = 'tx_kesearch_filteroptions';
@@ -108,12 +108,12 @@ class user_filterlist {
 					$config['items'][] = array($row['title'].': '.$row2['title'], $row2['uid']);
 				}
 			}
-			
+
 		}
 	}
-	
-	
-	
+
+
+
 	function getListOfAvailableFilteroptionsForFlexforms(&$config) {
 		// get id from string
 		if (strstr($config['row']['pages'],'pages_')) {
@@ -123,13 +123,13 @@ class user_filterlist {
 		} else {
 			$intString = intval($config['row']['pages']);
 		}
-		
+
 		// print message if no startingpoint is set in plugin config
 		if (empty($intString)) {
 			$config['items'][] = array('[SET STARTINGPOINT FIRST!]', '');
 		}
-		
-		// get filters 
+
+		// get filters
 		$fields = '*';
 		$table = 'tx_kesearch_filters';
 		$where = 'pid IN('.$intString.') ';
@@ -137,7 +137,7 @@ class user_filterlist {
 		$where .= t3lib_befunc::deleteClause($table,$inv=0);
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
 		while ($rowFilter=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-			
+
 			if (!empty($rowFilter['options'])) {
 				// get filteroptions
 				$fieldsOpts = '*';

@@ -34,9 +34,29 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
  * @subpackage	tx_kesearch
  */
 class tx_kesearch_pi1 extends tslib_pibase {
-	var $prefixId      = 'tx_kesearch_pi1';		// Same as class name
-	var $scriptRelPath = 'pi1/class.tx_kesearch_pi1.php';	// Path to this script relative to the extension dir.
-	var $extKey        = 'ke_search';	// The extension key.
+	var $prefixId      					= 'tx_kesearch_pi1';		// Same as class name
+	var $scriptRelPath 				= 'pi1/class.tx_kesearch_pi1.php';	// Path to this script relative to the extension dir.
+	var $extKey        					= 'ke_search';	// The extension key.
+
+	var $ms                 				= 0;
+	var $startingPoints     			= 0; // comma seperated list of startingPoints
+	var $firstStartingPoint 		= 0; // comma seperated list of startingPoints
+	var $ffdata             				= array(); // FlexForm-Configuration
+	var $countTagsResult    	= 0; // precount the results of table content
+	var $countContentResult 	= 0; // precount the results of table tags
+	var $indexToUse         		= ''; // it's for 'USE INDEX ($indexToUse)' to speed up queries
+	var $tagsInSearchResult 	= array(); // contains all tags of current search result
+
+ 	/**
+	* @var tx_xajax
+	*/
+	var $xajax;
+
+	/**
+	* @var tx_kesearch_div
+	*/
+	var $div;
+
 
 	/**
 	 * The main method of the PlugIn
@@ -47,10 +67,17 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 */
 	function main($content, $conf) {
 
+		$this->ms = t3lib_div::milliseconds();
 		$this->conf = $conf;
 		$this->pi_setPiVarDefaults();
 		$this->pi_loadLL();
 		$this->pi_USER_INT_obj = 1;	// Configuring so caching is not expected. This value means that no cHash params are ever set. We do this, because it's a USER_INT object!
+
+		// get some helper functions
+		$this->div = t3lib_div::makeInstance('tx_kesearch_div', $this);
+
+		// GET FLEXFORM DATA
+		$this->initFlexforms();
 
 		// debug db errors?
 		// $GLOBALS['TYPO3_DB']->debugOutput = true;
@@ -64,20 +91,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$this->templateCode = $this->cObj->fileResource($this->templateFile);
 
 		// get startingpoint
-		$pages = $this->cObj->data['pages'];
-		$this->pids = $this->pi_getPidList($pages, $this->cObj->data['recursive']);
-
-		// get first page in pages list
-		if ($pages) {
-			$pagesList = explode(',', $pages);
-			$this->firstStoragePage = $pagesList[0];
-			unset ($pagesList);
-		} else {
-			$this->firstStoragePage = 0;
-		}
-
-		// GET FLEXFORM DATA
-		$this->initFlexforms();
+		$this->startingPoints = $this->div->getStartingPoint();
+		$this->firstStartingPoint = $this->div->getFirstStartingPoint($this->startingPoints);
 
 		// init XAJAX?
 		if ($this->ffdata['renderMethod'] != 'static') $this->initXajax();
@@ -481,7 +496,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$content = $this->cObj->substituteMarker($content,'###SUBMIT_VALUE###',$this->pi_getLL('submit'));
 
 		// search word value
-		$swordValue = $this->piVars['sword'] ? $this->removeXSS($this->piVars['sword']) : '';
+		$swordValue = $this->piVars['sword'] ? $this->div->removeXSS($this->piVars['sword']) : '';
 		$content = $this->cObj->substituteMarker($content,'###SWORD_VALUE###', $swordValue);
 
 
@@ -504,14 +519,14 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			// language parameter
 			$lParam = t3lib_div::_GET('L');
 			if (isset($lParam)) {
-				$hiddenFieldValue = $this->removeXSS($lParam);
+				$hiddenFieldValue = $this->div->removeXSS($lParam);
 				$hiddenFieldsContent .= '<input type="hidden" name="L" value="'.$hiddenFieldValue.'" />';
 			}
 			// mountpoint parameter
 			$mpParam = t3lib_div::_GET('MP');
 			if (isset($mpParam)) {
 				$hiddenFieldValue = t3lib_div::_GET('MP');
-				$hiddenFieldValue = $this->removeXSS($hiddenFieldValue);
+				$hiddenFieldValue = $this->div->removeXSS($hiddenFieldValue);
 				$hiddenFieldsContent .= '<input type="hidden" name="MP" value="'.$hiddenFieldValue.'" />';
 			}
 			$content = $this->cObj->substituteMarker($content,'###HIDDENFIELDS###', $hiddenFieldsContent);
@@ -548,7 +563,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$this->filters = $this->getFilters();
 
 		if (!empty($this->ffdata['filters'])) {
-			$filterList = explode(',',$this->ffdata['filters']);
+			$filterList = explode(',', $this->ffdata['filters']);
 
 			foreach ($filterList as $key => $filterUid) {
 
@@ -561,7 +576,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					$fields = '*';
 					$table = 'tx_kesearch_filteroptions';
 					$where = 'uid in ('.$this->filters[$filterUid]['options'].')';
-					$where .= ' AND pid in ('.$this->pids.')';
+					$where .= ' AND pid in ('.$this->startingPoints.')';
 					$where .= $this->cObj->enableFields($table);
 					$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='sorting',$limit='');
 
@@ -813,7 +828,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	function checkIfTagMatchesRecords($tag, $mode='multi', $filterId) {
 
 		// prepare searchword for query
-		$sword = $this->removeXSS($this->piVars['sword']);
+		$sword = $this->div->removeXSS($this->piVars['sword']);
 		// replace plus and minus chars
 		$sword = str_replace('-', ' ', $sword);
 		$sword = str_replace('+', ' ', $sword);
@@ -827,8 +842,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			foreach ($swords as $key => $word) {
 				// ignore words under length of 4 chars
 				if (strlen($word) > 3) {
-					if ($this->UTF8QuirksMode) $wordsAgainst .= '+*'.utf8_encode($word).'* ';
-					else $wordsAgainst .= '+*'.$word.'* ';
+					if ($this->UTF8QuirksMode) $wordsAgainst .= '+'.utf8_encode($word).'* ';
+					else $wordsAgainst .= '+'.$word.'* ';
 				} else {
 					unset ($swords[$key]);
 				}
@@ -836,36 +851,103 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		}
 		$filterList = explode(',', $this->ffdata['filters']);
 
-		// against-clause for single check (not in condition with other selected filters)
-		// $against = ' +"#'.$tag.'#" ';
-		$tagsAgainst = ' +"#'.$tag.'#" ';
+		// build query
+		// get all tags of current searchresult
+		if(!count($this->tagsInSearchResult)) {
 
-		// extend against-clause for multi check (in condition with other selected filters)
-		if ($mode == 'multi' && is_array($filterList)) {
-			// andere filter aufrufen
-			foreach ($filterList as $key => $foreignFilterId) {
-				if ($foreignFilterId != $filterId) {
-					// filter wurde gewählt
-					if (!empty($this->piVars['filter'][$foreignFilterId])) {
-						$tagsAgainst .= ' +"#'.$this->piVars['filter'][$foreignFilterId].'#" ';
+			// extend against-clause for multi check (in condition with other selected filters)
+			if ($mode == 'multi' && is_array($filterList)) {
+				// andere filter aufrufen
+				foreach ($filterList as $key => $foreignFilterId) {
+					if ($foreignFilterId != $filterId) {
+						// filter wurde gewählt
+						if (!empty($this->piVars['filter'][$foreignFilterId])) {
+							$tagsAgainst .= ' +"#'.$this->piVars['filter'][$foreignFilterId].'#" ';
+						}
 					}
 				}
 			}
+
+			$this->setCountResults($wordsAgainst, $tagsAgainst);
+
+			$fields = 'uid';
+			$table = 'tx_kesearch_index';
+			$where = '1=1';
+			if($tagsAgainst) {
+				$where .= ' AND MATCH (tags) AGAINST (\''.$tagsAgainst.'\' IN BOOLEAN MODE) ';
+			}
+			if (count($swords)) {
+				$where .= ' AND MATCH (content) AGAINST (\''.$wordsAgainst.'\' IN BOOLEAN MODE) ';
+			}
+			$where .= $this->cObj->enableFields($table);
+
+			$query = $GLOBALS['TYPO3_DB']->SELECTquery(
+				'uid, REPLACE(tags, "##", "#,#") as tags',
+				'tx_kesearch_index USE INDEX (' . $this->indexToUse . ')',
+				$where,
+				'','',''
+			);
+			$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+
+			while($tags = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+				foreach(explode(',', $tags['tags']) as $value) {
+					$tagTempArray[] = $value;
+				}
+			}
+
+			// the following is much faster than array_unique()
+			$tagArray = array();
+			foreach($tagTempArray as $key => $val) {
+				$tagArray[$val] = true;
+			}
+			$this->tagsInSearchResult = array_keys($tagArray);
 		}
 
-		// build query
-		$fields = 'uid';
-		$table = 'tx_kesearch_index';
-		// $where = ' MATCH('.$againstCols.') AGAINST (\''.$againstBoolean.'\' IN BOOLEAN MODE) ';
-		$where = 'MATCH tags AGAINST (\''.$tagsAgainst.'\' IN BOOLEAN MODE) ';
-		if (count($swords)) {
-			$where .= ' AND MATCH content AGAINST (\''.$wordsAgainst.'\' IN BOOLEAN MODE) ';
+		if(array_search('#' . $tag . '#', $this->tagsInSearchResult) === false) {
+			return false;
+		} else {
+			return true;
 		}
-		$where .= $this->cObj->enableFields($table);
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,'','',1);
-		$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields,$table,$where,'','',1);
-		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-		return $numResults;
+	}
+
+
+	/**
+	 * This function is useful to decide which index to use
+	 *
+	 * @param string $searchString
+	 * @param string $tagsString
+	 */
+	protected function setCountResults($searchString, $tagsString = '') {
+		if(!$this->countContentResults) {
+			// generate Query for counting searchresults in table content
+			$query = $GLOBALS['TYPO3_DB']->SELECTquery(
+				'COUNT(*) as content',
+				'tx_kesearch_index',
+				'AND MATCH (content) AGAINST (\'' . $searchString . '\' IN BOOLEAN MODE)'
+			);
+			$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+			$count = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+			$this->countContentResult = $count['content'];
+		}
+
+		if(!$this->countTagsResults && $tagsString) {
+			// generate Query for counting searchresults in table tags
+			$queryTags = $GLOBALS['TYPO3_DB']->SELECTquery(
+				'COUNT(*) as tags',
+				'tx_kesearch_index',
+				'MATCH (tags) AGAINST (\'' . $tagsString . '\' IN BOOLEAN MODE)'
+			);
+			$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+			$count = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+			$this->countTagsResult = $count['tags'];
+		}
+
+		//decide which index to use
+		if($this->countContentResult > $this->countTagsResult) {
+			$this->indexToUse = 'tag';
+		} else {
+			$this->indexToUse = 'content';
+		}
 	}
 
 
@@ -876,7 +958,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		if (!empty($this->ffdata['filters'])) {
 			$fields = '*';
 			$table = 'tx_kesearch_filters';
-			$where = 'pid in ('.$this->pids.')';
+			$where = 'pid in ('.$this->startingPoints.')';
 			$where .= 'AND uid in ('.$this->ffdata['filters'].')';
 			$where .= $this->cObj->enableFields($table);
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
@@ -887,9 +969,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		return $results;
 
 	}
-
-
-
 
 
 	/**
@@ -956,7 +1035,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// set pivars
 		$this->piVars = $data[$this->prefixId];
-		$this->piVars['sword'] = $this->removeXSS($this->piVars['sword']);
+		$this->piVars['sword'] = $this->div->removeXSS($this->piVars['sword']);
 
 		// make xajax response object
 		$objResponse = new tx_xajax_response();
@@ -1007,7 +1086,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// set pivars
 		foreach ($data[$this->prefixId] as $key => $value) {
-			$this->piVars[$key] = $this->removeXSS($value);
+			$this->piVars[$key] = $this->div->removeXSS($value);
 		}
 
 		// init Flexforms
@@ -1102,18 +1181,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				$objResponse->addAssign("kesearch_error", "innerHTML", '');
 			}
 
-
-		// fill testbox
-		/*
-		$objResponse->addAssign(
-			"testbox",
-			"innerHTML",
-			// t3lib_div::view_array($this->piVars).'<br /><br />'
-			 '<b>data:</b><br />'.t3lib_div::view_array($data).'<br /><br />'
-			// $this->onclickFilter.'<br /><br />'
-		);
-		*/
-
 		// return response xml
 		return $objResponse->getXML();
 
@@ -1128,7 +1195,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// set pivars
 		$this->piVars = $data[$this->prefixId];
 		foreach ($this->piVars as $key => $value) {
-			$this->piVars[$key] = $this->removeXSS($value);
+			$this->piVars[$key] = $this->div->removeXSS($value);
 		}
 
 		// init Flexforms
@@ -1190,7 +1257,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		$this->piVars = $data[$this->prefixId];
 		foreach ($this->piVars as $key => $value) {
-			$this->piVars[$key] = $this->removeXSS($value);
+			$this->piVars[$key] = $this->div->removeXSS($value);
 		}
 
 
@@ -1246,9 +1313,10 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 * function getSearchResults
 	 */
 	function getSearchResults($numOnly=false, $maxScore=false) {
+		if($this->ms == 0) $this->ms = t3lib_div::milliseconds();
 
 		// prepare searchword for query
-		$sword = $this->removeXSS($this->piVars['sword']);
+		$sword = $this->div->removeXSS($this->piVars['sword']);
 
 		// replace plus and minus chars
 		$sword = str_replace('-', ' ', $sword);
@@ -1277,12 +1345,16 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		if (empty($this->ffdata['resultsPerPage'])) {
 			$limit .= '10';
 		}
+		$limit = 10;
 
 		// build words searchphrase
 		$scoreAgainst = '';
 		$contentAgainst = '';
 		// build against clause for all searchwords
 		if (count($swords)) {
+			// precount results to find the best index
+			$this->setCountResults($contentAgainst, $tagsAgainst);
+
 			foreach ($swords as $key => $word) {
 				// ignore words under length of 4 chars
 				if (strlen($word) > 3) {
@@ -1315,7 +1387,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$where = '1=1 ';
 			if (!empty($contentAgainst)) $where .= 'AND MATCH (content) AGAINST (\''.$contentAgainst.'\' IN BOOLEAN MODE) ';
 			if (!empty($tagsAgainst)) $where .= 'AND MATCH (tags) AGAINST (\''.$tagsAgainst.'\' IN BOOLEAN MODE) ';
-			$where .= ' AND pid in ('.$this->pids.') ';
+			$where .= ' AND pid in ('.$this->startingPoints.') ';
 
 			// add "tagged content only" searchphrase
 			if ($this->ffdata['showTaggedContentOnly']) $where .= $taggedOnlyWhere;
@@ -1324,9 +1396,13 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$where .= $this->cObj->enableFields($table);
 
 			// process query
-			$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit);
-			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit);
-			$row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+			$query = $GLOBALS['TYPO3_DB']->SELECTquery(
+				$fields,
+				$table . ' USE INDEX (' . $this->indexToUse . ')',
+				$where, '', '', $limit
+			);
+			$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+			$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 
 			// return maximum score
 			return $row['maxscore'];
@@ -1358,7 +1434,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		if (!empty($tagsAgainst)) $where .= 'AND MATCH (tags) AGAINST (\''.$tagsAgainst.'\' IN BOOLEAN MODE) ';
 
 		// restrict to storage page
-		$where .= ' AND pid in ('.$this->pids.') ';
+		$where .= ' AND pid in ('.$this->startingPoints.') ';
 
 		// add "tagged content only" searchphrase
 		if ($this->ffdata['showTaggedContentOnly']) $where .= $taggedOnlyWhere;
@@ -1371,9 +1447,18 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		else $orderBy = 'uid ASC';
 
 		// process query
-		$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields,$table,$where,$groupBy='',$orderBy,$limit);
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy,$limit);
-		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
+		if(count($swords)) {
+			$query = $GLOBALS['TYPO3_DB']->SELECTquery(
+				$fields,
+				$table . ' USE INDEX (' . $this->indexToUse . ')',
+				$where, '', '', $limit
+			);
+			$query = $GLOBALS['TYPO3_DB']->SELECTquery('*', '(' . $query . ') as results', '', '', 'results.score DESC', '');
+    } else {
+    	$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields, $table, $where, '', $orderBy, $limit);
+    }
+    $res = $GLOBALS['TYPO3_DB']->sql_query($query);
+    $numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 
 			// count searchword with ke_stats
 		if (!$numOnly) {
@@ -1432,13 +1517,14 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			// set result title
 			$linktext = $row['title'];
 			$linktext = strip_tags($linktext);
-			$linktext = $this->removeXSS($linktext);
+			$linktext = $this->div->removeXSS($linktext);
 			//$linktext = htmlentities($linktext);
 
 			// highlight hits in result title?
 			if ($this->ffdata['highlightSword'] && count($swords)) {
 				foreach ($swords as $word) {
-					$linktext = preg_replace('/('.$word.')/iu','<span class="hit">\0</span>',$linktext);
+					$linktextReplaced = preg_replace('/('.$word.')/iu','<span class="hit">\0</span>',$linktext);
+					if (!empty($linktextReplaced)) $linktext = $linktextReplaced;
 				}
 			}
 
@@ -1646,7 +1732,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					'element_title,year,month',
 					$singleword,
 					0,
-					$this->firstStoragePage,
+					$this->firstStartingPoint,
 					$GLOBALS['TSFE']->sys_page->sys_language_uid,
 					0,
 					'extension'
@@ -1659,7 +1745,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				'element_title,year,month',
 				$searchphrase,
 				0,
-				$this->firstStoragePage,
+				$this->firstStartingPoint,
 				$GLOBALS['TSFE']->sys_page->sys_language_uid,
 				0,
 				'extension'
@@ -1673,28 +1759,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	}
 
 
-	/*
-	 * function checkIfFiftyPercentRuleFits
-	 * @param $sword
-	 */
-	function checkIfFiftyPercentRuleFits($swords) {
 
-		$fields = '*';
-		$table = 'tx_kesearch_index';
-		$where = '';
-		$i=0;
-		foreach ($swords as $word) {
-			if ($i>0) $where .= ' AND ';
-			$where .= 'content like "%'.$word.'%"';
-			$i++;
-		}
-
-		$where .= $this->cObj->enableFields($table);
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='1');
-		$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='1');
-		$num = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-		return $num ? true : false;
-	}
 
 
 
@@ -1796,32 +1861,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				}
 			}
 
-			// load startingpoint from other CE
-			$fields = 'pages, recursive';
-			$table = 'tt_content';
-			$where = 'uid="'.intval($this->ffdata['loadFlexformsFromOtherCE']).'"  ';
-			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='1');
-			$row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
-			$this->pids = $this->pi_getPidList($row['pages'], $row['recursive']);
+			$this->startingPoints = $this->div->getStartingPoint();
 		}
 
-	}
-
-	/**
-	* Use removeXSS function from t3lib_div if exists
-	* otherwise use removeXSS class included in this extension
-	* (e.g. for older TYPO3 versions)
-	*
-	* @param	string		value
-	* @return	string 		XSS safe value
-	*/
-	function removeXSS($value) {
-		if (method_exists(t3lib_div,'removeXSS')) {
-			return t3lib_div::removeXSS($value);
-		} else {
-			require_once(t3lib_extMgm::extPath($this->extKey).'res/scripts/RemoveXSS.php');
-			return  RemoveXSS::process($value);
-		}
 	}
 
 
@@ -2096,7 +2138,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 * @param $type string
 	 */
 	function renderTypeIcon($type) {
-		$type = $this->removeXSS($type);
+		$type = $this->div->removeXSS($type);
 		unset($imageConf);
 		$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/types/'.$type.'.gif';
 		$image=$this->cObj->IMAGE($imageConf);
