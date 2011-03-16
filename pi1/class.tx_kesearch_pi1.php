@@ -578,7 +578,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					$where = 'uid in ('.$this->filters[$filterUid]['options'].')';
 					$where .= ' AND pid in ('.$this->startingPoints.')';
 					$where .= $this->cObj->enableFields($table);
-					$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='sorting',$limit='');
+					$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
 
 					// loop through filteroptions
 					while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
@@ -602,7 +602,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 										$this->piVars['filter'][$filterUid] = $row['tag'];
 									}
 								}
-								$options[] = array(
+								$options[$row['uid']] = array(
 									'title' => $row['title'],
 									'value' => $row['tag'],
 									'selected' => $selected,
@@ -611,7 +611,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 							}
 						} else {
 							// do not process check; show all filters
-							$options[] = array(
+							$options[$row['uid']] = array(
 								'title' => $row['title'],
 								'value' => $row['tag'],
 								'selected' => $selected,
@@ -619,10 +619,17 @@ class tx_kesearch_pi1 extends tslib_pibase {
 							$optionsCount++;
 						}
 					}
-
 				}
 
-					// hook for modifying filter options
+				// sorting of options as set in filter record by IRRE
+				$sorting = t3lib_div::trimExplode(',', $this->filters[$filterUid]['options'], true);
+				foreach ($sorting as $key => $uid) {
+					$sortedOptions[] = $options[$uid];
+				}
+				$options = $sortedOptions;
+				unset($sortedOptions);
+
+				// hook for modifying filter options
 				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptionsArray'])) {
 					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptionsArray'] as $_classRef) {
 						$_procObj = & t3lib_div::getUserObj($_classRef);
