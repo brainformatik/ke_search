@@ -827,33 +827,17 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 */
 	function checkIfTagMatchesRecords($tag, $mode='multi', $filterId) {
 
-		// prepare searchword for query
-		$sword = $this->div->removeXSS($this->piVars['sword']);
-		// replace plus and minus chars
-		$sword = str_replace('-', ' ', $sword);
-		$sword = str_replace('+', ' ', $sword);
-		// split several words
-		$swords = t3lib_div::trimExplode(' ', $sword, true);
-
-		// build words searchphrase
-		$wordsAgainst = '';
-		// build against clause for all searchwords
-		if (count($swords)) {
-			foreach ($swords as $key => $word) {
-				// ignore words under length of 4 chars
-				if (strlen($word) > 3) {
-					if ($this->UTF8QuirksMode) $wordsAgainst .= '+'.utf8_encode($word).'* ';
-					else $wordsAgainst .= '+'.$word.'* ';
-				} else {
-					unset ($swords[$key]);
-				}
-			}
-		}
-		$filterList = explode(',', $this->ffdata['filters']);
-
-		// build query
 		// get all tags of current searchresult
 		if(!count($this->tagsInSearchResult)) {
+
+			// build words search phrase
+			$searchWordInformation = $this->buildWordSearchphrase();
+			$sword = $searchWordInformation['sword'];
+			$swords = $searchWordInformation['swords'];
+			$wordsAgainst = $searchWordInformation['wordsAgainst'];
+
+			// get filter list
+			$filterList = explode(',', $this->ffdata['filters']);
 
 			// extend against-clause for multi check (in condition with other selected filters)
 			if ($mode == 'multi' && is_array($filterList)) {
@@ -1296,23 +1280,24 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 */
 	function buildTagSearchphrase() {
 		// build tag searchphrase
+		$against = '';
 		if (is_array($this->piVars['filter'])) {
-			$against = '';
 			foreach ($this->piVars['filter'] as $key => $tag)  {
 				if (!empty($tag)) 	$against .= ' +"#'.$tag.'#" ';
 			}
-			return $against;
 		}
+		return $against;
 	}
 
 
-
-	/*
-	 * function getSearchResults
-	 */
-	function getSearchResults($numOnly=false, $maxScore=false) {
-		if($this->ms == 0) $this->ms = t3lib_div::milliseconds();
-
+	/**
+ 	* Build search word string for SQL Query from piVars['sword']
+ 	*
+ 	* @return  array
+ 	* @author  Christian Buelter <buelter@kennziffer.com>
+ 	* @since   Wed Mar 16 2011 15:03:26 GMT+0100
+ 	*/
+	public function buildWordSearchphrase() {
 		// prepare searchword for query
 		$sword = $this->div->removeXSS($this->piVars['sword']);
 
@@ -1323,14 +1308,63 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// split several words
 		$swords = t3lib_div::trimExplode(' ', $sword, true);
 
+		// build words searchphrase
+		$wordsAgainst = '';
+		$scoreAgainst = '';
+
+		// build against clause for all searchwords
+		if (count($swords)) {
+			foreach ($swords as $key => $word) {
+				// ignore words under length of 4 chars
+				if (strlen($word) > 3) {
+
+
+					if ($this->UTF8QuirksMode) {
+						$scoreAgainst .= utf8_decode($word).' ';
+						$wordsAgainst .= '+'.utf8_decode($word).'* ';
+					}
+					else {
+						$scoreAgainst .= $word.' ';
+						$wordsAgainst .= '+'.$word.'* ';
+					}
+
+				} else {
+					unset ($swords[$key]);
+
+					// if any of the search words is below 3 characters
+					$this->showShortMessage = true;
+				}
+			}
+		}
+
+		return array(
+			'sword' => $sword,
+			'swords' => $swords,
+			'wordsAgainst' => $wordsAgainst,
+			'scoreAgainst' => $scoreAgainst
+		);
+	}
+
+	/*
+	 * function getSearchResults
+	 */
+	function getSearchResults($numOnly=false, $maxScore=false) {
+		if($this->ms == 0) $this->ms = t3lib_div::milliseconds();
+
+		// build words searchphrase
+		$searchWordInformation = $this->buildWordSearchphrase();
+		$sword = $searchWordInformation['sword'];
+		$swords = $searchWordInformation['swords'];
+		$wordsAgainst = $searchWordInformation['wordsAgainst'];
+		$scoreAgainst = $searchWordInformation['scoreAgainst'];
+
 		// build "tagged content only" searchphrase
 		if ($this->ffdata['showTaggedContentOnly']) {
 			$taggedOnlyWhere = ' AND tags<>"" ';
 		}
 
 		// build tag searchphrase
-		$tagsAgainst = '';
-		$tagsAgainst .= $this->buildTagSearchphrase();
+		$tagsAgainst = $this->buildTagSearchphrase();
 
 		// calculate limit (not if num or max score is requested)
 		if ($numOnly || $maxScore) {
@@ -1338,37 +1372,14 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		} else {
 			$start = ($this->piVars['page'] * $this->ffdata['resultsPerPage']) - $this->ffdata['resultsPerPage'];
 			if ($start < 0) $start = 0;
-			$limit = $start.', '.$this->ffdata['resultsPerPage'];
+			$limit = $start . ', ' . $this->ffdata['resultsPerPage'];
 		}
 		if (empty($this->ffdata['resultsPerPage'])) {
 			$limit .= '10';
 		}
 
-		// build words searchphrase
-		$scoreAgainst = '';
-		$contentAgainst = '';
-		// build against clause for all searchwords
-		if (count($swords)) {
-			// precount results to find the best index
-			$this->setCountResults($contentAgainst, $tagsAgainst);
-
-			foreach ($swords as $key => $word) {
-				// ignore words under length of 4 chars
-				if (strlen($word) > 3) {
-					if ($this->UTF8QuirksMode) {
-						$scoreAgainst .= utf8_decode($word).' ';
-						$contentAgainst .= '+*'.utf8_decode($word).'* ';
-					}
-					else {
-						$scoreAgainst .= $word.' ';
-						$contentAgainst .= '+*'.$word.'* ';
-					}
-				} else {
-					unset ($swords[$key]);
-					$this->showShortMessage = true;
-				}
-			}
-		}
+		// precount results to find the best index
+		$this->setCountResults($wordsAgainst, $tagsAgainst);
 
 		// get max score only (searchword entered)
 		if ($maxScore && count($swords)) {
@@ -1382,7 +1393,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$fields = 'MAX(MATCH (content) AGAINST (\''.$scoreAgainst.'\')) AS maxscore';
 			$table = 'tx_kesearch_index';
 			$where = '1=1 ';
-			if (!empty($contentAgainst)) $where .= 'AND MATCH (content) AGAINST (\''.$contentAgainst.'\' IN BOOLEAN MODE) ';
+			if (!empty($wordsAgainst)) $where .= 'AND MATCH (content) AGAINST (\''.$wordsAgainst.'\' IN BOOLEAN MODE) ';
 			if (!empty($tagsAgainst)) $where .= 'AND MATCH (tags) AGAINST (\''.$tagsAgainst.'\' IN BOOLEAN MODE) ';
 			$where .= ' AND pid in ('.$this->startingPoints.') ';
 
@@ -1408,7 +1419,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 			// if there is no sword: set max score to 0
 			return 0;
-
 		}
 
 		// Generate query for matching content
@@ -1427,7 +1437,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// add boolean where clause for all searchwords and/or tags
 		$where = '1=1 ';
-		if (!empty($contentAgainst)) $where .= 'AND MATCH (content) AGAINST (\''.$contentAgainst.'\' IN BOOLEAN MODE) ';
+		if (!empty($wordsAgainst)) $where .= 'AND MATCH (content) AGAINST (\''.$wordsAgainst.'\' IN BOOLEAN MODE) ';
 		if (!empty($tagsAgainst)) $where .= 'AND MATCH (tags) AGAINST (\''.$tagsAgainst.'\' IN BOOLEAN MODE) ';
 
 		// restrict to storage page
@@ -1451,11 +1461,11 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				$where, '', '', $limit
 			);
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery('*', '(' . $query . ') as results', '', '', 'results.score DESC', '');
-    } else {
-    	$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields, $table, $where, '', $orderBy, $limit);
-    }
-    $res = $GLOBALS['TYPO3_DB']->sql_query($query);
-    $numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
+		} else {
+			$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields, $table, $where, '', $orderBy, $limit);
+		}
+		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 
 			// count searchword with ke_stats
 		if (!$numOnly) {
