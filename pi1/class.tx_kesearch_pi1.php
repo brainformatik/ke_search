@@ -1716,12 +1716,12 @@ class tx_kesearch_pi1 extends tslib_pibase {
  	*/
 	function countSearchWord($searchphrase='') {
 
-		if (t3lib_extMgm::isLoaded('ke_stats')) {
+		$searchphrase = trim($searchphrase);
+		if (t3lib_extMgm::isLoaded('ke_stats') && !empty($searchphrase)) {
 			$keStatsObj = t3lib_div::getUserObj('EXT:ke_stats/pi1/class.tx_kestats_pi1.php:tx_kestats_pi1');
 			$keStatsObj->initApi();
 
 				// count words
-
 			$wordlist = t3lib_div::trimExplode(' ', $searchphrase, true);
 			foreach ($wordlist as $singleword) {
 				$keStatsObj->increaseCounter(
@@ -1752,13 +1752,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			unset($singleword);
 			unset($keStatsObj);
 		}
-
 	}
-
-
-
-
-
 
 	/*
 	 * function calculateScore
