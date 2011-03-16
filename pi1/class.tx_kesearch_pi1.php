@@ -857,16 +857,14 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 			// extend against-clause for multi check (in condition with other selected filters)
 			if ($mode == 'multi' && is_array($filterList)) {
-				// andere filter aufrufen
+				// get all filteroptions from URL
 				foreach ($filterList as $key => $foreignFilterId) {
-					if ($foreignFilterId != $filterId) {
-						// filter wurde gewählt
-						if (!empty($this->piVars['filter'][$foreignFilterId])) {
-							$tagsAgainst .= ' +"#'.$this->piVars['filter'][$foreignFilterId].'#" ';
-						}
+					if(!empty($this->piVars['filter'][$foreignFilterId])) {
+						$tagsAgainst .= ' +"#'.$this->piVars['filter'][$foreignFilterId].'#" ';
 					}
 				}
 			}
+			$tagsAgainst = $this->div->removeXSS($tagsAgainst);
 
 			$this->setCountResults($wordsAgainst, $tagsAgainst);
 
@@ -1345,7 +1343,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		if (empty($this->ffdata['resultsPerPage'])) {
 			$limit .= '10';
 		}
-		$limit = 10;
 
 		// build words searchphrase
 		$scoreAgainst = '';
@@ -1803,8 +1800,11 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// crop til whitespace reached
 		$cropped = false;
 		if ($startPos != 0 && $teaser[0] != " " ) {
-			while ($teaser[0] != " ") {
-				$teaser = substr($teaser, 1);
+			$pos = strpos($teaser, ' ');
+			if ($pos === false) {
+				$teaser = ' ' . $teaser;
+			} else {
+				$teaser = substr($teaser, $pos);
 				$cropped = true;
 			}
 		}
