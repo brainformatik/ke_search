@@ -399,7 +399,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				}
 
 				// get max score
-				$this->maxScore = $this->getSearchResults(false, true);
+				if ($this->ffdata['showScore']) {
+					$this->maxScore = $this->getSearchResults(false, true);
+				}
 				$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->getSearchResults());
 				$content = $this->cObj->substituteMarker($content,'###SPINNER###',$this->spinnerImageResults);
 				$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
@@ -1036,7 +1038,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		if ($this->ffdata['showQueryTime']) $startMS = t3lib_div::milliseconds();
 
 		// get max score for all hits
-		$this->maxScore = $this->getSearchResults(false, true);
+		if ($this->ffdata['showScore']) {
+			$this->maxScore = $this->getSearchResults(false, true);
+		}
 
 		// get onclick action
 		$this->initOnclickActions();
@@ -1137,7 +1141,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
 
 		// get max score for all hits
-		$this->maxScore = $this->getSearchResults(false, true);
+		if ($this->ffdata['showScore']) {
+			$this->maxScore = $this->getSearchResults(false, true);
+		}
 
 		// set search results
 		// process if on result page
