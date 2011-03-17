@@ -626,7 +626,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				// sorting of options as set in filter record by IRRE
 				$sorting = t3lib_div::trimExplode(',', $this->filters[$filterUid]['options'], true);
 				foreach ($sorting as $key => $uid) {
-					$sortedOptions[] = $options[$uid];
+					if (is_array($options[$uid])) {
+						$sortedOptions[] = $options[$uid];
+					}
 				}
 				$options = $sortedOptions;
 				unset($sortedOptions);
