@@ -45,7 +45,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	var $countTagsResult    	= 0; // precount the results of table content
 	var $countContentResult 	= 0; // precount the results of table tags
 	var $indexToUse         		= ''; // it's for 'USE INDEX ($indexToUse)' to speed up queries
-	var $tagsInSearchResult 	= array(); // contains all tags of current search result
+	var $tagsInSearchResult 	= false; // contains all tags of current search result
 
  	/**
 	* @var tx_xajax
@@ -835,7 +835,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	function checkIfTagMatchesRecords($tag, $mode='multi', $filterId) {
 
 		// get all tags of current searchresult
-		if(!count($this->tagsInSearchResult)) {
+		if(!is_array($this->tagsInSearchResult)) {
 
 			// build words search phrase
 			$searchWordInformation = $this->buildWordSearchphrase();
