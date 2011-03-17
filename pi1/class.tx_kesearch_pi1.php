@@ -1462,7 +1462,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// get number of results with COUNT(*)
 		if ($numOnly) {
-			$query = $GLOBALS['TYPO3_DB']->SELECTquery('COUNT(uid) as numResults', $table, $where);
+			$query = $GLOBALS['TYPO3_DB']->SELECTquery('COUNT(*) as numResults', $table, $where);
 			$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 			$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 			return $row['numResults'];
