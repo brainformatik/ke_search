@@ -399,7 +399,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				}
 
 				// get max score
-				if ($this->ffdata['showScore']) {
+				if ($this->ffdata['showPercentalScore'] || $this->ffdata['showScoreScale']) {
 					$this->maxScore = $this->getSearchResults(false, true);
 				}
 				$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->getSearchResults());
@@ -1040,7 +1040,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		if ($this->ffdata['showQueryTime']) $startMS = t3lib_div::milliseconds();
 
 		// get max score for all hits
-		if ($this->ffdata['showScore']) {
+		if ($this->ffdata['showPercentalScore'] || $this->ffdata['showScoreScale']) {
 			$this->maxScore = $this->getSearchResults(false, true);
 		}
 
@@ -1143,7 +1143,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
 
 		// get max score for all hits
-		if ($this->ffdata['showScore']) {
+		if ($this->ffdata['showPercentalScore'] || $this->ffdata['showScoreScale']) {
 			$this->maxScore = $this->getSearchResults(false, true);
 		}
 
