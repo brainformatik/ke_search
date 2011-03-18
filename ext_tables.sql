@@ -108,3 +108,29 @@ CREATE TABLE tx_kesearch_indexerconfig (
 	PRIMARY KEY (uid),
 	KEY parent (pid)
 );
+
+#
+# Table structure for table 'tx_kesearch_stat_search'
+#
+CREATE TABLE tx_kesearch_stat_search (
+  uid int(11) NOT NULL auto_increment,
+  pid int(11) DEFAULT '0' NOT NULL,
+  searchphrase text,
+  tstamp int(11) DEFAULT '0' NOT NULL,
+  hits int(11) DEFAULT '0' NOT NULL,
+  tagsagainst text,
+  PRIMARY KEY (uid)
+);
+
+#
+# Table structure for table 'tx_kesearch_stat_word'
+#
+CREATE TABLE tx_kesearch_stat_word (
+  uid int(11) NOT NULL auto_increment,
+  pid int(11) DEFAULT '0' NOT NULL,
+  word text,
+  tstamp int(11) DEFAULT '0' NOT NULL,
+  pageid int(11) DEFAULT '0' NOT NULL,
+  resultsfound int(1) DEFAULT '0' NOT NULL,
+  PRIMARY KEY (uid),
+);

@@ -43,6 +43,7 @@
 			<label index="ff.renderMethod.I.1">AJAX after page load</label>
 			<label index="ff.renderMethod.I.2">AJAX</label>
 			<label index="ff.showQueryTime">Show query process duration?</label>
+			<label index="ff.countSearchPhrases">Count search phrases in statistic tables?</label>
 			<label index="ff.showTags">Show tags? (for debugging)</label>
 			<label index="ff.showQuery">Show query? (for debugging)</label>
 			<label index="ff.showTaggedContentOnly">Show tagged content only? (for debugging)</label>
@@ -112,6 +113,7 @@
 			<label index="ff.renderMethod.I.1">AJAX nach Seitenaufbau</label>
 			<label index="ff.renderMethod.I.2">AJAX direkt (kein Zurück-Button)</label>
 			<label index="ff.showQueryTime">Benötigte Zeit für Suchabfrage anzeigen?</label>
+			<label index="ff.countSearchPhrases">Statistik über Suchbegriffe führen?</label>
 			<label index="ff.showTags">Zeige Tags? (Debugging)</label>
 			<label index="ff.showQuery">Zeige Such-Query? (Debugging)</label>
 			<label index="ff.showTaggedContentOnly">Nur getaggte Inhalte zeigen? (Debugging)</label>

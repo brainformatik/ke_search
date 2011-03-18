@@ -362,6 +362,17 @@
 						</TCEforms>
 					</showQueryTime>
 
+					<countSearchPhrases>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.countSearchPhrases</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>check</type>
+								<default>1</default>
+							</config>
+						</TCEforms>
+					</countSearchPhrases>
+
 					<showTags>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showTags</label>

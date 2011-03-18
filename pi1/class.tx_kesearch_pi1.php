@@ -1490,9 +1490,15 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 
-			// count searchword with ke_stats
+		// searchword statistic
 		if (!$numOnly) {
-			$this->countSearchWord($sword);
+			// count searchword with ke_stats
+			$this->countSearchWordWithKeStats($sword);
+
+			// count search phrase in ke_search statistic tables
+			if ($this->ffdata['countSearchPhrases']) {
+				$this->countSearchPhrase($sword, $swords, $numResults, $tagsAgainst);
+			}
 		}
 
 		if ($numOnly) {
@@ -1747,7 +1753,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
  	* @author  Christian Buelter <buelter@kennziffer.com>
  	* @since   Tue Mar 01 2011 12:34:25 GMT+0100
  	*/
-	function countSearchWord($searchphrase='') {
+	function countSearchWordWithKeStats($searchphrase='') {
 
 		$searchphrase = trim($searchphrase);
 		if (t3lib_extMgm::isLoaded('ke_stats') && !empty($searchphrase)) {
@@ -2205,6 +2211,55 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				$this->onloadImage = '';
 				break;
 
+		}
+
+	}
+
+
+
+	/*
+	 * count searchwords and phrases in statistic tables
+	 *
+	 * @param $searchPhrase string
+	 * @param $searchWordsArray array
+	 * @param $hits int
+	 * @param $tagsAgainst string
+	 * @return void
+	 *
+	 */
+	function countSearchPhrase($searchPhrase, $searchWordsArray, $hits, $tagsAgainst) {
+
+		// prepare "tagsAgainst"
+		$search = array('"', ' ', '+');
+		$replace = array('', '', '');
+		$tagsAgainst = str_replace($search, $replace, $tagsAgainst);
+
+		// count search phrase
+		if (!empty($searchPhrase)) {
+			$table = 'tx_kesearch_stat_search';
+			$fields_values = array(
+				'pid' => $this->firstStartingPoint,
+				'searchphrase' => strtolower($searchPhrase),
+				'tstamp' => time(),
+				'hits' => $hits,
+				'tagsagainst' => $tagsAgainst,
+			);
+			$GLOBALS['TYPO3_DB']->exec_INSERTquery($table,$fields_values,$no_quote_fields=FALSE);
+		}
+
+		// count single words
+		foreach ($searchWordsArray as $searchWord) {
+			if (!empty($searchWord)) {
+				$table = 'tx_kesearch_stat_word';
+				$fields_values = array(
+					'pid' => $this->firstStartingPoint,
+					'word' => strtolower($searchWord),
+					'tstamp' => time(),
+					'pageid' => $GLOBALS['TSFE']->id,
+					'resultsfound' => $hits ? 1 : 0,
+				);
+				$GLOBALS['TYPO3_DB']->exec_INSERTquery($table,$fields_values,$no_quote_fields=FALSE);
+			}
 		}
 
 	}

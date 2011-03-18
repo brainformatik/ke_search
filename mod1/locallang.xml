@@ -10,12 +10,14 @@
 			<label index="function1">Start indexing</label>
 			<label index="function2">Indexed content</label>
 			<label index="function3">Index table information</label>
+			<label index="function4">Searchword statistics</label>
 		</languageKey>
 		<languageKey index="de" type="array">
 			<label index="title">Facettierte Suche</label>
 			<label index="function1">Indizierung anstossen</label>
 			<label index="function2">Indizierte Inhalte</label>
 			<label index="function3">Informationen über Index-Tabelle</label>
+			<label index="function4">Suchwort-Statistik</label>
 		</languageKey>
 	</data>
 </T3locallang>

@@ -117,4 +117,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'iconfile'          => t3lib_extMgm::extRelPath($_EXTKEY).'icon_tx_kesearch_indexerconfig.gif',
 	),
 );
+
+
+
 ?>

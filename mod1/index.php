@@ -53,7 +53,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 		global $BE_USER,$LANG,$BACK_PATH,$TCA_DESCR,$TCA,$CLIENT,$TYPO3_CONF_VARS;
 		parent::init();
 	}
-	
+
 	/**
 	 * Adds items to the ->MOD_MENU array. Used for the function menu selector.
 	 *
@@ -66,11 +66,12 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 				'1' => $LANG->getLL('function1'),
 				'2' => $LANG->getLL('function2'),
 				'3' => $LANG->getLL('function3'),
+				'4' => $LANG->getLL('function4'),
 			)
 		);
 		parent::menuConfig();
 	}
-	
+
 	/**
 	 * Main function of the module. Write the content to $this->content
 	 * If you chose "web" as main module, you will need to consider the $this->id parameter which will contain the uid-number of the page clicked in the page tree
@@ -79,12 +80,12 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 	 */
 	function main()	{
 		global $BE_USER,$LANG,$BACK_PATH,$TCA_DESCR,$TCA,$CLIENT,$TYPO3_CONF_VARS;
-		
+
 		// Access check!
 		// The page will show only if there is a valid page and if this page may be viewed by the user
 		$this->pageinfo = t3lib_BEfunc::readPageAccess($this->id,$this->perms_clause);
 		$access = is_array($this->pageinfo) ? 1 : 0;
-	
+
 		if (($this->id && $access) || ($BE_USER->user['admin'] && !$this->id))	{
 
 				// Draw the header.
@@ -107,17 +108,17 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					if (top.fsMod) top.fsMod.recentIds["web"] = 0;
 				</script>
 			';
-			
+
 			// add some css
 			$this->doc->inDocStyles = '
-				
+
 				.clearer {
 					line-height: 1px;
 					height: 1px;
 					clear: both;
 					display:block;
 				}
-				
+
 				.box {
 					-moz-border-radius: 10px;
 					border-radius: 10px;
@@ -126,8 +127,8 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					margin-top: 20px;
 					background: #DDD;
 					box-shadow: 5px 5px 5px #AFAFAF;
-					-moz-box-shadow: 5px 5px 5px #AFAFAF; 
-					-webkit-box-shadow: 5px 5px 5px #AFAFAF; 
+					-moz-box-shadow: 5px 5px 5px #AFAFAF;
+					-webkit-box-shadow: 5px 5px 5px #AFAFAF;
 				}
 				.box .headline {
 					-moz-border-radius: 8px;
@@ -148,7 +149,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					padding: 5px;
 					background: white;
 				}
-				
+
 				table.tags td {
 					padding: 2px 4px;
 					-moz-border-radius: 8px;
@@ -156,7 +157,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					border: 1px solid black;
 					background: white;
 				}
-				
+
 				.summary {
 					-moz-border-radius: 10px;
 					border-radius: 10px;
@@ -167,7 +168,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					box-shadow: 5px 5px 5px #AFAFAF;
 					-moz-box-shadow: 5px 5px 5px #AFAFAF;
 					-webkit-box-shadow: 5px 5px 5px #AFAFAF;
-					
+
 				}
 				.summary .title {
 					font-size: 120%;
@@ -194,9 +195,9 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					text-align: left;
 					margin-left: 125px;
 				}
-				
-				
-				
+
+
+
 				.reindex-button,
 				.index-button {
 					-moz-border-radius: 7px;
@@ -213,20 +214,70 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					font-weight: bold;
 					color: white
 				}
-				
+
 				.reindex-button {
 					margin-top: 20px;
 				}
-				
+
+				table.statistics {
+					-moz-border-radius: 10px;
+					border-radius: 10px;
+					border: 3px solid #666;
+					padding: 10px;
+					margin-top: 20px;
+					background: white;
+					box-shadow: 5px 5px 5px #AFAFAF;
+					-moz-box-shadow: 5px 5px 5px #AFAFAF;
+					-webkit-box-shadow: 5px 5px 5px #AFAFAF;
+					border-spacing: 0;
+				}
+
+				table.statistics th {
+					background: #666;
+					color: white;
+					padding: 3px;
+				}
+
+				table.statistics td {
+					padding: 3px;
+				}
+
+				table.statistics td.even {
+					background: #CCC;
+				}
+
+				table.statistics td.odd {
+					background: white;
+				}
+
+				table.statistics td.times {
+					text-align: right;
+				}
+
+				.error {
+					font-weight: bold;
+					color: red;
+					-moz-border-radius: 10px;
+					border-radius: 10px;
+					border: 3px solid red;
+					padding: 10px;
+					margin-top: 20px;
+					background: white;
+					box-shadow: 5px 5px 5px red;
+					-moz-box-shadow: 5px 5px 5px red;
+					-webkit-box-shadow: 5px 5px 5px red;
+
+				}
+
 			';
-			
+
 			$headerSection = $this->doc->getHeader('pages',$this->pageinfo,$this->pageinfo['_thePath']).'<br />'.$LANG->sL('LLL:EXT:lang/locallang_core.xml:labels.path').': '.t3lib_div::fixed_lgd_pre($this->pageinfo['_thePath'],50);
 			$this->content.=$this->doc->startPage($LANG->getLL('title'));
 			$this->content.=$this->doc->header($LANG->getLL('title'));
 			$this->content.=$this->doc->spacer(5);
 			$this->content.=$this->doc->section('',$this->doc->funcMenu($headerSection,t3lib_BEfunc::getFuncMenu($this->id,'SET[function]',$this->MOD_SETTINGS['function'],$this->MOD_MENU['function'])));
 			$this->content.=$this->doc->divider(5);
-	
+
 			// Render content:
 			$this->moduleContent();
 
@@ -248,7 +299,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 			$this->content.=$this->doc->spacer(5);
 			$this->content.=$this->doc->spacer(10);
 		}
-	
+
 	}
 
 	/**
@@ -268,38 +319,38 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 	 * @return	void
 	 */
 	function moduleContent()	{
-		
+
 		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search']);
-		
+
 		switch((string)$this->MOD_SETTINGS['function'])	{
-			
+
 			// start indexing process
 			case 1:
 				if (t3lib_div::_GET('do') == 'startindexer') {
 					// make indexer instance and init
-					
+
 					require_once(t3lib_extMgm::extPath('ke_search').'indexer/class.tx_kesearch_indexer.php');
 					$indexer = t3lib_div::makeInstance('tx_kesearch_indexer');
-					
+
 					$verbose = true;
 					$cleanup = $this->extConf['cleanupInterval'];
 					$content = $indexer->startIndexing(true, $cleanup); // start indexing in verbose mode with cleanup process
-					
-					
+
+
 					// Reload - for Debugging only
 					$content .= '<br /><br /><input type="button" value="Reload Page" onClick="window.location.reload()">';
-					
+
 				} else {
 					// show "start indexer" link
 					$content='<br /><br /><a class="index-button" href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=startindexer">Start Indexer</a>';
 				}
 				$this->content.=$this->doc->section('INDEXER FOR KE_SEARCH',$content,0,1);
 			break;
-			
+
 			// show indexed content
 			case 2:
 				if ($this->id) {
-					
+
 					if (t3lib_div::_GET('do') == 'reindex') {
 						require_once(t3lib_extMgm::extPath('ke_search').'indexer/class.tx_kesearch_indexer.php');
 						$indexer = t3lib_div::makeInstance('tx_kesearch_indexer');
@@ -307,40 +358,50 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 						$cleanup = $this->extConf['cleanupInterval'];
 						$content = $indexer->startIndexing(true, $cleanup, $this->id); // start indexing in verbose mode with cleanup process
 					}
-					
+
 					// page is selected: get indexed content
 					$content = '<h2>Index content for page '.$this->id.'</h2>';
 					$content .= $this->getIndexedContent($this->id);
-					
+
 					// Start RE-Indexing for current page
 					// TODO
 					// $content .= '<a href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=reindex" class="reindex-button">Re-Index</a>';
-					
+
 				} else {
 					// no page selected: show message
 					$content = 'Select page first';
 				}
-				
+
 				$this->content.=$this->doc->section('FACETED SEARCH',$content,0,1);
 				break;
-			
-			
+
+
 			// index table information
 			case 3:
-				
+
 				$content = $this->renderIndexTableInformation();
 				$this->content.=$this->doc->section('FACETED SEARCH',$content,0,1);
-				
+
 				break;
+
+			// searchword statistics
+			case 4:
+
+				$content = $this->getSearchwordStatistics($this->id);
+				$this->content.=$this->doc->section('FACETED SEARCH',$content,0,1);
+
+				break;
+
+
 		}
 	}
-	
-	
+
+
 	/*
 	 * function renderIndexTableInformation
 	 */
 	function renderIndexTableInformation() {
-		
+
 		$table = 'tx_kesearch_index';
 
 		// get table status
@@ -348,11 +409,11 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 		while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 			if ($row['Name'] == $table) {
-				
+
 				$dataLength = $this->formatFilesize($row['Data_length']);
 				$indexLength = $this->formatFilesize($row['Index_length']);
 				$completeLength = $this->formatFilesize($row['Data_length'] + $row['Index_length']);
-				
+
 				$content .= '
 					<h2>Index table information</h2>
 					<table>
@@ -375,12 +436,12 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					</table>';
 			}
 		}
-		
-		
+
+
 		return $content;
 	}
-	
-	
+
+
 	/**
 	* format file size from bytes to human readable format
 	*/
@@ -392,13 +453,13 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 			return (round($size/pow(1024, ($i = floor(log($size, 1024)))), $decimals) . $sizes[$i]);
 		}
 	}
-	
+
 	/*
 	 * function getIndexedContent
 	 * @param $pageUid page uid
 	 */
 	function getIndexedContent($pageUid) {
-		
+
 		$fields = '*';
 		$table = 'tx_kesearch_index';
 		$where = '(type="page" AND targetpid="'.intval($pageUid).'")  ';
@@ -409,7 +470,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 		// t3lib_div::debug($GLOBALS['TYPO3_DB']->SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit=''),1);
 		// $anz = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 		while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-			
+
 			// build type image path
 			switch($row['type']) {
 				case 'page':
@@ -421,10 +482,10 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 				default:
 					$imagePath = t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_2.gif';
 					break;
-				
+
 			}
-			
-			
+
+
 			// build tag table
 			$tagTable = '<table class="tags" >';
 			$cols = 5;
@@ -440,7 +501,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 				$i++;
 			}
 			$tagTable .= '</table>';
-			
+
 			// build content
 			$content .= '
 				<div class="summary">
@@ -450,34 +511,34 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					<div class="rightcol">
 						<span class="title">'.$row['title'].'</span>
 						<div class="clearer">&nbsp;</div>
-						
+
 						<div class="label">Type:</div>
 						<div class="value">'.$row['type'].'</div>
 						<div class="clearer">&nbsp;</div>
-						
+
 						<div class="label">Words:</div>
 						<div class="value">'.str_word_count($row['content']).'</div>
 						<div class="clearer">&nbsp;</div>
-						
+
 						<div class="label">Language (UID):</div>
 						<div class="value">'.$row['language'].'</div>
 						<div class="clearer">&nbsp;</div>
 					</div>
 					<div class="clearer">&nbsp;</div>
 				</div>
-				
+
 				<div class="box">
 					<div class="headline">Content</div>
 					<div class="content">
 						'.wordwrap(nl2br($row['content']), 70, '<br />', 1).'
 					</div>
 				</div>
-				
+
 				<div class="box">
 					<div class="headline">Tags</div>
 					'.$tagTable.'
 				</div>
-				
+
 				<div class="box">
 					<div class="headline">Further information</div>
 					<div class="content">
@@ -494,14 +555,69 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					</div>
 				</div>
 				';
-			
+
 		}
-		
+
 		return $content;
-		
+
 	}
-	
-	
+
+
+	/*
+	 * function getSearchwordStatistics
+	 */
+	function getSearchwordStatistics($pageUid) {
+
+		if (!$pageUid) {
+			$content = '<div class="error">Select page first!</div>';
+			return $content;
+		}
+
+		// calculate statistic start
+		$timestampStart = time() - (10*60*60*24);
+
+		$content = '<h2>Searchword statistics for last 10 days</h2>';
+		$content .= '(from '.strftime('%d.%m.%Y %H:%M', $timestampStart).' \'til now)';
+
+		$fields = 'count(word) as num, word';
+		$table = 'tx_kesearch_stat_word';
+		$where = 'tstamp > "'.$timestampStart.'" ';
+		$where .= ' AND pageid="'.$pageUid.'" ';
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='word HAVING count(word)>0',$orderBy='num desc',$limit='');
+		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
+
+		if (!$numResults) {
+			$content .= '<div class="error">No statistic data found!</div>';
+			return $content;
+		}
+
+		// get statistic
+		$i=1;
+		while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+			$cssClass = ($i%2==0) ?  'even' : 'odd';
+			$rows .= '<tr>';
+			$rows .= '	<td class="'.$cssClass.'">'.$row['word'].'</td>';
+			$rows .= '	<td class="times '.$cssClass.'">'.$row['num'].'</td>';
+			$rows .= '</tr>';
+			$i++;
+		}
+
+		$content .= '<table class="statistics">
+						<tr>
+							<th>Word</th>
+							<th>Times</th>
+						</tr>'
+						.$rows.
+					'</table>';
+
+
+
+		return $content;
+
+	}
+
+
+
 }
 
 
