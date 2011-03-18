@@ -579,10 +579,14 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 		$content = '<h2>Searchword statistics for last 10 days</h2>';
 		$content .= '(from '.strftime('%d.%m.%Y %H:%M', $timestampStart).' \'til now)';
 
+		// get data from sysfolder or from single page?
+		$pidWhere = $this->checkSysfolder() ? ' AND pid="'.$pageUid.'" ' : ' AND pageid="'.$pageUid.'" ';
+
+		// get statistic data from db
 		$fields = 'count(word) as num, word';
 		$table = 'tx_kesearch_stat_word';
 		$where = 'tstamp > "'.$timestampStart.'" ';
-		$where .= ' AND pageid="'.$pageUid.'" ';
+		$where .= $pidWhere;
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='word HAVING count(word)>0',$orderBy='num desc',$limit='');
 		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 
@@ -614,6 +618,28 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 
 		return $content;
 
+	}
+
+
+	/*
+	 * check if selected page is a sysfolder
+	 *
+	 * @return boolean
+	 */
+	function checkSysfolder() {
+
+		$fields = 'doktype';
+		$table = 'pages';
+		$where = 'uid="'.$this->id.'" ';
+		$where .= t3lib_befunc::BEenableFields($table,$inv=0);
+		$where .= t3lib_befunc::deleteClause($table,$inv=0);
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='1');
+		$row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+		if ($row['doktype'] == 254) {
+			return TRUE;
+		} else {
+			return FALSE;
+		}
 	}
 
 

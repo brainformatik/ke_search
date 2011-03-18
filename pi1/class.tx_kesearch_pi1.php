@@ -1894,7 +1894,13 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				}
 			}
 
+			// set startingPoints
 			$this->startingPoints = $this->div->getStartingPoint();
+		}
+
+		// set "countSearchPhrase" to 1 if not set yet (default)
+		if (!isset($this->ffdata['countSearchPhrases'])) {
+			$this->ffdata['countSearchPhrases'] = 1;
 		}
 
 	}
