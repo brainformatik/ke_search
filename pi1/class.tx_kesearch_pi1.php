@@ -1491,7 +1491,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 
 		// searchword statistic
-		if (!$numOnly) {
+		if (!$numOnly && !$maxScore) {
 			// count searchword with ke_stats
 			$this->countSearchWordWithKeStats($sword);
 
@@ -2249,12 +2249,13 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// count single words
 		foreach ($searchWordsArray as $searchWord) {
+			$table = 'tx_kesearch_stat_word';
+			$timestamp = time();
 			if (!empty($searchWord)) {
-				$table = 'tx_kesearch_stat_word';
 				$fields_values = array(
 					'pid' => $this->firstStartingPoint,
 					'word' => strtolower($searchWord),
-					'tstamp' => time(),
+					'tstamp' => $timestamp,
 					'pageid' => $GLOBALS['TSFE']->id,
 					'resultsfound' => $hits ? 1 : 0,
 				);
