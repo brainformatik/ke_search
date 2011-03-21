@@ -33,7 +33,7 @@ require_once(t3lib_extMgm::extPath('ke_search').'indexer/class.tx_kesearch_index
 
 
 class tx_kesearch_cli extends t3lib_cli {
-	
+
 	/**
 	 * Constructor
 	 */
@@ -47,7 +47,7 @@ class tx_kesearch_cli extends t3lib_cli {
         $this->cli_help['synopsis'] = '###OPTIONS###';
         $this->cli_help['description'] = 'Start indexer for ke_search as CLI script';
         $this->cli_help['examples'] = '.../cli_dispatch.phpsh ke_search startIndexing';
-        $this->cli_help['author'] = 'Andreas Kiefer, (c) 2010';
+        $this->cli_help['author'] = 'Andreas Kiefer, (c) 2010-2011';
     }
 
     /**
@@ -57,41 +57,41 @@ class tx_kesearch_cli extends t3lib_cli {
      * @return    string
      */
     function cli_main($argv) {
-    	
+
 		// make instance of indexer
-		
+
         // get task (function)
         $task = (string)$this->cli_args['_DEFAULT'][1];
-		
+
 		// get extension configuration
 		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search']);
-		
+
 		// switch between tasks
 		switch ($task) {
-			
+
 			default:
 				$this->cli_validateArgs();
 				$this->cli_help();
 				break;
-			
+
 			case 'startIndexing':
-				
+
 				$indexer = t3lib_div::makeInstance('tx_kesearch_indexer');
 				$this->cli_echo(chr(10));
 				$verboseMode = true;
 				$cleanup = $this->extConf['cleanupInterval'];
-				$response = $indexer->startIndexing($verboseMode, $cleanup);
+				$response = $indexer->startIndexing($verboseMode, $this->extConf, 'CLI');
 				$response = str_replace('<br /><br />', chr(10),$response);
 				$response = str_replace('<br />', chr(10),$response);
 				$response = strip_tags($response);
 				$this->cli_echo($response.chr(10).chr(10));
 				break;
-			
+
 		}
-		
-        
+
+
     }
-	
+
 }
 
 // Call the functionality

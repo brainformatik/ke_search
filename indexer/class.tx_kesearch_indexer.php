@@ -32,15 +32,20 @@
  */
 class tx_kesearch_indexer {
 	var $startMicrotime = 0;
+	var $counter;
+	var $extConf;
 
 	/*
 	 * function startIndexing
-	 * @param $verbose boolean 	if set, information about the
-	 * 								indexing process is returned,
-	 * 								otherwise processing is quiet
-	 * @return string				only if param $verbose is true
+	 * @param $verbose boolean 	if set, information about the indexing process is returned, otherwise processing is quiet
+	 * @param $extConf array			extension config array from EXT Manager
+	 * @param $mode string				"CLI" if called from command line, otherwise empty
+	 * @return string							only if param $verbose is true
 	 */
-	function startIndexing($verbose=true, $doCleanup=0, $pageUid=0) {
+	function startIndexing($verbose=true, $extConf, $mode='')  {
+
+		// make extConf available
+		$this->extConf = $extConf;
 
 		// get configurations
 		$configurations = $this->getConfigurations();
@@ -62,7 +67,7 @@ class tx_kesearch_indexer {
 					$indexPids = explode(',',$this->pagelist);
 
 					// show indexer content?
-					$content .= '<p><b>Indexer "' . $indexerConfig['title'] . '": ' . count($indexPids) . ' pages have been indexed.</b></p>';
+					$content .= '<p><b>Indexer "' . $indexerConfig['title'] . '": ' . count($indexPids) . ' pages have been indexed.</b></p>'."\n";
 
 					// get rootline tags
 					$this->rootlineTags = $this->getRootlineTags();
@@ -115,9 +120,25 @@ class tx_kesearch_indexer {
 		}
 
 		// process index cleanup?
-		if ($doCleanup) {
-			$content .= '<p><b>Index cleanup processed</b></p>';
-			$content .= $this->cleanUpIndex($doCleanup);
+		if ($extConf['cleanupInterval']) {
+			$content .= '<p><b>Index cleanup processed</b></p>'."\n";
+			$content .= $this->cleanUpIndex($extConf['cleanupInterval']);
+		}
+
+		// send notification in CLI mode
+		if ($mode == 'CLI') {
+
+			// send finishNotification
+			if ($extConf['finishNotification'] && t3lib_div::validEmail($extConf['notificationRecipient'])) {
+
+				// build message
+				$msg = 'Indexing process was finished:'."\n";
+				$msg .= "==============================\n\n";
+				$msg .= strip_tags($content);
+				// send the notification message
+				mail($extConf['notificationRecipient'], $extConf['notificationSubject'], $msg);
+			}
+
 		}
 
 		// verbose or quiet output? as set in function call!
@@ -218,6 +239,7 @@ class tx_kesearch_indexer {
 					$yacRecord['fe_group'], 					// fe_group
 					false 										// debug only?
 				);
+
 			}
 		}
 
@@ -421,9 +443,9 @@ class tx_kesearch_indexer {
 		if ($duration > 10000) {
 			$duration /= 1000;
 			$duration = intval($duration);
-			return '<p><i>Indexing process for "' . $indexerConfig['title'] . '" took '.$duration.' s.</i></p>';
+			return '<p><i>Indexing process for "' . $indexerConfig['title'] . '" took '.$duration.' s.</i> </p>'."\n\n";
 		} else {
-			return '<p><i>Indexing process for "' . $indexerConfig['title'] . '" took '.$duration.' ms.</i></p>';
+			return '<p><i>Indexing process for "' . $indexerConfig['title'] . '" took '.$duration.' ms.</i> </p>'."\n\n";
 		}
 
 
@@ -495,7 +517,6 @@ class tx_kesearch_indexer {
 			'crdate' => $now,
 		);
 
-
 		// check if record already exists
 		$existingRecordUid = $this->indexRecordExists($storagepid, $targetpid, $type, $params);
 		if ($existingRecordUid) {
@@ -505,7 +526,13 @@ class tx_kesearch_indexer {
 			if ($debugOnly) { // do not process - just debug query
 				t3lib_div::debug($GLOBALS['TYPO3_DB']->UPDATEquery($table,$where,$fields_values),1);
 			} else { // process storing of index record and return uid
-				if ($GLOBALS['TYPO3_DB']->exec_UPDATEquery($table,$where,$fields_values)) return true;
+				if ($GLOBALS['TYPO3_DB']->exec_UPDATEquery($table,$where,$fields_values)) {
+
+					// count record for periodic notification?
+					if ($this->extConf['periodicNotification']) $this->periodicNotificationCount();
+
+					return true;
+				}
 			}
 		} else {
 			// insert new record
@@ -513,6 +540,10 @@ class tx_kesearch_indexer {
 				t3lib_div::debug($GLOBALS['TYPO3_DB']->INSERTquery($table,$fields_values,$no_quote_fields=FALSE),1);
 			} else { // process storing of index record and return uid
 				$GLOBALS['TYPO3_DB']->exec_INSERTquery($table,$fields_values,$no_quote_fields=FALSE);
+
+				// count record for periodic notification?
+				if ($this->extConf['periodicNotification']) $this->periodicNotificationCount();
+
 				return $GLOBALS['TYPO3_DB']->sql_insert_id();
 			}
 		}
@@ -606,6 +637,7 @@ class tx_kesearch_indexer {
 			$pageRecord['fe_group'], // fe_group
 			false // debug only?
 		);
+
 		return str_word_count($pageContent).' words';
 
 	}
@@ -918,6 +950,7 @@ class tx_kesearch_indexer {
 					$damRecord['fe_group'], 					// fe_group
 					false 										// debug only?
 				);
+
 			}
 		}
 
@@ -1104,8 +1137,6 @@ class tx_kesearch_indexer {
 		$where = 'categories_id="'.intval($catId).'" ';
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
 		while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-			// t3lib_div::debug($row,1);
-
 			if ($row['categories_id'] > 0) {
 				$this->catRoot .= $row['categories_id'].',';
 			}
@@ -1117,26 +1148,22 @@ class tx_kesearch_indexer {
 
 
 
-	// GET SUBPAGES
 	/*
-	function getRecursivePids($startPid) {
-		// t3lib_div::debug('rec',1);
-		$fields = 'uid, hidden, deleted';
-		$table = 'pages';
-		$where = 'pid='.intval($startPid);
-		// $where .= ' AND hidden=0 AND deleted=0';
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where);
-		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))	{
-			// add to pagelist if not hidden and not deleted
-			if ($row['deleted'] == 0 && $row['hidden'] == 0) {
-				$this->pagelist .= $row['uid'].',';
+	 * function periodicNotificationCount
+	 */
+	function periodicNotificationCount() {
+		// increase counter
+		$this->counter += 1;
+
+		// check if number of records configured reached
+		if (($this->counter % $this->extConf['periodicNotification']) == 0) {
+			// send the notification message
+			if (t3lib_div::validEmail($this->extConf['notificationRecipient'])) {
+				$msg = $this->counter.' records have been indexed.';
+				mail($this->extConf['notificationRecipient'], $this->extConf['notificationSubject'], $msg);
 			}
-			$this->getRecursivePids($row['uid']);
 		}
 	}
-	*/
-
-
 
 }
 

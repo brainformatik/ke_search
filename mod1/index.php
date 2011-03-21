@@ -334,7 +334,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 
 					$verbose = true;
 					$cleanup = $this->extConf['cleanupInterval'];
-					$content = $indexer->startIndexing(true, $cleanup); // start indexing in verbose mode with cleanup process
+					$content = $indexer->startIndexing(true, $this->extConf); // start indexing in verbose mode with cleanup process
 
 
 					// Reload - for Debugging only
@@ -356,7 +356,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 						$indexer = t3lib_div::makeInstance('tx_kesearch_indexer');
 						$verbose = true;
 						$cleanup = $this->extConf['cleanupInterval'];
-						$content = $indexer->startIndexing(true, $cleanup, $this->id); // start indexing in verbose mode with cleanup process
+						$content = $indexer->startIndexing(true, $this->extConf); // start indexing in verbose mode with cleanup process
 					}
 
 					// page is selected: get indexed content
