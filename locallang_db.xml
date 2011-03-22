@@ -26,6 +26,7 @@
 			<label index="tx_kesearch_filteroptions.tag">Tag</label>
 			<label index="tx_kesearch_filteroptions.automated_tagging">Set tag for all children of this page</label>
 			<label index="tx_kesearch_index">Index</label>
+			<label index="tx_kesearch_index.relevance">Relevance</label>
 			<label index="tx_kesearch_index.targetpid">Target PID</label>
 			<label index="tx_kesearch_index.content">Indexed content</label>
 			<label index="tx_kesearch_index.params">Parameters</label>
@@ -34,6 +35,7 @@
 			<label index="tx_kesearch_index.abstract">Abstract</label>
 			<label index="tx_kesearch_index.title">Title</label>
 			<label index="tx_kesearch_index.language">Language UID</label>
+			<label index="tx_kesearch_index.sortdate">Date</label>
 			<label index="tx_kesearch_indexerconfig">Indexer Configuration</label>
 			<label index="tx_kesearch_indexerconfig.title">Title</label>
 			<label index="tx_kesearch_indexerconfig.storagepid">Storage page</label>
@@ -78,6 +80,7 @@
 			<label index="tx_kesearch_filteroptions.tag">Tag</label>
 			<label index="tx_kesearch_filteroptions.automated_tagging">Tag automatisch für Unterseiten dieser Seite setzen</label>
 			<label index="tx_kesearch_index">Index</label>
+			<label index="tx_kesearch_index.relevance">Relevanz</label>
 			<label index="tx_kesearch_index.targetpid">Zielseite</label>
 			<label index="tx_kesearch_index.content">Indizierter Content</label>
 			<label index="tx_kesearch_index.params">Parameter</label>
@@ -86,6 +89,7 @@
 			<label index="tx_kesearch_index.abstract">Abstract</label>
 			<label index="tx_kesearch_index.title">Titel</label>
 			<label index="tx_kesearch_index.language">Sprach-UID</label>
+			<label index="tx_kesearch_index.sortdate">Datum</label>
 			<label index="tx_kesearch_indexerconfig">Indexer Konfiguration</label>
 			<label index="tx_kesearch_indexerconfig.title">Titel</label>
 			<label index="tx_kesearch_indexerconfig.storagepid">Storage Seite</label>

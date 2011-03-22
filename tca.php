@@ -280,6 +280,18 @@ $TCA['tx_kesearch_index'] = array (
 				'maxitems' => 1,
 			)
 		),
+		'sortdate' => Array (
+			'exclude' => 0,
+			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_index.sortdate',
+			'config' => Array (
+				'type' => 'input',
+				'size' => '10',
+				'max' => '20',
+				'eval' => 'datetime',
+				'checkbox' => '0',
+				'default' => '0'
+			)
+		),
 	),
 	'types' => array (
 		'0' => array('showitem' => 'starttime;;;;1-1-1, endtime, fe_group, targetpid, content, params, type, tags, abstract, title;;;;2-2-2, language;;;;3-3-3')

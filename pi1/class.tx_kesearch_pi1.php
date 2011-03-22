@@ -1490,7 +1490,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		} else {
 			$orderBy = $this->ffdata['sortByAdmin'] ? $this->ffdata['sortByAdmin'] : 'uid ASC';
 		}
-		//t3lib_div::devLog('orderBy', $this->extKey, -1, array($orderBy, $swords));
 		
 		// get number of results with COUNT(*)
 		if ($numOnly) {
