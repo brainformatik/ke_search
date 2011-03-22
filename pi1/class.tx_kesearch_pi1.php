@@ -2140,6 +2140,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			if($this->ffdata['showSortInFrontend']) {
 				$orderByDir = strtolower($this->div->removeXSS($this->piVars['orderByDir']));
 				$orderByField = strtolower($this->div->removeXSS($this->piVars['orderByField']));
+				if(!$orderByField) $orderByField = 'score';
 				if($orderByDir != 'desc' && $orderByDir != 'asc') $orderByDir = 'desc';
 				if($orderByDir == 'desc') {
 					$orderByDir = 'asc';
@@ -2173,7 +2174,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					}
 
 					// add classname for sorting arrow
-					if($value == $orderByField || ($this->piVars['sword'] && $value == 'score')) {
+					if($value == $orderByField) {
 						if($orderByDir == 'asc') {
 							$markerArray['###CLASS###'] = 'down'; 
 						} else {
