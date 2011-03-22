@@ -5,6 +5,8 @@
 	    <input type="image" src="typo3conf/ext/ke_search/res/img/go.gif" id="kesearch_submit" class="submit" value="###SUBMIT_VALUE###" onclick="document.getElementById('pagenumber').value=1; ###ONCLICK###" />
 	    <input id="pagenumber" type="hidden" name="tx_kesearch_pi1[page]" value="###HIDDEN_PAGE_VALUE###" />
 	    <input id="resetFilters" type="hidden" name="tx_kesearch_pi1[resetFilters]" value="0" />
+		<input id="orderByField" type="hidden" name="tx_kesearch_pi1[orderByField]" />
+		<input id="orderByDir" type="hidden" name="tx_kesearch_pi1[orderByDir]" />
 	</div>
 	###RESET###
 	<div id="kesearch_filters">###FILTER###</div>
@@ -37,6 +39,7 @@
 <!-- ###RESULT_LIST### start -->
     <span id="kesearch_error"></span>
     <div id="kesearch_pagebrowser_top">###PAGEBROWSER_TOP###</div>
+    <div id="kesearch_ordering">###ORDERING###</div>
     <ul id="kesearch_results"><li>###MESSAGE###</li></ul>
 
     <div id="kesearch_updating_results"><center>###SPINNER###<br /></center></div>
@@ -61,6 +64,15 @@
 <!-- ###PAGEBROWSER### end -->
 
 
+<!-- ###ORDERNAVIGATION### start -->
+    <div class="ordering">
+		<!-- ###SORT_LINK### begin -->
+			###URL###<span class="###CLASS###"></span>&nbsp;
+		<!-- ###SORT_LINK### end -->
+    </div>
+<!-- ###ORDERNAVIGATION### end -->
+
+
 <!-- ###RESULT_ROW### start -->
     <li>
 	<!-- ###SUB_NUMERATION### start -->###NUMBER###.<!-- ###SUB_NUMERATION### end -->
@@ -76,6 +88,9 @@
 	    <!-- ###SUB_SCORE### start -->
 		<i>###LABEL_SCORE###:</i> ###SCORE###<br />
 	    <!-- ###SUB_SCORE### end -->
+	    <!-- ###SUB_DATE### start -->
+		<i>###LABEL_DATE###:</i> ###DATE###<br />
+	    <!-- ###SUB_DATE### end -->
 	    <!-- ###SUB_SCORE_PERCENT### start -->
 		<i>###LABEL_SCORE_PERCENT###:</i> ###SCORE_PERCENT### %<br />
 	    <!-- ###SUB_SCORE_PERCENT### end -->

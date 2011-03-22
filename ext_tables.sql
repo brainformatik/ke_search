@@ -70,6 +70,7 @@ CREATE TABLE tx_kesearch_index (
 	type tinytext,
 	tags text,
 	abstract text,
+	sortdate int(11) DEFAULT '0' NOT NULL,
 	title tinytext,
 	language int(11) DEFAULT '0' NOT NULL,
 

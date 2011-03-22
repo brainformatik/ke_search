@@ -53,7 +53,7 @@ class tx_kesearch_indexer {
 			$this->startMicrotime = microtime(true);
 
 			switch ($indexerConfig['type']) {
-
+				
 				// indexer for page content (text and textpic)
 				case 'page':
 					// set pages configuration
@@ -218,7 +218,8 @@ class tx_kesearch_indexer {
 							$params,
 							$tags,
 							$yacRecord,
-							$targetPID
+							$targetPID,
+							$additionalFields
 						);
 					}
 				}
@@ -387,36 +388,41 @@ class tx_kesearch_indexer {
 				$fullContent = $title . "\n" . $abstract . "\n" . $content;
 				$params = '&tx_ttnews[tt_news]=' . $newsRecord['uid'];
 				$tags = '';
+				$additionalFields = array();
 
-					// hook for custom modifications of the indexed data, e. g. the tags
+				// hook for custom modifications of the indexed data, e. g. the tags
 				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyNewsIndexEntry'])) {
 					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyNewsIndexEntry'] as $_classRef) {
 						$_procObj = & t3lib_div::getUserObj($_classRef);
-						$where_clause = $_procObj->modifyNewsIndexEntry(
+						$_procObj->modifyNewsIndexEntry(
 							$title,
 							$abstract,
 							$fullContent,
 							$params,
 							$tags,
-							$newsRecord);
+							$newsRecord,
+							$additionalFields
+						);
 					}
 				}
+				t3lib_div::devLog('news', 'search', -1, $additionalFields);
 
-					// ... and store them
+				// ... and store them
 				$this->storeInIndex(
-					$indexerConfig['storagepid'],	// storage PID
-					$title,							// page title
-					'tt_news', 						// content type
-					$indexerConfig['targetpid'],	// target PID: where is the single view?
-					$fullContent, 					// indexed content, includes the title (linebreak after title)
-					$tags,				 			// tags
-					$params, 						// typolink params for singleview
-					$abstract,						// abstract
-					$newsRecord['sys_language_uid'],// language uid
-					$newsRecord['starttime'], 		// starttime
-					$newsRecord['endtime'], 		// endtime
-					$newsRecord['fe_group'], 		// fe_group
-					false 							// debug only?
+					$indexerConfig['storagepid'],    // storage PID
+					$title,                          // page title
+					'tt_news',                       // content type
+					$indexerConfig['targetpid'],     // target PID: where is the single view?
+					$fullContent,                    // indexed content, includes the title (linebreak after title)
+					$tags,                           // tags
+					$params,                         // typolink params for singleview
+					$abstract,                       // abstract
+					$newsRecord['sys_language_uid'], // language uid
+					$newsRecord['starttime'],        // starttime
+					$newsRecord['endtime'],          // endtime
+					$newsRecord['fe_group'],         // fe_group
+					false,                           // debug only?
+					$additionalFields                // additional fields added by hooks
 				);
 			}
 			$content = '<p><b>Indexer "' . $indexerConfig['title'] . '": ' . $resCount . ' News have been indexed.</b></p>';
@@ -480,7 +486,7 @@ class tx_kesearch_indexer {
 	/*
 	 * function storeInIndex
 	 */
-	function storeInIndex($storagepid, $title, $type, $targetpid, $content, $tags='', $params='', $abstract='', $language=0, $starttime=0, $endtime=0, $fe_group, $debugOnly=false) {
+	function storeInIndex($storagepid, $title, $type, $targetpid, $content, $tags='', $params='', $abstract='', $language=0, $starttime=0, $endtime=0, $fe_group, $debugOnly=false, $additionalFields=array()) {
 
 		// check for errors
 		$errors = array();
@@ -516,6 +522,7 @@ class tx_kesearch_indexer {
 			'tstamp' => $now,
 			'crdate' => $now,
 		);
+		$fields_values += $additionalFields;
 
 		// check if record already exists
 		$existingRecordUid = $this->indexRecordExists($storagepid, $targetpid, $type, $params);
@@ -557,9 +564,12 @@ class tx_kesearch_indexer {
 	 */
 	function getPageContent($pid, $indexerConfig) {
 
+		$additionalFields = array();
+		
 		// get page record
 		$pageRecord = $this->getPageRecord($pid);
-
+		t3lib_div::devLog('pageContent', 'search', -1, array($pid, $indexerConfig, $additionalFields));
+		
 		// index only pages of doktype standard, advanced and "not in menu"
 		// t3lib_div::debug($pageRecord,1); die();
 		if ($pageRecord['doktype'] != 1 && $pageRecord['doktype'] != 2 && $pageRecord['doktype'] != 5) return '[SKIPPED] wrong doktype';
@@ -620,26 +630,42 @@ class tx_kesearch_indexer {
 			$pageContent = '';
 			return 'No content elements found';
 		}
+		
+		$tags = $this->getTagsForPage($pid);
+
+		// hook for custom modifications of the indexed data, e. g. the tags
+		if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyPagesIndexEntry'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyPagesIndexEntry'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$_procObj->modifyPagesIndexEntry(
+					$pageRecord['title'],
+					$pageContent,
+					$tags,
+					$pageRecord,
+					$additionalFields
+				);
+			}
+		}
 
 		// store record in index table
 		$this->storeInIndex(
-			$indexerConfig['storagepid'], // storage PID
-			$pageRecord['title'], // page title
-			'page', // type
-			$pid, // target PID
-			$pageContent, // indexed content
-			$this->getTagsForPage($pid), // tags
-			'', // params
-			'', // abstract
-			0, // language uid // TODO
-			$pageRecord['starttime'], // starttime,
-			$pageRecord['endtime'], // endtime,
-			$pageRecord['fe_group'], // fe_group
-			false // debug only?
+			$indexerConfig['storagepid'],   // storage PID
+			$pageRecord['title'],           // page title
+			'page',                         // content type
+			$pid,                           // target PID: where is the single view?
+			$pageContent,                   // indexed content, includes the title (linebreak after title)
+			$tags,                          // tags
+			'',                             // typolink params for singleview
+			'',                             // abstract
+			0,                              // language uid
+			$pageRecord['starttime'],       // starttime
+			$pageRecord['endtime'],         // endtime
+			$pageRecord['fe_group'],        // fe_group
+			false,                          // debug only?
+			$additionalFields               // additional fields added by hooks
 		);
 
 		return str_word_count($pageContent).' words';
-
 	}
 
 
@@ -757,7 +783,7 @@ class tx_kesearch_indexer {
 		// make array from list
 		$pidsRecursive = t3lib_div::trimExplode(',',$this->pids['recursive'],true);
 		$pidsNonRecursive = t3lib_div::trimExplode(',', $this->pids['non_recursive'], true);
-
+		
 		// get recursive pids
 		if (count($pidsRecursive)) {
 			foreach ($pidsRecursive as $pid) {
@@ -882,6 +908,8 @@ class tx_kesearch_indexer {
 		if ($resCount) {
 			while ($damRecord=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 
+				$additionalFields = array();
+				
 				// prepare content for storing in index table
 				$title = strip_tags($damRecord['title']);
 				$params = '&tx_kedownloadshop_pi1[showUid]='.intval($damRecord['uid']);
@@ -925,7 +953,8 @@ class tx_kesearch_indexer {
 							$tags,
 							$damRecord,
 							$targetPID,
-							$clearTextTags
+							$clearTextTags,
+							$additionalFields
 						);
 					}
 				}
@@ -936,19 +965,20 @@ class tx_kesearch_indexer {
 
 				// store data in index table
 				$this->storeInIndex(
-					$indexerConfig['storagepid'],				// storage PID
-					$title,										// page/record title
-					'dam', 										// content type
-					$indexerConfig['targetpid'],				// target PID: where is the single view?
-					$fullContent, 								// indexed content, includes the title (linebreak after title)
-					$tags,				 						// tags
-					$params, 									// typolink params for singleview
-					$abstract,									// abstract
-					$damRecord['sys_language_uid'],				// language uid
-					$damRecord['starttime'], 					// starttime
-					$damRecord['endtime'], 						// endtime
-					$damRecord['fe_group'], 					// fe_group
-					false 										// debug only?
+					$indexerConfig['storagepid'],   // storage PID
+					$title,                         // page/record title
+					'dam',                          // content type
+					$indexerConfig['targetpid'],    // target PID: where is the single view?
+					$fullContent,                   // indexed content, includes the title (linebreak after title)
+					$tags,                          // tags
+					$params,                        // typolink params for singleview
+					$abstract,                      // abstract
+					$damRecord['sys_language_uid'], // language uid
+					$damRecord['starttime'],        // starttime
+					$damRecord['endtime'],          // endtime
+					$damRecord['fe_group'],         // fe_group
+					false,                          // debug only?
+					$additionalFields               // additional fields added by hooks
 				);
 
 			}
@@ -996,6 +1026,8 @@ class tx_kesearch_indexer {
 		$resCount = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 		while ($prodRecord=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 
+			$additionalFields = array();
+			
 			// prepare content for storing in index table
 			$title = strip_tags($prodRecord['products_name']);
 			$tags = '';
@@ -1047,21 +1079,38 @@ class tx_kesearch_indexer {
 				$tagContent .= '#year_'.$prodRecord['products_jahr'].'#';
 			}
 
+			// hook for custom modifications of the indexed data, e. g. the tags
+			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyXTYPOCommerceIndexEntry'])) {
+				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyXTYPOCommerceIndexEntry'] as $_classRef) {
+					$_procObj = & t3lib_div::getUserObj($_classRef);
+					$_procObj->modifyNewsIndexEntry(
+						$title,
+						$abstract,
+						$fullContent,
+						$params,
+						$tagContent,
+						$prodRecord,
+						$additionalFields
+					);
+				}
+			}
+			
 			// store in index
 			$this->storeInIndex(
-				$indexerConfig['storagepid'],	// storage PID
-				$title,										// page/record title
-				'xtypocommerce', 					// content type
-				$targetPID,								// target PID: where is the single view?
-				$fullContent, 							// indexed content, includes the title (linebreak after title)
-				$tagContent,				 			// tags
-				$params, 								// typolink params for singleview
-				$abstract,								// abstract
-				0,												// language uid
-				0, 											// starttime
-				0, 											// endtime
-				0, 											// fe_group
-				false										// debug only?
+				$indexerConfig['storagepid'], // storage PID
+				$title,                       // page/record title
+				'xtypocommerce',              // content type
+				$targetPID,                   // target PID: where is the single view?
+				$fullContent,                 // indexed content, includes the title (linebreak after title)
+				$tagContent,                  // tags
+				$params,                      // typolink params for singleview
+				$abstract,                    // abstract
+				0,                            // language uid
+				0,                            // starttime
+				0,                            // endtime
+				0,                            // fe_group
+				false,                        // debug only?
+				$additionalFields             // additional fields added by hooks
 			);
 
 		}

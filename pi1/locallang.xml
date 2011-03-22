@@ -16,6 +16,9 @@
 			<label index="ff.resultPage">Page with result list</label>
 			<label index="ff.resultChars">Number of chars used by result preview</label>
 			<label index="ff.resultsNumeration">Number results consecutively?</label>
+			<label index="ff.showSortInFrontend">Should the website visitor see a possibility to order the searchresults?</label>
+			<label index="ff.sortByVisitor">Which fields should the visitor order by?</label>
+			<label index="ff.sortByAdmin">All searchresults will be sorted by this value</label>
 			<label index="ff.highlightSword">Highlight search word in result preview</label>
 			<label index="ff.previewMode">Preview Mode</label>
 			<label index="ff.previewMode.I.0">Always show abstract if set</label>
@@ -27,6 +30,7 @@
 			<label index="ff.showTypeIcon">Show result type icon?</label>
 			<label index="ff.showResultUrl">Show result URL?</label>
 			<label index="ff.showScore">Show score?</label>
+			<label index="ff.showDate">Show date?</label>
 			<label index="ff.showPercentalScore">Show percental score?</label>
 			<label index="ff.showScoreScale">Show score scale?</label>
 			<label index="ff.resetFiltersOnSubmit">Reset filters when submitting searchbox?</label>
@@ -60,6 +64,7 @@
 
 			<label index="label_resulturl">URL</label>
 			<label index="label_score">Score</label>
+			<label index="label_date">Date</label>
 			<label index="label_score_percent">Percental score</label>
 			<label index="label_score_scale">Score scale</label>
 			<label index="label_tags">Tags</label>
@@ -86,6 +91,9 @@
 			<label index="ff.resultPage">Suchergebnis-Seite</label>
 			<label index="ff.resultChars">Anzahl Zeichen für Ergebnisvorschau</label>
 			<label index="ff.resultsNumeration">Ergebnisse fortlaufend nummerieren?</label>
+			<label index="ff.showSortInFrontend">Soll dem Webseitenbesucher eine Möglichkeit gegeben werden, um die Suchergebnisse selbst zu sortieren?</label>
+			<label index="ff.sortByVisitor">Welche Felder für die Sortierung sollen dem Besucher zur Verfügung gestellt werden?</label>
+			<label index="ff.sortByAdmin">Alle Suchergebnisse werden nach dieser Vorgabe fest vorgegeben.</label>
 			<label index="ff.highlightSword">Highlighten des Suchwort in Ergebnisvorschau?</label>
 			<label index="ff.previewMode">Vorschau-Modus</label>
 			<label index="ff.previewMode.I.0">Immer Abstract anzeigen (wenn gesetzt)</label>
@@ -97,6 +105,7 @@
 			<label index="ff.showTypeIcon">Zeige Ergebnistyp-Icon?</label>
 			<label index="ff.showResultUrl">Ergebnis-URL anzeigen?</label>
 			<label index="ff.showScore">Zeige Relevanz?</label>
+			<label index="ff.showDate">Zeige Datum?</label>
 			<label index="ff.showPercentalScore">Zeige Prozentuale Relevanz?</label>
 			<label index="ff.showScoreScale">Zeige Relevanz-Skala?</label>
 			<label index="ff.resetFiltersOnSubmit">Filter beim Abschicken der Suchbox zurücksetzen?</label>
@@ -130,6 +139,7 @@
 
 			<label index="label_resulturl">URL</label>
 			<label index="label_score">Relevanz</label>
+			<label index="label_date">Datum</label>
 			<label index="label_score_percent">Prozentuale Relevanz</label>
 			<label index="label_score_scale">Relevanz-Skala</label>
 			<label index="label_tags">Tags</label>

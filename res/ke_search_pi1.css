@@ -301,3 +301,22 @@
 
 .tx-kesearch-pi1 .next{background: transparent url('img/arrow-next.gif') no-repeat left 5px;}
 .tx-kesearch-pi1 .prev{background: transparent url('img/arrow-prev.gif') no-repeat right 5px;}
+
+/*Ordering*/
+.tx-kesearch-pi1 #kesearch_ordering span.down {
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border-color: #FF0000 transparent;
+	border-style: solid solid none;
+	border-width: 4px 4px 0;			
+}
+
+.tx-kesearch-pi1 #kesearch_ordering span.up {
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border-color: transparent transparent #FF0000;
+	border-style: none solid solid;
+	border-width: 0 4px 4px;			
+}
