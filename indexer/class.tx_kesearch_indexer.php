@@ -1072,7 +1072,9 @@ class tx_kesearch_indexer {
 			}
 			if (!empty($prodRecord['products_language'])) {
 				// language
-				$tagContent .= '#language_'.$prodRecord['products_language'].'#';
+				$lang = $prodRecord['products_language'];
+				if (strtolower($lang) == 'niederländisch') $lang = 'niederlaendisch';
+				$tagContent .= '#language_'.$lang.'#';
 			}
 			if (!empty($prodRecord['products_monat']) && !empty($prodRecord['products_jahr'])) {
 				// date
