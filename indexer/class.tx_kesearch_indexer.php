@@ -53,7 +53,7 @@ class tx_kesearch_indexer {
 			$this->startMicrotime = microtime(true);
 
 			switch ($indexerConfig['type']) {
-				
+
 				// indexer for page content (text and textpic)
 				case 'page':
 					// set pages configuration
@@ -565,11 +565,11 @@ class tx_kesearch_indexer {
 	function getPageContent($pid, $indexerConfig) {
 
 		$additionalFields = array();
-		
+
 		// get page record
 		$pageRecord = $this->getPageRecord($pid);
 		t3lib_div::devLog('pageContent', 'search', -1, array($pid, $indexerConfig, $additionalFields));
-		
+
 		// index only pages of doktype standard, advanced and "not in menu"
 		// t3lib_div::debug($pageRecord,1); die();
 		if ($pageRecord['doktype'] != 1 && $pageRecord['doktype'] != 2 && $pageRecord['doktype'] != 5) return '[SKIPPED] wrong doktype';
@@ -630,7 +630,7 @@ class tx_kesearch_indexer {
 			$pageContent = '';
 			return 'No content elements found';
 		}
-		
+
 		$tags = $this->getTagsForPage($pid);
 
 		// hook for custom modifications of the indexed data, e. g. the tags
@@ -783,7 +783,7 @@ class tx_kesearch_indexer {
 		// make array from list
 		$pidsRecursive = t3lib_div::trimExplode(',',$this->pids['recursive'],true);
 		$pidsNonRecursive = t3lib_div::trimExplode(',', $this->pids['non_recursive'], true);
-		
+
 		// get recursive pids
 		if (count($pidsRecursive)) {
 			foreach ($pidsRecursive as $pid) {
@@ -909,7 +909,7 @@ class tx_kesearch_indexer {
 			while ($damRecord=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 
 				$additionalFields = array();
-				
+
 				// prepare content for storing in index table
 				$title = strip_tags($damRecord['title']);
 				$params = '&tx_kedownloadshop_pi1[showUid]='.intval($damRecord['uid']);
@@ -1027,7 +1027,7 @@ class tx_kesearch_indexer {
 		while ($prodRecord=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 
 			$additionalFields = array();
-			
+
 			// prepare content for storing in index table
 			$title = strip_tags($prodRecord['products_name']);
 			$tags = '';
@@ -1094,7 +1094,7 @@ class tx_kesearch_indexer {
 					);
 				}
 			}
-			
+
 			// store in index
 			$this->storeInIndex(
 				$indexerConfig['storagepid'], // storage PID

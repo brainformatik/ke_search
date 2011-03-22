@@ -242,7 +242,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 							document.getElementById(\'bullet_\' + objid).src=\''.t3lib_extMgm::siteRelPath($this->extKey).'res/img/list-head-expanded.gif\';
 						}
 					}
-					
+
 					// orderBy
 					function setOrderBy(field, direction) {
 						document.getElementById(\'orderByField\').value = field;
@@ -250,7 +250,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 						document.getElementById(\'pagenumber\').value=1;
 						//document.getElementById(\'resetFilters\').value=1;
 						'.$this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-						submitAction(); 
+						submitAction();
 					}
 					</script>';
 
@@ -1091,7 +1091,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		foreach ($data[$this->prefixId] as $key => $value) {
 			$this->piVars[$key] = $this->div->removeXSS($value);
 		}
-		
+
 		// init Flexforms
 		$this->initFlexforms();
 
@@ -1490,7 +1490,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		} else {
 			$orderBy = $this->ffdata['sortByAdmin'] ? $this->ffdata['sortByAdmin'] : 'uid ASC';
 		}
-		
+
 		// get number of results with COUNT(*)
 		if ($numOnly) {
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery('COUNT(*) as numResults', $table, $where);
@@ -1510,7 +1510,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		} else {
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields, $table, $where, '', $orderBy, $limit);
 		}
-		
+
 		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 
@@ -1913,7 +1913,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// set startingPoints
 		$this->startingPoints = $this->div->getStartingPoint();
-		
+
 		if ($this->ffdata['mode'] == 1 && !empty($this->ffdata['loadFlexformsFromOtherCE'])) {
 			// load flexform config from other ce
 			$fields = 'pi_flexform';
@@ -2136,7 +2136,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		if($this->ffdata['showSortInFrontend']) {
 			$subpartArray['###ORDERNAVIGATION###'] = $this->cObj->getSubpart($this->templateCode, '###ORDERNAVIGATION###');
 			$subpartArray['###SORT_LINK###'] = $this->cObj->getSubpart($subpartArray['###ORDERNAVIGATION###'], '###SORT_LINK###');
-	
+
 			if($this->ffdata['showSortInFrontend']) {
 				$orderByDir = strtolower($this->div->removeXSS($this->piVars['orderByDir']));
 				$orderByField = strtolower($this->div->removeXSS($this->piVars['orderByField']));
@@ -2150,9 +2150,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			} else {
 				$orderByDir = 'desc';
 			}
-			
+
 			$orderBy = t3lib_div::trimExplode(',', $this->ffdata['sortByVisitor']);
-			
+
 			// loop all allowed orderings
 			foreach($orderBy as $value) {
 				// we can't sort by score if there is no sword given
@@ -2176,28 +2176,28 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					// add classname for sorting arrow
 					if($value == $orderByField) {
 						if($orderByDir == 'asc') {
-							$markerArray['###CLASS###'] = 'down'; 
+							$markerArray['###CLASS###'] = 'down';
 						} else {
-							$markerArray['###CLASS###'] = 'up'; 
+							$markerArray['###CLASS###'] = 'up';
 						}
 					} else {
 						$markerArray['###CLASS###'] = '';
 					}
-					
-					$links .= $this->cObj->substituteMarkerArray($subpartArray['###SORT_LINK###'], $markerArray);					
+
+					$links .= $this->cObj->substituteMarkerArray($subpartArray['###SORT_LINK###'], $markerArray);
 				}
 			}
-	
+
 			$content = $this->cObj->substituteSubpart($subpartArray['###ORDERNAVIGATION###'], '###SORT_LINK###', $links);
-	
-			return $content;			
+
+			return $content;
 		} else {
 			return '';
 		}
 	}
-	
-	
-	
+
+
+
 	/*
 	 * function renderSVGScale
 	 * @param $arg

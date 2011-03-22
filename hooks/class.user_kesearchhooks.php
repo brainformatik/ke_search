@@ -30,9 +30,9 @@
  * @subpackage	ke_search
  */
 
-class user_kesearchhooks {
+class user_kesearch_sortdate {
 	public function modifyPagesIndexEntry(&$title, &$pageContent, &$tags, $pageRecord, &$additionalFields) {
-		// crdate is always given, but can be overwritten 
+		// crdate is always given, but can be overwritten
 		if(isset($pageRecord['crdate']) && $pageRecord['crdate'] > 0) {
 			$additionalFields['sortdate'] = $pageRecord['crdate'];
 		}
@@ -47,7 +47,7 @@ class user_kesearchhooks {
 	}
 
 	public function modifyNewsIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tags, $newsRecord, &$additionalFields) {
-		// crdate is always given, but can be overwritten 
+		// crdate is always given, but can be overwritten
 		if(isset($newsRecord['crdate']) && $newsRecord['crdate'] > 0) {
 			$additionalFields['sortdate'] = $newsRecord['crdate'];
 		}
@@ -58,7 +58,7 @@ class user_kesearchhooks {
 	}
 
 	public function modifyYACIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tags, $yacRecord, $targetPID, &$additionalFields) {
-		// crdate is always given, but can be overwritten 
+		// crdate is always given, but can be overwritten
 		if(isset($yacRecord['crdate']) && $yacRecord['crdate'] > 0) {
 			$additionalFields['sortdate'] = $yacRecord['crdate'];
 		}
@@ -69,7 +69,7 @@ class user_kesearchhooks {
 	}
 
 	public function modifyDAMIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tags, $damRecord, $targetPID, &$clearTextTags, &$additionalFields) {
-		// crdate is always given, but can be overwritten 
+		// crdate is always given, but can be overwritten
 		if(isset($damRecord['crdate']) && $damRecord['crdate'] > 0) {
 			$additionalFields['sortdate'] = $damRecord['crdate'];
 		}
@@ -84,7 +84,7 @@ class user_kesearchhooks {
 	}
 
 	public function modifyXTYPOCommerceIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tagContent, $prodRecord, &$additionalFields) {
-		
+
 	}
 }
 ?>
