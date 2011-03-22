@@ -1474,23 +1474,23 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$where .= $this->cObj->enableFields($table);
 
 		// add sorting if score was calculated
-		if (count($swords)) {
-			if($this->ffdata['showSortInFrontend']) {
-				$orderByField = strtolower(t3lib_div::removeXSS($this->piVars['orderByField']));
-				$orderByDir = strtolower(t3lib_div::removeXSS($this->piVars['orderByDir']));
-				if(!$orderByField) $orderByField = 'score';
-				if($orderByDir != 'desc' && $orderByDir != 'asc') $orderByDir = 'desc';
-				if($this->ffdata['sortByVisitor'] != '' && t3lib_div::inList($this->ffdata['sortByVisitor'], $orderByField)) {
-					$orderBy = $orderByField . ' ' . $orderByDir;
-				} else {
-					$orderBy = 'score DESC';
-				}
+		if($this->ffdata['showSortInFrontend']) {
+			$orderByField = strtolower(t3lib_div::removeXSS($this->piVars['orderByField']));
+			$orderByDir = strtolower(t3lib_div::removeXSS($this->piVars['orderByDir']));
+			// if there are no swords and orderByField is not given
+			if(!count($swords) && !$orderByField) $orderByField = 'uid';
+			// if swords are given but orderByField is empty
+			if(count($swords) && !$orderByField) $orderByField = 'score';
+			if($orderByDir != 'desc' && $orderByDir != 'asc') $orderByDir = 'desc';
+			if($this->ffdata['sortByVisitor'] != '' && t3lib_div::inList($this->ffdata['sortByVisitor'], $orderByField)) {
+				$orderBy = $orderByField . ' ' . $orderByDir;
 			} else {
-				$orderBy = $this->ffdata['sortByAdmin'] ? $this->ffdata['sortByAdmin'] : 'score DESC';
+				$orderBy = 'uid ASC';
 			}
 		} else {
-			$orderBy = 'uid ASC';
+			$orderBy = $this->ffdata['sortByAdmin'] ? $this->ffdata['sortByAdmin'] : 'uid ASC';
 		}
+		//t3lib_div::devLog('orderBy', $this->extKey, -1, array($orderBy, $swords));
 		
 		// get number of results with COUNT(*)
 		if ($numOnly) {
@@ -2152,28 +2152,40 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			}
 			
 			$orderBy = t3lib_div::trimExplode(',', $this->ffdata['sortByVisitor']);
+			
+			// loop all allowed orderings
 			foreach($orderBy as $value) {
-				if($this->ffdata['renderMethod'] == 'ajax') {
-					$markerArray['###URL###'] = '<span onclick="setOrderBy(\'' . $value . '\', \'' . $orderByDir . '\')">' . $value . '</span>';
-				} else {
-					$markerArray['###URL###'] = $this->pi_linkTP_keepPIvars(
-					$value,
-						array(
-							'orderByField' => $value,
-							'orderByDir' => $orderByDir,
-						)
-					);
-				}
-				if($value == $orderByField) {
-					if($orderByDir == 'asc') {
-						$markerArray['###CLASS###'] = 'down'; 
+				// we can't sort by score if there is no sword given
+				if($this->piVars['sword'] != '' || $value != 'score') {
+					if($this->ffdata['renderMethod'] == 'ajax') {
+						// generate link for ajax mode
+						$markerArray['###URL###'] = '<span onclick="setOrderBy(\'' . $value . '\', \'' . $orderByDir . '\')">' . $value . '</span>';
 					} else {
-						$markerArray['###CLASS###'] = 'up'; 
+						// generate link for static and after reload mode
+						$markerArray['###URL###'] = $this->cObj->typoLink(
+							$value,
+							array(
+								'parameter' => $GLOBALS['TSFE']->id,
+								'addQueryString' => 1,
+								'additionalParams' => '&' . $this->prefixId . '[orderByField]=' . $value . '&' . $this->prefixId . '[orderByDir]=' . $orderByDir,
+								'section' => 'kesearch_ordering'
+							)
+						);
 					}
-				} else {
-					$markerArray['###CLASS###'] = '';
+
+					// add classname for sorting arrow
+					if($value == $orderByField) {
+						if($orderByDir == 'asc') {
+							$markerArray['###CLASS###'] = 'down'; 
+						} else {
+							$markerArray['###CLASS###'] = 'up'; 
+						}
+					} else {
+						$markerArray['###CLASS###'] = '';
+					}
+					
+					$links .= $this->cObj->substituteMarkerArray($subpartArray['###SORT_LINK###'], $markerArray);					
 				}
-				$links .= $this->cObj->substituteMarkerArray($subpartArray['###SORT_LINK###'], $markerArray);
 			}
 	
 			$content = $this->cObj->substituteSubpart($subpartArray['###ORDERNAVIGATION###'], '###SORT_LINK###', $links);
