@@ -2173,7 +2173,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					}
 
 					// add classname for sorting arrow
-					if($value == $orderByField) {
+					if($value == $orderByField || ($this->piVars['sword'] && $value == 'score')) {
 						if($orderByDir == 'asc') {
 							$markerArray['###CLASS###'] = 'down'; 
 						} else {
