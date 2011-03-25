@@ -883,7 +883,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$where .= $this->cObj->enableFields($table);
 
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery(
-				'uid, REPLACE(tags, "##", "#,#") as tags',
+				'uid, REPLACE(tags, "##", "#~~~#") as tags',
 				'tx_kesearch_index USE INDEX (' . $this->indexToUse . ')',
 				$where,
 				'','',''
@@ -891,7 +891,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 
 			while($tags = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-				foreach(explode(',', $tags['tags']) as $value) {
+				foreach(explode('~~~', $tags['tags']) as $value) {
 					$tagTempArray[] = $value;
 				}
 			}
