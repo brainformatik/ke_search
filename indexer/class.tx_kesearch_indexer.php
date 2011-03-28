@@ -106,6 +106,12 @@ class tx_kesearch_indexer {
 					$content .= $this->showTime($indexerConfig);
 					break;
 
+				// indexer for tt_address records
+				case 'tt_address':
+					$content .= $this->indexAddressRecords($indexerConfig);
+					$content .= $this->showTime($indexerConfig);
+					break;
+
 					// use custom indexer code
 				default:
 						// hook for custom indexer
@@ -522,7 +528,11 @@ class tx_kesearch_indexer {
 			'tstamp' => $now,
 			'crdate' => $now,
 		);
-		$fields_values += $additionalFields;
+
+		if (count($additionalFields)) {
+			// merge arrays
+			$fields_values = array_merge($fields_values, $additionalFields);
+		}
 
 		// check if record already exists
 		$existingRecordUid = $this->indexRecordExists($storagepid, $targetpid, $type, $params);
@@ -1085,7 +1095,7 @@ class tx_kesearch_indexer {
 			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyXTYPOCommerceIndexEntry'])) {
 				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyXTYPOCommerceIndexEntry'] as $_classRef) {
 					$_procObj = & t3lib_div::getUserObj($_classRef);
-					$_procObj->modifyNewsIndexEntry(
+					$_procObj->modifyXTYPOCommerceIndexEntry(
 						$title,
 						$abstract,
 						$fullContent,
@@ -1180,7 +1190,8 @@ class tx_kesearch_indexer {
 
 	/*
 	 * function getXTYPOCommerceCatRootline
-	 * @param $arg
+	 * @param $catId int
+	 * @return void
 	 */
 	function getXTYPOCommerceParentCat($catId) {
 		$fields = '*';
@@ -1201,6 +1212,7 @@ class tx_kesearch_indexer {
 
 	/*
 	 * function periodicNotificationCount
+	 * @return void
 	 */
 	function periodicNotificationCount() {
 		// increase counter
@@ -1215,6 +1227,109 @@ class tx_kesearch_indexer {
 			}
 		}
 	}
+
+
+
+	/*
+	 * function indexAddressRecords
+	 * @param $indexerConfig
+	 */
+	function indexAddressRecords($indexerConfig) {
+
+		// get all address records from pid set in indexerConfig
+		$fields = '*';
+		$table = 'tt_address';
+		$where = 'pid IN ('.$indexerConfig['sysfolder'].') ';
+		$where .= t3lib_befunc::BEenableFields($table,$inv=0);
+		$where .= t3lib_befunc::deleteClause($table,$inv=0);
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
+		$resCount = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
+
+		// no address records found
+		if (!$resCount) {
+			$content = '<p>No address records found!</p>';
+			return $content;
+		}
+
+		// if records found: process them
+		while ($addressRow=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+			$tags = '';
+			$abstract = str_replace('<br />', chr(13), $yacRecord['teaser']);
+			$abstract = str_replace('<br>', chr(13), $abstract);
+			$abstract = str_replace('</p>', chr(13), $abstract);
+			$abstract = strip_tags($abstract);
+			$content = strip_tags($yacRecord['bodytext']);
+			$fullContent = $title . "\n" . $abstract . "\n" . $content;
+			$targetPID = $indexerConfig['targetpid'];
+
+			// prepare content for storing in index table
+			$title = !empty($addressRow['company']) ? $addressRow['company'] : (!empty($addressRow['name']) ? $addressRow['name'] : ($addressRow['first_name'].' '.$addressRow['last_name']));
+			// use description as abstract if set
+			if (!empty($addressRow['description'])) $abstract = $addressRow['description'];
+			// build content
+			if (!empty($addressRow['company'])) $content .= $addressRow['company']."\n"; // company
+			if (!empty($addressRow['name'])) $content = $addressRow['name']."\n"; // name
+			else $content = $addressRow['title'].' '.$addressRow['first_name'].' '.$addressRow['middle_name'].' '.$addressRow['last_name']."\n"; // splitted naming fields
+			if (!empty($addressRow['address'])) $content .=$addressRow['address']."\n";
+			if (!empty($addressRow['zip']) || !empty($addressRow['city'])) $content .= $addressRow['zip'].' '.$addressRow['city']."\n";
+			if (!empty($addressRow['country'])) $content .= $addressRow['country']."\n";
+			if (!empty($addressRow['region'])) $content .=$addressRow['region']."\n";
+			if (!empty($addressRow['email'])) $content .=$addressRow['email']."\n";
+			if (!empty($addressRow['phone'])) $content .=$addressRow['phone']."\n";
+			if (!empty($addressRow['fax'])) $content .=$addressRow['fax']."\n";
+			if (!empty($addressRow['mobile'])) $content .=$addressRow['mobile']."\n";
+			if (!empty($addressRow['www'])) $content .=$addressRow['www'];
+			// put content together
+			$fullContent = $title . "\n" . $abstract . "\n" . $content;
+			// there is no tt_address default param like this; you have to modify this by hook to fit your needs
+			$params = '&tt_address[showUid]='.$addressRow['uid'];
+			// no tags yet
+			$tagContent = '';
+			// set additional fields for sorting
+			$additionalFields = array(
+				'sortdate' => $addressRow['tstamp'],
+			);
+
+			// hook for custom modifications of the indexed data, e. g. the tags
+			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyAddressIndexEntry'])) {
+				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyAddressIndexEntry'] as $_classRef) {
+					$_procObj = & t3lib_div::getUserObj($_classRef);
+					$_procObj->modifyAddressIndexEntry(
+						$title,
+						$abstract,
+						$fullContent,
+						$params,
+						$tagContent,
+						$addressRow,
+						$additionalFields
+					);
+				}
+			}
+
+			// store in index
+			$this->storeInIndex(
+				$indexerConfig['storagepid'],	 // storage PID
+				$title,                       				// page/record title
+				'tt_address',              				// content type
+				$targetPID,                   			// target PID: where is the single view?
+				$fullContent,                 			// indexed content, includes the title (linebreak after title)
+				$tagContent,                 			// tags
+				$params,                      			// typolink params for singleview
+				$abstract,                    			// abstract
+				0,                            					// language uid
+				0,                            					// starttime
+				0,                            					// endtime
+				0,                            					// fe_group
+				false,                        				// debug only?
+				$additionalFields             		// additional fields added by hooks
+			);
+		}
+
+		$content = '<p><b>Indexer "' . $indexerConfig['title'] . '": ' . $resCount . ' address records have been indexed.</b></p>';
+		return $content;
+
+	}
+
 
 }
 

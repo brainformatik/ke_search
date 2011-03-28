@@ -331,7 +331,6 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'storagepid' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.storagepid',
-			// 'displayCond' => 'FIELD:type:!=:xtypocommerce',
 			'config' => array (
 				'type' => 'group',
 				'internal_type' => 'db',
@@ -342,7 +341,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 			)
 		),
 		'targetpid' => array (
-			'displayCond' => 'FIELD:type:IN:ke_yac,ttnews,dam,xtypocommerce',
+			'displayCond' => 'FIELD:type:IN:ke_yac,ttnews,dam,xtypocommerce,tt_address',
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.targetpid',
 			'config' => array (
@@ -365,6 +364,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.2', 'ttnews', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_2.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.3', 'dam', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_3.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.4', 'xtypocommerce', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_4.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.5', 'tt_address', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_5.gif'),
 				),
 				'size' => 1,
 				'maxitems' => 1,
@@ -399,7 +399,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'sysfolder' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.sysfolder',
-			'displayCond' => 'FIELD:type:IN:ke_yac,ttnews,dam',
+			'displayCond' => 'FIELD:type:IN:ke_yac,ttnews,dam,tt_address',
 			'config' => array (
 				'type' => 'group',
 				'internal_type' => 'db',
