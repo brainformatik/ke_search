@@ -1582,6 +1582,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			// highlight hits in result title?
 			if ($this->ffdata['highlightSword'] && count($swords)) {
 				foreach ($swords as $word) {
+					$word = str_replace('/', '\/', $word);
 					$linktextReplaced = preg_replace('/('.$word.')/iu','<span class="hit">\0</span>',$linktext);
 					if (!empty($linktextReplaced)) $linktext = $linktextReplaced;
 				}
@@ -1882,6 +1883,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// highlight hits?
 		if ($this->ffdata['highlightSword'] && count($swords)) {
 			foreach ($swords as $word) {
+				$word = str_replace('/', '\/', $word);
 				$teaser = preg_replace('/('.$word.')/iu','<span class="hit">\0</span>',$teaser);
 			}
 		}
