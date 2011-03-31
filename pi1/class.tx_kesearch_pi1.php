@@ -2165,7 +2165,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					} else {
 						// generate link for static and after reload mode
 						$markerArray['###URL###'] = $this->cObj->typoLink(
-							$value,
+							$this->pi_getLL('orderlink_' . $value, $value),
 							array(
 								'parameter' => $GLOBALS['TSFE']->id,
 								'addQueryString' => 1,

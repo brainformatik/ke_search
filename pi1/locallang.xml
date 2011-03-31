@@ -80,6 +80,9 @@
 			<label index="reset_button">Reset</label>
 			<label index="submit">Submit</label>
 
+			<label index="orderlink_title">Title</label>
+			<label index="orderlink_score">Relevance</label>
+			<label index="orderlink_sortdate">Date</label>
 		</languageKey>
 
 		<!-- GERMAN -->
@@ -156,6 +159,10 @@
 			<label index="query_time">Die Suchabfrage hat %s ms in Anspruch genommen.</label>
 			<label index="reset_button">Alle Eingaben löschen</label>
 			<label index="submit">Schnellsuche starten</label>
+
+			<label index="orderlink_title">Titel</label>
+			<label index="orderlink_score">Relevanz</label>
+			<label index="orderlink_sortdate">Datum</label>
 		</languageKey>
 
 	</data>
