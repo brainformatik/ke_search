@@ -7,6 +7,8 @@
 	<data type="array">
 		<!-- DEFAULT -->
 		<languageKey index="default" type="array">
+			<label index="pi_title">Faceted Search</label>
+			<label index="pi_plus_wiz_description">Adds a faceted search to your page.</label>
 			<label index="ff.main">General</label>
 			<label index="ff.mode">Plugin Mode</label>
 			<label index="ff.mode.I.0">Searchbox and Filters</label>
@@ -82,6 +84,8 @@
 
 		<!-- GERMAN -->
 		<languageKey index="de" type="array">
+			<label index="pi_title">Facettierte Suche</label>
+			<label index="pi_plus_wiz_description">Fügt eine facettierte Suche auf der Seite ein.</label>
 			<label index="ff.main">Allgemein</label>
 			<label index="ff.mode">Plugin Modus</label>
 			<label index="ff.mode.I.0">Suchbox und Filter</label>
