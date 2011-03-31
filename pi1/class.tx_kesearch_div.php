@@ -35,11 +35,11 @@ class tx_kesearch_div {
 	 * @var tx_kesearch_pi1
 	 */
 	var $pObj;
-	
-	function __construct($pObj) {
+
+	function init($pObj) {
 		$this->pObj = $pObj;
 	}
-	
+
 	function getStartingPoint() {
 		// if loadFlexformsFromOtherCE is set
 		// try to get startingPoint of given page
@@ -62,7 +62,7 @@ class tx_kesearch_div {
 			$this->pObj->cObj->data['recursive']
 		);
 	}
-	
+
 	/**
 	 * Get the first page of starting points
 	 * @param string comma seperated list of page-uids
@@ -72,14 +72,14 @@ class tx_kesearch_div {
 		$pageArray = explode(',', $pages);
 		return intval($pageArray[0]);
 	}
-	
+
 	function getSearchString() {
 		$searchString = $this->removeXSS($this->piVars['sword']);
-		
+
 		// replace plus and minus chars
 		$searchString = str_replace('-', ' ', $searchString);
 		$searchString = str_replace('+', ' ', $searchString);
-		
+
 		// split several words
 		$searchWordArray = t3lib_div::trimExplode(' ', $searchString, true);
 
@@ -101,9 +101,9 @@ class tx_kesearch_div {
 			return $newSearchString;
 		} else {
 			return '';
-		}		
+		}
 	}
-	
+
 	/**
 	* Use removeXSS function from t3lib_div if exists
 	* otherwise use removeXSS class included in this extension

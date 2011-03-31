@@ -22,9 +22,8 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-
 require_once(PATH_tslib.'class.tslib_pibase.php');
-
+require_once(t3lib_extMgm::extPath('ke_search').'pi1/class.tx_kesearch_div.php');
 
 /**
  * Plugin 'Faceted search - searchbox and filters' for the 'ke_search' extension.
@@ -1896,7 +1895,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 */
 	function initFlexforms() {
 		// get some helper functions
-		$this->div = t3lib_div::makeInstance('tx_kesearch_div', $this);
+		$this->div = t3lib_div::makeInstance('tx_kesearch_div');
+		$this->div->init($this);
 
 		// GET FLEXFORM DATA
 		$this->pi_initPIflexForm();
