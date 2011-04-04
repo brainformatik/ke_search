@@ -156,6 +156,7 @@
 		<li class="###OPTIONCSSCLASS###" onclick="###ONCLICK###"><input type="checkbox" name="###FILTERNAME###[###OPTIONKEY###]" id="###FILTERID###" value="###VALUE###" ###OPTIONSELECT### /><label>###TITLE###</label></li>
 		<!-- ###SUB_FILTER_CHECKBOX_OPTION### end -->
 	    </span>
+		<li class="clearer"></li>
 	    <span class="resetlink" onclick="document.getElementById('###FILTERID###').value=''; ###ONCLICK_RESET###">Filter zur&uuml;cksetzen</span>
 	</ul>
 	<!-- <input type="hidden" name="###FILTERNAME###" id="###FILTERID###" value="###VALUE###" /> -->

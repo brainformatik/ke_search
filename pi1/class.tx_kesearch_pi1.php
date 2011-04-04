@@ -879,6 +879,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONSELECT###', $select);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONKEY###', $key);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###FILTERID###', 'filter[' . $filterUid . '][' . $key . ']');
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONCSSCLASS###', 'optionCheckBox optionCheckBox' . $key);
 				
 				$optionsCount++;
 
