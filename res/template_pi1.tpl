@@ -126,8 +126,6 @@
 <!-- ###SUB_FILTER_SELECT### end -->
 
 
-
-
 <!-- ###SUB_FILTER_LIST### start -->
     <div class="list" id="list_###FILTERID###">
 	<span class="head">
@@ -145,3 +143,21 @@
 	<input type="hidden" name="###FILTERNAME###" id="###FILTERID###" value="###VALUE###" />
     </div>
 <!-- ###SUB_FILTER_LIST### end -->
+
+<!-- ###SUB_FILTER_CHECKBOX### start -->
+    <div class="list" id="list_###FILTERID###">
+	<span class="head">
+	    ###BULLET###
+	    <a href="javascript:switchArea('###FILTERID###');">###FILTERTITLE###</a>
+	</span>
+	<ul id="options_###FILTERID###" class="###LISTCSSCLASS###">
+	    <span class="###SPECIAL_CSS_CLASS###">
+		<!-- ###SUB_FILTER_CHECKBOX_OPTION### start -->
+		<li class="###OPTIONCSSCLASS###" onclick="###ONCLICK###"><input type="checkbox" name="###FILTERNAME###[###OPTIONKEY###]" id="###FILTERID###" value="###VALUE###" ###OPTIONSELECT### /><label>###TITLE###</label></li>
+		<!-- ###SUB_FILTER_CHECKBOX_OPTION### end -->
+	    </span>
+	    <span class="resetlink" onclick="document.getElementById('###FILTERID###').value=''; ###ONCLICK_RESET###">Filter zur&uuml;cksetzen</span>
+	</ul>
+	<!-- <input type="hidden" name="###FILTERNAME###" id="###FILTERID###" value="###VALUE###" /> -->
+    </div>
+<!-- ###SUB_FILTER_CHECKBOX### end -->

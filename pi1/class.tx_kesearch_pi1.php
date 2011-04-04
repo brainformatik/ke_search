@@ -602,10 +602,14 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 								// selected / preselected?
 								$selected = 0;
+								
 								if ($this->piVars['filter'][$filterUid] == $row['tag']) {
 									$selected = 1;
-								}
-								else if (!isset($this->piVars['filter'][$filterUid])) {
+								} else if (is_array($this->piVars['filter'][$filterUid])) {
+									if(t3lib_div::inArray($this->piVars['filter'][$filterUid], $row['tag'])) {
+										$selected = 1;
+									}
+								} else if (!isset($this->piVars['filter'][$filterUid]) && !is_array($this->piVars['filter'][$filterUid])) {
 									if (is_array($this->preselectedFilter) && in_array($row['tag'], $this->preselectedFilter)) {
 										$selected = 1;
 										$this->piVars['filter'][$filterUid] = $row['tag'];
@@ -629,7 +633,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 						}
 					}
 				}
-
+				
 				// sorting of options as set in filter record by IRRE
 				$sorting = t3lib_div::trimExplode(',', $this->filters[$filterUid]['options'], true);
 				foreach ($sorting as $key => $uid) {
@@ -668,6 +672,10 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 					case 'list':
 						$filterContent .= $wrap[0] . $this->renderList($filterUid, $options) . $wrap[1];
+						break;
+
+					case 'checkbox':
+						$filterContent .= $wrap[0] . $this->renderCheckbox($filterUid, $options) . $wrap[1];
 						break;
 
 						// use custom render code
@@ -841,6 +849,92 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 
 	/*
+	 * function renderCheckbox
+	 * @param $arg
+	 */
+	function renderCheckbox($filterUid, $options) {
+
+		t3lib_div::devLog('options', $this->extKey, -1, array($options));
+		if ($this->ffdata['renderMethod'] == 'ajax') {
+			return $this->renderSelect($filterUid, $options);
+		}
+
+		$filterSubpart = '###SUB_FILTER_CHECKBOX###';
+		$optionSubpart = '###SUB_FILTER_CHECKBOX_OPTION###';
+
+		$optionsCount = 0;
+
+		// loop through options
+		if (is_array($options)) {
+			foreach ($options as $key => $data) {
+
+				$onclick = 'document.getElementById(\'filter['.$filterUid.']['.$key.']\').value=\''.$data['value'].'\'; ';
+				// remove, because we don't want to reload after each click
+				//$onclick .= $this->onclickFilter;
+
+				$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###ONCLICK###', $onclick);
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $data['title']);
+				$select = $data['selected'] ? 'checked="checked"' : '';
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONSELECT###', $select);
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONKEY###', $key);
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###FILTERID###', 'filter[' . $filterUid . '][' . $key . ']');
+				
+				$optionsCount++;
+
+			}
+		}
+
+		// modify filter options by hook
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$optionsContent .= $_procObj->modifyFilterOptions(
+					$filterUid,
+					$optionsContent,
+					$optionsCount,
+					$this
+				);
+			}
+		}
+
+		// fill markers
+		$filterContent = $this->cObj->getSubpart($this->templateCode, $filterSubpart);
+		$filterContent = $this->cObj->substituteSubpart ($filterContent, $optionSubpart, $optionsContent);
+
+		if ($this->UTF8QuirksMode) $filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', utf8_encode($this->filters[$filterUid]['title']));
+		else $filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $this->filters[$filterUid]['title']);
+
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $this->filters[$filterUid]['title']);
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERNAME###', 'tx_kesearch_pi1[filter]['.$filterUid.']');
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERID###', 'filter['.$filterUid.']');
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCHANGE###', $this->onclickFilter);
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCLICK_RESET###', $this->onclickFilter);
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###DISABLED###', $optionsCount > 0 ? '' : ' disabled="disabled" ');
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###VALUE###', $this->piVars['filter'][$filterUid]);
+
+		// bullet
+		unset($imageConf);
+		$bulletSrc = $this->filters[$filterUid]['expandbydefault'] ? 'list-head-expanded.gif' : 'list-head-closed.gif';
+		$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/'.$bulletSrc;
+		$imageConf['params'] = 'class="bullet" id="bullet_filter['.$filterUid.']" ';
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###BULLET###', $this->cObj->IMAGE($imageConf));
+
+		// expand by default ?
+		$class = $this->filters[$filterUid]['expandbydefault'] || !empty($this->piVars['filter'][$filterUid]) ? 'expanded' : 'closed';
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###LISTCSSCLASS###', $class);
+
+		// special css class (outer options list for scrollbox)
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###SPECIAL_CSS_CLASS###', $this->filters[$filterUid]['cssclass'] ? $this->filters[$filterUid]['cssclass'] : '');
+
+		return $filterContent;
+
+	}
+
+
+
+
+	/*
 	 * function checkIfFilterMatchesRecords
 	 */
 	function checkIfTagMatchesRecords($tag, $mode='multi', $filterId) {
@@ -861,8 +955,16 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			if ($mode == 'multi' && is_array($filterList)) {
 				// get all filteroptions from URL
 				foreach ($filterList as $key => $foreignFilterId) {
-					if(!empty($this->piVars['filter'][$foreignFilterId])) {
-						$tagsAgainst .= ' +"#'.$this->piVars['filter'][$foreignFilterId].'#" ';
+					if(is_array($this->piVars['filter'][$foreignFilterId])) {
+						foreach($this->piVars['filter'][$foreignFilterId] as $optionKey => $optionValue) {
+							if(!empty($this->piVars['filter'][$foreignFilterId][$optionKey])) {
+								$tagsAgainst .= ' +"#'.$this->piVars['filter'][$foreignFilterId][$optionKey].'#" ';
+							}							
+						}
+					} else {
+						if(!empty($this->piVars['filter'][$foreignFilterId])) {
+							$tagsAgainst .= ' +"#'.$this->piVars['filter'][$foreignFilterId].'#" ';
+						}						
 					}
 				}
 			}
@@ -1306,7 +1408,13 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$against = '';
 		if (is_array($this->piVars['filter'])) {
 			foreach ($this->piVars['filter'] as $key => $tag)  {
-				if (!empty($tag)) 	$against .= ' +"#'.$tag.'#" ';
+				if (is_array($this->piVars['filter'][$key])) {
+					foreach ($this->piVars['filter'][$key] as $subkey => $subtag)  {
+						if (!empty($subtag)) $against .= ' +"#'.$subtag.'#" ';
+					}
+				} else {
+					if (!empty($tag)) 	$against .= ' +"#'.$tag.'#" ';
+				}
 			}
 		}
 		return $against;

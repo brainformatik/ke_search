@@ -17,6 +17,7 @@
 			<label index="tx_kesearch_filters.rendertype">Rendering type</label>
 			<label index="tx_kesearch_filters.rendertype.I.0">Select</label>
 			<label index="tx_kesearch_filters.rendertype.I.1">List</label>
+			<label index="tx_kesearch_filters.rendertype.I.2">Checkbox</label>
 			<label index="tx_kesearch_filters.cssclass">Special CSS-Class for Filter-Box</label>
 			<label index="tx_kesearch_filters.cssclass.I.0">None</label>
 			<label index="tx_kesearch_filters.cssclass.I.1">Small Box</label>
@@ -72,6 +73,7 @@
 			<label index="tx_kesearch_filters.rendertype">Rendering-Typ</label>
 			<label index="tx_kesearch_filters.rendertype.I.0">Selectbox</label>
 			<label index="tx_kesearch_filters.rendertype.I.1">Liste</label>
+			<label index="tx_kesearch_filters.rendertype.I.2">Checkbox</label>
 			<label index="tx_kesearch_filters.cssclass">Spezielle CSS-Klasse für Filter-Box</label>
 			<label index="tx_kesearch_filters.cssclass.I.0">Keine</label>
 			<label index="tx_kesearch_filters.cssclass.I.1">Kleine Box</label>

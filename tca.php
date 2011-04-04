@@ -33,6 +33,7 @@ $TCA['tx_kesearch_filters'] = array (
 				'items' => array (
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.rendertype.I.0', 'select'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.rendertype.I.1', 'list'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.rendertype.I.2', 'checkbox'),
 				),
 				'size' => 1,
 				'maxitems' => 1,
