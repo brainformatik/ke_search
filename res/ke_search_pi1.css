@@ -330,3 +330,24 @@
 	border-style: none solid solid;
 	border-width: 0 4px 4px;			
 }
+
+.tx-kesearch-pi1 #kesearch_ordering div.ordering {
+	text-align: right;
+}
+
+.tx-kesearch-pi1 #kesearch_ordering ul {
+	display: inline-block;
+	height: 20px;
+	list-style-type: none;
+	margin: 0 0 10px;
+	padding: 0;
+}
+
+.tx-kesearch-pi1 #kesearch_ordering ul li {
+	float: left;
+	margin-right: 10px;
+}
+
+.tx-kesearch-pi1 #kesearch_ordering div.clearer {
+	clear: left;
+}

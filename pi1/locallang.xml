@@ -66,6 +66,7 @@
 			<label index="searchword_length_error">Search words under length of 4 characters are not processed.</label>
 
 			<label index="label_resulturl">URL</label>
+			<label index="label_sort">Sorting:</label>
 			<label index="label_score">Score</label>
 			<label index="label_date">Date</label>
 			<label index="label_score_percent">Percental score</label>
@@ -147,6 +148,7 @@
 			<label index="searchword_length_error">Bitte beachten Sie: Suchbegriffe unter einer Länge von vier Buchstaben werden ignoriert.</label>
 
 			<label index="label_resulturl">URL</label>
+			<label index="label_sort">Sortierung:</label>
 			<label index="label_score">Relevanz</label>
 			<label index="label_date">Datum</label>
 			<label index="label_score_percent">Prozentuale Relevanz</label>

@@ -193,6 +193,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 						document.getElementById(\'ke_search_sword\').value="";
 						document.getElementById(\'pagenumber\').value="1";
 						tx_kesearch_pi1resetSearchbox(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
+						redirectToResultPage();
 						// document.getElementById(\'resetFilters\').value=0;
 					}
 
@@ -427,7 +428,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 */
 	function initOnclickActions() {
 
-
 		// t3lib_div::debug($this->ffdata['renderMethod'],1);
 		switch ($this->ffdata['renderMethod']) {
 
@@ -542,7 +542,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 			// set reset link
 			unset($linkconf);
-			$linkconf['parameter'] = $GLOBALS['TSFE']->id;
+			$linkconf['parameter'] = $this->ffdata['resultPage'];
 			$resetUrl = $this->cObj->typoLink_URL($linkconf);
 			$resetLink = '<a href="'.$resetUrl.'" class="resetButton"><span>'.$this->pi_getLL('reset_button').'</span></a>';
 
@@ -784,7 +784,12 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		if (is_array($options)) {
 			foreach ($options as $key => $data) {
 
-				$onclick = 'document.getElementById(\'filter['.$filterUid.']\').value=\''.$data['value'].'\'; ';
+				$tempField = strtolower(t3lib_div::removeXSS($this->piVars['orderByField']));
+				$tempDir = strtolower(t3lib_div::removeXSS($this->piVars['orderByDir']));
+				if($tempField != '' && $tempDir != '') {
+					$onclick = 'setOrderBy(' . $tempField . ', ' . $tempDir . ');';
+				}
+				$onclick = $onclick . ' document.getElementById(\'filter['.$filterUid.']\').value=\''.$data['value'].'\'; ';
 				$onclick .= $this->onclickFilter;
 
 				$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
@@ -1582,7 +1587,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// add ordering
 		// predefine ordering. Can be overwritten.
-		$orderByField = 'sortdate';
+		$orderByField = count($swords) ? 'score' : 'sortdate';
 		$orderByDir = 'DESC';
 
 		// if sorting in FE is allowed
@@ -2144,6 +2149,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					// render static version
 					unset($linkconf);
 					$linkconf['parameter'] = $GLOBALS['TSFE']->id;
+					$linkconf['addQueryString'] = 1;
 					$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
 					$linkconf['additionalParams'] .= '&tx_kesearch_pi1[page]='.intval($i);
 					$filterArray = $this->getFilters();
@@ -2179,6 +2185,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				// get static version
 				unset($linkconf);
 				$linkconf['parameter'] = $GLOBALS['TSFE']->id;
+				$linkconf['addQueryString'] = 1;
 				$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
 				$linkconf['additionalParams'] .= '&tx_kesearch_pi1[page]='.intval($previousPage);
 				$filterArray = $this->getFilters();
@@ -2207,6 +2214,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				// get static version
 				unset($linkconf);
 				$linkconf['parameter'] = $GLOBALS['TSFE']->id;
+				$linkconf['addQueryString'] = 1;
 				$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
 				$linkconf['additionalParams'] .= '&tx_kesearch_pi1[page]='.intval($nextPage);
 				$filterArray = $this->getFilters();
@@ -2277,6 +2285,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			foreach($orderBy as $value) {
 				// we can't sort by score if there is no sword given
 				if($this->piVars['sword'] != '' || $value != 'score') {
+					$markerArray['###FIELDNAME###'] = $value;
 					if($this->ffdata['renderMethod'] == 'ajax') {
 						// generate link for ajax mode
 						$markerArray['###URL###'] = '<span onclick="setOrderBy(\'' . $value . '\', \'' . $orderByDir . '\')">' . $value . '</span>';
@@ -2309,7 +2318,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			}
 
 			$content = $this->cObj->substituteSubpart($subpartArray['###ORDERNAVIGATION###'], '###SORT_LINK###', $links);
-
+			$content = $this->cObj->substituteMarker($content, '###LABEL_SORT###', $this->pi_getLL('label_sort'));
+			
 			return $content;
 		} else {
 			return '';

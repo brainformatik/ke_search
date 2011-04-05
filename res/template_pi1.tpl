@@ -66,9 +66,13 @@
 
 <!-- ###ORDERNAVIGATION### start -->
     <div class="ordering">
-		<!-- ###SORT_LINK### begin -->
-			###URL###<span class="###CLASS###"></span>&nbsp;
-		<!-- ###SORT_LINK### end -->
+		<ul>
+			<li><strong>###LABEL_SORT###</strong></li>
+			<!-- ###SORT_LINK### begin -->
+				<li class="sortlink sortlink-###FIELDNAME###">###URL###<span class="###CLASS###"></span></li>
+			<!-- ###SORT_LINK### end -->
+		</ul>
+		<div class="clearer"></div>
     </div>
 <!-- ###ORDERNAVIGATION### end -->
 
