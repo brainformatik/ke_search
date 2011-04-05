@@ -32,7 +32,7 @@ $EM_CONF[$_EXTKEY] = array(
 	'version' => '0.2.0',
 	'constraints' => array(
 		'depends' => array(
-			'xajax' => '',
+			'xajax' => '0.2.5-0.2.99',
 		),
 		'conflicts' => array(
 		),
