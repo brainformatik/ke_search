@@ -411,7 +411,6 @@ class tx_kesearch_indexer {
 						);
 					}
 				}
-				t3lib_div::devLog('news', 'search', -1, $additionalFields);
 
 				// ... and store them
 				$this->storeInIndex(
@@ -578,7 +577,6 @@ class tx_kesearch_indexer {
 
 		// get page record
 		$pageRecord = $this->getPageRecord($pid);
-		t3lib_div::devLog('pageContent', 'search', -1, array($pid, $indexerConfig, $additionalFields));
 
 		// index only pages of doktype standard, advanced and "not in menu"
 		// t3lib_div::debug($pageRecord,1); die();

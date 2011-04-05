@@ -854,7 +854,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 */
 	function renderCheckbox($filterUid, $options) {
 
-		t3lib_div::devLog('options', $this->extKey, -1, array($options));
 		if ($this->ffdata['renderMethod'] == 'ajax') {
 			return $this->renderSelect($filterUid, $options);
 		}
