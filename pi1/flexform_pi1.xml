@@ -60,6 +60,20 @@
 						</TCEforms>
 					</resultsNumeration>
 
+					<sortWithoutSearchword>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.sortWithoutSearchword</label>
+							<config type="array">
+								<type>select</type>
+								<maxitems>1</maxitems>
+								<size>5</size>
+								<relevanceNotAllowed>1</relevanceNotAllowed>
+								<default>sortdate DESC</default>
+								<itemsProcFunc>EXT:ke_search/classes/class.tx_kesearch_classes_flexform.php:tx_kesearch_classes_flexform->listAvailableOrderingsForAdmin</itemsProcFunc>
+							</config>
+						</TCEforms>
+					</sortWithoutSearchword>
+
 					<showSortInFrontend>
 						<TCEforms>
 							<onChange>reload</onChange>

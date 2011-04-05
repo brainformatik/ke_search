@@ -1580,23 +1580,33 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// add enable fields
 		$where .= $this->cObj->enableFields($table);
 
-		// add sorting if score was calculated
+		// add ordering
+		// predefine ordering. Can be overwritten.
+		$orderByField = 'sortdate';
+		$orderByDir = 'DESC';
+
+		// if sorting in FE is allowed
 		if($this->ffdata['showSortInFrontend']) {
-			$orderByField = strtolower(t3lib_div::removeXSS($this->piVars['orderByField']));
-			$orderByDir = strtolower(t3lib_div::removeXSS($this->piVars['orderByDir']));
-			// if there are no swords and orderByField is not given
-			if(!count($swords) && !$orderByField) $orderByField = 'uid';
-			// if swords are given but orderByField is empty
-			if(count($swords) && !$orderByField) $orderByField = 'score';
-			if($orderByDir != 'desc' && $orderByDir != 'asc') $orderByDir = 'desc';
-			if($this->ffdata['sortByVisitor'] != '' && t3lib_div::inList($this->ffdata['sortByVisitor'], $orderByField)) {
-				$orderBy = $orderByField . ' ' . $orderByDir;
+			$tempField = strtolower(t3lib_div::removeXSS($this->piVars['orderByField']));
+			$tempDir = strtolower(t3lib_div::removeXSS($this->piVars['orderByDir']));
+			if($tempField != '' && $tempDir != '') {
+				// overwrite ordering with piVars when allowed
+				if($this->ffdata['sortByVisitor'] != '' && t3lib_div::inList($this->ffdata['sortByVisitor'], $tempField)) {
+					$orderByField = $tempField;
+					$orderByDir = $tempDir;
+				}
 			} else {
-				$orderBy = 'uid ASC';
+				// if piVars for sorting are empty check if a sortword is given
+				if(!count($swords)) {
+					// if no searchword is given, order by setting in flexform
+					$orderBy = $this->ffdata['sortWithoutSearchword'] ? $this->ffdata['sortWithoutSearchword'] : $orderByField . ' ' . $orderByDir;
+				}				
 			}
 		} else {
-			$orderBy = $this->ffdata['sortByAdmin'] ? $this->ffdata['sortByAdmin'] : 'uid ASC';
+			// if sorting is predefined by admin
+			$orderBy = $this->ffdata['sortByAdmin'] ? $this->ffdata['sortByAdmin'] : $orderByField . ' ' . $orderByDir;
 		}
+		if(!$orderBy) $orderBy = $orderByField . ' ' . $orderByDir;		
 
 		// get number of results with COUNT(*)
 		if ($numOnly) {
