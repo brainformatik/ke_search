@@ -88,6 +88,7 @@
 					<sortWithoutSearchword>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.sortWithoutSearchword</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
 							<config type="array">
 								<type>select</type>
 								<maxitems>1</maxitems>
