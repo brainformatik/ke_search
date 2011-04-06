@@ -27,7 +27,7 @@
 			<label index="ff.highlightSword">Highlight search word in result preview</label>
 			<label index="ff.previewMode">Preview Mode</label>
 			<label index="ff.previewMode.I.0">Always show abstract if set</label>
-			<label index="ff.previewMode.I.1">Show abstract if contains searchword, otherwise show content</label>
+			<label index="ff.previewMode.I.1">Show abstract if it contains searchword, otherwise show content</label>
 			<label index="ff.resultsPerPage">Results per page</label>
 			<label index="ff.maxPagesInPagebrowser">Number of pages shown in pagebrowser</label>
 			<label index="ff.pagebrowserOnTop">Show pagebrowser on top of result list</label>
@@ -51,7 +51,7 @@
 			<label index="ff.renderMethod.I.0">static</label>
 			<label index="ff.renderMethod.I.1">AJAX after page load</label>
 			<label index="ff.renderMethod.I.2">AJAX</label>
-			<label index="ff.showQueryTime">Show query process duration?</label>
+			<label index="ff.showQueryTime">Show time (query process duration)?</label>
 			<label index="ff.countSearchPhrases">Count search phrases in statistic tables?</label>
 			<label index="ff.showTags">Show tags? (for debugging)</label>
 			<label index="ff.showQuery">Show query? (for debugging)</label>
