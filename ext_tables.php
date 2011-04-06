@@ -57,6 +57,7 @@ $TCA['tx_kesearch_filters'] = array (
 		'cruser_id' => 'cruser_id',
 		'default_sortby' => 'ORDER BY crdate',
 		'delete' => 'deleted',
+		'type' => 'rendertype',
 		'enablecolumns' => array (
 			'disabled' => 'hidden',
 		),

@@ -374,46 +374,54 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 				$content = $this->cObj->getSubpart($this->templateCode,'###RESULT_LIST###');
 
-				if ($this->ffdata['renderMethod'] == 'ajax_after_reload') {
-					$content = $this->cObj->substituteMarker($content,'###MESSAGE###', '');
-					$content = $this->cObj->substituteMarker($content,'###ORDERING###', $this->renderOrdering());
-					$content = $this->cObj->substituteMarker($content,'###SPINNER###', $this->spinnerImageResults);
-					$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
+				if(count($this->piVars) == 0 && $this->ffdata['showTextInsteadOfResults']) {
+					$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->pi_RTEcssText($this->ffdata['textForResults']));
 					$content = $this->cObj->substituteMarker($content,'###QUERY_TIME###', '');
 					$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', '');
 					$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###', '');
-					return $this->pi_wrapInBaseClass($content);
-				}
-
-				// get number of results
-				$this->numberOfResults = $this->getSearchResults(true);
-
-				// render pagebrowser
-				if ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) {
-					if ($this->ffdata['pagebrowserOnTop'] || $this->ffdata['pagebrowserAtBottom']) {
-						$pagebrowserContent = $this->renderPagebrowser();
-					}
-					if ($this->ffdata['pagebrowserOnTop']) {
-						$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', $pagebrowserContent);
-					} else {
+					$content = $this->cObj->substituteMarker($content,'###ORDERING###', '');
+				} else {
+					if ($this->ffdata['renderMethod'] == 'ajax_after_reload') {
+						$content = $this->cObj->substituteMarker($content,'###MESSAGE###', '');
+						$content = $this->cObj->substituteMarker($content,'###ORDERING###', $this->renderOrdering());
+						$content = $this->cObj->substituteMarker($content,'###SPINNER###', $this->spinnerImageResults);
+						$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
+						$content = $this->cObj->substituteMarker($content,'###QUERY_TIME###', '');
 						$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', '');
+						$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###', '');
+						return $this->pi_wrapInBaseClass($content);
 					}
-					if ($this->ffdata['pagebrowserAtBottom']) {
-						$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###',$pagebrowserContent);
-					} else {
-						$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###','');
+	
+					// get number of results
+					$this->numberOfResults = $this->getSearchResults(true);
+	
+					// render pagebrowser
+					if ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) {
+						if ($this->ffdata['pagebrowserOnTop'] || $this->ffdata['pagebrowserAtBottom']) {
+							$pagebrowserContent = $this->renderPagebrowser();
+						}
+						if ($this->ffdata['pagebrowserOnTop']) {
+							$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', $pagebrowserContent);
+						} else {
+							$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', '');
+						}
+						if ($this->ffdata['pagebrowserAtBottom']) {
+							$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###',$pagebrowserContent);
+						} else {
+							$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###','');
+						}
 					}
+	
+					// get max score
+					if ($this->ffdata['showPercentalScore'] || $this->ffdata['showScoreScale']) {
+						$this->maxScore = $this->getSearchResults(false, true);
+					}
+					$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->getSearchResults());
+					$content = $this->cObj->substituteMarker($content,'###ORDERING###', $this->renderOrdering());
+					$content = $this->cObj->substituteMarker($content,'###SPINNER###', $this->spinnerImageResults);
+					$content = $this->cObj->substituteMarker($content,'###LOADING###', $this->pi_getLL('loading'));
+					$content = $this->cObj->substituteMarker($content,'###QUERY_TIME###', '');					
 				}
-
-				// get max score
-				if ($this->ffdata['showPercentalScore'] || $this->ffdata['showScoreScale']) {
-					$this->maxScore = $this->getSearchResults(false, true);
-				}
-				$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->getSearchResults());
-				$content = $this->cObj->substituteMarker($content,'###ORDERING###', $this->renderOrdering());
-				$content = $this->cObj->substituteMarker($content,'###SPINNER###', $this->spinnerImageResults);
-				$content = $this->cObj->substituteMarker($content,'###LOADING###', $this->pi_getLL('loading'));
-				$content = $this->cObj->substituteMarker($content,'###QUERY_TIME###', '');
 
 				break;
 
@@ -862,31 +870,42 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		if ($this->ffdata['renderMethod'] == 'ajax') {
 			return $this->renderSelect($filterUid, $options);
 		}
-
+		
+		$filters = $this->getFilters();
+		$allOptionsOfCurrentFilter = $this->getFilterOptions($filters[$filterUid]['options']);
+		
 		$filterSubpart = '###SUB_FILTER_CHECKBOX###';
 		$optionSubpart = '###SUB_FILTER_CHECKBOX_OPTION###';
 
 		$optionsCount = 0;
 
 		// loop through options
-		if (is_array($options)) {
-			foreach ($options as $key => $data) {
-
-				$onclick = 'document.getElementById(\'filter['.$filterUid.']['.$key.']\').value=\''.$data['value'].'\'; ';
-				// remove, because we don't want to reload after each click
-				//$onclick .= $this->onclickFilter;
+		if(is_array($allOptionsOfCurrentFilter)) {
+			foreach($allOptionsOfCurrentFilter as $key => $data) {
+				$onclick = 'document.getElementById(\'filter['.$filterUid.']['.$key.']\').value=\''.$data['tag'].'\'; ';
+				if($options[$key]['selected']) {
+					$checkBoxParams['selected'] = 'checked="checked"';
+					$checkBoxParams['disabled'] = '';
+				} else {
+					$checkBoxParams['selected'] = '';
+					if(is_array($options[$key]) && t3lib_div::inArray($options[$key], $data['title'])) {
+						$checkBoxParams['disabled'] = '';
+					} else {
+						$checkBoxParams['disabled'] = 'disabled="disabled"';
+					}
+				}
 
 				$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###ONCLICK###', $onclick);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $data['title']);
-				$select = $data['selected'] ? 'checked="checked"' : '';
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONSELECT###', $select);
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###VALUE###', $data['tag']);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONKEY###', $key);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###FILTERID###', 'filter[' . $filterUid . '][' . $key . ']');
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONCSSCLASS###', 'optionCheckBox optionCheckBox' . $key);
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONSELECT###', $checkBoxParams['selected']);
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONDISABLED###', $checkBoxParams['disabled']);
 				
 				$optionsCount++;
-
 			}
 		}
 
@@ -916,7 +935,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCHANGE###', $this->onclickFilter);
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCLICK_RESET###', $this->onclickFilter);
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###DISABLED###', $optionsCount > 0 ? '' : ' disabled="disabled" ');
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###VALUE###', $this->piVars['filter'][$filterUid]);
 
 		// bullet
 		unset($imageConf);
@@ -1074,10 +1092,36 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			}
 		}
 		return $results;
-
 	}
 
+	/**
+	 * get optionrecords of given list of option-IDs
+	 * 
+	 * @param string $optionList
+	 * @return array Filteroptions
+	 */
+	protected function getFilterOptions($optionList) {
+		// check/convert if list contains only integers
+		$optionIdArray = t3lib_div::intExplode(',', $optionList, true);
+		$optionList = implode(',', $optionIdArray);
+		
+		// search for filteroptions
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+			'*',
+			'tx_kesearch_filteroptions',
+			'pid in ('.$this->startingPoints.') ' . 
+			'AND uid in (' . $optionList . ') ' . 
+			$this->cObj->enableFields('tx_kesearch_filteroptions'),
+			'', '', ''
+		);
+		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+			$optionArray[] = $row;
+		}
 
+		return $optionArray;
+	}
+
+	
 	/**
 	 * Init XAJAX
 	 */
@@ -1899,7 +1943,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		
 		// Show a text (if defined in FF) if searchbox was opened without any piVars
 		if($wordsAgainst == '' && $tagsAgainst == '' && $this->ffdata['showTextInsteadOfResults']) {
-			$content = $this->ffdata['textForResults'];
+			$content = $this->pi_RTEcssText($this->ffdata['textForResults']);
 		}
 
 		if ($this->UTF8QuirksMode) return utf8_encode($content);

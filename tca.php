@@ -1,7 +1,6 @@
 <?php
 if (!defined ('TYPO3_MODE')) 	die ('Access denied.');
 
-$TCA['tx_kesearch_filters']['ctrl']['requestUpdate'] = 'rendertype';
 $TCA['tx_kesearch_filters'] = array (
 	'ctrl' => $TCA['tx_kesearch_filters']['ctrl'],
 	'interface' => array (
@@ -42,7 +41,6 @@ $TCA['tx_kesearch_filters'] = array (
 		),
 
 		'cssclass' => array (
-			'displayCond' => 'FIELD:rendertype:=:list',
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.cssclass',
 			'config' => array (
@@ -59,7 +57,6 @@ $TCA['tx_kesearch_filters'] = array (
 
 		'expandbydefault' => array (
 			'exclude' => 0,
-			'displayCond' => 'FIELD:rendertype:=:list',
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.expandbydefault',
 			'config' => array (
 				'type'    => 'check',
@@ -90,7 +87,9 @@ $TCA['tx_kesearch_filters'] = array (
 		),
 	),
 	'types' => array (
-		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, expandbydefault, cssclass, options, wrap;;;;4-4-4')
+		'select' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, options, wrap;;;;4-4-4'),
+		'list' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, expandbydefault, cssclass, options, wrap;;;;4-4-4'),
+		'checkbox' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, expandbydefault, cssclass, options, wrap;;;;4-4-4')
 	),
 	'palettes' => array (
 		'1' => array('showitem' => '')
