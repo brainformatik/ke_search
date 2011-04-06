@@ -18,6 +18,8 @@
 			<label index="ff.resultPage">Page with result list</label>
 			<label index="ff.resultChars">Number of chars used by result preview</label>
 			<label index="ff.resultsNumeration">Number results consecutively?</label>
+			<label index="ff.showTextInsteadOfResults">Show text instead of searchresults when no filter or searchword was given.</label>
+			<label index="ff.textForResults">Insert this text, if checkbox above was activated.</label>
 			<label index="ff.sortWithoutSearchword">How to sort results if no searchword is given?</label>
 			<label index="ff.showSortInFrontend">Should the website visitor see a possibility to order the searchresults?</label>
 			<label index="ff.sortByVisitor">Which fields should the visitor order by?</label>
@@ -100,6 +102,8 @@
 			<label index="ff.resultPage">Suchergebnis-Seite</label>
 			<label index="ff.resultChars">Anzahl Zeichen für Ergebnisvorschau</label>
 			<label index="ff.resultsNumeration">Ergebnisse fortlaufend nummerieren?</label>
+			<label index="ff.showTextInsteadOfResults">Zeige einen Text anstatt Suchergebnisse, wenn kein Filter und noch kein Suchwort angegeben wurde.</label>
+			<label index="ff.textForResults">Füge diesen Text ein, wenn die vorige Checkbox aktiviert wurde.</label>
 			<label index="ff.sortWithoutSearchword">Wie sollen die Ergebnisse sortiert werden, wenn kein Suchwort angegeben wurde?</label>
 			<label index="ff.showSortInFrontend">Soll dem Webseitenbesucher eine Möglichkeit gegeben werden, um die Suchergebnisse selbst zu sortieren?</label>
 			<label index="ff.sortByVisitor">Welche Felder für die Sortierung sollen dem Besucher zur Verfügung gestellt werden?</label>

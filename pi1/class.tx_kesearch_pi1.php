@@ -1896,6 +1896,11 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// add onload image
 		$content .= $this->onloadImage;
+		
+		// Show a text (if defined in FF) if searchbox was opened without any piVars
+		if($wordsAgainst == '' && $tagsAgainst == '' && $this->ffdata['showTextInsteadOfResults']) {
+			$content = $this->ffdata['textForResults'];
+		}
 
 		if ($this->UTF8QuirksMode) return utf8_encode($content);
 		else return $content;

@@ -60,6 +60,31 @@
 						</TCEforms>
 					</resultsNumeration>
 
+					<showTextInsteadOfResults>
+						<TCEforms>
+							<onChange>reload</onChange>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showTextInsteadOfResults</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>check</type>
+								<default>0</default>
+							</config>
+						</TCEforms>
+					</showTextInsteadOfResults>
+
+					<textForResults>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.textForResults</label>
+							<displayCond>FIELD:showTextInsteadOfResults:=:1</displayCond>
+							<config>
+								<type>text</type>
+								<cols>52</cols>
+								<rows>5</rows>
+							</config>
+							<defaultExtras>richtext[*]:rte_transform[flag=rte_enabled|mode=ts_css]</defaultExtras>
+						</TCEforms>
+					</textForResults>
+
 					<sortWithoutSearchword>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.sortWithoutSearchword</label>
