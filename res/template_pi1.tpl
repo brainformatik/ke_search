@@ -156,7 +156,7 @@
 	</span>
 	<ul id="options_###FILTERID###" class="###LISTCSSCLASS###">
 	    <span class="###SPECIAL_CSS_CLASS###">
-	    <li><label onclick="enableCheckboxes(###FILTER_UID###)">###LABEL_ALL###</label></li>
+	    <li class="checkboxLabel"><label onclick="enableCheckboxes(###FILTER_UID###)">###LABEL_ALL###</label></li>
 		<!-- ###SUB_FILTER_CHECKBOX_OPTION### start -->
 		<li name="###OPTIONNAME###" class="###OPTIONCSSCLASS###"><input type="checkbox" name="###FILTERNAME###[###OPTIONKEY###]" id="###OPTIONID###" value="###VALUE###" ###OPTIONSELECT### ###OPTIONDISABLED### /><label>###TITLE###</label></li>
 		<!-- ###SUB_FILTER_CHECKBOX_OPTION### end -->
