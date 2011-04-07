@@ -792,6 +792,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		if (is_array($options)) {
 			foreach ($options as $key => $data) {
 
+				$onclick = '';
 				$tempField = strtolower(t3lib_div::removeXSS($this->piVars['orderByField']));
 				$tempDir = strtolower(t3lib_div::removeXSS($this->piVars['orderByDir']));
 				if($tempField != '' && $tempDir != '') {
@@ -867,9 +868,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 */
 	function renderCheckbox($filterUid, $options) {
 
-		if ($this->ffdata['renderMethod'] == 'ajax') {
+		/*if ($this->ffdata['renderMethod'] == 'ajax') {
 			return $this->renderSelect($filterUid, $options);
-		}
+		}*/
 		
 		$filters = $this->getFilters();
 		$allOptionsOfCurrentFilter = $this->getFilterOptions($filters[$filterUid]['options']);
@@ -893,12 +894,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 						break;
 					}
 				}
-				
-				t3lib_div::devLog('options', $this->extKey, -1, array(
-					$allOptionsOfCurrentFilter,
-					$options,
-					$isOptionInOptionArray
-				));
 				
 				// if option is in optionArray, we have to mark the checkboxes
 				// but only if customer has searched for filters
@@ -1074,11 +1069,13 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		}
 
 		if(!$this->countTagsResults && $tagsString) {
+			$where = $this->div->createQueryForTags($tagsString);
+			
 			// generate Query for counting searchresults in table tags
 			$queryTags = $GLOBALS['TYPO3_DB']->SELECTquery(
 				'COUNT(*) as tags',
 				'tx_kesearch_index',
-				'MATCH (tags) AGAINST (\'' . $tagsString . '\' IN BOOLEAN MODE)'
+				$where
 			);
 			$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 			$count = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
@@ -1209,42 +1206,51 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// make xajax response object
 		$objResponse = new tx_xajax_response();
 
-		// get number of results
-		$this->numberOfResults = $this->getSearchResults(true);
-
-		// set start milliseconds for query time calculation
-		if ($this->ffdata['showQueryTime']) $startMS = t3lib_div::milliseconds();
-
-		// get max score for all hits
-		if ($this->ffdata['showPercentalScore'] || $this->ffdata['showScoreScale']) {
-			$this->maxScore = $this->getSearchResults(false, true);
+		if(count($this->piVars) == 0 && $this->ffdata['showTextInsteadOfResults']) {
+			$objResponse->addAssign("kesearch_results", "innerHTML", $this->pi_RTEcssText($this->ffdata['textForResults']));
+			$objResponse->addAssign("kesearch_query_time", "innerHTML", '');
+			$objResponse->addAssign("kesearch_ordering", "innerHTML", '');
+			$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", '');
+			$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", '');
+			$objResponse->addAssign("kesearch_updating_results", "innerHTML", '');
+			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
+		} else {
+			// get number of results
+			$this->numberOfResults = $this->getSearchResults(true);
+	
+			// set start milliseconds for query time calculation
+			if ($this->ffdata['showQueryTime']) $startMS = t3lib_div::milliseconds();
+	
+			// get max score for all hits
+			if ($this->ffdata['showPercentalScore'] || $this->ffdata['showScoreScale']) {
+				$this->maxScore = $this->getSearchResults(false, true);
+			}
+	
+			// get onclick action
+			$this->initOnclickActions();
+	
+			// generate onload image
+			$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
+			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" /> ';
+			if ($GLOBALS['TSFE']->id != $this->ffdata['resultPage']) {
+				$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
+			}
+	
+			// set filters
+			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
+	
+			// set search results
+			$searchResults = $this->getSearchResults();
+			$objResponse->addAssign("kesearch_results", "innerHTML", $this->getSearchResults().$this->onloadImage);
+	
+			// set end milliseconds for query time calculation
+			if ($this->ffdata['showQueryTime']) {
+				$endMS = t3lib_div::milliseconds();
+				// calculate query time
+				$queryTime = $endMS - $startMS;
+				$objResponse->addAssign("kesearch_query_time", "innerHTML", sprintf($this->pi_getLL('query_time'), $queryTime));
+			}
 		}
-
-		// get onclick action
-		$this->initOnclickActions();
-
-		// generate onload image
-		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
-		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" /> ';
-		if ($GLOBALS['TSFE']->id != $this->ffdata['resultPage']) {
-			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
-		}
-
-		// set filters
-		$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
-
-		// set search results
-		$searchResults = $this->getSearchResults();
-		$objResponse->addAssign("kesearch_results", "innerHTML", $this->getSearchResults().$this->onloadImage);
-
-		// set end milliseconds for query time calculation
-		if ($this->ffdata['showQueryTime']) {
-			$endMS = t3lib_div::milliseconds();
-			// calculate query time
-			$queryTime = $endMS - $startMS;
-			$objResponse->addAssign("kesearch_query_time", "innerHTML", sprintf($this->pi_getLL('query_time'), $queryTime));
-		}
-
 		// return response xml
 		return $objResponse->getXML();
 	}
@@ -1256,8 +1262,23 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	function refresh($data) {
 
 		// set pivars
-		foreach ($data[$this->prefixId] as $key => $value) {
-			$this->piVars[$key] = $this->div->removeXSS($value);
+		foreach($data[$this->prefixId] as $key => $value) {
+			if(is_array($data[$this->prefixId][$key])) {
+				foreach($data[$this->prefixId][$key] as $subkey => $subtag)  {
+					$this->piVars[$key][$subkey] = $this->div->removeXSS($subtag);
+				}
+			} else {
+				$this->piVars[$key] = $this->div->removeXSS($value);
+			}			
+		}
+		
+		// create a list of all filters in piVars
+		foreach($this->piVars['filter'] as $key => $value) {
+			if(is_array($this->piVars['filter'][$key])) {
+				$filterString .= implode($this->piVars['filter'][$key]);
+			} else {
+				$filterString .= $this->piVars['filter'][$key];
+			}			
 		}
 
 		// init Flexforms
@@ -1283,62 +1304,68 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				if ($this->preselectedFilter[$key]) {
 					$this->piVars['filter'][$key] = $this->preselectedFilter[$key];
 				}
-				else {
-					$this->piVars['filter'][$key] = '';
-				}
 			}
 		}
 
 		// make xajax response object
 		$objResponse = new tx_xajax_response();
-
-		// get number of results
-		$this->numberOfResults = $this->getSearchResults(true);
-
-		// set pagebrowser
-		if ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) {
-			if ($this->ffdata['pagebrowserOnTop'] || $this->ffdata['pagebrowserAtBottom']) {
-				$pagebrowserContent = $this->renderPagebrowser();
+		
+		if(!$filterString && !$this->piVars['sword'] && $this->ffdata['showTextInsteadOfResults']) {
+			$objResponse->addAssign("kesearch_results", "innerHTML", $this->pi_RTEcssText($this->ffdata['textForResults']));
+			$objResponse->addAssign("kesearch_query_time", "innerHTML", '');
+			$objResponse->addAssign("kesearch_ordering", "innerHTML", '');
+			$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", '');
+			$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", '');
+			$objResponse->addAssign("kesearch_updating_results", "innerHTML", '');
+			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
+		} else {
+			// get number of results
+			$this->numberOfResults = $this->getSearchResults(true);
+	
+			// set pagebrowser
+			if ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) {
+				if ($this->ffdata['pagebrowserOnTop'] || $this->ffdata['pagebrowserAtBottom']) {
+					$pagebrowserContent = $this->renderPagebrowser();
+				}
+				if ($this->ffdata['pagebrowserOnTop']) {
+					$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", $pagebrowserContent);
+				} else {
+					$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", '');
+				}
+				if ($this->ffdata['pagebrowserAtBottom']) {
+					$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", $pagebrowserContent);
+				} else {
+					$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", '');
+				}
 			}
-			if ($this->ffdata['pagebrowserOnTop']) {
-				$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", $pagebrowserContent);
-			} else {
-				$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", '');
+	
+			// set start milliseconds for query time calculation
+			if ($this->ffdata['showQueryTime']) $startMS = t3lib_div::milliseconds();
+	
+			// set filters
+			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
+	
+			// get max score for all hits
+			if ($this->ffdata['showPercentalScore'] || $this->ffdata['showScoreScale']) {
+				$this->maxScore = $this->getSearchResults(false, true);
 			}
-			if ($this->ffdata['pagebrowserAtBottom']) {
-				$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", $pagebrowserContent);
-			} else {
-				$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", '');
+	
+			// set search results
+			// process if on result page
+			if ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) {
+				$objResponse->addAssign("kesearch_results", "innerHTML", $this->getSearchResults());
+				$objResponse->addAssign("kesearch_ordering", "innerHTML", $this->renderOrdering());
 			}
-		}
-
-		// set start milliseconds for query time calculation
-		if ($this->ffdata['showQueryTime']) $startMS = t3lib_div::milliseconds();
-
-		// set filters
-		$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
-
-		// get max score for all hits
-		if ($this->ffdata['showPercentalScore'] || $this->ffdata['showScoreScale']) {
-			$this->maxScore = $this->getSearchResults(false, true);
-		}
-
-		// set search results
-		// process if on result page
-		if ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) {
-			$objResponse->addAssign("kesearch_results", "innerHTML", $this->getSearchResults());
-			$objResponse->addAssign("kesearch_ordering", "innerHTML", $this->renderOrdering());
-		}
-
-		// set end milliseconds for query time calculation
-		if ($this->ffdata['showQueryTime']) {
-			$endMS = t3lib_div::milliseconds();
-			// calculate query time
-			$queryTime = $endMS - $startMS;
-			$objResponse->addAssign("kesearch_query_time", "innerHTML", sprintf($this->pi_getLL('query_time'), $queryTime));
-		}
-
-		// Show error message
+	
+			// set end milliseconds for query time calculation
+			if ($this->ffdata['showQueryTime']) {
+				$endMS = t3lib_div::milliseconds();
+				// calculate query time
+				$queryTime = $endMS - $startMS;
+				$objResponse->addAssign("kesearch_query_time", "innerHTML", sprintf($this->pi_getLL('query_time'), $queryTime));
+			}
+	
+			// Show error message
 			if ($this->showShortMessage) {
 				$errorMessage = $this->cObj->getSubpart($this->templateCode,'###GENERAL_MESSAGE###');
 				// attention icon
@@ -1354,10 +1381,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			} else {
 				$objResponse->addAssign("kesearch_error", "innerHTML", '');
 			}
-
+		}
 		// return response xml
-		return $objResponse->getXML();
-
+		return $objResponse->getXML();			
 	}
 
 	/*
@@ -1472,16 +1498,16 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 */
 	function buildTagSearchphrase() {
 		// build tag searchphrase
-		$against = '';
+		$against = array();
 		if (is_array($this->piVars['filter'])) {
 			foreach ($this->piVars['filter'] as $key => $tag)  {
 				if (is_array($this->piVars['filter'][$key])) {
 					foreach ($this->piVars['filter'][$key] as $subkey => $subtag)  {
 						// Don't add a "+", because we are here in checkbox mode
-						if (!empty($subtag)) $against .= ' "#'.$subtag.'#" ';
+						if (!empty($subtag)) $against[($key + 1)] .= ' "#'.$subtag.'#" ';
 					}
 				} else {
-					if (!empty($tag)) 	$against .= ' +"#'.$tag.'#" ';
+					if (!empty($tag)) $against[0] .= ' +"#'.$tag.'#" ';
 				}
 			}
 		}
@@ -1593,7 +1619,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$table = 'tx_kesearch_index';
 			$where = '1=1 ';
 			if (!empty($wordsAgainst)) $where .= 'AND MATCH (content) AGAINST (\''.$wordsAgainst.'\' IN BOOLEAN MODE) ';
-			if (!empty($tagsAgainst)) $where .= 'AND MATCH (tags) AGAINST (\''.$tagsAgainst.'\' IN BOOLEAN MODE) ';
+			$where .= $this->div->createQueryForTags($tagsAgainst);
 			$where .= ' AND pid in ('.$this->startingPoints.') ';
 
 			// add "tagged content only" searchphrase
@@ -1637,8 +1663,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// add boolean where clause for all searchwords and/or tags
 		$where = '1=1 ';
 		if (!empty($wordsAgainst)) $where .= 'AND MATCH (content) AGAINST (\''.$wordsAgainst.'\' IN BOOLEAN MODE) ';
-		if (!empty($tagsAgainst)) $where .= 'AND MATCH (tags) AGAINST (\''.$tagsAgainst.'\' IN BOOLEAN MODE) ';
-
+		$where .= $this->div->createQueryForTags($tagsAgainst);
+		
 		// restrict to storage page
 		$where .= ' AND pid in (' . $this->startingPoints . ') ';
 
@@ -1695,7 +1721,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		} else {
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields, $table, $where, '', $orderBy, $limit);
 		}
-
+		t3lib_div::devLog('query', $this->extKey, -1, array($query));
 		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 
@@ -2536,7 +2562,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// prepare "tagsAgainst"
 		$search = array('"', ' ', '+');
 		$replace = array('', '', '');
-		$tagsAgainst = str_replace($search, $replace, $tagsAgainst);
+		$tagsAgainst = str_replace($search, $replace, implode(' ', $tagsAgainst));
 
 		// count search phrase
 		if (!empty($searchPhrase)) {

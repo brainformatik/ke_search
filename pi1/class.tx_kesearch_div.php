@@ -116,8 +116,23 @@ class tx_kesearch_div {
 			return t3lib_div::removeXSS($value);
 		} else {
 			require_once(t3lib_extMgm::extPath($this->extKey).'res/scripts/RemoveXSS.php');
-			return  RemoveXSS::process($value);
+			return RemoveXSS::process($value);
 		}
+	}
+	
+	/**
+	 * Create MATCH AGAINST Query for tags
+	 * 
+	 * @param array $tags
+	 * @return string Query
+	 */
+	function createQueryForTags($tags) {
+		if(count($tags)) {
+			foreach($tags as $value) {
+				$where .= ' AND MATCH (tags) AGAINST (\'' . $value . '\' IN BOOLEAN MODE) '; 
+			}
+			return $where;
+		} return '';
 	}
 }
 

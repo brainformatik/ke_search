@@ -156,7 +156,7 @@
 	</span>
 	<ul id="options_###FILTERID###" class="###LISTCSSCLASS###">
 	    <span class="###SPECIAL_CSS_CLASS###">
-	    <li><input type="checkbox" id="###FILTERID###[markall]" value="markall" onclick="check=this.checked;countInput=(document.getElementById('kesearch_filters').getElementsByTagName('input').length-1);for(i=0;i<countInput;i++){document.getElementById('###FILTERID###['+i+']').checked=check;}" /><label>###LABEL_ALL###</label></li>
+	    <li><input type="hidden" value="false" id="###FILTERID###[markall]" /><label onclick="if(document.getElementById('###FILTERID###[markall]').value=='true'){document.getElementById('###FILTERID###[markall]').value='false';check=false;}else{document.getElementById('###FILTERID###[markall]').value='true';check=true;}countInput=(document.getElementById('kesearch_filters').getElementsByTagName('input').length-1);for(i=0;i<countInput;i++){document.getElementById('###FILTERID###['+i+']').checked=check;}">###LABEL_ALL###</label></li>
 		<!-- ###SUB_FILTER_CHECKBOX_OPTION### start -->
 		<li class="###OPTIONCSSCLASS###"><input type="checkbox" name="###FILTERNAME###[###OPTIONKEY###]" id="###OPTIONID###" value="###VALUE###" ###OPTIONSELECT### ###OPTIONDISABLED### /><label>###TITLE###</label></li>
 		<!-- ###SUB_FILTER_CHECKBOX_OPTION### end -->
