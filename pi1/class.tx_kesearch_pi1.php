@@ -252,6 +252,29 @@ class tx_kesearch_pi1 extends tslib_pibase {
 						'.$this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
 						submitAction();
 					}
+					
+					function enableCheckboxes(filter) {
+						allLi = document.getElementsByName(\'optionCheckBox\' + filter);
+						allCb = new Array();
+						for(i = 0; i < allLi.length; i++) {
+							allCb[i] = allLi[i].getElementsByTagName(\'input\');
+						}
+						allCbChecked = true;
+						for(i = 0; i < allCb.length; i++) {
+							if(!allCb[i][0].checked) {
+								allCbChecked = false;
+							}
+						}
+						if(allCbChecked) {
+							for(i = 0; i < allCb.length; i++) {
+								allCb[i][0].checked = false;
+							}
+						} else {
+							for(i = 0; i < allCb.length; i++) {
+								allCb[i][0].checked = true;
+							}
+						}
+					}
 					</script>';
 
 			// minify JS?
@@ -913,6 +936,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONKEY###', $key);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONID###', 'filter[' . $filterUid . '][' . $key . ']');
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONCSSCLASS###', 'optionCheckBox optionCheckBox' . $key);
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONNAME###', 'optionCheckBox' . $filterUid);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONSELECT###', $checkBoxParams['selected']);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONDISABLED###', $checkBoxParams['disabled']);
 				
@@ -944,6 +968,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $this->filters[$filterUid]['title']);
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERNAME###', 'tx_kesearch_pi1[filter]['.$filterUid.']');
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERID###', 'filter['.$filterUid.']');
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTER_UID###', $filterUid);
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCHANGE###', $this->onclickFilter);
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCLICK_RESET###', $this->onclickFilter);
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###DISABLED###', $optionsCount > 0 ? '' : ' disabled="disabled" ');
