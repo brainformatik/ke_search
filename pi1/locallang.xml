@@ -75,6 +75,7 @@
 			<label index="label_score_scale">Score scale</label>
 			<label index="label_tags">Tags</label>
 			<label index="label_query">DB-Query</label>
+			<label index="label_all">select all / deselect all</label>
 
 			<label index="loading">Loading</label>
 			<label index="all_options">ALL</label>
@@ -159,6 +160,7 @@
 			<label index="label_score_scale">Relevanz-Skala</label>
 			<label index="label_tags">Tags</label>
 			<label index="label_query">DB-Query</label>
+			<label index="label_all">alle auswählen / alle abwählen</label>
 
 			<label index="loading">laedt</label>
 			<label index="all_options">Alle</label>

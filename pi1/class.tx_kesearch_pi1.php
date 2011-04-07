@@ -878,29 +878,45 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$optionSubpart = '###SUB_FILTER_CHECKBOX_OPTION###';
 
 		$optionsCount = 0;
-
+		
 		// loop through options
 		if(is_array($allOptionsOfCurrentFilter)) {
 			foreach($allOptionsOfCurrentFilter as $key => $data) {
-				$onclick = 'document.getElementById(\'filter['.$filterUid.']['.$key.']\').value=\''.$data['tag'].'\'; ';
-				if($options[$key]['selected']) {
-					$checkBoxParams['selected'] = 'checked="checked"';
-					$checkBoxParams['disabled'] = '';
-				} else {
-					$checkBoxParams['selected'] = '';
-					if(is_array($options[$key]) && t3lib_div::inArray($options[$key], $data['title'])) {
-						$checkBoxParams['disabled'] = '';
-					} else {
-						$checkBoxParams['disabled'] = 'disabled="disabled"';
+				$checkBoxParams['selected'] = '';
+				$checkBoxParams['disabled'] = '';
+				
+				// check if current option (of searchresults) is in array of all possible options
+				$isOptionInOptionArray = 0;
+				foreach($options as $optionKey => $optionValue) {
+					if(is_array($options[$optionKey]) && t3lib_div::inArray($options[$optionKey], $data['title'])) {
+						$isOptionInOptionArray = 1;
+						break;
 					}
 				}
-
+				
+				t3lib_div::devLog('options', $this->extKey, -1, array(
+					$allOptionsOfCurrentFilter,
+					$options,
+					$isOptionInOptionArray
+				));
+				
+				// if option is in optionArray, we have to mark the checkboxes
+				// but only if customer has searched for filters
+				if($isOptionInOptionArray) {
+					// first...remove all empty piVars[filter]
+					// &tx_kesearch_pi1[filter][3][1]=&tx_kesearch_pi1[filter][3][2]=
+					// if there is no filter defined implode returns an empty string
+					$checkBoxParams['selected'] = (implode($this->piVars['filter'][$filterUid])) ? 'checked="checked"' : '';
+					$checkBoxParams['disabled'] = '';
+				} else {
+					$checkBoxParams['disabled'] = 'disabled="disabled"';
+				}
+				
 				$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###ONCLICK###', $onclick);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $data['title']);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###VALUE###', $data['tag']);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONKEY###', $key);
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###FILTERID###', 'filter[' . $filterUid . '][' . $key . ']');
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONID###', 'filter[' . $filterUid . '][' . $key . ']');
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONCSSCLASS###', 'optionCheckBox optionCheckBox' . $key);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONSELECT###', $checkBoxParams['selected']);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONDISABLED###', $checkBoxParams['disabled']);
@@ -929,6 +945,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		if ($this->UTF8QuirksMode) $filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', utf8_encode($this->filters[$filterUid]['title']));
 		else $filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $this->filters[$filterUid]['title']);
 
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###LABEL_ALL###', $this->pi_getLL('label_all'));
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $this->filters[$filterUid]['title']);
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERNAME###', 'tx_kesearch_pi1[filter]['.$filterUid.']');
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERID###', 'filter['.$filterUid.']');
@@ -981,7 +998,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					if(is_array($this->piVars['filter'][$foreignFilterId])) {
 						foreach($this->piVars['filter'][$foreignFilterId] as $optionKey => $optionValue) {
 							if(!empty($this->piVars['filter'][$foreignFilterId][$optionKey])) {
-								$tagsAgainst .= ' +"#'.$this->piVars['filter'][$foreignFilterId][$optionKey].'#" ';
+								// Don't add a "+", because we are here in checkbox mode
+								$tagsAgainst .= ' "#'.$this->piVars['filter'][$foreignFilterId][$optionKey].'#" ';
 							}							
 						}
 					} else {
@@ -1459,7 +1477,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			foreach ($this->piVars['filter'] as $key => $tag)  {
 				if (is_array($this->piVars['filter'][$key])) {
 					foreach ($this->piVars['filter'][$key] as $subkey => $subtag)  {
-						if (!empty($subtag)) $against .= ' +"#'.$subtag.'#" ';
+						// Don't add a "+", because we are here in checkbox mode
+						if (!empty($subtag)) $against .= ' "#'.$subtag.'#" ';
 					}
 				} else {
 					if (!empty($tag)) 	$against .= ' +"#'.$tag.'#" ';
