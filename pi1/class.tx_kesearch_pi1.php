@@ -101,284 +101,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// get preselected filter from rootline
 		$this->getFilterPreselect();
 
-		// set javascript if searchbox is loaded (=load once only )
-		// ajax mode
-		if ($this->ffdata['mode'] == 0 && $this->ffdata['renderMethod'] == 'ajax') {
-			$jsContent = '
-				<script type="text/javascript">
-					function submitAction() {
-						document.getElementById(\'kesearch_filters\').style.display=\'none\';
-						document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
-						document.getElementById(\'kesearch_results\').style.display=\'none\';
-						document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
-						document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
-						document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
-						document.getElementById(\'kesearch_query_time\').style.display=\'none\';
-						document.getElementById(\'pagenumber\').value="1";
-					}
-
-					function refreshFiltersOnly() {
-						document.getElementById(\'kesearch_filters\').style.display=\'none\';
-						document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
-					}
-
-					function hideSpinnerFiltersOnly() {
-						document.getElementById(\'kesearch_filters\').style.display=\'block\';
-						document.getElementById(\'kesearch_updating_filters\').style.display=\'none\';
-						document.getElementById(\'resetFilters\').value=0;
-					}
-
-					function pagebrowserAction() {
-						document.getElementById(\'kesearch_results\').style.display=\'none\';
-						document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
-						document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
-						document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
-						document.getElementById(\'kesearch_query_time\').style.display=\'none\';
-					}
-
-					function hideSpinner() {
-						document.getElementById(\'kesearch_filters\').style.display=\'block\';
-						document.getElementById(\'kesearch_updating_filters\').style.display=\'none\';
-						document.getElementById(\'kesearch_results\').style.display=\'block\';
-						document.getElementById(\'kesearch_updating_results\').style.display=\'none\';
-						document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'block\';
-						document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'block\';
-						document.getElementById(\'kesearch_query_time\').style.display=\'block\';';
-
-			// add reset filters?
-			if ($this->ffdata['resetFiltersOnSubmit']) {
-				$jsContent .= '
-						document.getElementById(\'resetFilters\').value=0; ';
-			}
-			$jsContent .= '
-					}';
-
-			// build target URL if not result page
-			unset($linkconf);
-			$linkconf['parameter'] = $this->ffdata['resultPage'];
-			$linkconf['additionalParams'] = '';
-			$linkconf['useCacheHash'] = false;
-			$targetUrl = t3lib_div::locationHeaderUrl($this->cObj->typoLink_URL($linkconf));
-
-
-			$jsContent .= '
-
-					// refresh result list onload
-					function onloadResults() {
-						document.getElementById(\'kesearch_results\').style.display=\'none\';
-						document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
-						document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
-						document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
-						document.getElementById(\'kesearch_query_time\').style.display=\'none\';
-						tx_kesearch_pi1refreshResultsOnLoad(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-						// document.getElementById(\'resetFilters\').value=0;
-					}
-
-					function onloadFiltersAndResults() {
-						document.getElementById(\'kesearch_filters\').style.display=\'none\';
-						document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
-						document.getElementById(\'kesearch_results\').style.display=\'none\';
-						document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
-						document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
-						document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
-						document.getElementById(\'kesearch_query_time\').style.display=\'none\';
-						tx_kesearch_pi1refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-					}
-
-					// reset both searchbox and filters
-					function resetSearchboxAndFilters() {
-						document.getElementById(\'kesearch_filters\').style.display=\'none\';
-						document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
-						document.getElementById(\'resetFilters\').value=1;
-						document.getElementById(\'ke_search_sword\').value="";
-						document.getElementById(\'pagenumber\').value="1";
-						tx_kesearch_pi1resetSearchbox(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-						redirectToResultPage();
-						// document.getElementById(\'resetFilters\').value=0;
-					}
-
-					// set form action so that redirect to result page is processed
-					function redirectToResultPage() {
-						formEl = document.getElementById(\'xajax_form_kesearch_pi1\');
-						formEl.action=\''.$targetUrl.'\';
-						formEl.submit();
-					}
-
-					// add event listener for key press
-					function keyPressAction(e) {
-						e = e || window.event;
-						var code = e.keyCode || e.which;
-						// (submit search when pressing RETURN)
-						if(code == 13) {
-					';
-
-
-			if ($this->ffdata['resetFiltersOnSubmit']) {
-				$jsContent .= '
-							document.getElementById(\'resetFilters\').value=1;';
-			}
-
-			if ($GLOBALS['TSFE']->id != $this->ffdata['resultPage']) {
-				// redirect to result page if current page is not the result page and option is activated
-				$jsContent .= '
-							redirectToResultPage();
-						}';
-			} else {
-				// refresh results and searchbox if current page is result page
-				$jsContent .= '
-							'.$this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-							submitAction();}';
-			}
-
-			$jsContent .= '
-					}
-
-					function switchArea(objid) {
-						if (document.getElementById(\'options_\' + objid).className == \'expanded\') {
-							document.getElementById(\'options_\' + objid).className = \'closed\';
-							document.getElementById(\'bullet_\' + objid).src=\''.t3lib_extMgm::siteRelPath($this->extKey).'res/img/list-head-closed.gif\';
-						} else {
-							document.getElementById(\'options_\' + objid).className = \'expanded\';
-							document.getElementById(\'bullet_\' + objid).src=\''.t3lib_extMgm::siteRelPath($this->extKey).'res/img/list-head-expanded.gif\';
-						}
-					}
-
-					// orderBy
-					function setOrderBy(field, direction) {
-						document.getElementById(\'orderByField\').value = field;
-						document.getElementById(\'orderByDir\').value = direction;
-						document.getElementById(\'pagenumber\').value=1;
-						//document.getElementById(\'resetFilters\').value=1;
-						'.$this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-						submitAction();
-					}
-
-					function enableCheckboxes(filter) {
-						allLi = document.getElementsByName(\'optionCheckBox\' + filter);
-						allCb = new Array();
-						for(i = 0; i < allLi.length; i++) {
-							allCb[i] = allLi[i].getElementsByTagName(\'input\');
-						}
-						allCbChecked = true;
-						for(i = 0; i < allCb.length; i++) {
-							if(!allCb[i][0].checked) {
-								allCbChecked = false;
-							}
-						}
-						if(allCbChecked) {
-							for(i = 0; i < allCb.length; i++) {
-								allCb[i][0].checked = false;
-							}
-						} else {
-							for(i = 0; i < allCb.length; i++) {
-								allCb[i][0].checked = true;
-							}
-						}
-					}
-					</script>';
-
-			// minify JS?
-			if (version_compare(TYPO3_version, '4.2.0', '>=' )) $jsContent = t3lib_div::minifyJavaScript($jsContent);
-
-			// add JS to page header
-			$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId.'_jsContent_ajax'] .= $jsContent;
-		}
-
-		// set javascript if searchbox is loaded (=load once only )
-		// ajax_after_reload mode
-		if ($this->ffdata['mode'] == 0 && $this->ffdata['renderMethod'] == 'ajax_after_reload') {
-
-			$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId.'_jsContent_static'] .= '
-				<script type="text/javascript">
-
-					// refresh result list onload
-					function onloadResults() {
-						document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
-						document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
-						document.getElementById(\'kesearch_results\').style.display=\'none\';
-						document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
-						document.getElementById(\'kesearch_query_time\').style.display=\'none\';
-						tx_kesearch_pi1refreshResultsOnLoad(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-					}
-
-					// refresh result list onload
-					function onloadFilters() {
-						document.getElementById(\'kesearch_filters\').style.display=\'none\';
-						document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
-						tx_kesearch_pi1refreshFiltersOnLoad(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-					}
-
-					function onloadFiltersAndResults() {
-						document.getElementById(\'kesearch_filters\').style.display=\'none\';
-						document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
-						document.getElementById(\'kesearch_results\').style.display=\'none\';
-						document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
-						document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
-						document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
-						document.getElementById(\'kesearch_query_time\').style.display=\'none\';
-						tx_kesearch_pi1refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-					}
-
-					function hideSpinner() {
-						document.getElementById(\'kesearch_filters\').style.display=\'block\';
-						document.getElementById(\'kesearch_updating_filters\').style.display=\'none\';
-						document.getElementById(\'kesearch_results\').style.display=\'block\';
-						document.getElementById(\'kesearch_updating_results\').style.display=\'none\';
-						document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'block\';
-						document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'block\';
-						document.getElementById(\'kesearch_query_time\').style.display=\'block\';
-					}
-
-					function hideSpinnerFiltersOnly() {
-						document.getElementById(\'kesearch_filters\').style.display=\'block\';
-						document.getElementById(\'kesearch_updating_filters\').style.display=\'none\';
-						document.getElementById(\'resetFilters\').value=0;
-					}
-
-					function pagebrowserAction() {
-						document.getElementById(\'kesearch_results\').style.display=\'none\';
-						document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
-						document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
-						document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
-						document.getElementById(\'kesearch_query_time\').style.display=\'none\';
-					}
-
-					function switchArea(objid) {
-						if (document.getElementById(\'options_\' + objid).className == \'expanded\') {
-							document.getElementById(\'options_\' + objid).className = \'closed\';
-							document.getElementById(\'bullet_\' + objid).src=\''.t3lib_extMgm::siteRelPath($this->extKey).'res/img/list-head-closed.gif\';
-						} else {
-							document.getElementById(\'options_\' + objid).className = \'expanded\';
-							document.getElementById(\'bullet_\' + objid).src=\''.t3lib_extMgm::siteRelPath($this->extKey).'res/img/list-head-expanded.gif\';
-						}
-					}
-
-					function enableCheckboxes(filter) {
-						allLi = document.getElementsByName(\'optionCheckBox\' + filter);
-						allCb = new Array();
-						for(i = 0; i < allLi.length; i++) {
-							allCb[i] = allLi[i].getElementsByTagName(\'input\');
-						}
-						allCbChecked = true;
-						for(i = 0; i < allCb.length; i++) {
-							if(!allCb[i][0].checked) {
-								allCbChecked = false;
-							}
-						}
-						if(allCbChecked) {
-							for(i = 0; i < allCb.length; i++) {
-								allCb[i][0].checked = false;
-							}
-						} else {
-							for(i = 0; i < allCb.length; i++) {
-								allCb[i][0].checked = true;
-							}
-						}
-					}
-
-				</script>';
-
-		}
+		// include javascript in searchbox mode only
+		if ($this->ffdata['mode'] == 0) $this->getJSContent();
 
 		// Spinner Image
 		if ($this->conf['spinnerImageFile']) {
@@ -482,7 +206,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 */
 	function initOnclickActions() {
 
-		// t3lib_div::debug($this->ffdata['renderMethod'],1);
 		switch ($this->ffdata['renderMethod']) {
 
 
@@ -558,9 +281,27 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// submit
 		$content = $this->cObj->substituteMarker($content,'###SUBMIT_VALUE###',$this->pi_getLL('submit'));
 
-		// search word value
-		$swordValue = $this->piVars['sword'] ? $this->div->removeXSS($this->piVars['sword']) : '';
+		// searchword input value
+		$searchWordValue = trim($this->piVars['sword']);
+
+		if (!empty($searchWordValue) && $searchWordValue != $this->pi_getLL('searchbox_default_value')) {
+			// no searchword entered
+			$swordValue = $this->piVars['sword'] ? $this->div->removeXSS($this->piVars['sword']) : '';
+			$searchboxFocusJS = '';
+		// } else if ($this->ffdata['renderMethod'] != 'static') {
+		} else {
+			// do not use when static mode is called
+
+			// get default value from LL
+			$swordValue = $this->pi_getLL('searchbox_default_value');
+
+			// set javascript for resetting searchbox value
+			$searchboxFocusJS = ' searchboxFocus(this);  ';
+
+		}
 		$content = $this->cObj->substituteMarker($content,'###SWORD_VALUE###', $swordValue);
+		$content = $this->cObj->substituteMarker($content,'###SWORD_ONFOCUS###', $searchboxFocusJS);
+
 
 
 		// get filters
@@ -615,8 +356,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$typeParam = t3lib_div::_GP('type');
 		if ($typeParam) {
 			$hiddenFieldValue = intval($typeParam);
-			// $hiddenFieldValue = $this->div->removeXSS($hiddenFieldValue);
-			//$hiddenFieldsContent .= '<input type="hidden" name="type" value="'.$hiddenFieldValue.'" />';
 			$typeContent = $this->cObj->getSubpart($this->templateCode,'###SUB_PAGETYPE###');
 			$typeContent = $this->cObj->substituteMarker($typeContent,'###PAGETYPE###',$typeParam);
 		} else $typeContent = '';
@@ -1585,6 +1324,11 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// prepare searchword for query
 		$sword = $this->div->removeXSS($this->piVars['sword']);
 
+		// ignore default search box content
+		if (strtolower(trim($sword)) == strtolower($this->pi_getLL('searchbox_default_value'))) {
+			$sword = '';
+		}
+
 		// replace plus and minus chars
 		$sword = str_replace('-', ' ', $sword);
 		$sword = str_replace('+', ' ', $sword);
@@ -1641,6 +1385,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$swords = $searchWordInformation['swords'];
 		$wordsAgainst = $searchWordInformation['wordsAgainst'];
 		$scoreAgainst = $searchWordInformation['scoreAgainst'];
+
 
 		// build "tagged content only" searchphrase
 		if ($this->ffdata['showTaggedContentOnly']) {
@@ -1780,7 +1525,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		} else {
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields, $table, $where, '', $orderBy, $limit);
 		}
-		t3lib_div::devLog('query', $this->extKey, -1, array($query));
 		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 
@@ -2660,6 +2404,253 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		}
 
 	}
+
+
+
+	/*
+	 * function includeJavascript
+	 */
+	function getJSContent() {
+
+		$jsContent = '';
+
+		// build target URL if not result page
+		unset($linkconf);
+		$linkconf['parameter'] = $this->ffdata['resultPage'];
+		$linkconf['additionalParams'] = '';
+		$linkconf['useCacheHash'] = false;
+		$targetUrl = t3lib_div::locationHeaderUrl($this->cObj->typoLink_URL($linkconf));
+
+		// include js for all render methods
+		$jsContent .= '
+			function searchboxFocus(searchbox) {
+				if (searchbox.value == \''.$this->pi_getLL('searchbox_default_value').'\' ) {
+					searchbox.value = \'\';
+				}
+			}
+
+			function enableCheckboxes(filter) {
+				allLi = document.getElementsByName(\'optionCheckBox\' + filter);
+				allCb = new Array();
+				for(i = 0; i < allLi.length; i++) {
+					allCb[i] = allLi[i].getElementsByTagName(\'input\');
+				}
+				allCbChecked = true;
+				for(i = 0; i < allCb.length; i++) {
+					if(!allCb[i][0].checked) {
+						allCbChecked = false;
+					}
+				}
+				if(allCbChecked) {
+					for(i = 0; i < allCb.length; i++) {
+						allCb[i][0].checked = false;
+					}
+				} else {
+					for(i = 0; i < allCb.length; i++) {
+						allCb[i][0].checked = true;
+					}
+				}
+			}
+
+		';
+
+		// include js for non-static modes
+		if ($this->ffdata['renderMethod'] != 'static' ) {
+			$jsContent .= '
+				function switchArea(objid) {
+					if (document.getElementById(\'options_\' + objid).className == \'expanded\') {
+						document.getElementById(\'options_\' + objid).className = \'closed\';
+						document.getElementById(\'bullet_\' + objid).src=\''.t3lib_extMgm::siteRelPath($this->extKey).'res/img/list-head-closed.gif\';
+					} else {
+						document.getElementById(\'options_\' + objid).className = \'expanded\';
+						document.getElementById(\'bullet_\' + objid).src=\''.t3lib_extMgm::siteRelPath($this->extKey).'res/img/list-head-expanded.gif\';
+					}
+				}
+
+				function hideSpinnerFiltersOnly() {
+					document.getElementById(\'kesearch_filters\').style.display=\'block\';
+					document.getElementById(\'kesearch_updating_filters\').style.display=\'none\';
+					document.getElementById(\'resetFilters\').value=0;
+				}
+
+				function pagebrowserAction() {
+					document.getElementById(\'kesearch_results\').style.display=\'none\';
+					document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
+					document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
+					document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
+					document.getElementById(\'kesearch_query_time\').style.display=\'none\';
+				}
+
+			';
+
+		}
+
+		// include js for full ajax mode
+		if ($this->ffdata['renderMethod'] == 'ajax') {
+			$jsContent .= '
+
+				function submitAction() {
+					document.getElementById(\'kesearch_filters\').style.display=\'none\';
+					document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
+					document.getElementById(\'kesearch_results\').style.display=\'none\';
+					document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
+					document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
+					document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
+					document.getElementById(\'kesearch_query_time\').style.display=\'none\';
+					document.getElementById(\'pagenumber\').value="1";
+				}
+
+				function refreshFiltersOnly() {
+					document.getElementById(\'kesearch_filters\').style.display=\'none\';
+					document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
+				}
+
+				// refresh result list onload
+				function onloadResults() {
+					document.getElementById(\'kesearch_results\').style.display=\'none\';
+					document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
+					document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
+					document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
+					document.getElementById(\'kesearch_query_time\').style.display=\'none\';
+					tx_kesearch_pi1refreshResultsOnLoad(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
+					// document.getElementById(\'resetFilters\').value=0;
+				}
+
+				function onloadFiltersAndResults() {
+					document.getElementById(\'kesearch_filters\').style.display=\'none\';
+					document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
+					document.getElementById(\'kesearch_results\').style.display=\'none\';
+					document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
+					document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
+					document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
+					document.getElementById(\'kesearch_query_time\').style.display=\'none\';
+					tx_kesearch_pi1refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
+				}
+
+				// reset both searchbox and filters
+				function resetSearchboxAndFilters() {
+					document.getElementById(\'kesearch_filters\').style.display=\'none\';
+					document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
+					document.getElementById(\'resetFilters\').value=1;
+					document.getElementById(\'ke_search_sword\').value="";
+					document.getElementById(\'pagenumber\').value="1";
+					tx_kesearch_pi1resetSearchbox(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
+					redirectToResultPage();
+					// document.getElementById(\'resetFilters\').value=0;
+				}
+
+				// set form action so that redirect to result page is processed
+				function redirectToResultPage() {
+					formEl = document.getElementById(\'xajax_form_kesearch_pi1\');
+					formEl.action=\''.$targetUrl.'\';
+					formEl.submit();
+				}
+
+				// orderBy
+				function setOrderBy(field, direction) {
+					document.getElementById(\'orderByField\').value = field;
+					document.getElementById(\'orderByDir\').value = direction;
+					document.getElementById(\'pagenumber\').value=1;
+					//document.getElementById(\'resetFilters\').value=1;
+					'.$this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
+					submitAction();
+				}
+			';
+
+			$jsContent .= '
+					// add event listener for key press
+					function keyPressAction(e) {
+						e = e || window.event;
+						var code = e.keyCode || e.which;
+						// (submit search when pressing RETURN)
+						if(code == 13) {
+					';
+
+			if ($this->ffdata['resetFiltersOnSubmit']) {
+				$jsContent .= '
+							document.getElementById(\'resetFilters\').value=1;';
+			}
+
+			if ($GLOBALS['TSFE']->id != $this->ffdata['resultPage']) {
+				// redirect to result page if current page is not the result page and option is activated
+				$jsContent .= 'redirectToResultPage(); }';
+			} else {
+				// refresh results and searchbox if current page is result page
+				$jsContent .=  ' '.$this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); submitAction();}';
+			}
+			$jsContent .= '}';
+
+			$jsContent .= '
+				function hideSpinner() {
+					document.getElementById(\'kesearch_filters\').style.display=\'block\';
+					document.getElementById(\'kesearch_updating_filters\').style.display=\'none\';
+					document.getElementById(\'kesearch_results\').style.display=\'block\';
+					document.getElementById(\'kesearch_updating_results\').style.display=\'none\';
+					document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'block\';
+					document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'block\';
+					document.getElementById(\'kesearch_query_time\').style.display=\'block\';';
+
+			// add reset filters?
+			if ($this->ffdata['resetFiltersOnSubmit']) $jsContent .= 'document.getElementById(\'resetFilters\').value=0; ';
+
+			$jsContent .= '
+				}';
+
+		}
+
+		// include js for "ajax after page reload" mode
+		if ($this->ffdata['renderMethod'] == 'ajax_after_reload') {
+			$jsContent .= '
+				// refresh result list onload
+				function onloadResults() {
+					document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
+					document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
+					document.getElementById(\'kesearch_results\').style.display=\'none\';
+					document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
+					document.getElementById(\'kesearch_query_time\').style.display=\'none\';
+					tx_kesearch_pi1refreshResultsOnLoad(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
+				}
+
+				// refresh result list onload
+				function onloadFilters() {
+					document.getElementById(\'kesearch_filters\').style.display=\'none\';
+					document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
+					tx_kesearch_pi1refreshFiltersOnLoad(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
+				}
+
+				function onloadFiltersAndResults() {
+					document.getElementById(\'kesearch_filters\').style.display=\'none\';
+					document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
+					document.getElementById(\'kesearch_results\').style.display=\'none\';
+					document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
+					document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
+					document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
+					document.getElementById(\'kesearch_query_time\').style.display=\'none\';
+					tx_kesearch_pi1refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
+				}
+
+				function hideSpinner() {
+					document.getElementById(\'kesearch_filters\').style.display=\'block\';
+					document.getElementById(\'kesearch_updating_filters\').style.display=\'none\';
+					document.getElementById(\'kesearch_results\').style.display=\'block\';
+					document.getElementById(\'kesearch_updating_results\').style.display=\'none\';
+					document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'block\';
+					document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'block\';
+					document.getElementById(\'kesearch_query_time\').style.display=\'block\';
+				}
+			';
+		}
+
+		$jsContent = '<script type="text/javascript">'.$jsContent.'</script>';
+
+		// minify JS?
+		// if (version_compare(TYPO3_version, '4.2.0', '>=' )) $jsContent = t3lib_div::minifyJavaScript($jsContent);
+		// add JS to page header
+		$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId.'_jsContent'] = $jsContent;
+
+	}
+
+
 
 }
 

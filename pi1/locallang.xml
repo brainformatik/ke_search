@@ -88,6 +88,8 @@
 			<label index="orderlink_title">Title</label>
 			<label index="orderlink_score">Relevance</label>
 			<label index="orderlink_sortdate">Date</label>
+
+			<label index="searchbox_default_value">Your search phrase</label>
 		</languageKey>
 
 		<!-- GERMAN -->
@@ -173,6 +175,8 @@
 			<label index="orderlink_title">Titel</label>
 			<label index="orderlink_score">Relevanz</label>
 			<label index="orderlink_sortdate">Datum</label>
+
+			<label index="searchbox_default_value">Suchbegriff</label>
 		</languageKey>
 
 	</data>

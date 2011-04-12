@@ -1,7 +1,7 @@
 <!-- ###SEARCHBOX_AJAX### start -->
     <form id="xajax_form_kesearch_pi1" name="xajax_form_kesearch_pi1" method="post" action="" onsubmit="return false;" class="ajax" >
 	<div class="searchbox">
-	    <input type="text" name="tx_kesearch_pi1[sword]" id="ke_search_sword" value="###SWORD_VALUE###" onkeypress="keyPressAction(event);" />
+	    <input type="text" name="tx_kesearch_pi1[sword]" id="ke_search_sword" value="###SWORD_VALUE###" onkeypress="keyPressAction(event);" onfocus="###SWORD_ONFOCUS###" />
 	    <input type="image" src="typo3conf/ext/ke_search/res/img/go.gif" id="kesearch_submit" class="submit" value="###SUBMIT_VALUE###" onclick="document.getElementById('pagenumber').value=1; ###ONCLICK###" />
 	    <input id="pagenumber" type="hidden" name="tx_kesearch_pi1[page]" value="###HIDDEN_PAGE_VALUE###" />
 	    <input id="resetFilters" type="hidden" name="tx_kesearch_pi1[resetFilters]" value="0" />
@@ -21,7 +21,7 @@
 	    <input type="hidden" name="id" value="###FORM_TARGET_PID###" />
 	    ###HIDDENFIELDS###
 	    <div class="search_input">
-		<b><input type="text" name="tx_kesearch_pi1[sword]" id="ke_search_sword" value="###SWORD_VALUE###" /></b>
+		<b><input type="text" name="tx_kesearch_pi1[sword]" id="ke_search_sword" value="###SWORD_VALUE###" onfocus="###SWORD_ONFOCUS###" /></b>
 	    </div>
 	    <div class=clearer"">&nbsp;</div>
 	    <input type="image" src="typo3conf/ext/ke_search/res/img/go.gif" id="kesearch_submit" class="submit" value="###SUBMIT_VALUE###" onclick="document.getElementById('pagenumber').value=1; document.getElementById('xajax_form_kesearch_pi1').submit();" />
