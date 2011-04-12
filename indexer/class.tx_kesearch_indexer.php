@@ -1074,19 +1074,25 @@ class tx_kesearch_indexer {
 			if (!empty($prodRecord['products_region']) || !empty($prodRecord['products_countries'])) {
 				$tagContent .= $this->getXTYPOCommerceRegionAndCountryTags($prodRecord['products_region'], $prodRecord['products_countries']);
 			}
+			// manufacturer
 			if (!empty($prodRecord['manufacturers_id'])) {
 				// publisher
 				$tagContent .= '#publisher_'.$prodRecord['manufacturers_id'].'#';
 			}
+			// language
 			if (!empty($prodRecord['products_language'])) {
 				// language
 				$lang = $prodRecord['products_language'];
-				if (strtolower($lang) == 'niederländisch') $lang = 'niederlaendisch';
+				if (stristr($lang, 'niederl')) $lang = 'niederlaendisch';
 				$tagContent .= '#language_'.$lang.'#';
 			}
+			// publish date
 			if (!empty($prodRecord['products_monat']) && !empty($prodRecord['products_jahr'])) {
 				// date
 				$tagContent .= '#year_'.$prodRecord['products_jahr'].'#';
+
+				// set date as sortdate
+				$additionalFields['sortdate'] = mktime(0,0,0,$prodRecord['products_monat'], 1, $prodRecord['products_jahr']);
 			}
 
 			// hook for custom modifications of the indexed data, e. g. the tags
