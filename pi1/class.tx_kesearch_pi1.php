@@ -2644,7 +2644,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$jsContent = '<script type="text/javascript">'.$jsContent.'</script>';
 
 		// minify JS?
-		// if (version_compare(TYPO3_version, '4.2.0', '>=' )) $jsContent = t3lib_div::minifyJavaScript($jsContent);
+		if (version_compare(TYPO3_version, '4.2.0', '>=' )) $jsContent = t3lib_div::minifyJavaScript($jsContent);
 		// add JS to page header
 		$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId.'_jsContent'] = $jsContent;
 
