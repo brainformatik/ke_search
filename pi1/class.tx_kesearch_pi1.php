@@ -2205,6 +2205,13 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		if (!isset($this->ffdata['countSearchPhrases'])) {
 			$this->ffdata['countSearchPhrases'] = 1;
 		}
+
+		// Hook: modify_flexFormData
+		foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF'][$this->extKey]['modifyFlexFormClass'] as $hookObject) {
+		    if(method_exists($hookObject, 'modify_flexFormData')) {
+		        $hookObject->modify_flexFormData($this->ffdata, $this->cObj, $this->piVars);
+		    }
+		}
 	}
 
 
