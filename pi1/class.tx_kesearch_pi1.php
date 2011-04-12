@@ -1555,14 +1555,24 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			}
 
 			// no results found
-			$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->pi_getLL('no_results_found'));
-
-			// attention icon
-			unset($imageConf);
-			$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/attention.gif';
-			$imageConf['altText'] = $this->pi_getLL('no_results_found');
-			$attentionImage=$this->cObj->IMAGE($imageConf);
+			if ($this->ffdata['showNoResultsText']) {
+				// use individual text set in flexform
+				$noResultsText = $this->pi_RTEcssText($this->ffdata['noResultsText']);
+				$attentionImage = '';
+			} else {
+				// use general text
+				$noResultsText = $this->pi_getLL('no_results_found');
+				// attention icon
+				unset($imageConf);
+				$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/attention.gif';
+				$imageConf['altText'] = $this->pi_getLL('no_results_found');
+				$attentionImage=$this->cObj->IMAGE($imageConf);
+			}
+			// set text for "no results found"
+			$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $noResultsText);
+			// set attention icon?
 			$content = $this->cObj->substituteMarker($content,'###IMAGE###', $attentionImage);
+
 
 			// add query
 			if ($this->ffdata['showQuery']) {

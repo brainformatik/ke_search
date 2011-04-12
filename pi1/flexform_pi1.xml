@@ -85,6 +85,32 @@
 						</TCEforms>
 					</textForResults>
 
+
+					<showNoResultsText>
+						<TCEforms>
+							<onChange>reload</onChange>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showNoResultsText</label>
+							<displayCond>FIELD:mode:=:0</displayCond>
+							<config>
+								<type>check</type>
+								<default>0</default>
+							</config>
+						</TCEforms>
+					</showNoResultsText>
+
+					<noResultsText>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.noResultsText</label>
+							<displayCond>FIELD:showNoResultsText:=:1</displayCond>
+							<config>
+								<type>text</type>
+								<cols>52</cols>
+								<rows>5</rows>
+							</config>
+							<defaultExtras>richtext[*]:rte_transform[flag=rte_enabled|mode=ts_css]</defaultExtras>
+						</TCEforms>
+					</noResultsText>
+
 					<sortWithoutSearchword>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.sortWithoutSearchword</label>

@@ -247,7 +247,7 @@
     margin-right: 10px;
 }
 .tx-kesearch-pi1 .general-message .message {
-    font-weight: bold;
+    /* font-weight: bold; */
 }
 
 
@@ -319,7 +319,7 @@
 	height: 0;
 	border-color: #FF0000 transparent;
 	border-style: solid solid none;
-	border-width: 4px 4px 0;			
+	border-width: 4px 4px 0;
 }
 
 .tx-kesearch-pi1 #kesearch_ordering span.up {
@@ -328,7 +328,7 @@
 	height: 0;
 	border-color: transparent transparent #FF0000;
 	border-style: none solid solid;
-	border-width: 0 4px 4px;			
+	border-width: 0 4px 4px;
 }
 
 .tx-kesearch-pi1 #kesearch_ordering div.ordering {

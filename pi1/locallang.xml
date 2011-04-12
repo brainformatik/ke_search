@@ -20,6 +20,8 @@
 			<label index="ff.resultsNumeration">Number results consecutively?</label>
 			<label index="ff.showTextInsteadOfResults">Show text instead of searchresults if no filter or searchword has been given.</label>
 			<label index="ff.textForResults">Insert this text if no filter or searchword has been given.</label>
+			<label index="ff.showNoResultsText">Show individual text if no results were found?</label>
+			<label index="ff.noResultsText">Individual text for "no results found"</label>
 			<label index="ff.sortWithoutSearchword">How should the sort results be sorted if no searchword/filter is given?</label>
 			<label index="ff.showSortInFrontend">Should the website visitor see a possibility to order the searchresults?</label>
 			<label index="ff.sortByVisitor">Which fields should the visitor be able to order by?</label>
@@ -107,6 +109,8 @@
 			<label index="ff.resultsNumeration">Ergebnisse fortlaufend nummerieren?</label>
 			<label index="ff.showTextInsteadOfResults">Zeige einen Text anstatt der Suchergebnisse, wenn kein Filter und noch kein Suchwort angegeben wurde.</label>
 			<label index="ff.textForResults">Zeige diesen Text an, wenn kein Filter und noch kein Suchwort angegeben wurde.</label>
+			<label index="ff.showNoResultsText">Individuellen Text verwenden, wenn keine Ergebnisse gefunden wurden?</label>
+			<label index="ff.noResultsText">Individueller Text für "keine Ergebnisse gefunden"</label>
 			<label index="ff.sortWithoutSearchword">Wie sollen die Ergebnisse sortiert werden, wenn kein Suchwort angegeben wurde?</label>
 			<label index="ff.showSortInFrontend">Soll dem Webseitenbesucher die Möglichkeit gegeben werden, die Suchergebnisse selbst zu sortieren?</label>
 			<label index="ff.sortByVisitor">Welche Sortiermöglichkeiten sollen dem Besucher zur Verfügung gestellt werden?</label>
