@@ -1629,12 +1629,15 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				// always show abstract
 				if (!empty($row['abstract'])) {
 					$teaserContent = nl2br($row['abstract']);
+					$teaserContent = $this->buildTeaserContent($teaserContent);
 					// highlight hits?
+					/*
 					if ($this->ffdata['highlightSword'] && count($swords)) {
 						foreach ($swords as $word) {
 							$teaserContent = preg_replace('/('.$word.')/iu','<span class="hit">\0</span>',$teaserContent);
 						}
 					}
+					*/
 				} else  {
 					// build teaser from content
 					$teaserContent = $this->buildTeaserContent($row['content'], $swords);
@@ -1651,12 +1654,15 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					}
 					if ($abstractHit) {
 						$teaserContent = nl2br($row['abstract']);
+						$teaserContent = $this->buildTeaserContent($teaserContent);
 						// highlight hits?
+						/*
 						if ($this->ffdata['highlightSword'] && count($swords)) {
 							foreach ($swords as $word) {
 								$teaserContent = preg_replace('/('.$word.')/iu','<span class="hit">\0</span>',$teaserContent);
 							}
 						}
+						*/
 					} else {
 						// sword was not found in abstract
 						$teaserContent = $this->buildTeaserContent($row['content'], $swords);
