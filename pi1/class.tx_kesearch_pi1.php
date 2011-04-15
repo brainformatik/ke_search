@@ -1952,6 +1952,14 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// set startingPoints
 		$this->startingPoints = $this->div->getStartingPoint();
 
+		// set resultPage to value from conf if set or current PID if not set in ff or conf
+		 if (!$this->ffdata['resultPage']) {
+			/*
+			 if ($this->conf['resultPage']) $this->ffdata['resultPage'] = $this->conf['resultPage'];
+			else $this->ffdata['resultPage'] = $GLOBALS['TSFE']->id;
+			*/
+		}
+
 		if ($this->ffdata['mode'] == 1 && !empty($this->ffdata['loadFlexformsFromOtherCE'])) {
 			// load flexform config from other ce
 			$fields = 'pi_flexform';
@@ -2497,6 +2505,13 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					document.getElementById(\'kesearch_query_time\').style.display=\'none\';
 				}
 
+				// refresh result list onload
+				function onloadFilters() {
+					document.getElementById(\'kesearch_filters\').style.display=\'none\';
+					document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
+					tx_kesearch_pi1refreshFiltersOnLoad(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
+				}
+
 			';
 
 		}
@@ -2551,8 +2566,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					document.getElementById(\'ke_search_sword\').value="";
 					document.getElementById(\'pagenumber\').value="1";
 					tx_kesearch_pi1resetSearchbox(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-					redirectToResultPage();
-					// document.getElementById(\'resetFilters\').value=0;
 				}
 
 				// set form action so that redirect to result page is processed
@@ -2625,13 +2638,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
 					document.getElementById(\'kesearch_query_time\').style.display=\'none\';
 					tx_kesearch_pi1refreshResultsOnLoad(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-				}
-
-				// refresh result list onload
-				function onloadFilters() {
-					document.getElementById(\'kesearch_filters\').style.display=\'none\';
-					document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
-					tx_kesearch_pi1refreshFiltersOnLoad(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
 				}
 
 				function onloadFiltersAndResults() {
