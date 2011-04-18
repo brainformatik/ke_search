@@ -150,6 +150,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', '');
 					$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###', '');
 					$content = $this->cObj->substituteMarker($content,'###ORDERING###', '');
+					$content = $this->cObj->substituteMarker($content,'###SPINNER###', $this->spinnerImageResults);
 				} else {
 					if ($this->ffdata['renderMethod'] == 'ajax_after_reload') {
 						$content = $this->cObj->substituteMarker($content,'###MESSAGE###', '');
@@ -2354,17 +2355,13 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$resultPage = ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) ? TRUE : FALSE;
 
 		switch ($this->ffdata['renderMethod']) {
-			case 'ajax':
-				if ($resultPage) {
-					$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFiltersAndResults();" alt="" /> ';
-				} else {
-					$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFilters();" alt="" /> ';
-				}
-				break;
 
+			case 'ajax':
 			case 'ajax_after_reload':
-				if ($resultPage) {
-					$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="setTimeout(\'onloadFiltersAndResults()\',200 );" alt="" /> ';
+				// refresh results only if we are on the defined result page
+				// do not refresh results if default text is shown (before filters and swords are sent)
+				if ($resultPage && !(count($this->piVars) == 0 && $this->ffdata['showTextInsteadOfResults'])) {
+					$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFiltersAndResults();" alt="" /> ';
 				} else {
 					$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFilters();" alt="" /> ';
 				}
