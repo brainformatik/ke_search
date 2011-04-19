@@ -141,61 +141,61 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 			// SEARCH RESULTS
 			case 1:
+				// show text instead of results if no searchparams set and activated in ff
+				if ($this->isEmptySearch() && $this->ffdata['showTextInsteadOfResults']) {
+					$content = '<div id="textmessage">'.$this->pi_RTEcssText($this->ffdata['textForResults']).'</div>';
+					$content .= '<div id="kesearch_results"></div>';
+					$content .= '<div id="kesearch_updating_results"></div>';
+					$content .= '<div id="kesearch_pagebrowser_top"></div>';
+					$content .= '<div id="kesearch_pagebrowser_bottom"></div>';
+					$content .= '<div id="kesearch_query_time"></div>';
+					return $content;
+				}
 
 				$content = $this->cObj->getSubpart($this->templateCode,'###RESULT_LIST###');
 
-				if(count($this->piVars) == 0 && $this->ffdata['showTextInsteadOfResults']) {
-					$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->pi_RTEcssText($this->ffdata['textForResults']));
+				if ($this->ffdata['renderMethod'] == 'ajax_after_reload') {
+					$content = $this->cObj->substituteMarker($content,'###MESSAGE###', '');
+					$content = $this->cObj->substituteMarker($content,'###ORDERING###', $this->renderOrdering());
+					$content = $this->cObj->substituteMarker($content,'###SPINNER###', $this->spinnerImageResults);
+					$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
 					$content = $this->cObj->substituteMarker($content,'###QUERY_TIME###', '');
 					$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', '');
 					$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###', '');
-					$content = $this->cObj->substituteMarker($content,'###ORDERING###', '');
-					$content = $this->cObj->substituteMarker($content,'###SPINNER###', $this->spinnerImageResults);
-				} else {
-					if ($this->ffdata['renderMethod'] == 'ajax_after_reload') {
-						$content = $this->cObj->substituteMarker($content,'###MESSAGE###', '');
-						$content = $this->cObj->substituteMarker($content,'###ORDERING###', $this->renderOrdering());
-						$content = $this->cObj->substituteMarker($content,'###SPINNER###', $this->spinnerImageResults);
-						$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
-						$content = $this->cObj->substituteMarker($content,'###QUERY_TIME###', '');
-						$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', '');
-						$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###', '');
-						return $this->pi_wrapInBaseClass($content);
-					}
-
-					// get number of results
-					$this->numberOfResults = $this->getSearchResults(true);
-
-					// render pagebrowser
-					if ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) {
-						if ($this->ffdata['pagebrowserOnTop'] || $this->ffdata['pagebrowserAtBottom']) {
-							$pagebrowserContent = $this->renderPagebrowser();
-						}
-						if ($this->ffdata['pagebrowserOnTop']) {
-							$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', $pagebrowserContent);
-						} else {
-							$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', '');
-						}
-						if ($this->ffdata['pagebrowserAtBottom']) {
-							$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###',$pagebrowserContent);
-						} else {
-							$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###','');
-						}
-					}
-
-					// get max score
-					if ($this->ffdata['showPercentalScore'] || $this->ffdata['showScoreScale']) {
-						$this->maxScore = $this->getSearchResults(false, true);
-					}
-					$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->getSearchResults());
-					$content = $this->cObj->substituteMarker($content,'###ORDERING###', $this->renderOrdering());
-					$content = $this->cObj->substituteMarker($content,'###SPINNER###', $this->spinnerImageResults);
-					$content = $this->cObj->substituteMarker($content,'###LOADING###', $this->pi_getLL('loading'));
-					$content = $this->cObj->substituteMarker($content,'###QUERY_TIME###', '');
+					return $this->pi_wrapInBaseClass($content);
 				}
 
-				break;
+				// get number of results
+				$this->numberOfResults = $this->getSearchResults(true);
 
+				// render pagebrowser
+				if ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) {
+					if ($this->ffdata['pagebrowserOnTop'] || $this->ffdata['pagebrowserAtBottom']) {
+						$pagebrowserContent = $this->renderPagebrowser();
+					}
+					if ($this->ffdata['pagebrowserOnTop']) {
+						$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', $pagebrowserContent);
+					} else {
+						$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', '');
+					}
+					if ($this->ffdata['pagebrowserAtBottom']) {
+						$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###',$pagebrowserContent);
+					} else {
+						$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###','');
+					}
+				}
+
+				// get max score
+				if ($this->ffdata['showPercentalScore'] || $this->ffdata['showScoreScale']) {
+					$this->maxScore = $this->getSearchResults(false, true);
+				}
+				$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->getSearchResults());
+				$content = $this->cObj->substituteMarker($content,'###ORDERING###', $this->renderOrdering());
+				$content = $this->cObj->substituteMarker($content,'###SPINNER###', $this->spinnerImageResults);
+				$content = $this->cObj->substituteMarker($content,'###LOADING###', $this->pi_getLL('loading'));
+				$content = $this->cObj->substituteMarker($content,'###QUERY_TIME###', '');
+
+				break;
 		}
 
 		return $this->pi_wrapInBaseClass($content);
@@ -208,7 +208,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	function initOnclickActions() {
 
 		switch ($this->ffdata['renderMethod']) {
-
 
 			// AJAX version
 			case 'ajax':
@@ -244,7 +243,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 				// set pagebrowser onclick
 				$this->onclickPagebrowser = 'pagebrowserAction(); ';
-
 
 				// $this->onclickFilter = 'this.form.submit();';
 				$this->onclickFilter = 'document.getElementById(\'xajax_form_kesearch_pi1\').submit();';
@@ -1005,7 +1003,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// make xajax response object
 		$objResponse = new tx_xajax_response();
 
-		if(count($this->piVars) == 0 && $this->ffdata['showTextInsteadOfResults']) {
+		// show text instead of results if empty search
+		if( $this->isEmptySearch() && $this->ffdata['showTextInsteadOfResults']) {
+			/*
 			$objResponse->addAssign("kesearch_results", "innerHTML", $this->pi_RTEcssText($this->ffdata['textForResults']));
 			$objResponse->addAssign("kesearch_query_time", "innerHTML", '');
 			$objResponse->addAssign("kesearch_ordering", "innerHTML", '');
@@ -1013,6 +1013,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", '');
 			$objResponse->addAssign("kesearch_updating_results", "innerHTML", '');
 			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
+			*/
 		} else {
 			// get number of results
 			$this->numberOfResults = $this->getSearchResults(true);
@@ -1087,7 +1088,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$this->getFilterPreselect();
 
 		// generate onload image
-		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
+		 $onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
 		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" />';
 		if ($GLOBALS['TSFE']->id != $this->ffdata['resultPage']) {
 			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
@@ -1110,6 +1111,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$objResponse = new tx_xajax_response();
 
 		if(!$filterString && !$this->piVars['sword'] && $this->ffdata['showTextInsteadOfResults']) {
+			/*
 			$objResponse->addAssign("kesearch_results", "innerHTML", $this->pi_RTEcssText($this->ffdata['textForResults']));
 			$objResponse->addAssign("kesearch_query_time", "innerHTML", '');
 			$objResponse->addAssign("kesearch_ordering", "innerHTML", '');
@@ -1117,6 +1119,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", '');
 			$objResponse->addAssign("kesearch_updating_results", "innerHTML", '');
 			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
+			*/
 		} else {
 			// get number of results
 			$this->numberOfResults = $this->getSearchResults(true);
@@ -1631,14 +1634,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				if (!empty($row['abstract'])) {
 					$teaserContent = nl2br($row['abstract']);
 					$teaserContent = $this->buildTeaserContent($teaserContent);
-					// highlight hits?
-					/*
-					if ($this->ffdata['highlightSword'] && count($swords)) {
-						foreach ($swords as $word) {
-							$teaserContent = preg_replace('/('.$word.')/iu','<span class="hit">\0</span>',$teaserContent);
-						}
-					}
-					*/
 				} else  {
 					// build teaser from content
 					$teaserContent = $this->buildTeaserContent($row['content'], $swords);
@@ -1656,14 +1651,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					if ($abstractHit) {
 						$teaserContent = nl2br($row['abstract']);
 						$teaserContent = $this->buildTeaserContent($teaserContent);
-						// highlight hits?
-						/*
-						if ($this->ffdata['highlightSword'] && count($swords)) {
-							foreach ($swords as $word) {
-								$teaserContent = preg_replace('/('.$word.')/iu','<span class="hit">\0</span>',$teaserContent);
-							}
-						}
-						*/
 					} else {
 						// sword was not found in abstract
 						$teaserContent = $this->buildTeaserContent($row['content'], $swords);
@@ -1805,11 +1792,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// add onload image
 		$content .= $this->onloadImage;
-
-		// Show a text (if defined in FF) if searchbox was opened without any piVars
-		if($wordsAgainst == '' && $tagsAgainst == '' && $this->ffdata['showTextInsteadOfResults']) {
-			$content = $this->pi_RTEcssText($this->ffdata['textForResults']);
-		}
 
 		if ($this->UTF8QuirksMode) return utf8_encode($content);
 		else return $content;
@@ -2360,8 +2342,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			case 'ajax_after_reload':
 				// refresh results only if we are on the defined result page
 				// do not refresh results if default text is shown (before filters and swords are sent)
-				if ($resultPage && !(count($this->piVars) == 0 && $this->ffdata['showTextInsteadOfResults'])) {
-					$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFiltersAndResults();" alt="" /> ';
+				if ($resultPage) {
+					if ($this->isEmptySearch() && $this->ffdata['showTextInsteadOfResults']) $this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFilters();" alt="" /> ';
+					else $this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFiltersAndResults();" alt="" /> ';
 				} else {
 					$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFilters();" alt="" /> ';
 				}
@@ -2426,6 +2409,30 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 	}
 
+
+	/*
+	 * function isEmptySearch
+	 * checks if an empty search was loaded / submitted
+	 *
+	 * @return true if no searchparams given; otherwise false
+	 */
+	function isEmptySearch() {
+
+		// check if searchword is emtpy or equal with default searchbox value
+		$emptySearchword = (empty($searchWordValue) || $searchWordValue == $this->pi_getLL('searchbox_default_value')) ? true : false;
+		if (!$emptySearchword) return false;
+
+		// check if filters are set
+		$this->filters = $this->getFilters();
+		if (is_array($this->filters))  {
+			foreach ($this->filters as $uid => $data)  {
+				if (!empty($this->piVars['filter'][$uid])) return false;
+			}
+		}
+
+		return true;
+
+	}
 
 
 	/*
