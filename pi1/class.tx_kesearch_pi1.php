@@ -1991,7 +1991,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$_procObj = & t3lib_div::getUserObj($_classRef);
 			$_procObj->modifyFlexFormData($this->ffdata, $this->cObj, $this->piVars);
 		}
-		
+
 	}
 
 
