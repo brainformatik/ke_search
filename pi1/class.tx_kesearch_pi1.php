@@ -154,6 +154,10 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 				$content = $this->cObj->getSubpart($this->templateCode,'###RESULT_LIST###');
 
+				// get number of results
+				$this->numberOfResults = $this->getSearchResults(true);
+				$content = $this->cObj->substituteMarker($content,'###NUMBER_OF_RESULTS###', $this->numberOfResults);
+
 				if ($this->ffdata['renderMethod'] == 'ajax_after_reload') {
 					$content = $this->cObj->substituteMarker($content,'###MESSAGE###', '');
 					$content = $this->cObj->substituteMarker($content,'###ORDERING###', $this->renderOrdering());
@@ -164,10 +168,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###', '');
 					return $this->pi_wrapInBaseClass($content);
 				}
-
-				// get number of results
-				$this->numberOfResults = $this->getSearchResults(true);
-
+				
 				// render pagebrowser
 				if ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) {
 					if ($this->ffdata['pagebrowserOnTop'] || $this->ffdata['pagebrowserAtBottom']) {

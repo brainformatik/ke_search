@@ -38,7 +38,10 @@
 
 <!-- ###RESULT_LIST### start -->
     <span id="kesearch_error"></span>
-    <div id="kesearch_pagebrowser_top">###PAGEBROWSER_TOP###</div>
+
+	Treffer: ###NUMBER_OF_RESULTS###<br /><br />
+
+	<div id="kesearch_pagebrowser_top">###PAGEBROWSER_TOP###</div>
     <div id="kesearch_ordering">###ORDERING###</div>
     <ul id="kesearch_results"><li>###MESSAGE###</li></ul>
 
