@@ -1968,10 +1968,12 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$this->ffdata['countSearchPhrases'] = 1;
 		}
 
-		// Hook: modifyFlexFormData
-		foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFlexFormData'] as $_classRef) {
-			$_procObj = & t3lib_div::getUserObj($_classRef);
-			$_procObj->modifyFlexFormData($this->ffdata, $this->cObj, $this->piVars);
+		// hook: modifyFlexFormData
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFlexFormData'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFlexFormData'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$_procObj->modifyFlexFormData($this->ffdata, $this->cObj, $this->piVars);
+			}
 		}
 
 	}
