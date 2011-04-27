@@ -168,7 +168,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###', '');
 					return $this->pi_wrapInBaseClass($content);
 				}
-				
+
 				// render pagebrowser
 				if ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) {
 					if ($this->ffdata['pagebrowserOnTop'] || $this->ffdata['pagebrowserAtBottom']) {
@@ -1074,13 +1074,16 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		}
 
 		// create a list of all filters in piVars
-		foreach($this->piVars['filter'] as $key => $value) {
-			if(is_array($this->piVars['filter'][$key])) {
-				$filterString .= implode($this->piVars['filter'][$key]);
-			} else {
-				$filterString .= $this->piVars['filter'][$key];
+		if (is_array($this->piVars['filter'])) {
+			foreach($this->piVars['filter'] as $key => $value) {
+				if(is_array($this->piVars['filter'][$key])) {
+					$filterString .= implode($this->piVars['filter'][$key]);
+				} else {
+					$filterString .= $this->piVars['filter'][$key];
+				}
 			}
 		}
+
 
 		// init Flexforms
 		$this->initFlexforms();
