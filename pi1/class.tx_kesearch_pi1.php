@@ -2178,7 +2178,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 	function renderOrdering() {
 		// show ordering only if is set in FlexForm
-		if($this->ffdata['showSortInFrontend']) {
+		if($this->ffdata['showSortInFrontend'] && $this->ffdata['sortByVisitor'] != '') {
 			$subpartArray['###ORDERNAVIGATION###'] = $this->cObj->getSubpart($this->templateCode, '###ORDERNAVIGATION###');
 			$subpartArray['###SORT_LINK###'] = $this->cObj->getSubpart($subpartArray['###ORDERNAVIGATION###'], '###SORT_LINK###');
 
