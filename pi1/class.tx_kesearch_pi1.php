@@ -2424,19 +2424,23 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 */
 	function isEmptySearch() {
 
+		// get searchword value
+		$searchWordValue = $this->div->removeXSS($this->piVars['sword']);
+
 		// check if searchword is emtpy or equal with default searchbox value
 		$emptySearchword = (empty($searchWordValue) || $searchWordValue == $this->pi_getLL('searchbox_default_value')) ? true : false;
-		if (!$emptySearchword) return false;
 
 		// check if filters are set
 		$this->filters = $this->getFilters();
+		$filterSet = false;
 		if (is_array($this->filters))  {
 			foreach ($this->filters as $uid => $data)  {
-				if (!empty($this->piVars['filter'][$uid])) return false;
+				if (!empty($this->piVars['filter'][$uid])) $filterSet = true;
 			}
 		}
 
-		return true;
+		if ($emptySearchword && !$filterSet) return true;
+		else return false;
 
 	}
 
