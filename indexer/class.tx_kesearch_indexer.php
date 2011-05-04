@@ -1083,7 +1083,19 @@ class tx_kesearch_indexer {
 			if (!empty($prodRecord['products_language'])) {
 				// language
 				$lang = $prodRecord['products_language'];
-				if (stristr($lang, 'niederl')) $lang = 'niederlaendisch';
+				// niederländisch
+				if (stristr($lang, 'Deutsch') && stristr($lang, 'Englisch')) {
+					// deutsch oder englisch
+					$lang = 'Deutsch_oder_Englisch';
+				} else if (stristr($lang, 'Deutsch')) {
+					// nur Deutsch
+					$lang = 'Deutsch';
+				} else if (stristr($lang, 'Englisch')) {
+					// nur Englisch
+					$lang = 'Englisch';
+				} else if (stristr($lang, 'niederl')) {
+					$lang = 'Niederlaendisch';
+				} else
 				$tagContent .= '#language_'.$lang.'#';
 			}
 			// publish date
