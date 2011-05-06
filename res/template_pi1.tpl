@@ -1,19 +1,106 @@
-<!-- ###SEARCHBOX_AJAX### start -->
-    <form id="xajax_form_kesearch_pi1" name="xajax_form_kesearch_pi1" method="post" action="" onsubmit="return false;" class="ajax" >
-	<div class="searchbox">
-	    <input type="text" name="tx_kesearch_pi1[sword]" id="ke_search_sword" value="###SWORD_VALUE###" onkeypress="keyPressAction(event);" onfocus="###SWORD_ONFOCUS###" />
-	    <input type="image" src="typo3conf/ext/ke_search/res/img/go.gif" id="kesearch_submit" class="submit" value="###SUBMIT_VALUE###" onclick="document.getElementById('pagenumber').value=1; ###ONCLICK###" />
-	    <input id="pagenumber" type="hidden" name="tx_kesearch_pi1[page]" value="###HIDDEN_PAGE_VALUE###" />
-	    <input id="resetFilters" type="hidden" name="tx_kesearch_pi1[resetFilters]" value="0" />
-		<input id="orderByField" type="hidden" name="tx_kesearch_pi1[orderByField]" />
-		<input id="orderByDir" type="hidden" name="tx_kesearch_pi1[orderByDir]" />
-	</div>
-	###RESET###
-	<div id="kesearch_filters">###FILTER###</div>
-	<div id="kesearch_updating_filters"><center>###SPINNER###<br /></center></div>
-    </form>
-<!-- ###SEARCHBOX_AJAX### end -->
+<!-- ###JS_SEARCH_ALL### begin -->
+<script type="text/javascript">
+// js for all render methods
+function searchboxFocus(searchbox) {
+	if(searchbox.value == "###SEARCHBOX_DEFAULT_VALUE###") {
+		searchbox.value = "";
+	}
+}
 
+function enableCheckboxes(filter) {
+	allLi = document.getElementsByName("optionCheckBox" + filter);
+	allCb = new Array();
+	for(i = 0; i < allLi.length; i++) {
+		allCb[i] = allLi[i].getElementsByTagName("input");
+	}
+	allCbChecked = true;
+	for(i = 0; i < allCb.length; i++) {
+		if(!allCb[i][0].checked) {
+			allCbChecked = false;
+		}
+	}
+	if(allCbChecked) {
+		for(i = 0; i < allCb.length; i++) {
+			allCb[i][0].checked = false;
+		}
+	} else {
+		for(i = 0; i < allCb.length; i++) {
+			allCb[i][0].checked = true;
+		}
+	}
+}
+</script>
+<!-- ###JS_SEARCH_ALL### end -->
+
+<!-- ###JS_SEARCH_NON_STATIC### begin -->
+<script type="text/javascript">
+function switchArea(objid) {
+	if (document.getElementById("options_" + objid).className == "expanded") {
+		document.getElementById("options_" + objid).className = "closed";
+		document.getElementById("bullet_" + objid).src="###SITE_REL_PATH###res/img/list-head-closed.gif";
+	} else {
+		document.getElementById("options_" + objid).className = "expanded";
+		document.getElementById("bullet_" + objid).src="###SITE_REL_PATH###res/img/list-head-expanded.gif";
+	}
+}
+
+function hideSpinnerFiltersOnly() {
+	document.getElementById("kesearch_filters").style.display="block";
+	document.getElementById("kesearch_updating_filters").style.display="none";
+	document.getElementById("resetFilters").value=0;
+}
+
+function pagebrowserAction() {
+	document.getElementById("kesearch_results").style.display="none";
+	document.getElementById("kesearch_updating_results").style.display="block";
+	document.getElementById("kesearch_pagebrowser_top").style.display="none";
+	document.getElementById("kesearch_pagebrowser_bottom").style.display="none";
+	document.getElementById("kesearch_query_time").style.display="none";
+}
+
+// refresh result list onload
+function onloadFilters() {
+	document.getElementById("kesearch_filters").style.display="none";
+	document.getElementById("kesearch_updating_filters").style.display="block";
+	tx_kesearch_pi1refreshFiltersOnLoad(xajax.getFormValues("xajax_form_kesearch_pi1"));
+}
+</script>
+<!-- ###JS_SEARCH_NON_STATIC### end -->
+
+<!-- ###JS_SEARCH_AJAX_RELOAD### begin -->
+<script type="text/javascript">
+// refresh result list onload
+function onloadResults() {
+	document.getElementById("kesearch_pagebrowser_top").style.display="none";
+	document.getElementById("kesearch_pagebrowser_bottom").style.display="none";
+	document.getElementById("kesearch_results").style.display="none";
+	document.getElementById("kesearch_updating_results").style.display="block";
+	document.getElementById("kesearch_query_time").style.display="none";
+	tx_kesearch_pi1refreshResultsOnLoad(xajax.getFormValues("xajax_form_kesearch_pi1"));
+}
+
+function onloadFiltersAndResults() {
+	document.getElementById("kesearch_filters").style.display="none";
+	document.getElementById("kesearch_updating_filters").style.display="block";
+	document.getElementById("kesearch_results").style.display="none";
+	document.getElementById("kesearch_updating_results").style.display="block";
+	document.getElementById("kesearch_pagebrowser_top").style.display="none";
+	document.getElementById("kesearch_pagebrowser_bottom").style.display="none";
+	document.getElementById("kesearch_query_time").style.display="none";
+	tx_kesearch_pi1refresh(xajax.getFormValues("xajax_form_kesearch_pi1"));
+}
+
+function hideSpinner() {
+	document.getElementById("kesearch_filters").style.display="block";
+	document.getElementById("kesearch_updating_filters").style.display="none";
+	document.getElementById("kesearch_results").style.display="block";
+	document.getElementById("kesearch_updating_results").style.display="none";
+	document.getElementById("kesearch_pagebrowser_top").style.display="block";
+	document.getElementById("kesearch_pagebrowser_bottom").style.display="block";
+	document.getElementById("kesearch_query_time").style.display="block";
+}
+</script>
+<!-- ###JS_SEARCH_AJAX_RELOAD### end -->
 
 <!-- ###SEARCHBOX_STATIC### start -->
     <form method="get" id="xajax_form_kesearch_pi1" name="xajax_form_kesearch_pi1"  action="###FORM_ACTION###" class="static">

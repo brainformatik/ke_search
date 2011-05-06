@@ -454,10 +454,6 @@
 										<numIndex index="0">LLL:EXT:ke_search/pi1/locallang.xml:ff.renderMethod.I.1</numIndex>
 										<numIndex index="1">ajax_after_reload</numIndex>
 									</numIndex>
-									<numIndex index="2">
-										<numIndex index="0">LLL:EXT:ke_search/pi1/locallang.xml:ff.renderMethod.I.2</numIndex>
-										<numIndex index="1">ajax</numIndex>
-									</numIndex>
 								</items>
 								<size>1</size>
 								<default>ajax_after_reload</default>

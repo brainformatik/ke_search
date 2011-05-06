@@ -78,17 +78,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// debug db errors?
 		// $GLOBALS['TYPO3_DB']->debugOutput = true;
 
-		// get extension configuration array
-		$confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->extKey]);
-		$this->UTF8QuirksMode = $confArr['useUTF8QuirksMode'];
-
-		// get html template
-		$this->templateFile = $this->conf['templateFile'] ? $this->conf['templateFile'] : t3lib_extMgm::siteRelPath($this->extKey).'res/template_pi1.tpl';
-		$this->templateCode = $this->cObj->fileResource($this->templateFile);
-
-		// get startingpoint
-		$this->firstStartingPoint = $this->div->getFirstStartingPoint($this->startingPoints);
-
 		// init XAJAX?
 		if ($this->conf['renderMethod'] != 'static') $this->initXajax();
 
@@ -100,9 +89,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// get preselected filter from rootline
 		$this->getFilterPreselect();
-
-		// include javascript in searchbox mode only
-		if ($this->conf['mode'] == 0) $this->getJSContent();
 
 		// Spinner Image
 		if ($this->conf['spinnerImageFile']) {
@@ -142,7 +128,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			// SEARCH RESULTS
 			case 1:
 				// show text instead of results if no searchparams set and activated in ff
-				if ($this->isEmptySearch() && $this->conf['showTextInsteadOfResults']) {
+				if($this->isEmptySearch() && $this->conf['showTextInsteadOfResults']) {
 					$content = '<div id="textmessage">'.$this->pi_RTEcssText($this->conf['textForResults']).'</div>';
 					$content .= '<div id="kesearch_results"></div>';
 					$content .= '<div id="kesearch_updating_results"></div>';
@@ -152,13 +138,13 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					return $content;
 				}
 
-				$content = $this->cObj->getSubpart($this->templateCode,'###RESULT_LIST###');
-
+				$content = $this->cObj->getSubpart($this->templateCode, '###RESULT_LIST###');
+				
 				// get number of results
 				$this->numberOfResults = $this->getSearchResults(true);
-				$content = $this->cObj->substituteMarker($content,'###NUMBER_OF_RESULTS###', $this->numberOfResults);
-
-				if ($this->conf['renderMethod'] == 'ajax_after_reload') {
+				$content = $this->cObj->substituteMarker($content, '###NUMBER_OF_RESULTS###', $this->numberOfResults);
+				
+				if($this->conf['renderMethod'] == 'ajax_after_reload') {
 					$content = $this->cObj->substituteMarker($content,'###MESSAGE###', '');
 					$content = $this->cObj->substituteMarker($content,'###ORDERING###', $this->renderOrdering());
 					$content = $this->cObj->substituteMarker($content,'###SPINNER###', $this->spinnerImageResults);
@@ -168,7 +154,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###', '');
 					return $this->pi_wrapInBaseClass($content);
 				}
-
+				
 				// render pagebrowser
 				if ($GLOBALS['TSFE']->id == $this->conf['resultPage']) {
 					if ($this->conf['pagebrowserOnTop'] || $this->conf['pagebrowserAtBottom']) {
@@ -210,35 +196,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		switch ($this->conf['renderMethod']) {
 
-			// AJAX version
-			case 'ajax':
-
-				// set submit onclick
-				if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
-					 // results page is  not the current page
-					 $this->onclickSubmit =  'redirectToResultPage()';
-				} else {
-					// results page is the current page
-					$this->onclickSubmit =  $this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); submitAction(); ';
-					// add resetting of filters?
-					if ($this->conf['resetFiltersOnSubmit']) $this->onclickSubmit = 'document.getElementById(\'resetFilters\').value=1; '. $this->onclickSubmit;
-				}
-
-				// onclick filter
-				if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
-					if ($this->conf['redirectOnFilterChange']) {
-						$this->onclickFilter = 'redirectToResultPage();';
-					} else {
-						$this->onclickFilter = $this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); refreshFiltersOnly(); ';
-					}
-				} else {
-					$this->onclickFilter = 'submitAction(); '.$this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));  ';
-				}
-
-				// set pagebrowser onclick
-				$this->onclickPagebrowser = $this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); pagebrowserAction(); ';
-				break;
-
 			// AJAX after reload version
 			case 'ajax_after_reload':
 
@@ -254,11 +211,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			case 'static':
 				return;
 				break;
-
 		}
-
 	}
-
 
 
 	/*
@@ -267,13 +221,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	function getSearchboxContent() {
 
 		// get main template code
-		if ($this->conf['renderMethod'] != 'ajax') {
-			$content = $this->cObj->getSubpart($this->templateCode,'###SEARCHBOX_STATIC###');
-		} else {
-			$content = $this->cObj->getSubpart($this->templateCode,'###SEARCHBOX_AJAX###');
-			$content = $this->cObj->substituteMarker($content,'###ONCLICK###',$this->onclickSubmit);
-		}
-
+		$content = $this->cObj->getSubpart($this->templateCode,'###SEARCHBOX_STATIC###');
+		
 		// set page = 1 if not set yet
 		if (!$this->piVars['page']) $this->piVars['page'] = 1;
 		$content = $this->cObj->substituteMarker($content,'###HIDDEN_PAGE_VALUE###',$this->piVars['page']);
@@ -307,41 +256,33 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// get filters
 		$content = $this->cObj->substituteMarker($content, '###FILTER###', $this->renderFilters());
 		
-		// set form action for static mode
-		if ($this->conf['renderMethod'] != 'ajax') {
+		// set form action pid
+		$content = $this->cObj->substituteMarker($content,'###FORM_TARGET_PID###', $this->conf['resultPage']);
+		// set form action
+		$content = $this->cObj->substituteMarker($content,'###FORM_ACTION###', t3lib_div::getIndpEnv('TYPO3_SITE_URL'));
 
-			// set form action pid
-			$content = $this->cObj->substituteMarker($content,'###FORM_TARGET_PID###', $this->conf['resultPage']);
-			// set form action
-			$content = $this->cObj->substituteMarker($content,'###FORM_ACTION###', t3lib_div::getIndpEnv('TYPO3_SITE_URL'));
-
-			// set other hidden fields
-			$hiddenFieldsContent = '';
-			// language parameter
-			$lParam = t3lib_div::_GET('L');
-			if (isset($lParam)) {
-				$hiddenFieldValue = $this->div->removeXSS($lParam);
-				$hiddenFieldsContent .= '<input type="hidden" name="L" value="'.$hiddenFieldValue.'" />';
-			}
-			// mountpoint parameter
-			$mpParam = t3lib_div::_GET('MP');
-			if (isset($mpParam)) {
-				$hiddenFieldValue = t3lib_div::_GET('MP');
-				$hiddenFieldValue = $this->div->removeXSS($hiddenFieldValue);
-				$hiddenFieldsContent .= '<input type="hidden" name="MP" value="'.$hiddenFieldValue.'" />';
-			}
-			$content = $this->cObj->substituteMarker($content,'###HIDDENFIELDS###', $hiddenFieldsContent);
-
-			// set reset link
-			unset($linkconf);
-			$linkconf['parameter'] = $this->conf['resultPage'];
-			$resetUrl = $this->cObj->typoLink_URL($linkconf);
-			$resetLink = '<a href="'.$resetUrl.'" class="resetButton"><span>'.$this->pi_getLL('reset_button').'</span></a>';
-
-		} else {
-			// set reset link
-			$resetLink = '<div onclick="resetSearchboxAndFilters();" class="resetButton"><span>'.$this->pi_getLL('reset_button').'</span>'.$resetButton.'</div>';
+		// set other hidden fields
+		$hiddenFieldsContent = '';
+		// language parameter
+		$lParam = t3lib_div::_GET('L');
+		if (isset($lParam)) {
+			$hiddenFieldValue = $this->div->removeXSS($lParam);
+			$hiddenFieldsContent .= '<input type="hidden" name="L" value="'.$hiddenFieldValue.'" />';
 		}
+		// mountpoint parameter
+		$mpParam = t3lib_div::_GET('MP');
+		if (isset($mpParam)) {
+			$hiddenFieldValue = t3lib_div::_GET('MP');
+			$hiddenFieldValue = $this->div->removeXSS($hiddenFieldValue);
+			$hiddenFieldsContent .= '<input type="hidden" name="MP" value="'.$hiddenFieldValue.'" />';
+		}
+		$content = $this->cObj->substituteMarker($content,'###HIDDENFIELDS###', $hiddenFieldsContent);
+
+		// set reset link
+		unset($linkconf);
+		$linkconf['parameter'] = $this->conf['resultPage'];
+		$resetUrl = $this->cObj->typoLink_URL($linkconf);
+		$resetLink = '<a href="'.$resetUrl.'" class="resetButton"><span>'.$this->pi_getLL('reset_button').'</span></a>';
 
 		$this->initOnloadImage;
 
@@ -572,10 +513,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 */
 	function renderList($filterUid, $options) {
 
-		if ($this->conf['renderMethod'] == 'ajax') {
-			return $this->renderSelect($filterUid, $options);
-		}
-
 		$filterSubpart = '###SUB_FILTER_LIST###';
 		$optionSubpart = '###SUB_FILTER_LIST_OPTION###';
 
@@ -660,10 +597,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 * @param $arg
 	 */
 	function renderCheckbox($filterUid, $options) {
-
-		/*if ($this->conf['renderMethod'] == 'ajax') {
-			return $this->renderSelect($filterUid, $options);
-		}*/
 
 		$filters = $this->getFilters();
 		$allOptionsOfCurrentFilter = $this->getFilterOptions($filters[$filterUid]['options']);
@@ -757,8 +690,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		return $filterContent;
 
 	}
-
-
 
 
 	/*
@@ -1944,6 +1875,20 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		
 		// set startingPoints
 		$this->startingPoints = $this->div->getStartingPoint();
+
+		// get extension configuration array
+		$confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->extKey]);
+		$this->UTF8QuirksMode = $confArr['useUTF8QuirksMode'];
+
+		// get html template
+		$this->templateFile = $this->conf['templateFile'] ? $this->conf['templateFile'] : t3lib_extMgm::siteRelPath($this->extKey).'res/template_pi1.tpl';
+		$this->templateCode = $this->cObj->fileResource($this->templateFile);
+
+		// get first startingpoint
+		$this->firstStartingPoint = $this->div->getFirstStartingPoint($this->startingPoints);
+
+		// add header parts when in searchbox mode
+		if($this->conf['mode'] == 0) $this->addHeaderParts();
 	}
 	
 	/**
@@ -2060,33 +2005,22 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		for ($i=1; $i<=$pagesTotal; $i++) {
 			if ($i >= $startPage && $i <= $endPage) {
 
-				if ($this->conf['renderMethod'] == 'static' || $this->conf['renderMethod'] == 'ajax_after_reload') {
+				// render static version
+				unset($linkconf);
+				$linkconf['parameter'] = $GLOBALS['TSFE']->id;
+				$linkconf['addQueryString'] = 1;
+				$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
+				$linkconf['additionalParams'] .= '&tx_kesearch_pi1[page]='.intval($i);
+				$filterArray = $this->getFilters();
 
-					// render static version
-					unset($linkconf);
-					$linkconf['parameter'] = $GLOBALS['TSFE']->id;
-					$linkconf['addQueryString'] = 1;
-					$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
-					$linkconf['additionalParams'] .= '&tx_kesearch_pi1[page]='.intval($i);
-					$filterArray = $this->getFilters();
-
-					if (is_array($this->piVars['filter'])) {
-						foreach($this->piVars['filter'] as $filterId => $data) {
-							$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.']='.$this->piVars['filter'][$filterId];
-						}
+				if (is_array($this->piVars['filter'])) {
+					foreach($this->piVars['filter'] as $filterId => $data) {
+						$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.']='.$this->piVars['filter'][$filterId];
 					}
-
-					if ($this->piVars['page'] == $i) $linkconf['ATagParams'] = 'class="current" ';
-					$tempContent .= $this->cObj->typoLink($i, $linkconf);
-
-				} else {
-
-					// render ajax version
-					$tempContent .= '<a onclick="document.getElementById(\'pagenumber\').value=\''.$i.'\'; '.$this->onclickPagebrowser.'"';
-					if ($this->piVars['page'] == $i) $tempContent .= ' class="current" ';
-					$tempContent .= '>'.$i.'</a>';
-
 				}
+
+				if ($this->piVars['page'] == $i) $linkconf['ATagParams'] = 'class="current" ';
+				$tempContent .= $this->cObj->typoLink($i, $linkconf);
 			}
 		}
 
@@ -2097,28 +2031,23 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		if ($this->piVars['page'] > 1) {
 
 			$previousPage = $this->piVars['page']-1;
-			if ($this->conf['renderMethod'] == 'static' || $this->conf['renderMethod'] == 'ajax_after_reload') {
-				// get static version
-				unset($linkconf);
-				$linkconf['parameter'] = $GLOBALS['TSFE']->id;
-				$linkconf['addQueryString'] = 1;
-				$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
-				$linkconf['additionalParams'] .= '&tx_kesearch_pi1[page]='.intval($previousPage);
-				$filterArray = $this->getFilters();
 
-				if (is_array($this->piVars['filter'])) {
-					foreach($this->piVars['filter'] as $filterId => $data) {
-						$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.']='.$this->piVars['filter'][$filterId];
-					}
+			// get static version
+			unset($linkconf);
+			$linkconf['parameter'] = $GLOBALS['TSFE']->id;
+			$linkconf['addQueryString'] = 1;
+			$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
+			$linkconf['additionalParams'] .= '&tx_kesearch_pi1[page]='.intval($previousPage);
+			$filterArray = $this->getFilters();
+
+			if (is_array($this->piVars['filter'])) {
+				foreach($this->piVars['filter'] as $filterId => $data) {
+					$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.']='.$this->piVars['filter'][$filterId];
 				}
-
-				$linkconf['ATagParams'] = 'class="prev" ';
-				$previous = $this->cObj->typoLink(' ', $linkconf);
-			} else {
-				// get ajax version
-				$onclickPrevious = 'document.getElementById(\'pagenumber\').value=\''.$previousPage.'\'; ';
-				$previous = '<a class="prev" onclick="'.$onclickPrevious.$this->onclickPagebrowser.'">&nbsp;</a>';
 			}
+
+			$linkconf['ATagParams'] = 'class="prev" ';
+			$previous = $this->cObj->typoLink(' ', $linkconf);
 		} else {
 			$previous = '';
 		}
@@ -2126,29 +2055,23 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// next image with link
 		if ($this->piVars['page'] < $pagesTotal) {
 			$nextPage = $this->piVars['page']+1;
-			if ($this->conf['renderMethod'] == 'static' || $this->conf['renderMethod'] == 'ajax_after_reload') {
-				// get static version
-				unset($linkconf);
-				$linkconf['parameter'] = $GLOBALS['TSFE']->id;
-				$linkconf['addQueryString'] = 1;
-				$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
-				$linkconf['additionalParams'] .= '&tx_kesearch_pi1[page]='.intval($nextPage);
-				$filterArray = $this->getFilters();
 
-				if (is_array($this->piVars['filter'])) {
-					foreach($this->piVars['filter'] as $filterId => $data) {
-						$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.']='.$this->piVars['filter'][$filterId];
-					}
+			// get static version
+			unset($linkconf);
+			$linkconf['parameter'] = $GLOBALS['TSFE']->id;
+			$linkconf['addQueryString'] = 1;
+			$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
+			$linkconf['additionalParams'] .= '&tx_kesearch_pi1[page]='.intval($nextPage);
+			$filterArray = $this->getFilters();
+
+			if (is_array($this->piVars['filter'])) {
+				foreach($this->piVars['filter'] as $filterId => $data) {
+					$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.']='.$this->piVars['filter'][$filterId];
 				}
-
-				$linkconf['ATagParams'] = 'class="next" ';
-				$next = $this->cObj->typoLink(' ', $linkconf);
-			} else {
-				// get ajax version
-				$onclickNext = 'document.getElementById(\'pagenumber\').value=\''.$nextPage.'\'; ';
-				$next  = '<a class="next" onclick="'.$onclickNext.$this->onclickPagebrowser.'">&nbsp;</a>';
 			}
 
+			$linkconf['ATagParams'] = 'class="next" ';
+			$next = $this->cObj->typoLink(' ', $linkconf);
 		} else {
 			$next = '';
 		}
@@ -2202,21 +2125,17 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				// we can't sort by score if there is no sword given
 				if($this->piVars['sword'] != '' || $value != 'score') {
 					$markerArray['###FIELDNAME###'] = $value;
-					if($this->conf['renderMethod'] == 'ajax') {
-						// generate link for ajax mode
-						$markerArray['###URL###'] = '<span onclick="setOrderBy(\'' . $value . '\', \'' . $orderByDir . '\')">' . $value . '</span>';
-					} else {
-						// generate link for static and after reload mode
-						$markerArray['###URL###'] = $this->cObj->typoLink(
-							$this->pi_getLL('orderlink_' . $value, $value),
-							array(
-								'parameter' => $GLOBALS['TSFE']->id,
-								'addQueryString' => 1,
-								'additionalParams' => '&' . $this->prefixId . '[orderByField]=' . $value . '&' . $this->prefixId . '[orderByDir]=' . $orderByDir,
-								'section' => 'kesearch_ordering'
-							)
-						);
-					}
+
+					// generate link for static and after reload mode
+					$markerArray['###URL###'] = $this->cObj->typoLink(
+						$this->pi_getLL('orderlink_' . $value, $value),
+						array(
+							'parameter' => $GLOBALS['TSFE']->id,
+							'addQueryString' => 1,
+							'additionalParams' => '&' . $this->prefixId . '[orderByField]=' . $value . '&' . $this->prefixId . '[orderByDir]=' . $orderByDir,
+							'section' => 'kesearch_ordering'
+						)
+					);
 
 					// add classname for sorting arrow
 					if($value == $orderByField) {
@@ -2343,7 +2262,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		switch ($this->conf['renderMethod']) {
 
-			case 'ajax':
 			case 'ajax_after_reload':
 				// refresh results only if we are on the defined result page
 				// do not refresh results if default text is shown (before filters and swords are sent)
@@ -2444,13 +2362,10 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	}
 
 
-	/*
+	/**
 	 * function includeJavascript
 	 */
-	function getJSContent() {
-
-		$jsContent = '';
-
+	function addHeaderParts() {
 		// build target URL if not result page
 		unset($linkconf);
 		$linkconf['parameter'] = $this->conf['resultPage'];
@@ -2458,241 +2373,40 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$linkconf['useCacheHash'] = false;
 		$targetUrl = t3lib_div::locationHeaderUrl($this->cObj->typoLink_URL($linkconf));
 
-		// include js for all render methods
-		$jsContent .= '
-			function searchboxFocus(searchbox) {
-				if (searchbox.value == \''.$this->pi_getLL('searchbox_default_value').'\' ) {
-					searchbox.value = \'\';
-				}
-			}
-
-			function enableCheckboxes(filter) {
-				allLi = document.getElementsByName(\'optionCheckBox\' + filter);
-				allCb = new Array();
-				for(i = 0; i < allLi.length; i++) {
-					allCb[i] = allLi[i].getElementsByTagName(\'input\');
-				}
-				allCbChecked = true;
-				for(i = 0; i < allCb.length; i++) {
-					if(!allCb[i][0].checked) {
-						allCbChecked = false;
-					}
-				}
-				if(allCbChecked) {
-					for(i = 0; i < allCb.length; i++) {
-						allCb[i][0].checked = false;
-					}
-				} else {
-					for(i = 0; i < allCb.length; i++) {
-						allCb[i][0].checked = true;
-					}
-				}
-			}
-
-		';
-
-		// include js for non-static modes
-		if ($this->conf['renderMethod'] != 'static' ) {
-			$jsContent .= '
-				function switchArea(objid) {
-					if (document.getElementById(\'options_\' + objid).className == \'expanded\') {
-						document.getElementById(\'options_\' + objid).className = \'closed\';
-						document.getElementById(\'bullet_\' + objid).src=\''.t3lib_extMgm::siteRelPath($this->extKey).'res/img/list-head-closed.gif\';
-					} else {
-						document.getElementById(\'options_\' + objid).className = \'expanded\';
-						document.getElementById(\'bullet_\' + objid).src=\''.t3lib_extMgm::siteRelPath($this->extKey).'res/img/list-head-expanded.gif\';
-					}
-				}
-
-				function hideSpinnerFiltersOnly() {
-					document.getElementById(\'kesearch_filters\').style.display=\'block\';
-					document.getElementById(\'kesearch_updating_filters\').style.display=\'none\';
-					document.getElementById(\'resetFilters\').value=0;
-				}
-
-				function pagebrowserAction() {
-					document.getElementById(\'kesearch_results\').style.display=\'none\';
-					document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
-					document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
-					document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
-					document.getElementById(\'kesearch_query_time\').style.display=\'none\';
-				}
-
-				// refresh result list onload
-				function onloadFilters() {
-					document.getElementById(\'kesearch_filters\').style.display=\'none\';
-					document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
-					tx_kesearch_pi1refreshFiltersOnLoad(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-				}
-
-			';
-
+		$content = $this->cObj->getSubpart($this->templateCode, '###JS_SEARCH_ALL###');
+		if($this->conf['renderMethod'] != 'static' ) {
+			$content .= $this->cObj->getSubpart($this->templateCode, '###JS_SEARCH_NON_STATIC###');		
 		}
-
-		// include js for full ajax mode
-		if ($this->conf['renderMethod'] == 'ajax') {
-			$jsContent .= '
-
-				function submitAction() {
-					document.getElementById(\'kesearch_filters\').style.display=\'none\';
-					document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
-					document.getElementById(\'kesearch_results\').style.display=\'none\';
-					document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
-					document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
-					document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
-					document.getElementById(\'kesearch_query_time\').style.display=\'none\';
-					document.getElementById(\'pagenumber\').value="1";
-				}
-
-				function refreshFiltersOnly() {
-					document.getElementById(\'kesearch_filters\').style.display=\'none\';
-					document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
-				}
-
-				// refresh result list onload
-				function onloadResults() {
-					document.getElementById(\'kesearch_results\').style.display=\'none\';
-					document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
-					document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
-					document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
-					document.getElementById(\'kesearch_query_time\').style.display=\'none\';
-					tx_kesearch_pi1refreshResultsOnLoad(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-					// document.getElementById(\'resetFilters\').value=0;
-				}
-
-				function onloadFiltersAndResults() {
-					document.getElementById(\'kesearch_filters\').style.display=\'none\';
-					document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
-					document.getElementById(\'kesearch_results\').style.display=\'none\';
-					document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
-					document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
-					document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
-					document.getElementById(\'kesearch_query_time\').style.display=\'none\';
-					tx_kesearch_pi1refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-				}
-
-				// reset both searchbox and filters
-				function resetSearchboxAndFilters() {
-					document.getElementById(\'kesearch_filters\').style.display=\'none\';
-					document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
-					document.getElementById(\'resetFilters\').value=1;
-					document.getElementById(\'ke_search_sword\').value="";
-					document.getElementById(\'pagenumber\').value="1";
-					tx_kesearch_pi1resetSearchbox(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-				}
-
-				// set form action so that redirect to result page is processed
-				function redirectToResultPage() {
-					formEl = document.getElementById(\'xajax_form_kesearch_pi1\');
-					formEl.action=\''.$targetUrl.'\';
-					formEl.submit();
-				}
-
-				// orderBy
-				function setOrderBy(field, direction) {
-					document.getElementById(\'orderByField\').value = field;
-					document.getElementById(\'orderByDir\').value = direction;
-					document.getElementById(\'pagenumber\').value=1;
-					//document.getElementById(\'resetFilters\').value=1;
-					'.$this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-					submitAction();
-				}
-			';
-
-			$jsContent .= '
-					// add event listener for key press
-					function keyPressAction(e) {
-						e = e || window.event;
-						var code = e.keyCode || e.which;
-						// (submit search when pressing RETURN)
-						if(code == 13) {
-					';
-
-			if ($this->conf['resetFiltersOnSubmit']) {
-				$jsContent .= '
-							document.getElementById(\'resetFilters\').value=1;';
-			}
-
-			if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
-				// redirect to result page if current page is not the result page and option is activated
-				$jsContent .= 'redirectToResultPage(); }';
-			} else {
-				// refresh results and searchbox if current page is result page
-				$jsContent .=  ' '.$this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); submitAction();}';
-			}
-			$jsContent .= '}';
-
-			$jsContent .= '
-				function hideSpinner() {
-					document.getElementById(\'kesearch_filters\').style.display=\'block\';
-					document.getElementById(\'kesearch_updating_filters\').style.display=\'none\';
-					document.getElementById(\'kesearch_results\').style.display=\'block\';
-					document.getElementById(\'kesearch_updating_results\').style.display=\'none\';
-					document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'block\';
-					document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'block\';
-					document.getElementById(\'kesearch_query_time\').style.display=\'block\';';
-
-			// add reset filters?
-			if ($this->conf['resetFiltersOnSubmit']) $jsContent .= 'document.getElementById(\'resetFilters\').value=0; ';
-
-			$jsContent .= '
-				}';
-
-		}
-
 		// include js for "ajax after page reload" mode
 		if ($this->conf['renderMethod'] == 'ajax_after_reload') {
-			$jsContent .= '
-				// refresh result list onload
-				function onloadResults() {
-					document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
-					document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
-					document.getElementById(\'kesearch_results\').style.display=\'none\';
-					document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
-					document.getElementById(\'kesearch_query_time\').style.display=\'none\';
-					tx_kesearch_pi1refreshResultsOnLoad(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-				}
-
-				function onloadFiltersAndResults() {
-					document.getElementById(\'kesearch_filters\').style.display=\'none\';
-					document.getElementById(\'kesearch_updating_filters\').style.display=\'block\';
-					document.getElementById(\'kesearch_results\').style.display=\'none\';
-					document.getElementById(\'kesearch_updating_results\').style.display=\'block\';
-					document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'none\';
-					document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'none\';
-					document.getElementById(\'kesearch_query_time\').style.display=\'none\';
-					tx_kesearch_pi1refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\'));
-				}
-
-				function hideSpinner() {
-					document.getElementById(\'kesearch_filters\').style.display=\'block\';
-					document.getElementById(\'kesearch_updating_filters\').style.display=\'none\';
-					document.getElementById(\'kesearch_results\').style.display=\'block\';
-					document.getElementById(\'kesearch_updating_results\').style.display=\'none\';
-					document.getElementById(\'kesearch_pagebrowser_top\').style.display=\'block\';
-					document.getElementById(\'kesearch_pagebrowser_bottom\').style.display=\'block\';
-					document.getElementById(\'kesearch_query_time\').style.display=\'block\';
-				}
-			';
+			$content .= $this->cObj->getSubpart($this->templateCode, '###JS_SEARCH_AJAX_RELOAD###');		
 		}
-
-		$jsContent = '<script type="text/javascript">'.$jsContent.'</script>';
-
+		
+		// loop through LL and fill $markerArray
+		array_key_exists($this->LLkey, $this->LOCAL_LANG) ? $langKey = $this->LLkey : $langKey = 'default';
+		foreach($this->LOCAL_LANG[$langKey] as $key => $value) {
+			$markerArray['###' . strtoupper($key) . '###'] = $value;
+		}
+		
+		// define some additional markers
+		$markerArray['###SITE_REL_PATH###'] = t3lib_extMgm::siteRelPath($this->extKey); 
+		$markerArray['###TARGET_URL###'] = $targetUrl;
+		$markerArray['###PREFIX_ID###'] = $this->prefixId; 
+		
+		$content = $this->cObj->substituteMarkerArray($content, $markerArray);
+		
 		// minify JS?
-		if (version_compare(TYPO3_version, '4.2.0', '>=' )) $jsContent = t3lib_div::minifyJavaScript($jsContent);
+		if(version_compare(TYPO3_version, '4.2.0', '>=')) {
+			$content = t3lib_div::minifyJavaScript($content);
+		}
+		
 		// add JS to page header
-		$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId.'_jsContent'] = $jsContent;
-
+		$GLOBALS['TSFE']->additionalHeaderData['jsContent'] = $content;
 	}
-
-
-
 }
-
 
 
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/pi1/class.tx_kesearch_pi1.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/pi1/class.tx_kesearch_pi1.php']);
 }
-
 ?>
