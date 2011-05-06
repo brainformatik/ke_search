@@ -161,7 +161,7 @@
 	    <span class="###SPECIAL_CSS_CLASS###">
 	    <li class="checkboxLabel"><label onclick="enableCheckboxes(###FILTER_UID###)">###LABEL_ALL###</label></li>
 		<!-- ###SUB_FILTER_CHECKBOX_OPTION### start -->
-		<li name="###OPTIONNAME###" class="###OPTIONCSSCLASS###"><input type="checkbox" name="###FILTERNAME###[###OPTIONKEY###]" id="###OPTIONID###" value="###VALUE###" ###OPTIONSELECT### ###OPTIONDISABLED### /><label>###TITLE###</label></li>
+		<li name="###OPTIONNAME###" class="###OPTIONCSSCLASS###"><input type="checkbox" name="###FILTERNAME###[###OPTIONKEY###]" id="###OPTIONID###" value="###VALUE###" ###OPTIONSELECT### ###OPTIONDISABLED### /><label for="###OPTIONID###">###TITLE###</label></li>
 		<!-- ###SUB_FILTER_CHECKBOX_OPTION### end -->
 	    </span>
 		<li class="clearer"></li>
