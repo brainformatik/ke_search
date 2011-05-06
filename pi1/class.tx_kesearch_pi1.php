@@ -305,11 +305,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 
 		// get filters
-		if ($this->conf['renderMethod'] == 'ajax') $content = $this->cObj->substituteMarker($content,'###FILTER###',$this->renderFilters());
-		else {
-			$content = $this->cObj->substituteMarker($content,'###FILTER###', $hiddenFilterContent);
-		}
-
+		$content = $this->cObj->substituteMarker($content, '###FILTER###', $this->renderFilters());
+		
 		// set form action for static mode
 		if ($this->conf['renderMethod'] != 'ajax') {
 
@@ -645,7 +642,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###BULLET###', $this->cObj->IMAGE($imageConf));
 
 		// expand by default ?
-		$class = $this->filters[$filterUid]['expandbydefault'] || !empty($this->piVars['filter'][$filterUid]) ? 'expanded' : 'closed';
+		$class = $this->filters[$filterUid]['expandbydefault'] || !empty($this->piVars['filter'][$filterUid]) || $this->conf['renderMethod'] == 'static' ? 'expanded' : 'closed';
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###LISTCSSCLASS###', $class);
 
 		// special css class (outer options list for scrollbox)
@@ -751,7 +748,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###BULLET###', $this->cObj->IMAGE($imageConf));
 
 		// expand by default ?
-		$class = $this->filters[$filterUid]['expandbydefault'] || !empty($this->piVars['filter'][$filterUid]) ? 'expanded' : 'closed';
+		$class = $this->filters[$filterUid]['expandbydefault'] || !empty($this->piVars['filter'][$filterUid]) || $this->conf['renderMethod'] == 'static' ? 'expanded' : 'closed';
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###LISTCSSCLASS###', $class);
 
 		// special css class (outer options list for scrollbox)
