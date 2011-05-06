@@ -694,10 +694,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				// if option is in optionArray, we have to mark the checkboxes
 				// but only if customer has searched for filters
 				if($isOptionInOptionArray) {
-					// first...remove all empty piVars[filter]
-					// &tx_kesearch_pi1[filter][3][1]=&tx_kesearch_pi1[filter][3][2]=
-					// if there is no filter defined implode returns an empty string
-					$checkBoxParams['selected'] = (implode($this->piVars['filter'][$filterUid])) ? 'checked="checked"' : '';
+					$checkBoxParams['selected'] = ($this->piVars['filter'][$filterUid][$key]) ? 'checked="checked"' : '';
 					$checkBoxParams['disabled'] = '';
 				} else {
 					$checkBoxParams['disabled'] = 'disabled="disabled"';
