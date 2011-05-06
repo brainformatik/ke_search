@@ -40,7 +40,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	var $ms                 = 0;
 	var $startingPoints     = 0; // comma seperated list of startingPoints
 	var $firstStartingPoint = 0; // comma seperated list of startingPoints
-	var $ffdata             = array(); // FlexForm-Configuration
+	var $conf             = array(); // FlexForm-Configuration
 	var $countTagsResult    = 0; // precount the results of table content
 	var $countContentResult = 0; // precount the results of table tags
 	var $indexToUse         = ''; // it's for 'USE INDEX ($indexToUse)' to speed up queries
@@ -72,9 +72,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$this->pi_loadLL();
 		$this->pi_USER_INT_obj = 1;	// Configuring so caching is not expected. This value means that no cHash params are ever set. We do this, because it's a USER_INT object!
 
-		// GET FLEXFORM DATA
-		$this->initFlexforms();
-
+		// initializes plugin configuration
+		$this->init();
+				
 		// debug db errors?
 		// $GLOBALS['TYPO3_DB']->debugOutput = true;
 
@@ -90,10 +90,10 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$this->firstStartingPoint = $this->div->getFirstStartingPoint($this->startingPoints);
 
 		// init XAJAX?
-		if ($this->ffdata['renderMethod'] != 'static') $this->initXajax();
+		if ($this->conf['renderMethod'] != 'static') $this->initXajax();
 
 		// get css file (include only in searchbox -> avoid duplicate css)
-		if ($this->ffdata['mode'] == 0) {
+		if ($this->conf['mode'] == 0) {
 			$cssFile = $this->conf['cssFile'] ? $this->conf['cssFile'] : t3lib_extMgm::siteRelPath($this->extKey).'res/ke_search_pi1.css';
 			$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId.'_css'] = '<link rel="stylesheet" type="text/css" href="'.$cssFile.'" / >';
 		}
@@ -102,7 +102,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$this->getFilterPreselect();
 
 		// include javascript in searchbox mode only
-		if ($this->ffdata['mode'] == 0) $this->getJSContent();
+		if ($this->conf['mode'] == 0) $this->getJSContent();
 
 		// Spinner Image
 		if ($this->conf['spinnerImageFile']) {
@@ -129,7 +129,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 
 		// get content
-		switch ($this->ffdata['mode']) {
+		switch ($this->conf['mode']) {
 
 			// SEARCHBOX AND FILTERS
 			case 0:
@@ -142,8 +142,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			// SEARCH RESULTS
 			case 1:
 				// show text instead of results if no searchparams set and activated in ff
-				if ($this->isEmptySearch() && $this->ffdata['showTextInsteadOfResults']) {
-					$content = '<div id="textmessage">'.$this->pi_RTEcssText($this->ffdata['textForResults']).'</div>';
+				if ($this->isEmptySearch() && $this->conf['showTextInsteadOfResults']) {
+					$content = '<div id="textmessage">'.$this->pi_RTEcssText($this->conf['textForResults']).'</div>';
 					$content .= '<div id="kesearch_results"></div>';
 					$content .= '<div id="kesearch_updating_results"></div>';
 					$content .= '<div id="kesearch_pagebrowser_top"></div>';
@@ -158,7 +158,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				$this->numberOfResults = $this->getSearchResults(true);
 				$content = $this->cObj->substituteMarker($content,'###NUMBER_OF_RESULTS###', $this->numberOfResults);
 
-				if ($this->ffdata['renderMethod'] == 'ajax_after_reload') {
+				if ($this->conf['renderMethod'] == 'ajax_after_reload') {
 					$content = $this->cObj->substituteMarker($content,'###MESSAGE###', '');
 					$content = $this->cObj->substituteMarker($content,'###ORDERING###', $this->renderOrdering());
 					$content = $this->cObj->substituteMarker($content,'###SPINNER###', $this->spinnerImageResults);
@@ -170,16 +170,16 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				}
 
 				// render pagebrowser
-				if ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) {
-					if ($this->ffdata['pagebrowserOnTop'] || $this->ffdata['pagebrowserAtBottom']) {
+				if ($GLOBALS['TSFE']->id == $this->conf['resultPage']) {
+					if ($this->conf['pagebrowserOnTop'] || $this->conf['pagebrowserAtBottom']) {
 						$pagebrowserContent = $this->renderPagebrowser();
 					}
-					if ($this->ffdata['pagebrowserOnTop']) {
+					if ($this->conf['pagebrowserOnTop']) {
 						$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', $pagebrowserContent);
 					} else {
 						$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', '');
 					}
-					if ($this->ffdata['pagebrowserAtBottom']) {
+					if ($this->conf['pagebrowserAtBottom']) {
 						$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###',$pagebrowserContent);
 					} else {
 						$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###','');
@@ -187,7 +187,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				}
 
 				// get max score
-				if ($this->ffdata['showPercentalScore'] || $this->ffdata['showScoreScale']) {
+				if ($this->conf['showPercentalScore'] || $this->conf['showScoreScale']) {
 					$this->maxScore = $this->getSearchResults(false, true);
 				}
 				$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->getSearchResults());
@@ -208,25 +208,25 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 */
 	function initOnclickActions() {
 
-		switch ($this->ffdata['renderMethod']) {
+		switch ($this->conf['renderMethod']) {
 
 			// AJAX version
 			case 'ajax':
 
 				// set submit onclick
-				if ($GLOBALS['TSFE']->id != $this->ffdata['resultPage']) {
+				if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
 					 // results page is  not the current page
 					 $this->onclickSubmit =  'redirectToResultPage()';
 				} else {
 					// results page is the current page
 					$this->onclickSubmit =  $this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); submitAction(); ';
 					// add resetting of filters?
-					if ($this->ffdata['resetFiltersOnSubmit']) $this->onclickSubmit = 'document.getElementById(\'resetFilters\').value=1; '. $this->onclickSubmit;
+					if ($this->conf['resetFiltersOnSubmit']) $this->onclickSubmit = 'document.getElementById(\'resetFilters\').value=1; '. $this->onclickSubmit;
 				}
 
 				// onclick filter
-				if ($GLOBALS['TSFE']->id != $this->ffdata['resultPage']) {
-					if ($this->ffdata['redirectOnFilterChange']) {
+				if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
+					if ($this->conf['redirectOnFilterChange']) {
 						$this->onclickFilter = 'redirectToResultPage();';
 					} else {
 						$this->onclickFilter = $this->prefixId . 'refresh(xajax.getFormValues(\'xajax_form_kesearch_pi1\')); refreshFiltersOnly(); ';
@@ -267,7 +267,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	function getSearchboxContent() {
 
 		// get main template code
-		if ($this->ffdata['renderMethod'] != 'ajax') {
+		if ($this->conf['renderMethod'] != 'ajax') {
 			$content = $this->cObj->getSubpart($this->templateCode,'###SEARCHBOX_STATIC###');
 		} else {
 			$content = $this->cObj->getSubpart($this->templateCode,'###SEARCHBOX_AJAX###');
@@ -288,7 +288,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			// no searchword entered
 			$swordValue = $this->piVars['sword'] ? $this->div->removeXSS($this->piVars['sword']) : '';
 			$searchboxFocusJS = '';
-		// } else if ($this->ffdata['renderMethod'] != 'static') {
+		// } else if ($this->conf['renderMethod'] != 'static') {
 		} else {
 			// do not use when static mode is called
 
@@ -305,16 +305,16 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 
 		// get filters
-		if ($this->ffdata['renderMethod'] == 'ajax') $content = $this->cObj->substituteMarker($content,'###FILTER###',$this->renderFilters());
+		if ($this->conf['renderMethod'] == 'ajax') $content = $this->cObj->substituteMarker($content,'###FILTER###',$this->renderFilters());
 		else {
 			$content = $this->cObj->substituteMarker($content,'###FILTER###', $hiddenFilterContent);
 		}
 
 		// set form action for static mode
-		if ($this->ffdata['renderMethod'] != 'ajax') {
+		if ($this->conf['renderMethod'] != 'ajax') {
 
 			// set form action pid
-			$content = $this->cObj->substituteMarker($content,'###FORM_TARGET_PID###', $this->ffdata['resultPage']);
+			$content = $this->cObj->substituteMarker($content,'###FORM_TARGET_PID###', $this->conf['resultPage']);
 			// set form action
 			$content = $this->cObj->substituteMarker($content,'###FORM_ACTION###', t3lib_div::getIndpEnv('TYPO3_SITE_URL'));
 
@@ -337,7 +337,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 			// set reset link
 			unset($linkconf);
-			$linkconf['parameter'] = $this->ffdata['resultPage'];
+			$linkconf['parameter'] = $this->conf['resultPage'];
 			$resetUrl = $this->cObj->typoLink_URL($linkconf);
 			$resetLink = '<a href="'.$resetUrl.'" class="resetButton"><span>'.$this->pi_getLL('reset_button').'</span></a>';
 
@@ -375,8 +375,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// get filters from db
 		$this->filters = $this->getFilters();
 
-		if (!empty($this->ffdata['filters'])) {
-			$filterList = explode(',', $this->ffdata['filters']);
+		if (!empty($this->conf['filters'])) {
+			$filterList = explode(',', $this->conf['filters']);
 
 			foreach ($filterList as $key => $filterUid) {
 
@@ -400,8 +400,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 						$optionsCount = 0;
 
 						// check filter availability?
-						if ($this->ffdata['checkFilterCondition'] != 'none') {
-							if ($this->checkIfTagMatchesRecords($row['tag'],$this->ffdata['checkFilterCondition'], $filterUid)) {
+						if ($this->conf['checkFilterCondition'] != 'none') {
+							if ($this->checkIfTagMatchesRecords($row['tag'],$this->conf['checkFilterCondition'], $filterUid)) {
 								// process check in condition to other filters or without condition
 
 								// selected / preselected?
@@ -556,7 +556,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###DISABLED###', $optionsCount > 0 ? '' : ' disabled="disabled" ');
 
 		// set onclick actions for different rendering methods
-		if ($this->ffdata['renderMethod'] == 'static') {
+		if ($this->conf['renderMethod'] == 'static') {
 			$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCHANGE###', '');
 		} else {
 			$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCHANGE###', $this->onclickFilter);
@@ -575,7 +575,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 */
 	function renderList($filterUid, $options) {
 
-		if ($this->ffdata['renderMethod'] == 'ajax') {
+		if ($this->conf['renderMethod'] == 'ajax') {
 			return $this->renderSelect($filterUid, $options);
 		}
 
@@ -664,7 +664,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 */
 	function renderCheckbox($filterUid, $options) {
 
-		/*if ($this->ffdata['renderMethod'] == 'ajax') {
+		/*if ($this->conf['renderMethod'] == 'ajax') {
 			return $this->renderSelect($filterUid, $options);
 		}*/
 
@@ -782,7 +782,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$wordsAgainst = $searchWordInformation['wordsAgainst'];
 
 			// get filter list
-			$filterList = explode(',', $this->ffdata['filters']);
+			$filterList = explode(',', $this->conf['filters']);
 
 			// extend against-clause for multi check (in condition with other selected filters)
 			if ($mode == 'multi' && is_array($filterList)) {
@@ -859,7 +859,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery(
 				'COUNT(*) as content',
 				'tx_kesearch_index',
-				'AND MATCH (content) AGAINST (\'' . $searchString . '\' IN BOOLEAN MODE)'
+				'MATCH (content) AGAINST (\'' . $searchString . '\' IN BOOLEAN MODE)'
 			);
 			$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 			$count = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
@@ -893,11 +893,11 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 * function getFilters
 	 */
 	function getFilters() {
-		if (!empty($this->ffdata['filters'])) {
+		if (!empty($this->conf['filters'])) {
 			$fields = '*';
 			$table = 'tx_kesearch_filters';
 			$where = 'pid in ('.$this->startingPoints.')';
-			$where .= 'AND uid in ('.$this->ffdata['filters'].')';
+			$where .= 'AND uid in ('.$this->conf['filters'].')';
 			$where .= $this->cObj->enableFields($table);
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
 			while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
@@ -959,7 +959,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// Register the names of the PHP functions you want to be able to call through xajax
 		$this->xajax->registerFunction(array('refresh', &$this, 'refresh'));
-		if ($this->ffdata['renderMethod'] != 'static') {
+		if ($this->conf['renderMethod'] != 'static') {
 			$this->xajax->registerFunction(array('refreshResultsOnLoad', &$this, 'refreshResultsOnLoad'));
 			$this->xajax->registerFunction(array('refreshFiltersOnLoad', &$this, 'refreshFiltersOnLoad'));
 		}
@@ -975,7 +975,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		}
 		$GLOBALS['TSFE']->additionalHeaderData['xajax_search_filters'] = $this->xajax->getJavascript( "typo3conf/ext/xajax/");
 		$GLOBALS['TSFE']->additionalHeaderData['xajax_search_filters'] .= '<script type="text/javascript">function tx_kesearch_pi1refresh(){ return xajax.call("refresh", arguments, 1);}</script>';
-		if ($this->ffdata['renderMethod'] != 'static') {
+		if ($this->conf['renderMethod'] != 'static') {
 			$GLOBALS['TSFE']->additionalHeaderData['xajax_search_onload'] = '<script type="text/javascript">function tx_kesearch_pi1refreshResultsOnLoad(){ return xajax.call("refreshResultsOnLoad", arguments, 1);}</script>';
 			$GLOBALS['TSFE']->additionalHeaderData['xajax_search_onload'] .= '<script type="text/javascript">function tx_kesearch_pi1refreshFiltersOnLoad(){ return xajax.call("refreshFiltersOnLoad", arguments, 1);}</script>';
 		}
@@ -990,9 +990,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	* @return	The content that is displayed on the website
 	*/
 	function refreshResultsOnLoad($data) {
-
-		// init Flexforms
-		$this->initFlexforms();
+		// initializes plugin configuration
+		$this->init();
 
 		// get preselected filter from rootline
 		$this->getFilterPreselect();
@@ -1005,9 +1004,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$objResponse = new tx_xajax_response();
 
 		// show text instead of results if empty search
-		if( $this->isEmptySearch() && $this->ffdata['showTextInsteadOfResults']) {
+		if( $this->isEmptySearch() && $this->conf['showTextInsteadOfResults']) {
 			/*
-			$objResponse->addAssign("kesearch_results", "innerHTML", $this->pi_RTEcssText($this->ffdata['textForResults']));
+			$objResponse->addAssign("kesearch_results", "innerHTML", $this->pi_RTEcssText($this->conf['textForResults']));
 			$objResponse->addAssign("kesearch_query_time", "innerHTML", '');
 			$objResponse->addAssign("kesearch_ordering", "innerHTML", '');
 			$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", '');
@@ -1020,10 +1019,10 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$this->numberOfResults = $this->getSearchResults(true);
 
 			// set start milliseconds for query time calculation
-			if ($this->ffdata['showQueryTime']) $startMS = t3lib_div::milliseconds();
+			if ($this->conf['showQueryTime']) $startMS = t3lib_div::milliseconds();
 
 			// get max score for all hits
-			if ($this->ffdata['showPercentalScore'] || $this->ffdata['showScoreScale']) {
+			if ($this->conf['showPercentalScore'] || $this->conf['showScoreScale']) {
 				$this->maxScore = $this->getSearchResults(false, true);
 			}
 
@@ -1033,7 +1032,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			// generate onload image
 			$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
 			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" /> ';
-			if ($GLOBALS['TSFE']->id != $this->ffdata['resultPage']) {
+			if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
 				$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
 			}
 
@@ -1045,7 +1044,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$objResponse->addAssign("kesearch_results", "innerHTML", $this->getSearchResults().$this->onloadImage);
 
 			// set end milliseconds for query time calculation
-			if ($this->ffdata['showQueryTime']) {
+			if ($this->conf['showQueryTime']) {
 				$endMS = t3lib_div::milliseconds();
 				// calculate query time
 				$queryTime = $endMS - $startMS;
@@ -1085,16 +1084,16 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		}
 
 
-		// init Flexforms
-		$this->initFlexforms();
-
+		// initializes plugin configuration
+		$this->init();
+		
 		// get preselected filter from rootline
 		$this->getFilterPreselect();
 
 		// generate onload image
 		 $onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
 		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" />';
-		if ($GLOBALS['TSFE']->id != $this->ffdata['resultPage']) {
+		if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
 			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
 		}
 
@@ -1114,9 +1113,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// make xajax response object
 		$objResponse = new tx_xajax_response();
 
-		if(!$filterString && !$this->piVars['sword'] && $this->ffdata['showTextInsteadOfResults']) {
+		if(!$filterString && !$this->piVars['sword'] && $this->conf['showTextInsteadOfResults']) {
 			/*
-			$objResponse->addAssign("kesearch_results", "innerHTML", $this->pi_RTEcssText($this->ffdata['textForResults']));
+			$objResponse->addAssign("kesearch_results", "innerHTML", $this->pi_RTEcssText($this->conf['textForResults']));
 			$objResponse->addAssign("kesearch_query_time", "innerHTML", '');
 			$objResponse->addAssign("kesearch_ordering", "innerHTML", '');
 			$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", '');
@@ -1129,16 +1128,16 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$this->numberOfResults = $this->getSearchResults(true);
 
 			// set pagebrowser
-			if ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) {
-				if ($this->ffdata['pagebrowserOnTop'] || $this->ffdata['pagebrowserAtBottom']) {
+			if ($GLOBALS['TSFE']->id == $this->conf['resultPage']) {
+				if ($this->conf['pagebrowserOnTop'] || $this->conf['pagebrowserAtBottom']) {
 					$pagebrowserContent = $this->renderPagebrowser();
 				}
-				if ($this->ffdata['pagebrowserOnTop']) {
+				if ($this->conf['pagebrowserOnTop']) {
 					$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", $pagebrowserContent);
 				} else {
 					$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", '');
 				}
-				if ($this->ffdata['pagebrowserAtBottom']) {
+				if ($this->conf['pagebrowserAtBottom']) {
 					$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", $pagebrowserContent);
 				} else {
 					$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", '');
@@ -1146,25 +1145,25 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			}
 
 			// set start milliseconds for query time calculation
-			if ($this->ffdata['showQueryTime']) $startMS = t3lib_div::milliseconds();
+			if ($this->conf['showQueryTime']) $startMS = t3lib_div::milliseconds();
 
 			// set filters
 			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
 
 			// get max score for all hits
-			if ($this->ffdata['showPercentalScore'] || $this->ffdata['showScoreScale']) {
+			if ($this->conf['showPercentalScore'] || $this->conf['showScoreScale']) {
 				$this->maxScore = $this->getSearchResults(false, true);
 			}
 
 			// set search results
 			// process if on result page
-			if ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) {
+			if ($GLOBALS['TSFE']->id == $this->conf['resultPage']) {
 				$objResponse->addAssign("kesearch_results", "innerHTML", $this->getSearchResults());
 				$objResponse->addAssign("kesearch_ordering", "innerHTML", $this->renderOrdering());
 			}
 
 			// set end milliseconds for query time calculation
-			if ($this->ffdata['showQueryTime']) {
+			if ($this->conf['showQueryTime']) {
 				$endMS = t3lib_div::milliseconds();
 				// calculate query time
 				$queryTime = $endMS - $startMS;
@@ -1204,16 +1203,16 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$this->piVars[$key] = $this->div->removeXSS($value);
 		}
 
-		// init Flexforms
-		$this->initFlexforms();
-
+		// initializes plugin configuration
+		$this->init();
+		
 		// get preselected filter from rootline
 		$this->getFilterPreselect();
 
 		// generate onload image
 		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
 		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" />';
-		if ($GLOBALS['TSFE']->id != $this->ffdata['resultPage']) {
+		if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
 			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
 		}
 
@@ -1251,13 +1250,13 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	 */
 	function resetSearchbox($data) {
 
-		// init Flexforms
-		$this->initFlexforms();
-
+		// initializes plugin configuration
+		$this->init();
+		
 		// generate onload image
 		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
 		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" /> ';
-		if ($GLOBALS['TSFE']->id != $this->ffdata['resultPage']) {
+		if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
 			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
 		}
 
@@ -1396,7 +1395,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 
 		// build "tagged content only" searchphrase
-		if ($this->ffdata['showTaggedContentOnly']) {
+		if ($this->conf['showTaggedContentOnly']) {
 			$taggedOnlyWhere = ' AND tags<>"" ';
 		}
 
@@ -1407,11 +1406,11 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		if ($numOnly || $maxScore) {
 			$limit = '';
 		} else {
-			$start = ($this->piVars['page'] * $this->ffdata['resultsPerPage']) - $this->ffdata['resultsPerPage'];
+			$start = ($this->piVars['page'] * $this->conf['resultsPerPage']) - $this->conf['resultsPerPage'];
 			if ($start < 0) $start = 0;
-			$limit = $start . ', ' . $this->ffdata['resultsPerPage'];
+			$limit = $start . ', ' . $this->conf['resultsPerPage'];
 		}
-		if (empty($this->ffdata['resultsPerPage'])) {
+		if (empty($this->conf['resultsPerPage'])) {
 			$limit .= '10';
 		}
 
@@ -1435,7 +1434,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$where .= ' AND pid in ('.$this->startingPoints.') ';
 
 			// add "tagged content only" searchphrase
-			if ($this->ffdata['showTaggedContentOnly']) $where .= $taggedOnlyWhere;
+			if ($this->conf['showTaggedContentOnly']) $where .= $taggedOnlyWhere;
 
 			// add enable fields
 			$where .= $this->cObj->enableFields($table);
@@ -1481,7 +1480,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$where .= ' AND pid in (' . $this->startingPoints . ') ';
 
 		// add "tagged content only" searchphrase
-		if ($this->ffdata['showTaggedContentOnly']) $where .= $taggedOnlyWhere;
+		if ($this->conf['showTaggedContentOnly']) $where .= $taggedOnlyWhere;
 
 		// add enable fields
 		$where .= $this->cObj->enableFields($table);
@@ -1492,12 +1491,12 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$orderByDir = 'DESC';
 
 		// if sorting in FE is allowed
-		if($this->ffdata['showSortInFrontend']) {
+		if($this->conf['showSortInFrontend']) {
 			$tempField = strtolower(t3lib_div::removeXSS($this->piVars['orderByField']));
 			$tempDir = strtolower(t3lib_div::removeXSS($this->piVars['orderByDir']));
 			if($tempField != '' && $tempDir != '') {
 				// overwrite ordering with piVars when allowed
-				if($this->ffdata['sortByVisitor'] != '' && t3lib_div::inList($this->ffdata['sortByVisitor'], $tempField)) {
+				if($this->conf['sortByVisitor'] != '' && t3lib_div::inList($this->conf['sortByVisitor'], $tempField)) {
 					$orderByField = $tempField;
 					$orderByDir = $tempDir;
 				}
@@ -1505,12 +1504,12 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				// if piVars for sorting are empty check if a sortword is given
 				if(!count($swords)) {
 					// if no searchword is given, order by setting in flexform
-					$orderBy = $this->ffdata['sortWithoutSearchword'] ? $this->ffdata['sortWithoutSearchword'] : $orderByField . ' ' . $orderByDir;
+					$orderBy = $this->conf['sortWithoutSearchword'] ? $this->conf['sortWithoutSearchword'] : $orderByField . ' ' . $orderByDir;
 				}
 			}
 		} else {
 			// if sorting is predefined by admin
-			$orderBy = $this->ffdata['sortByAdmin'] ? $this->ffdata['sortByAdmin'] : $orderByField . ' ' . $orderByDir;
+			$orderBy = $this->conf['sortByAdmin'] ? $this->conf['sortByAdmin'] : $orderByField . ' ' . $orderByDir;
 		}
 		if(!$orderBy) $orderBy = $orderByField . ' ' . $orderByDir;
 
@@ -1542,7 +1541,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$this->countSearchWordWithKeStats($sword);
 
 			// count search phrase in ke_search statistic tables
-			if ($this->ffdata['countSearchPhrases']) {
+			if ($this->conf['countSearchPhrases']) {
 				$this->countSearchPhrase($sword, $swords, $numResults, $tagsAgainst);
 			}
 		}
@@ -1563,9 +1562,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			}
 
 			// no results found
-			if ($this->ffdata['showNoResultsText']) {
+			if ($this->conf['showNoResultsText']) {
 				// use individual text set in flexform
-				$noResultsText = $this->pi_RTEcssText($this->ffdata['noResultsText']);
+				$noResultsText = $this->pi_RTEcssText($this->conf['noResultsText']);
 				$attentionImage = '';
 			} else {
 				// use general text
@@ -1583,7 +1582,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 
 			// add query
-			if ($this->ffdata['showQuery']) {
+			if ($this->conf['showQuery']) {
 				$content .= '<br />'.$query.'<br />';
 			}
 
@@ -1604,7 +1603,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			if (!empty($row['params'])) $linkconf['additionalParams'] = $row['params'];
 			// add chash
 			$linkconf['useCacheHash'] = true;
-			$linkconf['target'] = $this->ffdata['resultLinkTarget'];
+			$linkconf['target'] = $this->conf['resultLinkTarget'];
 
 			// set result title
 			$linktext = $row['title'];
@@ -1613,7 +1612,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			//$linktext = htmlentities($linktext);
 
 			// highlight hits in result title?
-			if ($this->ffdata['highlightSword'] && count($swords)) {
+			if ($this->conf['highlightSword'] && count($swords)) {
 				foreach ($swords as $word) {
 					$word = str_replace('/', '\/', $word);
 					$linktextReplaced = preg_replace('/('.$word.')/iu','<span class="hit">\0</span>',$linktext);
@@ -1632,7 +1631,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 
 			// result preview - as set in pi config
-			if ($this->ffdata['previewMode'] == 'abstract') {
+			if ($this->conf['previewMode'] == 'abstract') {
 
 				// always show abstract
 				if (!empty($row['abstract'])) {
@@ -1643,7 +1642,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					$teaserContent = $this->buildTeaserContent($row['content'], $swords);
 				}
 
-			} else if ($this->ffdata['previewMode'] == 'hit' || $this->ffdata['previewMode'] == '') {
+			} else if ($this->conf['previewMode'] == 'hit' || $this->conf['previewMode'] == '') {
 				if (!empty($row['abstract'])) {
 					// show abstract if it contains sword, otherwise show content
 					$abstractHit = false;
@@ -1689,7 +1688,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$tempContent = $this->cObj->substituteMarkerArray($tempContent,$tempMarkerArray,$wrap='###|###',$uppercase=1);
 
 			// show result url?
-			if ($this->ffdata['showResultUrl']) {
+			if ($this->conf['showResultUrl']) {
 				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_RESULTURL###');
 				$subContent = $this->cObj->substituteMarker($subContent,'###LABEL_RESULTURL###', $this->pi_getLL('label_resulturl'));
 				$subContent = $this->cObj->substituteMarker($subContent,'###RESULTURL###', $resultUrlLink);
@@ -1699,7 +1698,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_RESULTURL###', $subContent, $recursive=1);
 
 			// show result url?
-			if ($this->ffdata['resultsNumeration']) {
+			if ($this->conf['resultsNumeration']) {
 				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_NUMERATION###');
 				$subContent = $this->cObj->substituteMarker($subContent,'###NUMBER###', $resultCount+$start);
 			} else {
@@ -1708,7 +1707,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_NUMERATION###', $subContent, $recursive=1);
 
 			// show score?
-			if ($this->ffdata['showScore'] && $row['score']) {
+			if ($this->conf['showScore'] && $row['score']) {
 				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_SCORE###');
 				$subContent = $this->cObj->substituteMarker($subContent,'###LABEL_SCORE###', $this->pi_getLL('label_score'));
 				$subContent = $this->cObj->substituteMarker($subContent,'###SCORE###', number_format($row['score'],2,',',''));
@@ -1718,7 +1717,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_SCORE###', $subContent, $recursive=1);
 
 			// show date?
-			if ($this->ffdata['showDate'] && $row['sortdate']) {
+			if ($this->conf['showDate'] && $row['sortdate']) {
 				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_DATE###');
 				$subContent = $this->cObj->substituteMarker($subContent,'###LABEL_DATE###', $this->pi_getLL('label_date'));
 				$subContent = $this->cObj->substituteMarker($subContent,'###DATE###', date($GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'], $row['sortdate']));
@@ -1728,7 +1727,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_DATE###', $subContent, $recursive=1);
 
 			// show percental score?
-			if ($this->ffdata['showPercentalScore'] && $row['score']) {
+			if ($this->conf['showPercentalScore'] && $row['score']) {
 				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_SCORE_PERCENT###');
 				$subContent = $this->cObj->substituteMarker($subContent,'###LABEL_SCORE_PERCENT###', $this->pi_getLL('label_score_percent'));
 				$subContent = $this->cObj->substituteMarker($subContent,'###SCORE_PERCENT###', $this->calculateScorePercent($row['score']));
@@ -1738,7 +1737,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_SCORE_PERCENT###', $subContent, $recursive=1);
 
 			// show score scale?
-			if ($this->ffdata['showScoreScale'] && $row['score']) {
+			if ($this->conf['showScoreScale'] && $row['score']) {
 				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_SCORE_SCALE###');
 				$subContent = $this->cObj->substituteMarker($subContent,'###LABEL_SCORE_SCALE###', $this->pi_getLL('label_score_scale'));
 				$scoreScale = $this->renderSVGScale($this->calculateScorePercent($row['score']));
@@ -1749,7 +1748,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_SCORE_SCALE###', $subContent, $recursive=1);
 
 			// show tags?
-			if ($this->ffdata['showTags']) {
+			if ($this->conf['showTags']) {
 				$tags = $row['tags'];
 				$tags = str_replace('#', ' ', $tags);
 				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_TAGS###');
@@ -1761,7 +1760,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_TAGS###', $subContent, $recursive=1);
 
 			// show query?
-			if ($this->ffdata['showQuery']) {
+			if ($this->conf['showQuery']) {
 				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_QUERY###');
 				$subContent = $this->cObj->substituteMarker($subContent,'###LABEL_QUERY###', $this->pi_getLL('label_query'));
 				$subContent = $this->cObj->substituteMarker($subContent,'###QUERY###', $query);
@@ -1771,7 +1770,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_QUERY###', $subContent, $recursive=1);
 
 			// type icon
-			if ($this->ffdata['showTypeIcon']) {
+			if ($this->conf['showTypeIcon']) {
 				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_TYPE_ICON###');
 				$subContent = $this->cObj->substituteMarker($subContent,'###TYPE_ICON###', $this->renderTypeIcon($row['type']));
 			} else {
@@ -1883,7 +1882,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			}
 		}
 
-		$startPos = $resultPos - (ceil($this->ffdata['resultChars'] / 2));
+		$startPos = $resultPos - (ceil($this->conf['resultChars'] / 2));
 		if ($startPos < 0) $startPos = 0;
 		$teaser = substr($resultText, $startPos);
 
@@ -1901,10 +1900,10 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// append dots when cropped
 		if ($startPos > 0) $teaser = '...'.$teaser;
-		$teaser = $this->betterSubstr($teaser, $this->ffdata['resultChars']);
+		$teaser = $this->betterSubstr($teaser, $this->conf['resultChars']);
 
 		// highlight hits?
-		if ($this->ffdata['highlightSword'] && count($swords)) {
+		if ($this->conf['highlightSword'] && count($swords)) {
 			foreach ($swords as $word) {
 				$word = str_replace('/', '\/', $word);
 				$teaser = preg_replace('/('.$word.')/iu','<span class="hit">\0</span>',$teaser);
@@ -1915,74 +1914,80 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	}
 
 
-	/*
-	 * init flexforms
+	/**
+	 * Initializes flexform, conf vars and some more
+	 * 
+	 * @return nothing
 	 */
-	function initFlexforms() {
+	protected function init() {
 		// get some helper functions
 		$this->div = t3lib_div::makeInstance('tx_kesearch_div');
 		$this->div->init($this);
-
-		// GET FLEXFORM DATA
-		$this->pi_initPIflexForm();
-		$piFlexForm = $this->cObj->data['pi_flexform'];
-		if (is_array($piFlexForm['data'])) {
-			foreach ( $piFlexForm['data'] as $sheet => $data ) {
-				foreach ( $data as $lang => $value ) {
-					foreach ( $value as $key => $val ) {
-						$this->ffdata[$key] = $this->pi_getFFvalue($piFlexForm, $key, $sheet);
-					}
-				}
-			}
+		
+		$this->moveFlexFormDataToConf();
+		
+		if($this->conf['mode'] == 1 && !empty($this->conf['loadFlexformsFromOtherCE'])) {
+			$data = $this->pi_getRecord('tt_content', intval($this->conf['loadFlexformsFromOtherCE']));
+			$this->cObj->data = $data;
+			$this->moveFlexFormDataToConf();
+		}
+		
+		// add stdWrap properties to each config value
+		foreach($this->conf as $key => $value) {
+			$this->conf[$key] = $this->cObj->stdWrap($value, $this->conf[$key . '.']);
 		}
 
-		// set startingPoints
-		$this->startingPoints = $this->div->getStartingPoint();
-
-		// set resultPage to value from conf if set or current PID if not set in ff or conf
-		 if (!$this->ffdata['resultPage']) {
-			/*
-			 if ($this->conf['resultPage']) $this->ffdata['resultPage'] = $this->conf['resultPage'];
-			else $this->ffdata['resultPage'] = $GLOBALS['TSFE']->id;
-			*/
-		}
-
-		if ($this->ffdata['mode'] == 1 && !empty($this->ffdata['loadFlexformsFromOtherCE'])) {
-			// load flexform config from other ce
-			$fields = 'pi_flexform';
-			$table = 'tt_content';
-			$where = 'uid="'.intval($this->ffdata['loadFlexformsFromOtherCE']).'"  ';
-			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='1');
-			while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-				$ffXMLData = t3lib_div::xml2array($row['pi_flexform']);
-				if (is_array($ffXMLData['data'])) {
-					foreach ( $ffXMLData['data'] as $sheet => $data ) {
-						foreach ( $data as $lang => $value ) {
-							foreach ( $value as $key => $val ) {
-								if ($key != 'mode') $this->ffdata[$key] = $this->pi_getFFvalue($ffXMLData, $key, $sheet);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		// set "countSearchPhrase" to 1 if not set yet (default)
-		if (!isset($this->ffdata['countSearchPhrases'])) {
-			$this->ffdata['countSearchPhrases'] = 1;
-		}
-
+		// set some default values (this part have to be after stdWrap!!!)
+		if(!$this->conf['resultPage']) $this->conf['resultPage'] = $GLOBALS['TSFE']->id;
+		
 		// hook: modifyFlexFormData
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFlexFormData'])) {
 			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFlexFormData'] as $_classRef) {
 				$_procObj = & t3lib_div::getUserObj($_classRef);
-				$_procObj->modifyFlexFormData($this->ffdata, $this->cObj, $this->piVars);
+				$_procObj->modifyFlexFormData($this->conf, $this->cObj, $this->piVars);
 			}
 		}
-
+		
+		// set startingPoints
+		$this->startingPoints = $this->div->getStartingPoint();
+	}
+	
+	/**
+	 * Move all FlexForm data of current record to conf array
+	 */
+	protected function moveFlexFormDataToConf() {
+		// don't move this to init
+		// in case of mode==1 this method has to be called again
+		$this->pi_initPIflexForm();
+		
+		$piFlexForm = $this->cObj->data['pi_flexform'];
+		if(is_array($piFlexForm['data'])) {
+			foreach($piFlexForm['data'] as $sheetKey => $sheet) {
+				foreach($sheet as $lang) {
+					foreach($lang as $key => $value) {
+						$this->conf[$key] = $this->fetchConfigurationValue($key, $sheetKey);
+					}
+				}
+			}
+		}
 	}
 
 
+	/**
+	 * Fetches configuration value given its name.
+	 * Merges flexform and TS configuration values.
+	 *
+	 * @param	string	$param	Configuration value name
+	 * @return	string	Parameter value
+	 */
+	function fetchConfigurationValue($param, $sheet = 'sDEF') {
+		$value = trim($this->pi_getFFvalue(
+			$this->cObj->data['pi_flexform'], $param, $sheet)
+		);
+		return $value ? $value : $this->conf[$param];
+	}
+	
+	
 	/*
 	 * function betterSubstr
 	 *
@@ -2017,8 +2022,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$this->initOnclickActions();
 
 		$numberOfResults = $this->numberOfResults;
-		$resultsPerPage = $this->ffdata['resultsPerPage'];
-		$maxPages = $this->ffdata['maxPagesInPagebrowser'];
+		$resultsPerPage = $this->conf['resultsPerPage'];
+		$maxPages = $this->conf['maxPagesInPagebrowser'];
 
 		// set first page if not set
 		if (!isset($this->piVars['page'])) $this->piVars['page'] = 1;
@@ -2061,7 +2066,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		for ($i=1; $i<=$pagesTotal; $i++) {
 			if ($i >= $startPage && $i <= $endPage) {
 
-				if ($this->ffdata['renderMethod'] == 'static' || $this->ffdata['renderMethod'] == 'ajax_after_reload') {
+				if ($this->conf['renderMethod'] == 'static' || $this->conf['renderMethod'] == 'ajax_after_reload') {
 
 					// render static version
 					unset($linkconf);
@@ -2098,7 +2103,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		if ($this->piVars['page'] > 1) {
 
 			$previousPage = $this->piVars['page']-1;
-			if ($this->ffdata['renderMethod'] == 'static' || $this->ffdata['renderMethod'] == 'ajax_after_reload') {
+			if ($this->conf['renderMethod'] == 'static' || $this->conf['renderMethod'] == 'ajax_after_reload') {
 				// get static version
 				unset($linkconf);
 				$linkconf['parameter'] = $GLOBALS['TSFE']->id;
@@ -2127,7 +2132,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		// next image with link
 		if ($this->piVars['page'] < $pagesTotal) {
 			$nextPage = $this->piVars['page']+1;
-			if ($this->ffdata['renderMethod'] == 'static' || $this->ffdata['renderMethod'] == 'ajax_after_reload') {
+			if ($this->conf['renderMethod'] == 'static' || $this->conf['renderMethod'] == 'ajax_after_reload') {
 				// get static version
 				unset($linkconf);
 				$linkconf['parameter'] = $GLOBALS['TSFE']->id;
@@ -2178,11 +2183,11 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 	function renderOrdering() {
 		// show ordering only if is set in FlexForm
-		if($this->ffdata['showSortInFrontend'] && $this->ffdata['sortByVisitor'] != '') {
+		if($this->conf['showSortInFrontend'] && $this->conf['sortByVisitor'] != '') {
 			$subpartArray['###ORDERNAVIGATION###'] = $this->cObj->getSubpart($this->templateCode, '###ORDERNAVIGATION###');
 			$subpartArray['###SORT_LINK###'] = $this->cObj->getSubpart($subpartArray['###ORDERNAVIGATION###'], '###SORT_LINK###');
 
-			if($this->ffdata['showSortInFrontend']) {
+			if($this->conf['showSortInFrontend']) {
 				$orderByDir = strtolower($this->div->removeXSS($this->piVars['orderByDir']));
 				$orderByField = strtolower($this->div->removeXSS($this->piVars['orderByField']));
 				if(!$orderByField) $orderByField = 'score';
@@ -2196,14 +2201,14 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				$orderByDir = 'desc';
 			}
 
-			$orderBy = t3lib_div::trimExplode(',', $this->ffdata['sortByVisitor']);
+			$orderBy = t3lib_div::trimExplode(',', $this->conf['sortByVisitor']);
 
 			// loop all allowed orderings
 			foreach($orderBy as $value) {
 				// we can't sort by score if there is no sword given
 				if($this->piVars['sword'] != '' || $value != 'score') {
 					$markerArray['###FIELDNAME###'] = $value;
-					if($this->ffdata['renderMethod'] == 'ajax') {
+					if($this->conf['renderMethod'] == 'ajax') {
 						// generate link for ajax mode
 						$markerArray['###URL###'] = '<span onclick="setOrderBy(\'' . $value . '\', \'' . $orderByDir . '\')">' . $value . '</span>';
 					} else {
@@ -2285,8 +2290,8 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		}
 
 		// get definitions from plugin settings
-		if ($this->ffdata['mode'] == 0 && $this->ffdata['preselected_filters']) {
-			$preselectedArray = t3lib_div::trimExplode(',', $this->ffdata['preselected_filters'], true);
+		if ($this->conf['mode'] == 0 && $this->conf['preselected_filters']) {
+			$preselectedArray = t3lib_div::trimExplode(',', $this->conf['preselected_filters'], true);
 			foreach ($preselectedArray as $key => $option) {
 				$fields = '*, tx_kesearch_filters.uid as filteruid';
 				$table = 'tx_kesearch_filters, tx_kesearch_filteroptions';
@@ -2340,16 +2345,16 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
 
 		// is current page the result page?
-		$resultPage = ($GLOBALS['TSFE']->id == $this->ffdata['resultPage']) ? TRUE : FALSE;
+		$resultPage = ($GLOBALS['TSFE']->id == $this->conf['resultPage']) ? TRUE : FALSE;
 
-		switch ($this->ffdata['renderMethod']) {
+		switch ($this->conf['renderMethod']) {
 
 			case 'ajax':
 			case 'ajax_after_reload':
 				// refresh results only if we are on the defined result page
 				// do not refresh results if default text is shown (before filters and swords are sent)
 				if ($resultPage) {
-					if ($this->isEmptySearch() && $this->ffdata['showTextInsteadOfResults']) $this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFilters();" alt="" /> ';
+					if ($this->isEmptySearch() && $this->conf['showTextInsteadOfResults']) $this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFilters();" alt="" /> ';
 					else $this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFiltersAndResults();" alt="" /> ';
 				} else {
 					$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFilters();" alt="" /> ';
@@ -2454,7 +2459,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// build target URL if not result page
 		unset($linkconf);
-		$linkconf['parameter'] = $this->ffdata['resultPage'];
+		$linkconf['parameter'] = $this->conf['resultPage'];
 		$linkconf['additionalParams'] = '';
 		$linkconf['useCacheHash'] = false;
 		$targetUrl = t3lib_div::locationHeaderUrl($this->cObj->typoLink_URL($linkconf));
@@ -2493,7 +2498,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		';
 
 		// include js for non-static modes
-		if ($this->ffdata['renderMethod'] != 'static' ) {
+		if ($this->conf['renderMethod'] != 'static' ) {
 			$jsContent .= '
 				function switchArea(objid) {
 					if (document.getElementById(\'options_\' + objid).className == \'expanded\') {
@@ -2531,7 +2536,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		}
 
 		// include js for full ajax mode
-		if ($this->ffdata['renderMethod'] == 'ajax') {
+		if ($this->conf['renderMethod'] == 'ajax') {
 			$jsContent .= '
 
 				function submitAction() {
@@ -2609,12 +2614,12 @@ class tx_kesearch_pi1 extends tslib_pibase {
 						if(code == 13) {
 					';
 
-			if ($this->ffdata['resetFiltersOnSubmit']) {
+			if ($this->conf['resetFiltersOnSubmit']) {
 				$jsContent .= '
 							document.getElementById(\'resetFilters\').value=1;';
 			}
 
-			if ($GLOBALS['TSFE']->id != $this->ffdata['resultPage']) {
+			if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
 				// redirect to result page if current page is not the result page and option is activated
 				$jsContent .= 'redirectToResultPage(); }';
 			} else {
@@ -2634,7 +2639,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					document.getElementById(\'kesearch_query_time\').style.display=\'block\';';
 
 			// add reset filters?
-			if ($this->ffdata['resetFiltersOnSubmit']) $jsContent .= 'document.getElementById(\'resetFilters\').value=0; ';
+			if ($this->conf['resetFiltersOnSubmit']) $jsContent .= 'document.getElementById(\'resetFilters\').value=0; ';
 
 			$jsContent .= '
 				}';
@@ -2642,7 +2647,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		}
 
 		// include js for "ajax after page reload" mode
-		if ($this->ffdata['renderMethod'] == 'ajax_after_reload') {
+		if ($this->conf['renderMethod'] == 'ajax_after_reload') {
 			$jsContent .= '
 				// refresh result list onload
 				function onloadResults() {

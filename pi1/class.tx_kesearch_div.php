@@ -43,7 +43,7 @@ class tx_kesearch_div {
 	function getStartingPoint() {
 		// if loadFlexformsFromOtherCE is set
 		// try to get startingPoint of given page
-		if($uid = intval($this->pObj->ffdata['loadFlexformsFromOtherCE'])) {
+		if($uid = intval($this->pObj->conf['loadFlexformsFromOtherCE'])) {
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 				'pages, recursive',
 				'tt_content',
