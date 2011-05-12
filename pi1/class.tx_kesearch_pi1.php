@@ -40,9 +40,10 @@ class tx_kesearch_pi1 extends tslib_pibase {
 	var $ms                 = 0;
 	var $startingPoints     = 0; // comma seperated list of startingPoints
 	var $firstStartingPoint = 0; // comma seperated list of startingPoints
-	var $conf             = array(); // FlexForm-Configuration
+	var $conf               = array(); // FlexForm-Configuration
 	var $countTagsResult    = 0; // precount the results of table content
 	var $countContentResult = 0; // precount the results of table tags
+	var $countSearchResults = 0; // count search results
 	var $indexToUse         = ''; // it's for 'USE INDEX ($indexToUse)' to speed up queries
 	var $tagsInSearchResult = false; // contains all tags of current search result
 
@@ -1278,7 +1279,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				// ignore words under length of 4 chars
 				if (strlen($word) > 3) {
 
-
 					if ($this->UTF8QuirksMode) {
 						$scoreAgainst .= utf8_decode($word).' ';
 						$wordsAgainst .= '+'.utf8_decode($word).'* ';
@@ -1458,7 +1458,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields, $table, $where, '', $orderBy, $limit);
 		}
 		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
-		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
+		$this->countSearchResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 
 		// searchword statistic
 		if (!$numOnly && !$maxScore) {
@@ -1467,15 +1467,15 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 			// count search phrase in ke_search statistic tables
 			if ($this->conf['countSearchPhrases']) {
-				$this->countSearchPhrase($sword, $swords, $numResults, $tagsAgainst);
+				$this->countSearchPhrase($sword, $swords, $this->countSearchResults, $tagsAgainst);
 			}
 		}
 
 		if ($numOnly) {
 			// get number of records only?
-			return $numResults;
+			return $this->countSearchResults;
 		}
-		else if ($numResults == 0) {
+		else if ($this->countSearchResults == 0) {
 
 			// get subpart for general message
 			$content = $this->cObj->getSubpart($this->templateCode,'###GENERAL_MESSAGE###');
@@ -2100,7 +2100,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 	function renderOrdering() {
 		// show ordering only if is set in FlexForm
-		if($this->conf['showSortInFrontend'] && $this->conf['sortByVisitor'] != '') {
+		if($this->conf['showSortInFrontend'] && $this->conf['sortByVisitor'] != '' && $this->countSearchResults) {
 			$subpartArray['###ORDERNAVIGATION###'] = $this->cObj->getSubpart($this->templateCode, '###ORDERNAVIGATION###');
 			$subpartArray['###SORT_LINK###'] = $this->cObj->getSubpart($subpartArray['###ORDERNAVIGATION###'], '###SORT_LINK###');
 
