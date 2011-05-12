@@ -626,6 +626,9 @@ class tx_kesearch_pi1 extends tslib_pibase {
 				// but only if customer has searched for filters
 				if($isOptionInOptionArray) {
 					$checkBoxParams['selected'] = ($this->piVars['filter'][$filterUid][$key]) ? 'checked="checked"' : '';
+					if(!is_array($this->piVars['filter'][$filterUid]) && $this->filters[$filterUid]['markAllCheckboxes']) {
+						$checkBoxParams['selected'] = 'checked="checked"';
+					}				
 					$checkBoxParams['disabled'] = '';
 				} else {
 					$checkBoxParams['disabled'] = 'disabled="disabled"';
@@ -689,7 +692,6 @@ class tx_kesearch_pi1 extends tslib_pibase {
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###SPECIAL_CSS_CLASS###', $this->filters[$filterUid]['cssclass'] ? $this->filters[$filterUid]['cssclass'] : '');
 
 		return $filterContent;
-
 	}
 
 
