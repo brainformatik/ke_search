@@ -737,17 +737,25 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$fields = 'uid';
 			$table = 'tx_kesearch_index';
 			$where = '1=1';
+			$countMatches = 0;
 			if($tagsAgainst) {
 				$where .= ' AND MATCH (tags) AGAINST (\''.$tagsAgainst.'\' IN BOOLEAN MODE) ';
+				$countMatches++;
 			}
 			if (count($swords)) {
 				$where .= ' AND MATCH (content) AGAINST (\''.$wordsAgainst.'\' IN BOOLEAN MODE) ';
+				$countMatches++;
 			}
 			$where .= $this->cObj->enableFields($table);
+			
+			// which index to use
+			if($countMatches == 2) {
+				$index = ' USE INDEX (' . $this->indexToUse . ')';
+			} else $index = '';
 
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery(
 				'uid, REPLACE(tags, "##", "#~~~#") as tags',
-				'tx_kesearch_index USE INDEX (' . $this->indexToUse . ')',
+				'tx_kesearch_index' . $index,
 				$where,
 				'','',''
 			);
@@ -1356,8 +1364,15 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$fields = 'MAX(MATCH (content) AGAINST (\''.$scoreAgainst.'\')) AS maxscore';
 			$table = 'tx_kesearch_index';
 			$where = '1=1 ';
-			if (!empty($wordsAgainst)) $where .= 'AND MATCH (content) AGAINST (\''.$wordsAgainst.'\' IN BOOLEAN MODE) ';
-			$where .= $this->div->createQueryForTags($tagsAgainst);
+			$countMatches = 0;
+			if(!empty($wordsAgainst)) {
+				$where .= 'AND MATCH (content) AGAINST (\''.$wordsAgainst.'\' IN BOOLEAN MODE) ';
+				$countMatches++;
+			}
+			if(($tagWhere = $this->div->createQueryForTags($tagsAgainst))) {
+				$where .= $tagWhere;
+				$countMatches++;
+			}
 			$where .= ' AND pid in ('.$this->startingPoints.') ';
 
 			// add "tagged content only" searchphrase
@@ -1365,11 +1380,15 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 			// add enable fields
 			$where .= $this->cObj->enableFields($table);
+			
+			if($countMatches == 2) {
+				$index = ' USE INDEX (' . $this->indexToUse . ')';
+			}
 
 			// process query
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery(
 				$fields,
-				$table . ' USE INDEX (' . $this->indexToUse . ')',
+				$table . $index,
 				$where, '', '', $limit
 			);
 			$res = $GLOBALS['TYPO3_DB']->sql_query($query);
@@ -1400,8 +1419,15 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// add boolean where clause for all searchwords and/or tags
 		$where = '1=1 ';
-		if (!empty($wordsAgainst)) $where .= 'AND MATCH (content) AGAINST (\''.$wordsAgainst.'\' IN BOOLEAN MODE) ';
-		$where .= $this->div->createQueryForTags($tagsAgainst);
+		$countMatches = 0;
+		if(!empty($wordsAgainst)) {
+			$where .= 'AND MATCH (content) AGAINST (\''.$wordsAgainst.'\' IN BOOLEAN MODE) ';
+			$countMatches++;
+		}
+		if(($tagWhere = $this->div->createQueryForTags($tagsAgainst))) {
+			$where .= $tagWhere;
+			$countMatches++;
+		}
 
 		// restrict to storage page
 		$where .= ' AND pid in (' . $this->startingPoints . ') ';
@@ -1414,7 +1440,7 @@ class tx_kesearch_pi1 extends tslib_pibase {
 
 		// add ordering
 		// predefine ordering. Can be overwritten.
-		$orderByField = count($swords) ? 'score' : 'sortdate';
+		$orderByField = (count($swords) || count($tagsAgainst)) ? 'score' : 'sortdate';
 		$orderByDir = 'DESC';
 
 		// if sorting in FE is allowed
@@ -1434,9 +1460,13 @@ class tx_kesearch_pi1 extends tslib_pibase {
 					$orderBy = $this->conf['sortWithoutSearchword'] ? $this->conf['sortWithoutSearchword'] : $orderByField . ' ' . $orderByDir;
 				}
 			}
-		} else {
-			// if sorting is predefined by admin
-			$orderBy = $this->conf['sortByAdmin'] ? $this->conf['sortByAdmin'] : $orderByField . ' ' . $orderByDir;
+		} else { // if sorting is predefined by admin
+			// if sort by admin is set to score, we can do this only when searchwords or tags are given
+			if(($this->conf['sortByAdmin'] == 'score ASC' || $this->conf['sortByAdmin'] == 'score DESC') && (!count($swords) || !count($tagsAgainst))) {
+				$orderBy = '';
+			} else {
+				$orderBy = c ? $this->conf['sortByAdmin'] : $orderByField . ' ' . $orderByDir;
+			}
 		}
 		if(!$orderBy) $orderBy = $orderByField . ' ' . $orderByDir;
 
@@ -1447,12 +1477,16 @@ class tx_kesearch_pi1 extends tslib_pibase {
 			$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 			return $row['numResults'];
 		}
+		
+		if($countMatches == 2) {
+			$index = ' USE INDEX (' . $this->indexToUse . ')';
+		}
 
 		// process query
 		if(count($swords)) {
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery(
 				$fields,
-				$table . ' USE INDEX (' . $this->indexToUse . ')',
+				$table . $index, 
 				$where, '', '', $limit
 			);
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery('*', '(' . $query . ') as results', '', '', 'results.' . $orderBy, '');
