@@ -31,8 +31,8 @@ require_once(t3lib_extMgm::extPath('ke_search').'lib/class.tx_kesearch_lib.php')
  * @package	TYPO3
  * @subpackage	tx_kesearch
  */
-class tx_kesearch_pi1 extends tx_kesearch_lib {
-	var $scriptRelPath      = 'pi1/class.tx_kesearch_pi1.php';	// Path to this script relative to the extension dir.
+class tx_kesearch_pi2 extends tx_kesearch_lib {
+	var $scriptRelPath      = 'pi1/class.tx_kesearch_pi2.php';	// Path to this script relative to the extension dir.
 	
 	/**
 	 * The main method of the PlugIn
@@ -51,16 +51,9 @@ class tx_kesearch_pi1 extends tx_kesearch_lib {
 
 		// initializes plugin configuration
 		$this->init();
-		
-		// add header parts when in searchbox mode
-		$this->addHeaderParts();
-		
+				
 		// init XAJAX?
 		if ($this->conf['renderMethod'] != 'static') $this->initXajax();
-
-		// get css file (include only in searchbox -> avoid duplicate css)
-		$cssFile = $this->conf['cssFile'] ? $this->conf['cssFile'] : t3lib_extMgm::siteRelPath($this->extKey).'res/ke_search_pi1.css';
-		$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId.'_css'] = '<link rel="stylesheet" type="text/css" href="'.$cssFile.'" / >';
 
 		// get preselected filter from rootline
 		$this->getFilterPreselect();
@@ -89,15 +82,60 @@ class tx_kesearch_pi1 extends tx_kesearch_lib {
 		}
 
 
-		// get content
-		$content = $this->getSearchboxContent();
-		$content = $this->cObj->substituteMarker($content,'###SPINNER###',$this->spinnerImageFilters);
-		$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
+		// show text instead of results if no searchparams set and activated in ff
+		if($this->isEmptySearch() && $this->conf['showTextInsteadOfResults']) {
+			$content = '<div id="textmessage">'.$this->pi_RTEcssText($this->conf['textForResults']).'</div>';
+			$content .= '<div id="kesearch_results"></div>';
+			$content .= '<div id="kesearch_updating_results"></div>';
+			$content .= '<div id="kesearch_pagebrowser_top"></div>';
+			$content .= '<div id="kesearch_pagebrowser_bottom"></div>';
+			$content .= '<div id="kesearch_query_time"></div>';
+			return $content;
+		}
+
+		$content = $this->cObj->getSubpart($this->templateCode, '###RESULT_LIST###');
+		
+		if($this->conf['renderMethod'] == 'ajax_after_reload') {
+			$this->getSearchResults(); //TODO We have to call it again, to get the numberOfResults. Maybe it's better to change it in Template and refreshResultsOnLoad
+			$content = $this->cObj->substituteMarker($content,'###MESSAGE###', '');
+			$content = $this->cObj->substituteMarker($content, '###NUMBER_OF_RESULTS###', $this->numberOfResults);
+			$content = $this->cObj->substituteMarker($content,'###ORDERING###', $this->renderOrdering());
+			$content = $this->cObj->substituteMarker($content,'###SPINNER###', $this->spinnerImageResults);
+			$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
+			$content = $this->cObj->substituteMarker($content,'###QUERY_TIME###', '');
+			$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', '');
+			$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###', '');
+			return $this->pi_wrapInBaseClass($content);
+		}
+		
+		// render pagebrowser
+		if ($GLOBALS['TSFE']->id == $this->conf['resultPage']) {
+			if ($this->conf['pagebrowserOnTop'] || $this->conf['pagebrowserAtBottom']) {
+				$pagebrowserContent = $this->renderPagebrowser();
+			}
+			if ($this->conf['pagebrowserOnTop']) {
+				$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', $pagebrowserContent);
+			} else {
+				$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', '');
+			}
+			if ($this->conf['pagebrowserAtBottom']) {
+				$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###', $pagebrowserContent);
+			} else {
+				$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###','');
+			}
+		}
+
+		$content = $this->cObj->substituteMarker($content, '###MESSAGE###', $this->getSearchResults());
+		$content = $this->cObj->substituteMarker($content, '###NUMBER_OF_RESULTS###', $this->numberOfResults);
+		$content = $this->cObj->substituteMarker($content, '###ORDERING###', $this->renderOrdering());
+		$content = $this->cObj->substituteMarker($content, '###SPINNER###', $this->spinnerImageResults);
+		$content = $this->cObj->substituteMarker($content, '###LOADING###', $this->pi_getLL('loading'));
+		$content = $this->cObj->substituteMarker($content, '###QUERY_TIME###', '');
 
 		return $this->pi_wrapInBaseClass($content);
 	}
 
-	
+
 	/*
 	 * function getFilterPreselect
 	 */
@@ -122,22 +160,6 @@ class tx_kesearch_pi1 extends tx_kesearch_lib {
 							}
 						}
 					}
-				}
-			}
-		}
-
-		// get definitions from plugin settings
-		if($this->conf['preselected_filters']) {
-			$preselectedArray = t3lib_div::trimExplode(',', $this->conf['preselected_filters'], true);
-			foreach ($preselectedArray as $key => $option) {
-				$fields = '*, tx_kesearch_filters.uid as filteruid';
-				$table = 'tx_kesearch_filters, tx_kesearch_filteroptions';
-				$where = $GLOBALS['TYPO3_DB']->listQuery('options', $option, 'tx_kesearch_filters');
-				$where .= ' AND tx_kesearch_filteroptions.uid = '.$option;
-				$where .= $this->cObj->enableFields('tx_kesearch_filters');
-				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
-				while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-					$this->preselectedFilter[$row['filteruid']] = $row['tag'];
 				}
 			}
 		}

@@ -30,13 +30,15 @@
  * @subpackage	tx_kesearch
  */
 class tx_kesearch_div {
+	var $showShortMessage = false;
+	
 	/**
 	 * Contains the parent object
 	 * @var tx_kesearch_pi1
 	 */
 	var $pObj;
 
-	function init($pObj) {
+	public function __construct($pObj) {
 		$this->pObj = $pObj;
 	}
 
@@ -104,6 +106,83 @@ class tx_kesearch_div {
 		}
 	}
 
+	
+	/**
+ 	* Build search strings for SQL Query from piVars
+ 	*
+ 	* @return  array
+ 	* @author  Christian Buelter <buelter@kennziffer.com>
+ 	* @since   Wed Mar 16 2011 15:03:26 GMT+0100
+ 	*/
+	public function buildSearchphrase() {
+		// prepare searchword for query
+		$sword = $this->removeXSS($this->pObj->piVars['sword']);
+
+		// ignore default search box content
+		if (strtolower(trim($sword)) == strtolower($this->pObj->pi_getLL('searchbox_default_value'))) {
+			$sword = '';
+		}
+
+		// replace plus and minus chars
+		$sword = str_replace('-', ' ', $sword);
+		$sword = str_replace('+', ' ', $sword);
+
+		// split several words
+		$swords = t3lib_div::trimExplode(' ', $sword, true);
+
+		// build words searchphrase
+		$wordsAgainst = '';
+		$scoreAgainst = '';
+
+		// build against clause for all searchwords
+		if (count($swords)) {
+			foreach ($swords as $key => $word) {
+				// ignore words under length of 4 chars
+				if (strlen($word) > 3) {
+
+					if ($this->pObj->UTF8QuirksMode) {
+						$scoreAgainst .= utf8_decode($word).' ';
+						$wordsAgainst .= '+'.utf8_decode($word).'* ';
+					}
+					else {
+						$scoreAgainst .= $word.' ';
+						$wordsAgainst .= '+'.$word.'* ';
+					}
+
+				} else {
+					unset ($swords[$key]);
+
+					// if any of the search words is below 3 characters
+					$this->showShortMessage = true;
+				}
+			}
+		}
+
+		// build tag searchphrase
+		$tagsAgainst = array();
+		if(is_array($this->piVars['filter'])) {
+			foreach($this->piVars['filter'] as $key => $tag)  {
+				if(is_array($this->piVars['filter'][$key])) {
+					foreach($this->piVars['filter'][$key] as $subkey => $subtag)  {
+						// Don't add a "+", because we are here in checkbox mode. It's a OR.
+						if(!empty($subtag)) $tagsAgainst[($key + 1)] .= ' "#'.$subtag.'#" ';
+					}
+				} else {
+					if(!empty($tag)) $tagsAgainst[0] .= ' +"#'.$tag.'#" ';
+				}
+			}
+		}
+
+		return array(
+			'sword' => $sword, // f.e. hello karl-heinz +mueller
+			'swords' => $swords, // f.e. Array: hello|karl|heinz|mueller
+			'wordsAgainst' => $wordsAgainst, // f.e. +hello* +karl* +heinz* +mueller* 
+			'tagsAgainst' => $tagsAgainst, // f.e. Array: +#category_213# +#color_123# +#city_42# 
+			'scoreAgainst' => $scoreAgainst // f.e. hello karl heinz mueller
+		);
+	}
+
+	
 	/**
 	* Use removeXSS function from t3lib_div if exists
 	* otherwise use removeXSS class included in this extension
@@ -118,21 +197,6 @@ class tx_kesearch_div {
 			require_once(t3lib_extMgm::extPath($this->extKey).'res/scripts/RemoveXSS.php');
 			return RemoveXSS::process($value);
 		}
-	}
-	
-	/**
-	 * Create MATCH AGAINST Query for tags
-	 * 
-	 * @param array $tags
-	 * @return string Query
-	 */
-	function createQueryForTags($tags) {
-		if(count($tags)) {
-			foreach($tags as $value) {
-				$where .= ' AND MATCH (tags) AGAINST (\'' . $value . '\' IN BOOLEAN MODE) '; 
-			}
-			return $where;
-		} return '';
 	}
 }
 

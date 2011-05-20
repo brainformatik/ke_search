@@ -19,6 +19,7 @@ if (TYPO3_MODE=='BE')    {
 
 // add plugin
 t3lib_extMgm::addPItoST43($_EXTKEY, 'pi1/class.tx_kesearch_pi1.php', '_pi1', 'list_type', 0);
+t3lib_extMgm::addPItoST43($_EXTKEY, 'pi2/class.tx_kesearch_pi2.php', '_pi2', 'list_type', 0);
 
 // use hooks for generation of sortdate values
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyPagesIndexEntry'][] = 'EXT:ke_search/hooks/class.user_kesearchhooks.php:user_kesearch_sortdate';

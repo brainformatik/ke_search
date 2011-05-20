@@ -1,0 +1,65 @@
+<T3DataStructure>
+	<meta>
+	    <!-- <langDisable>1</langDisable> -->
+	</meta>
+	<sheets>
+		<MAIN>
+			<ROOT>
+				<TCEforms>
+					<sheetTitle>LLL:EXT:ke_search/pi2/locallang.xml:ff.main</sheetTitle>
+				</TCEforms>
+				<type>array</type>
+				<el>
+
+					<loadFlexformsFromOtherCE>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi2/locallang.xml:ff.loadFlexformsFromOtherCE</label>
+							<config>
+								<type>group</type>
+								<internal_type>db</internal_type>
+								<allowed>tt_content</allowed>
+								<size>1</size>
+								<maxitems>1</maxitems>
+								<minitems>1</minitems>
+							</config>
+						</TCEforms>
+					</loadFlexformsFromOtherCE>
+
+					<showTags>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi2/locallang.xml:ff.showTags</label>
+							<displayCond>HIDE_FOR_NON_ADMINS</displayCond>
+							<config>
+								<type>check</type>
+								<default>0</default>
+							</config>
+						</TCEforms>
+					</showTags>
+
+					<showQuery>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi2/locallang.xml:ff.showQuery</label>
+							<displayCond>HIDE_FOR_NON_ADMINS</displayCond>
+							<config>
+								<type>check</type>
+								<default>0</default>
+							</config>
+						</TCEforms>
+					</showQuery>
+
+					<showTaggedContentOnly>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi2/locallang.xml:ff.showTaggedContentOnly</label>
+							<displayCond>HIDE_FOR_NON_ADMINS</displayCond>
+							<config>
+								<type>check</type>
+								<default>0</default>
+							</config>
+						</TCEforms>
+					</showTaggedContentOnly>
+
+				</el>
+			</ROOT>
+		</MAIN>
+	</sheets>
+</T3DataStructure>
