@@ -63,6 +63,22 @@ class tx_kesearch_indexer {
 		// get configurations
 		$configurations = $this->getConfigurations();
 		
+		/*$GLOBALS['TYPO3_DB']->sql_query('PREPARE searchStmtWithoutParams FROM "
+			SELECT uid
+			FROM tx_kesearch_index
+			WHERE pid = ?
+			AND targetpid = ?
+			AND type = ?
+		";');
+		$GLOBALS['TYPO3_DB']->sql_query('PREPARE searchStmtWithParams FROM "
+			SELECT uid
+			FROM tx_kesearch_index
+			WHERE pid = ?
+			AND targetpid = ?
+			AND type = ?
+			AND params = ?
+		";');*/
+			
 		foreach($configurations as $indexerConfig) {
 			$this->indexerConfig = $indexerConfig;
 			
@@ -81,6 +97,10 @@ class tx_kesearch_indexer {
 				}
 			}
 		}
+		
+		//$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE searchStmtWithoutParams');
+		//$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE searchStmtWithParams');
+		
 		// write ending timestamp into temp file
 		t3lib_div::unlink_tempfile($this->lockFile);
 		t3lib_div::writeFileToTypo3tempDir($this->lockFile, $startTime . time());
@@ -157,7 +177,7 @@ class tx_kesearch_indexer {
 			foreach ($errors as $error) {
 				$errorMessage .= $error.chr(10).chr(13);
 			}
-			t3lib_div::debug($errorMessage,'ERROR WHILE STORING INDEX FOR PAGE '.$targetpid.' - '.$params);
+			t3lib_div::debug($errorMessage, 'ERROR WHILE STORING INDEX FOR PAGE '.$targetpid.' - '.$params);
 		}
 
 
@@ -235,21 +255,36 @@ class tx_kesearch_indexer {
 	}
 
 
-	/*
-	 * function indexRecordExists
+	/**
+	 * try to find an allready indexed record
 	 */
 	function indexRecordExists($storagepid, $targetpid, $type, $params='') {
 		$fields = 'uid';
 		$table = 'tx_kesearch_index';
-		$where = 'pid="'.intval($storagepid).'" ';
-		$where .= 'AND targetpid="'.intval($targetpid).'" ';
-		$where .= 'AND type="'.$type.'" ';
-		if (!empty($params)) $where .= ' AND params="'.$params.'" ';
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='1');
-		while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-			return $row['uid'];
+		$where = 'pid = ' . intval($storagepid);
+		$where .= ' AND targetpid = ' . intval($targetpid);
+		$where .= ' AND type = "' . $type . '"';
+		
+		if(!empty($params)) $where .= ' AND params = "' . $params . '"';
+		
+		if(($row = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where))) {
+			return $row[0];
+		} else return false;
+		/*$GLOBALS['TYPO3_DB']->sql_query('SET @storage = ' . $storagepid);
+		$GLOBALS['TYPO3_DB']->sql_query('SET @target = ' . $targetpid);
+		$GLOBALS['TYPO3_DB']->sql_query('SET @type = "' . $type . '"');
+		$GLOBALS['TYPO3_DB']->sql_query('SET @params = "' . $params . '"');
+		if($params) {
+			$res = $GLOBALS['TYPO3_DB']->sql_query('
+				EXECUTE searchStmtWithParams USING @storage, @target, @type, @params;
+			');
+		} else {
+			$res = $GLOBALS['TYPO3_DB']->sql_query('
+				EXECUTE searchStmtWithoutParams USING @storage, @target, @type;
+			');
 		}
-		return false;
+		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+		return $row['uid'];*/
 	}
 
 
