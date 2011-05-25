@@ -52,7 +52,6 @@ class tx_kesearch_indexer_types {
 	 * @return  string
  	*/
 	function showTime() {
-		t3lib_div::devLog('index', 'index', -1, array($this->indexerConfig));
 		// calculate duration of indexing process
 		$endMicrotime = microtime(true);
 		$duration = ceil(($endMicrotime - $this->startMicrotime) * 1000);

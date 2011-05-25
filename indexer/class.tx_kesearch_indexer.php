@@ -34,6 +34,7 @@ class tx_kesearch_indexer {
 	var $counter;
 	var $extConf; // extension configuration
 	var $indexerConfig = array(); // saves the indexer configuration of current loop
+	var $lockFile = '';
 	
 	
 	/**
@@ -41,6 +42,7 @@ class tx_kesearch_indexer {
 	 */
 	public function __construct() {
 		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search']);
+		$this->lockFile = PATH_site . 'typo3temp/ke_search_indexer.lock';
 	}
 	
 	/*
@@ -51,6 +53,13 @@ class tx_kesearch_indexer {
 	 * @return string							only if param $verbose is true
 	 */
 	function startIndexing($verbose=true, $extConf, $mode='')  {
+		// write starting timestamp into temp file
+		// this is a little helper for clean up process
+		// delete all records which are older than starting timestamp in temp file
+		$startTime = time() . CHR(10);
+		t3lib_div::unlink_tempfile($this->lockFile);
+		t3lib_div::writeFileToTypo3tempDir($this->lockFile, $startTime);
+		
 		// get configurations
 		$configurations = $this->getConfigurations();
 		
@@ -72,12 +81,13 @@ class tx_kesearch_indexer {
 				}
 			}
 		}
-
+		// write ending timestamp into temp file
+		t3lib_div::unlink_tempfile($this->lockFile);
+		t3lib_div::writeFileToTypo3tempDir($this->lockFile, $startTime . time());
+				
 		// process index cleanup?
-		if ($extConf['cleanupInterval']) {
-			$content .= '<p><b>Index cleanup processed</b></p>'."\n";
-			$content .= $this->cleanUpIndex($extConf['cleanupInterval']);
-		}
+		$content .= '<p><b>Index cleanup processed</b></p>'."\n";
+		$content .= $this->cleanUpIndex();
 
 		// send notification in CLI mode
 		if ($mode == 'CLI') {
@@ -102,24 +112,30 @@ class tx_kesearch_indexer {
 
 
 	/**
-	* Delete all index elements that are older than $interval (in hours)
-	* @param	int		$interval
+	* Delete all index elements that are older than starting timestamp in temporary file
+	* 
+	* @return string content for BE
 	*/
-	function cleanUpIndex($interval) {
-
+	function cleanUpIndex() {
 		$startMicrotime = microtime(true);
-
-		$interval = time() - ($interval * 60 * 60);
+		$fileContent = t3lib_div::trimExplode(CHR(10), t3lib_div::getURL($this->lockFile));
+		if(count($fileContent) != 2) return; // There must be exactly 2 rows (start and end time)
+		foreach($fileContent as $row) {
+			if(!intval($row)) { // both rows must contain an integer value
+				return;
+			}
+		}
+		
 		$table = 'tx_kesearch_index';
-		$where = 'tstamp <= "'.$interval.'" ';
-		$GLOBALS['TYPO3_DB']->exec_DELETEquery($table,$where);
+		$where = 'tstamp < ' . $fileContent[0];
+		$GLOBALS['TYPO3_DB']->exec_DELETEquery($table, $where);
+		t3lib_div::unlink_tempfile($this->lockFile); // delete lock file from temp direcory
 
 		// calculate duration of indexing process
 		$endMicrotime = microtime(true);
 		$duration = ceil(($endMicrotime - $startMicrotime) * 1000);
-		$content .= '<p><i>Cleanup process took '.$duration.' ms.</i></p>';
+		$content .= '<p><i>Cleanup process took ' . $duration . ' ms.</i></p>';
 		return $content;
-
 	}
 
 
