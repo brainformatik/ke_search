@@ -61,11 +61,11 @@ class tx_kesearch_db {
 		// if a searchword was given, calculate percent of score
 		if(count($this->pObj->swords)) {
 			$fields .= ',
-				MATCH (content) AGAINST ("' . $this->pObj->scoreAgainst . '") AS score,
-				IFNULL(ROUND(MATCH (content) AGAINST ("' . $this->pObj->scoreAgainst . '") / maxScore * 100), 0) AS percent
+				MATCH (title, content) AGAINST ("' . $this->pObj->scoreAgainst . '") + (' . $this->pObj->extConf['multiplyValueToTitle'] . ' * MATCH (title) AGAINST ("' . $this->pObj->scoreAgainst . '")) AS score,
+				IFNULL(ROUND(MATCH (title, content) AGAINST ("' . $this->pObj->scoreAgainst . '") + (' . $this->pObj->extConf['multiplyValueToTitle'] . ' * MATCH (title) AGAINST ("' . $this->pObj->scoreAgainst . '")) / maxScore * 100), 0) AS percent
 			';
 			$table .= ',
-				(SELECT MAX(MATCH (content) AGAINST ("' . $this->pObj->scoreAgainst . '")) AS maxScore FROM ' . $this->table . ') maxScoreTable
+				(SELECT MAX(MATCH (title, content) AGAINST ("' . $this->pObj->scoreAgainst . '") + (' . $this->pObj->extConf['multiplyValueToTitle'] . ' * MATCH (title) AGAINST ("' . $this->pObj->scoreAgainst . '"))) AS maxScore FROM ' . $this->table . ') maxScoreTable
 			';
 		}
 
@@ -137,7 +137,7 @@ class tx_kesearch_db {
 			$count = $GLOBALS['TYPO3_DB']->exec_SELECTcountRows(
 				'uid',
 				'tx_kesearch_index',
-				'MATCH (content) AGAINST ("' . $searchString . '" IN BOOLEAN MODE)'
+				'MATCH (title, content) AGAINST ("' . $searchString . '" IN BOOLEAN MODE)'
 			);
 			$this->countResultsOfContent = $count;
 			$countQueries++;
@@ -161,7 +161,7 @@ class tx_kesearch_db {
 			if($this->countContentResult > $this->countTagsResult) {
 				$this->bestIndex = ' USE INDEX (tag)';
 			} else {
-				$this->bestIndex = ' USE INDEX (content)';
+				$this->bestIndex = ' USE INDEX (titlecontent)';
 			}
 		} else {
 			// MySQL chooses the best index for you, if only one part (content OR tags) are given 
@@ -196,7 +196,7 @@ class tx_kesearch_db {
 	public function getWhere() {
 		// add boolean where clause for searchwords
 		if($this->pObj->wordsAgainst != '') {
-			$where .= ' AND MATCH (content) AGAINST ("' . $this->pObj->wordsAgainst . '" IN BOOLEAN MODE) ';
+			$where .= ' AND MATCH (title, content) AGAINST ("' . $this->pObj->wordsAgainst . '" IN BOOLEAN MODE) ';
 		}
 		
 		// add boolean where clause for tags
@@ -227,7 +227,7 @@ class tx_kesearch_db {
 	protected function getOrdering() {
 		// add ordering
 		// predefine ordering. Can be overwritten.
-		$orderByField = (count($swords) || count($tagsAgainst)) ? 'score' : 'sortdate';
+		$orderByField = (count($this->pObj->swords) || count($this->pObj->tagsAgainst)) ? 'score' : 'sortdate';
 		$orderByDir = 'DESC';
 
 		// if sorting in FE is allowed
@@ -242,14 +242,14 @@ class tx_kesearch_db {
 				}
 			} else {
 				// if piVars for sorting are empty check if a sortword is given
-				if(!count($swords)) {
+				if(!count($this->pObj->swords)) {
 					// if no searchword is given, order by setting in flexform
 					$orderBy = $this->conf['sortWithoutSearchword'] ? $this->conf['sortWithoutSearchword'] : $orderByField . ' ' . $orderByDir;
 				}
 			}
 		} else { // if sorting is predefined by admin
 			// if sort by admin is set to score, we can do this only when searchwords or tags are given
-			if(($this->conf['sortByAdmin'] == 'score ASC' || $this->conf['sortByAdmin'] == 'score DESC') && (!count($swords) || !count($tagsAgainst))) {
+			if(($this->conf['sortByAdmin'] == 'score ASC' || $this->conf['sortByAdmin'] == 'score DESC') && (!count($this->pObj->swords) || !count($this->pObj->tagsAgainst))) {
 				$orderBy = '';
 			} else {
 				$orderBy = c ? $this->conf['sortByAdmin'] : $orderByField . ' ' . $orderByDir;

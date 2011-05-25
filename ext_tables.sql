@@ -76,7 +76,8 @@ CREATE TABLE tx_kesearch_index (
 	language int(11) DEFAULT '0' NOT NULL,
 
 	FULLTEXT INDEX tags (tags),
-	FULLTEXT INDEX content (content),
+	FULLTEXT INDEX title (title),
+	FULLTEXT INDEX titlecontent (title,content),
 
 	PRIMARY KEY (uid),
 	KEY parent (pid)

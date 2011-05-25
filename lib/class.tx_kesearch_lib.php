@@ -50,6 +50,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	var $firstStartingPoint = 0; // comma seperated list of startingPoints
 	var $UTF8QuirksMode     = false; // if set non utf8 values will be converted to utf8
 	var $conf               = array(); // FlexForm-Configuration
+	var $extConf            = array(); // Extension-Configuration
 	var $numberOfResults    = 0; // count search results
 	var $indexToUse         = ''; // it's for 'USE INDEX ($indexToUse)' to speed up queries
 	var $tagsInSearchResult = false; // contains all tags of current search result
@@ -110,8 +111,9 @@ class tx_kesearch_lib extends tslib_pibase {
 		$this->startingPoints = $this->div->getStartingPoint();
 
 		// get extension configuration array
-		$confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->extKey]);
-		$this->UTF8QuirksMode = $confArr['useUTF8QuirksMode'];
+		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->extKey]);
+		$this->UTF8QuirksMode = $this->extConf['useUTF8QuirksMode'];
+		$this->extConf['multiplyValueToTitle'] = ($this->extConf['multiplyValueToTitle']) ? $this->extConf['multiplyValueToTitle'] : 1;
 
 		// get html template
 		$this->templateFile = $this->conf['templateFile'] ? $this->conf['templateFile'] : t3lib_extMgm::siteRelPath($this->extKey).'res/template_pi1.tpl';
@@ -1137,6 +1139,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	protected function getSearchResults() {
 		// get search results
 		$query = $this->db->generateQueryForSearch();
+		//echo $query;die();
 		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 		
 		// get number of records
@@ -1450,13 +1453,6 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * function buildTeaserContent
 	 */
 	protected function buildTeaserContent($resultText) {
-		
-		// get position of first linebreak
-		$breakPos = strpos($resultText, "\n");
-
-		// get substring from break position
-		// now we have the title removed
-		$resultText = substr($resultText, $breakPos);
 		
 		// calculate substring params
 		// switch through all swords and use first word found for calculating

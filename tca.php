@@ -374,6 +374,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.4', 'xtypocommerce', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_4.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.5', 'tt_address', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_5.gif'),
 				),
+				'itemsProcFunc' => 'tx_kesearch_lib_items->fillIndexerConfig',
 				'size' => 1,
 				'maxitems' => 1,
 			)
