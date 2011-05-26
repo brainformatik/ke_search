@@ -661,7 +661,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		if(!is_array($this->tagsInSearchResult)) {
 
 			// build words search phrase
-			$searchWordInformation = $this->buildWordSearchphrase();
+			$searchWordInformation = $this->div->buildSearchphrase();
 			$this->sword = $searchWordInformation['sword'];
 			$this->swords = $searchWordInformation['swords'];
 			$this->wordsAgainst = $searchWordInformation['wordsAgainst'];
@@ -689,7 +689,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 			$this->tagsAgainst = $this->div->removeXSS($this->tagsAgainst);
 
-			$this->setCountResults($this->wordsAgainst, $this->tagsAgainst);
+			$this->db->chooseBestIndex($this->wordsAgainst, $this->tagsAgainst);
 
 			$fields = 'uid';
 			$table = 'tx_kesearch_index';
@@ -797,40 +797,30 @@ class tx_kesearch_lib extends tslib_pibase {
 		// Make the instance
 		$this->xajax = t3lib_div::makeInstance('tx_xajax');
 		// Decode form vars from utf8
-		#$this->xajax->decodeUTF8InputOn();
+		$this->xajax->decodeUTF8InputOn();
 		// Encoding of the response to utf-8.
-		// $this->xajax->setCharEncoding('utf-8');
-		$this->xajax->setCharEncoding('iso-8859-1');
+		$this->xajax->setCharEncoding('utf-8');
+		// $this->xajax->setCharEncoding('iso-8859-1');
 		// To prevent conflicts, prepend the extension prefix.
 		$this->xajax->setWrapperPrefix($this->prefixId);
 		// Do you want messages in the status bar?
-		// $this->xajax->statusMessagesOn();
+		$this->xajax->statusMessagesOn();
 		// Turn only on during testing
 		// $this->xajax->debugOn();
 
 		// Register the names of the PHP functions you want to be able to call through xajax
 		$this->xajax->registerFunction(array('refresh', &$this, 'refresh'));
 		if ($this->conf['renderMethod'] != 'static') {
-			$this->xajax->registerFunction(array('refreshResultsOnLoad', &$this, 'refreshResultsOnLoad'));
+			// $this->xajax->registerFunction(array('refreshResultsOnLoad', &$this, 'refreshResultsOnLoad'));
 			$this->xajax->registerFunction(array('refreshFiltersOnLoad', &$this, 'refreshFiltersOnLoad'));
 		}
 		$this->xajax->registerFunction(array('resetSearchbox', &$this, 'resetSearchbox'));
-
+		
 		// If this is an xajax request call our registered function, send output and exit
 		$this->xajax->processRequests();
 
 		// Create javacript and add it to the normal output
-		$found = false;
-		foreach ($GLOBALS['TSFE']->additionalHeaderData as $key=>$val) {
-			if (stristr($key,'xajax_')) $found = true;
-		}
-		$GLOBALS['TSFE']->additionalHeaderData['xajax_search_filters'] = $this->xajax->getJavascript( "typo3conf/ext/xajax/");
-		$GLOBALS['TSFE']->additionalHeaderData['xajax_search_filters'] .= '<script type="text/javascript">function tx_kesearch_pi1refresh(){ return xajax.call("refresh", arguments, 1);}</script>';
-		if ($this->conf['renderMethod'] != 'static') {
-			$GLOBALS['TSFE']->additionalHeaderData['xajax_search_onload'] = '<script type="text/javascript">function tx_kesearch_pi1refreshResultsOnLoad(){ return xajax.call("refreshResultsOnLoad", arguments, 1);}</script>';
-			$GLOBALS['TSFE']->additionalHeaderData['xajax_search_onload'] .= '<script type="text/javascript">function tx_kesearch_pi1refreshFiltersOnLoad(){ return xajax.call("refreshFiltersOnLoad", arguments, 1);}</script>';
-		}
-		$GLOBALS['TSFE']->additionalHeaderData['xajax_search_reset'] = '<script type="text/javascript">function tx_kesearch_pi1resetSearchbox(){ return xajax.call("resetSearchbox", arguments, 1);}</script>';
+		$GLOBALS['TSFE']->additionalHeaderData['xajax_search_filters'] = $this->xajax->getJavascript(t3lib_extMgm::siteRelPath('xajax'));
 	}
 
 
@@ -903,7 +893,11 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * @param $data
 	 */
 	public function refresh($data) {
-
+		t3lib_div::devLog('data', 'data', -1, array(
+			$filterString,
+			$this->piVars,
+			$this->conf
+		));
 		// set pivars
 		foreach($data[$this->prefixId] as $key => $value) {
 			if(is_array($data[$this->prefixId][$key])) {
@@ -926,7 +920,6 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 		}
 
-
 		// initializes plugin configuration
 		$this->init();
 		
@@ -934,7 +927,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		$this->getFilterPreselect();
 
 		// generate onload image
-		 $onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
+		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/blank.gif';
 		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" />';
 		if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
 			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
@@ -957,8 +950,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		$objResponse = new tx_xajax_response();
 
 		if(!$filterString && !$this->piVars['sword'] && $this->conf['showTextInsteadOfResults']) {
-			/*
-			$objResponse->addAssign("kesearch_results", "innerHTML", $this->pi_RTEcssText($this->conf['textForResults']));
+			/*$objResponse->addAssign("kesearch_results", "innerHTML", $this->pi_RTEcssText($this->conf['textForResults']));
 			$objResponse->addAssign("kesearch_query_time", "innerHTML", '');
 			$objResponse->addAssign("kesearch_ordering", "innerHTML", '');
 			$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", '');
@@ -1030,8 +1022,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * function refresh
 	 * @param $arg
 	 */
-	protected function refreshFiltersOnload($data) {
-
+	public function refreshFiltersOnload($data) {
 		// set pivars
 		$this->piVars = $data[$this->prefixId];
 		foreach ($this->piVars as $key => $value) {
@@ -1071,11 +1062,10 @@ class tx_kesearch_lib extends tslib_pibase {
 		$objResponse = new tx_xajax_response();
 
 		// set filters
-		$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
+		$objResponse->addAssign('kesearch_filters', 'innerHTML', $this->renderFilters() . $this->onloadImage);
 
 		// return response xml
 		return $objResponse->getXML();
-
 	}
 
 
@@ -1083,7 +1073,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * function refresh
 	 * @param $arg
 	 */
-	protected function resetSearchbox($data) {
+	public function resetSearchbox($data) {
 
 		// initializes plugin configuration
 		$this->init();
@@ -1794,34 +1784,31 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * function initOnloadImage
 	 */
 	protected function initOnloadImage() {
-
 		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
 
 		// is current page the result page?
 		$resultPage = ($GLOBALS['TSFE']->id == $this->conf['resultPage']) ? TRUE : FALSE;
 
 		switch ($this->conf['renderMethod']) {
-
 			case 'ajax_after_reload':
 				// refresh results only if we are on the defined result page
 				// do not refresh results if default text is shown (before filters and swords are sent)
 				if ($resultPage) {
-					if ($this->isEmptySearch() && $this->conf['showTextInsteadOfResults']) $this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFilters();" alt="" /> ';
-					else $this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFiltersAndResults();" alt="" /> ';
+					if ($this->isEmptySearch() && $this->conf['showTextInsteadOfResults']) {
+						$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFilters();" alt="" /> ';
+					} else {
+						$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFiltersAndResults();" alt="" /> ';
+					}
 				} else {
 					$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFilters();" alt="" /> ';
 				}
 				break;
-
 			case 'static':
 			default:
 				$this->onloadImage = '';
 				break;
-
 		}
-
 	}
-
 
 
 	/*

@@ -51,7 +51,7 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 
 		// initializes plugin configuration
 		$this->init();
-				
+
 		// init XAJAX?
 		if ($this->conf['renderMethod'] != 'static') $this->initXajax();
 

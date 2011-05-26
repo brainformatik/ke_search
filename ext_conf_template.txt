@@ -4,14 +4,17 @@ useUTF8QuirksMode = 0
 # cat=basic//20; type=options[1,2,3,4,5]; label = Multiply value to title score: If you want you can score a searchword found in a title higher than a searchword found in bodytext. Default is 1. So an entry in title is as high scored than an entry in bodytext.
 multiplyValueToTitle = 1
 
-# cat=notification//30; type=boolean; label= Indexer notification: If activated, a notification will be sent when indexing process is finished
+# cat=basic//30; type=options[,DELAYED]; label = Activate DELAYED for INSERT-Queries: With this Option you can speed up the first indexing up to 35%. All INSERT-Queries will be cached first. After that they will be inserted to DB in one run.
+useDelayedForInsert = 
+
+# cat=notification//40; type=boolean; label= Indexer notification: If activated, a notification will be sent when indexing process is finished
 finishNotification = 0
 
-# cat=notification//40; type=options [off=0,1000=1000,5000=5000,10000=10000]; label= Periodic indexer notification: If set, a notification will be sent every X indexed record if set (e.g. for debugging)
+# cat=notification//50; type=options [off=0,1000=1000,5000=5000,10000=10000]; label= Periodic indexer notification: If set, a notification will be sent every X indexed record if set (e.g. for debugging)
 periodicNotification = 0
 
-# cat=notification//50; type=string; label= Indexer notification recipient: Indexer notifications are sent to this address
+# cat=notification//60; type=string; label= Indexer notification recipient: Indexer notifications are sent to this address
 notificationRecipient =
 
-# cat=notification//60; type=string; label= Indexer notification subject: Subject of notification mails
+# cat=notification//70; type=string; label= Indexer notification subject: Subject of notification mails
 notificationSubject = [KE_SEARCH INDEXER NOTIFICATION]
