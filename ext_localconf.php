@@ -29,4 +29,11 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyDAMIndexEntry'][] = '
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyXTYPOCommerceIndexEntry'][] = 'EXT:ke_search/hooks/class.user_kesearchhooks.php:user_kesearch_sortdate';
 
 
+// add scheduler task
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_kesearch_indexertask'] = array(
+    'extension'        => $_EXTKEY,
+    'title'            => 'Indexing process for ke_search',
+    'description'      => 'This task updates the ke_search index'
+);
+
 ?>
