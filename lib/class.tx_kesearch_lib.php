@@ -893,11 +893,6 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * @param $data
 	 */
 	public function refresh($data) {
-		t3lib_div::devLog('data', 'data', -1, array(
-			$filterString,
-			$this->piVars,
-			$this->conf
-		));
 		// set pivars
 		foreach($data[$this->prefixId] as $key => $value) {
 			if(is_array($data[$this->prefixId][$key])) {
@@ -1903,6 +1898,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		if($this->conf['renderMethod'] != 'static' ) {
 			$content .= $this->cObj->getSubpart($this->templateCode, '###JS_SEARCH_NON_STATIC###');		
 		}
+
 		// include js for "ajax after page reload" mode
 		if ($this->conf['renderMethod'] == 'ajax_after_reload') {
 			$content .= $this->cObj->getSubpart($this->templateCode, '###JS_SEARCH_AJAX_RELOAD###');		

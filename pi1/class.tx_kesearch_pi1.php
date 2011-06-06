@@ -51,6 +51,7 @@ class tx_kesearch_pi1 extends tx_kesearch_lib {
 
 		// initializes plugin configuration
 		$this->init();
+		t3lib_div::devLog('conf', 'conf', -1, array($this->conf));
 		
 		// add header parts when in searchbox mode
 		$this->addHeaderParts();

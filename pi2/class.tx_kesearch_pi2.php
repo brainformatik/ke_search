@@ -94,11 +94,11 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 		}
 
 		$content = $this->cObj->getSubpart($this->templateCode, '###RESULT_LIST###');
+		$this->getSearchResults(); //TODO We have to call it again, to get the numberOfResults. Maybe it's better to change it in Template and refreshResultsOnLoad
 		
 		if($this->conf['renderMethod'] == 'ajax_after_reload') {
-			$this->getSearchResults(); //TODO We have to call it again, to get the numberOfResults. Maybe it's better to change it in Template and refreshResultsOnLoad
 			$content = $this->cObj->substituteMarker($content,'###MESSAGE###', '');
-			$content = $this->cObj->substituteMarker($content, '###NUMBER_OF_RESULTS###', $this->numberOfResults);
+			$content = $this->cObj->substituteMarker($content,'###NUMBER_OF_RESULTS###', $this->numberOfResults);
 			$content = $this->cObj->substituteMarker($content,'###ORDERING###', $this->renderOrdering());
 			$content = $this->cObj->substituteMarker($content,'###SPINNER###', $this->spinnerImageResults);
 			$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
