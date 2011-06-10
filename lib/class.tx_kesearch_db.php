@@ -181,7 +181,7 @@ class tx_kesearch_db {
 	protected function createQueryForTags($tags) {
 		if(count($tags)) {
 			foreach($tags as $value) {
-				$where .= ' AND MATCH (tags) AGAINST ("' . $value . '" IN BOOLEAN MODE) '; 
+				$where .= ' AND MATCH (tags) AGAINST (\'' . $value . '\' IN BOOLEAN MODE) '; 
 			}
 			return $where;
 		} return '';
@@ -196,7 +196,7 @@ class tx_kesearch_db {
 	public function getWhere() {
 		// add boolean where clause for searchwords
 		if($this->pObj->wordsAgainst != '') {
-			$where .= ' AND MATCH (title, content) AGAINST ("' . $this->pObj->wordsAgainst . '" IN BOOLEAN MODE) ';
+			$where .= ' AND MATCH (title, content) AGAINST (\'' . $this->pObj->wordsAgainst . '\' IN BOOLEAN MODE) ';
 		}
 		
 		// add boolean where clause for tags
@@ -225,38 +225,23 @@ class tx_kesearch_db {
 	 * @return string ordering (f.e. score DESC)
 	 */
 	protected function getOrdering() {
-		// add ordering
-		// predefine ordering. Can be overwritten.
-		$orderByField = (count($this->pObj->swords) || count($this->pObj->tagsAgainst)) ? 'score' : 'sortdate';
-		$orderByDir = 'DESC';
-
-		// if sorting in FE is allowed
-		if($this->conf['showSortInFrontend']) {
-			$tempField = strtolower(t3lib_div::removeXSS($this->pObj->piVars['orderByField']));
-			$tempDir = strtolower(t3lib_div::removeXSS($this->pObj->piVars['orderByDir']));
-			if($tempField != '' && $tempDir != '') {
-				// overwrite ordering with piVars when allowed
-				if($this->conf['sortByVisitor'] != '' && t3lib_div::inList($this->conf['sortByVisitor'], $tempField)) {
-					$orderByField = $tempField;
-					$orderByDir = $tempDir;
-				}
-			} else {
-				// if piVars for sorting are empty check if a sortword is given
-				if(!count($this->pObj->swords)) {
-					// if no searchword is given, order by setting in flexform
-					$orderBy = $this->conf['sortWithoutSearchword'] ? $this->conf['sortWithoutSearchword'] : $orderByField . ' ' . $orderByDir;
-				}
-			}
-		} else { // if sorting is predefined by admin
-			// if sort by admin is set to score, we can do this only when searchwords or tags are given
-			if(($this->conf['sortByAdmin'] == 'score ASC' || $this->conf['sortByAdmin'] == 'score DESC') && (!count($this->pObj->swords) || !count($this->pObj->tagsAgainst))) {
-				$orderBy = '';
-			} else {
-				$orderBy = c ? $this->conf['sortByAdmin'] : $orderByField . ' ' . $orderByDir;
-			}
-		}
-		if(!$orderBy) $orderBy = $orderByField . ' ' . $orderByDir;
+		$orderBy = $this->conf['sortWithoutSearchword'];
 		
+		if(!$this->pObj->isEmptySearch) {
+			// if sorting in FE is allowed
+			if($this->conf['showSortInFrontend']) {
+				$tempField = strtolower(t3lib_div::removeXSS($this->pObj->piVars['orderByField']));
+				$tempDir = strtolower(t3lib_div::removeXSS($this->pObj->piVars['orderByDir']));
+				if($tempField != '' && $tempDir != '') {
+					// overwrite ordering with piVars when allowed
+					if($this->conf['sortByVisitor'] != '' && t3lib_div::inList($this->conf['sortByVisitor'], $tempField)) {
+						$orderBy = $tempField . ' ' . $tempDir;
+					}
+				}
+			} else { // if sorting is predefined by admin
+				$orderBy = $this->conf['sortByAdmin'];
+			}				
+		}
 		return $orderBy;
 	}
 	

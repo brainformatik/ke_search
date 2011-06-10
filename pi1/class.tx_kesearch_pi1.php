@@ -51,7 +51,6 @@ class tx_kesearch_pi1 extends tx_kesearch_lib {
 
 		// initializes plugin configuration
 		$this->init();
-		t3lib_div::devLog('conf', 'conf', -1, array($this->conf));
 		
 		// add header parts when in searchbox mode
 		$this->addHeaderParts();
@@ -96,52 +95,6 @@ class tx_kesearch_pi1 extends tx_kesearch_lib {
 		$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
 
 		return $this->pi_wrapInBaseClass($content);
-	}
-
-	
-	/*
-	 * function getFilterPreselect
-	 */
-	protected function getFilterPreselect() {
-
-		// get definitions from filter records (for pages only)
-		$rootlineArray = $GLOBALS['TSFE']->sys_page->getRootLine($GLOBALS['TSFE']->id);
-		$rootlineTags = $this->getRootlineTags();
-
-		if (count($rootlineArray)) {
-			foreach ($rootlineArray as $level => $data) {
-				if (count($rootlineTags)) {
-					foreach ($rootlineTags as $tagKey => $tagData) {
-						if ($data['pid'] == $tagData['foreign_pid']) {
-							$fields = '*';
-							$table = 'tx_kesearch_filters';
-							$where = $GLOBALS['TYPO3_DB']->listQuery('options', $tagData['uid'], 'tx_kesearch_filters');
-							$where .= $this->cObj->enableFields('tx_kesearch_filters');
-							$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='1');
-							while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-								$this->preselectedFilter[$row['uid']] = $tagData['tag'];
-							}
-						}
-					}
-				}
-			}
-		}
-
-		// get definitions from plugin settings
-		if($this->conf['preselected_filters']) {
-			$preselectedArray = t3lib_div::trimExplode(',', $this->conf['preselected_filters'], true);
-			foreach ($preselectedArray as $key => $option) {
-				$fields = '*, tx_kesearch_filters.uid as filteruid';
-				$table = 'tx_kesearch_filters, tx_kesearch_filteroptions';
-				$where = $GLOBALS['TYPO3_DB']->listQuery('options', $option, 'tx_kesearch_filters');
-				$where .= ' AND tx_kesearch_filteroptions.uid = '.$option;
-				$where .= $this->cObj->enableFields('tx_kesearch_filters');
-				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
-				while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-					$this->preselectedFilter[$row['filteruid']] = $row['tag'];
-				}
-			}
-		}
 	}
 }
 

@@ -135,7 +135,7 @@ class tx_kesearch_div {
 		$scoreAgainst = '';
 
 		// build against clause for all searchwords
-		if (count($swords)) {
+		if(count($swords)) {
 			foreach ($swords as $key => $word) {
 				// ignore words under length of 4 chars
 				if (strlen($word) > 3) {
@@ -160,10 +160,10 @@ class tx_kesearch_div {
 
 		// build tag searchphrase
 		$tagsAgainst = array();
-		if(is_array($this->piVars['filter'])) {
-			foreach($this->piVars['filter'] as $key => $tag)  {
-				if(is_array($this->piVars['filter'][$key])) {
-					foreach($this->piVars['filter'][$key] as $subkey => $subtag)  {
+		if(is_array($this->pObj->piVars['filter'])) {
+			foreach($this->pObj->piVars['filter'] as $key => $tag)  {
+				if(is_array($this->pObj->piVars['filter'][$key])) {
+					foreach($this->pObj->piVars['filter'][$key] as $subkey => $subtag)  {
 						// Don't add a "+", because we are here in checkbox mode. It's a OR.
 						if(!empty($subtag)) $tagsAgainst[($key + 1)] .= ' "#'.$subtag.'#" ';
 					}
@@ -172,7 +172,7 @@ class tx_kesearch_div {
 				}
 			}
 		}
-
+		
 		return array(
 			'sword' => $sword, // f.e. hello karl-heinz +mueller
 			'swords' => $swords, // f.e. Array: hello|karl|heinz|mueller

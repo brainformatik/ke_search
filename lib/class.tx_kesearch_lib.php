@@ -42,6 +42,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	var $wordsAgainst       = ''; // searchphrase for boolean mode (+karl* +heinz*) 
 	var $tagsAgainst        = ''; // tagsphrase for boolean mode (+#category_213# +#city_42#) 
 	var $scoreAgainst       = ''; // searchphrase for score/non boolean mode (karl heinz)
+	var $isEmptySearch      = true; // true if no searchparams given; otherwise false
 	
 	var $templateFile       = ''; // Template file
 	var $templateCode       = ''; // content of template file
@@ -80,8 +81,11 @@ class tx_kesearch_lib extends tslib_pibase {
 		// get some helper functions
 		$this->div = t3lib_div::makeInstance('tx_kesearch_div', $this);
 		
+		// set start of query timer
+		if(!$GLOBALS['TSFE']->register['ke_search_queryStartTime']) $GLOBALS['TSFE']->register['ke_search_queryStartTime'] = t3lib_div::milliseconds();
+		
 		$this->moveFlexFormDataToConf();
-
+		
 		if(!empty($this->conf['loadFlexformsFromOtherCE'])) {
 			$data = $this->pi_getRecord('tt_content', intval($this->conf['loadFlexformsFromOtherCE']));
 			$this->cObj->data = $data;
@@ -98,6 +102,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// set some default values (this part have to be after stdWrap!!!)
 		if(!$this->conf['resultPage']) $this->conf['resultPage'] = $GLOBALS['TSFE']->id;
+		if(!isset($this->piVars['page'])) $this->piVars['page'] = 1;
 		
 		// hook: modifyFlexFormData
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFlexFormData'])) {
@@ -128,8 +133,10 @@ class tx_kesearch_lib extends tslib_pibase {
 		$this->swords = $searchWordInformation['swords'];
 		$this->wordsAgainst = $searchWordInformation['wordsAgainst'];
 		$this->tagsAgainst = $searchWordInformation['tagsAgainst'];
-		$this->scoreAgainst = $searchWordInformation['scoreAgainst'];		
+		$this->scoreAgainst = $searchWordInformation['scoreAgainst'];
 				
+		$this->isEmptySearch = $this->isEmptySearch();
+		
 		// precount results to find the best index
 		$this->db->chooseBestIndex($this->wordsAgainst, $this->tagsAgainst);
 	}
@@ -275,7 +282,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	protected function renderFilters() {
 
 		// get filters from db
-		$this->filters = $this->getFilters();
+		$this->filters = $this->getFiltersFromFlexform();
 
 		if (!empty($this->conf['filters'])) {
 			$filterList = explode(',', $this->conf['filters']);
@@ -556,7 +563,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 */
 	protected function renderCheckbox($filterUid, $options) {
 
-		$filters = $this->getFilters();
+		$filters = $this->getFiltersFromFlexform();
 		$allOptionsOfCurrentFilter = $this->getFilterOptions($filters[$filterUid]['options']);
 
 		$filterSubpart = '###SUB_FILTER_CHECKBOX###';
@@ -740,20 +747,19 @@ class tx_kesearch_lib extends tslib_pibase {
 	}
 
 
-	/*
-	 * function getFilters
+	/**
+	 * get all filters configured in FlexForm
+	 * 
+	 * @return array Array with filter UIDs
 	 */
-	protected function getFilters() {
-		if (!empty($this->conf['filters'])) {
+	protected function getFiltersFromFlexform() {
+		if(!empty($this->conf['filters'])) {
 			$fields = '*';
 			$table = 'tx_kesearch_filters';
-			$where = 'pid in ('.$this->startingPoints.')';
-			$where .= 'AND uid in ('.$this->conf['filters'].')';
+			$where = 'pid IN (' . $this->startingPoints . ')';
+			$where .= 'AND uid IN (' . $this->conf['filters'] . ')';
 			$where .= $this->cObj->enableFields($table);
-			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
-			while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-				$results[$row['uid']] = $row;
-			}
+			$results = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields,$table,$where,$groupBy='',$orderBy='',$limit='', 'uid');
 		}
 		return $results;
 	}
@@ -845,7 +851,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		$objResponse = new tx_xajax_response();
 
 		// show text instead of results if empty search
-		if( $this->isEmptySearch() && $this->conf['showTextInsteadOfResults']) {
+		if($this->isEmptySearch && $this->conf['showTextInsteadOfResults']) {
 			/*
 			$objResponse->addAssign("kesearch_results", "innerHTML", $this->pi_RTEcssText($this->conf['textForResults']));
 			$objResponse->addAssign("kesearch_query_time", "innerHTML", '');
@@ -857,7 +863,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			*/
 		} else {
 			// set start milliseconds for query time calculation
-			if ($this->conf['showQueryTime']) $startMS = t3lib_div::milliseconds();
+			if($this->conf['showQueryTime']) $startMS = t3lib_div::milliseconds();
 
 			// get onclick action
 			$this->initOnclickActions();
@@ -870,17 +876,16 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 
 			// set filters
-			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
+			$objResponse->addAssign('kesearch_filters', 'innerHTML', $this->renderFilters().$this->onloadImage);
 
 			// set search results
-			$objResponse->addAssign("kesearch_results", "innerHTML", $this->getSearchResults().$this->onloadImage);
+			$objResponse->addAssign('kesearch_results', 'innerHTML', $this->getSearchResults().$this->onloadImage);
 
 			// set end milliseconds for query time calculation
-			if ($this->conf['showQueryTime']) {
-				$endMS = t3lib_div::milliseconds();
+			if($this->conf['showQueryTime']) {
 				// calculate query time
-				$queryTime = $endMS - $startMS;
-				$objResponse->addAssign("kesearch_query_time", "innerHTML", sprintf($this->pi_getLL('query_time'), $queryTime));
+				$queryTime = t3lib_div::milliseconds() - $startMS;
+				$objResponse->addAssign('kesearch_query_time', 'innerHTML', sprintf($this->pi_getLL('query_time'), $queryTime));
 			}
 		}
 		// return response xml
@@ -893,6 +898,9 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * @param $data
 	 */
 	public function refresh($data) {
+		// initializes plugin configuration
+		$this->init();
+		
 		// set pivars
 		foreach($data[$this->prefixId] as $key => $value) {
 			if(is_array($data[$this->prefixId][$key])) {
@@ -915,9 +923,6 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 		}
 
-		// initializes plugin configuration
-		$this->init();
-		
 		// get preselected filter from rootline
 		$this->getFilterPreselect();
 
@@ -1018,15 +1023,15 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * @param $arg
 	 */
 	public function refreshFiltersOnload($data) {
+		// initializes plugin configuration
+		$this->init();
+		
 		// set pivars
 		$this->piVars = $data[$this->prefixId];
 		foreach ($this->piVars as $key => $value) {
 			$this->piVars[$key] = $this->div->removeXSS($value);
 		}
 
-		// initializes plugin configuration
-		$this->init();
-		
 		// get preselected filter from rootline
 		$this->getFilterPreselect();
 
@@ -1114,7 +1119,6 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// return response xml
 		return $objResponse->getXML();
-
 	}
 
 
@@ -1124,8 +1128,12 @@ class tx_kesearch_lib extends tslib_pibase {
 	protected function getSearchResults() {
 		// get search results
 		$query = $this->db->generateQueryForSearch();
-		//echo $query;die();
+		t3lib_div::devLog('db', 'db', -1, array($query));
 		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+		
+		// Calculate Querytime
+		// we have two plugin. That's why we work with register here.
+		$GLOBALS['TSFE']->register['ke_search_queryTime'] = (t3lib_div::milliseconds() - $GLOBALS['TSFE']->register['ke_search_queryStartTime']);
 		
 		// get number of records
 		$this->numberOfResults = $this->db->getAmountOfSearchResults();
@@ -1534,9 +1542,6 @@ class tx_kesearch_lib extends tslib_pibase {
 		$resultsPerPage = $this->conf['resultsPerPage'];
 		$maxPages = $this->conf['maxPagesInPagebrowser'];
 
-		// set first page if not set
-		if (!isset($this->piVars['page'])) $this->piVars['page'] = 1;
-
 		// get total number of items to show
 		if ($numberOfResults > $resultsPerPage) {
 			// show pagebrowser if there are more entries that are
@@ -1582,7 +1587,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$linkconf['addQueryString.']['exclude'] = 'id';
 				$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
 				$linkconf['additionalParams'] .= '&tx_kesearch_pi1[page]='.intval($i);
-				$filterArray = $this->getFilters();
+				$filterArray = $this->getFiltersFromFlexform();
 
 				if (is_array($this->piVars['filter'])) {
 					foreach($this->piVars['filter'] as $filterId => $data) {
@@ -1609,7 +1614,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			$linkconf['addQueryString'] = 1;
 			$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
 			$linkconf['additionalParams'] .= '&tx_kesearch_pi1[page]='.intval($previousPage);
-			$filterArray = $this->getFilters();
+			$filterArray = $this->getFiltersFromFlexform();
 
 			if (is_array($this->piVars['filter'])) {
 				foreach($this->piVars['filter'] as $filterId => $data) {
@@ -1633,7 +1638,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			$linkconf['addQueryString'] = 1;
 			$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
 			$linkconf['additionalParams'] .= '&tx_kesearch_pi1[page]='.intval($nextPage);
-			$filterArray = $this->getFilters();
+			$filterArray = $this->getFiltersFromFlexform();
 
 			if (is_array($this->piVars['filter'])) {
 				foreach($this->piVars['filter'] as $filterId => $data) {
@@ -1671,14 +1676,18 @@ class tx_kesearch_lib extends tslib_pibase {
 
 	protected function renderOrdering() {
 		// show ordering only if is set in FlexForm
-		if($this->conf['showSortInFrontend'] && $this->conf['sortByVisitor'] != '' && $this->countSearchResults) {
+		if($this->conf['showSortInFrontend'] && $this->conf['sortByVisitor'] != '' && $this->numberOfResults) {
 			$subpartArray['###ORDERNAVIGATION###'] = $this->cObj->getSubpart($this->templateCode, '###ORDERNAVIGATION###');
 			$subpartArray['###SORT_LINK###'] = $this->cObj->getSubpart($subpartArray['###ORDERNAVIGATION###'], '###SORT_LINK###');
 
 			if($this->conf['showSortInFrontend']) {
 				$orderByDir = strtolower($this->div->removeXSS($this->piVars['orderByDir']));
 				$orderByField = strtolower($this->div->removeXSS($this->piVars['orderByField']));
-				if(!$orderByField) $orderByField = 'score';
+				if(!$orderByField) {
+					$orderByField = $this->conf['sortWithoutSearchword'];
+					$orderByField = str_replace(' UP', '', $this->conf['sortWithoutSearchword']);
+					$orderByField = str_replace(' DOWN', '', $this->conf['sortWithoutSearchword']);
+				}
 				if($orderByDir != 'desc' && $orderByDir != 'asc') $orderByDir = 'desc';
 				if($orderByDir == 'desc') {
 					$orderByDir = 'asc';
@@ -1694,7 +1703,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			// loop all allowed orderings
 			foreach($orderBy as $value) {
 				// we can't sort by score if there is no sword given
-				if($this->piVars['sword'] != '' || $value != 'score') {
+				if($this->sword != '' || $value != 'score') {
 					$markerArray['###FIELDNAME###'] = $value;
 
 					// generate link for static and after reload mode
@@ -1744,24 +1753,6 @@ class tx_kesearch_lib extends tslib_pibase {
 	}
 
 
-
-	/*
-	 * function getRootlineTags
-	 */
-	protected function getRootlineTags() {
-		$fields = '*, automated_tagging as foreign_pid';
-		$table = 'tx_kesearch_filteroptions';
-		$where = 'automated_tagging <> "" ';
-		// $where = 'AND pid in () "" '; TODO
-		$where .= $this->cObj->enableFields($table);
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
-		while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-			$results[] = $row;
-		}
-		return $results;
-	}
-
-
 	/*
 	 * function renderTypeIcon
 	 * @param $type string
@@ -1789,7 +1780,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				// refresh results only if we are on the defined result page
 				// do not refresh results if default text is shown (before filters and swords are sent)
 				if ($resultPage) {
-					if ($this->isEmptySearch() && $this->conf['showTextInsteadOfResults']) {
+					if($this->isEmptySearch && $this->conf['showTextInsteadOfResults']) {
 						$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFilters();" alt="" /> ';
 					} else {
 						$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFiltersAndResults();" alt="" /> ';
@@ -1855,31 +1846,49 @@ class tx_kesearch_lib extends tslib_pibase {
 
 
 	/*
+	 * function getFilterPreselect
+	 */
+	protected function getFilterPreselect() {
+		// get definitions from plugin settings
+		if($this->conf['preselected_filters']) {
+			$preselectedArray = t3lib_div::trimExplode(',', $this->conf['preselected_filters'], true);
+			foreach ($preselectedArray as $key => $option) {
+				$fields = '*, tx_kesearch_filters.uid as filteruid';
+				$table = 'tx_kesearch_filters, tx_kesearch_filteroptions';
+				$where = $GLOBALS['TYPO3_DB']->listQuery('options', $option, 'tx_kesearch_filters');
+				$where .= ' AND tx_kesearch_filteroptions.uid = '.$option;
+				$where .= $this->cObj->enableFields('tx_kesearch_filters');
+				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
+				while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+					$this->preselectedFilter[$row['filteruid']] = $row['tag'];
+				}
+			}
+		}
+	}
+	
+	
+	/**
 	 * function isEmptySearch
 	 * checks if an empty search was loaded / submitted
 	 *
-	 * @return true if no searchparams given; otherwise false
+	 * @return boolean true if no searchparams given; otherwise false
 	 */
 	protected function isEmptySearch() {
-
-		// get searchword value
-		$searchWordValue = $this->div->removeXSS($this->piVars['sword']);
-
 		// check if searchword is emtpy or equal with default searchbox value
-		$emptySearchword = (empty($searchWordValue) || $searchWordValue == $this->pi_getLL('searchbox_default_value')) ? true : false;
+		$emptySearchword = (empty($this->sword) || $this->sword == $this->pi_getLL('searchbox_default_value')) ? true : false;
 
 		// check if filters are set
-		$this->filters = $this->getFilters();
+		$this->filters = $this->getFiltersFromFlexform();
 		$filterSet = false;
-		if (is_array($this->filters))  {
-			foreach ($this->filters as $uid => $data)  {
-				if (!empty($this->piVars['filter'][$uid])) $filterSet = true;
+		if(is_array($this->filters))  {
+			//TODO: piVars filter is a multidimensional array
+			foreach($this->filters as $uid => $data)  {
+				if(!empty($this->piVars['filter'][$uid])) $filterSet = true;
 			}
 		}
 
-		if ($emptySearchword && !$filterSet) return true;
+		if($emptySearchword && !$filterSet) return true;
 		else return false;
-
 	}
 
 

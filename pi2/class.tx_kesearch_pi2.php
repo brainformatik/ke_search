@@ -32,7 +32,7 @@ require_once(t3lib_extMgm::extPath('ke_search').'lib/class.tx_kesearch_lib.php')
  * @subpackage	tx_kesearch
  */
 class tx_kesearch_pi2 extends tx_kesearch_lib {
-	var $scriptRelPath      = 'pi1/class.tx_kesearch_pi2.php';	// Path to this script relative to the extension dir.
+	var $scriptRelPath      = 'pi1/class.tx_kesearch_pi1.php';	// Path to this script relative to the extension dir.
 	
 	/**
 	 * The main method of the PlugIn
@@ -83,7 +83,7 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 
 
 		// show text instead of results if no searchparams set and activated in ff
-		if($this->isEmptySearch() && $this->conf['showTextInsteadOfResults']) {
+		if($this->isEmptySearch && $this->conf['showTextInsteadOfResults']) {
 			$content = '<div id="textmessage">'.$this->pi_RTEcssText($this->conf['textForResults']).'</div>';
 			$content .= '<div id="kesearch_results"></div>';
 			$content .= '<div id="kesearch_updating_results"></div>';
@@ -130,39 +130,9 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 		$content = $this->cObj->substituteMarker($content, '###ORDERING###', $this->renderOrdering());
 		$content = $this->cObj->substituteMarker($content, '###SPINNER###', $this->spinnerImageResults);
 		$content = $this->cObj->substituteMarker($content, '###LOADING###', $this->pi_getLL('loading'));
-		$content = $this->cObj->substituteMarker($content, '###QUERY_TIME###', '');
+		$content = $this->cObj->substituteMarker($content, '###QUERY_TIME###', sprintf($this->pi_getLL('query_time'), $GLOBALS['TSFE']->register['ke_search_queryTime']));
 
 		return $this->pi_wrapInBaseClass($content);
-	}
-
-
-	/*
-	 * function getFilterPreselect
-	 */
-	protected function getFilterPreselect() {
-
-		// get definitions from filter records (for pages only)
-		$rootlineArray = $GLOBALS['TSFE']->sys_page->getRootLine($GLOBALS['TSFE']->id);
-		$rootlineTags = $this->getRootlineTags();
-
-		if (count($rootlineArray)) {
-			foreach ($rootlineArray as $level => $data) {
-				if (count($rootlineTags)) {
-					foreach ($rootlineTags as $tagKey => $tagData) {
-						if ($data['pid'] == $tagData['foreign_pid']) {
-							$fields = '*';
-							$table = 'tx_kesearch_filters';
-							$where = $GLOBALS['TYPO3_DB']->listQuery('options', $tagData['uid'], 'tx_kesearch_filters');
-							$where .= $this->cObj->enableFields('tx_kesearch_filters');
-							$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='1');
-							while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-								$this->preselectedFilter[$row['uid']] = $tagData['tag'];
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 }
 
