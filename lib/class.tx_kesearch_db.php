@@ -79,7 +79,8 @@ class tx_kesearch_db {
 		$limit = $this->getLimit();
 
 		// process query
-		if(count($this->pObj->swords)) {
+		//TODO Descending searching works not properly. It sorts b->a, f->c and not z->x, w->t in pagebrowser
+		/*if(count($this->pObj->swords)) {
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery(
 				$fields,
 				$table, 
@@ -89,7 +90,8 @@ class tx_kesearch_db {
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery('*', '(' . $query . ') as results', '', '', 'results.' . $orderBy, '');
 		} else {
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields, $table, $where, '', $orderBy, $limit);
-		}
+		}*/
+		$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields, $table, $where, '', $orderBy, $limit);
 		return $query;
 	}	
 	

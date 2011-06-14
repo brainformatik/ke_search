@@ -31,6 +31,11 @@
  */
 
 class user_kesearch_sortdate {
+	public function registerAdditionalFields(&$additionalFields) {
+		$newField = array('sortdate', 0);
+		$additionalFields[] = $newField;
+	}
+	
 	public function modifyPagesIndexEntry(&$title, &$pageContent, &$tags, $pageRecord, &$additionalFields) {
 		// crdate is always given, but can be overwritten
 		if(isset($pageRecord['crdate']) && $pageRecord['crdate'] > 0) {

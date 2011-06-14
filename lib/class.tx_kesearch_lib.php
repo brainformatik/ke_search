@@ -55,6 +55,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	var $numberOfResults    = 0; // count search results
 	var $indexToUse         = ''; // it's for 'USE INDEX ($indexToUse)' to speed up queries
 	var $tagsInSearchResult = false; // contains all tags of current search result
+	var $preselectedFilter  = array(); // preselected filters by flexform
 
  	/**
 	* @var tx_xajax
@@ -92,6 +93,9 @@ class tx_kesearch_lib extends tslib_pibase {
 			$this->moveFlexFormDataToConf();
 		}
 		
+		// get preselected filter from rootline
+		$this->getFilterPreselect();
+
 		// prepare database object
 		$this->db = t3lib_div::makeInstance('tx_kesearch_db', $this);
 		
@@ -111,7 +115,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$_procObj->modifyFlexFormData($this->conf, $this->cObj, $this->piVars);
 			}
 		}
-		
+
 		// set startingPoints
 		$this->startingPoints = $this->div->getStartingPoint();
 
@@ -477,7 +481,11 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * @param $arg
 	 */
 	protected function renderList($filterUid, $options) {
-
+		// onClick don't works in static mode
+		if($this->conf['renderMethod'] == 'static') {
+			return $this->renderSelect($filterUid, $options);
+		}
+		
 		$filterSubpart = '###SUB_FILTER_LIST###';
 		$optionSubpart = '###SUB_FILTER_LIST_OPTION###';
 
@@ -840,9 +848,6 @@ class tx_kesearch_lib extends tslib_pibase {
 		// initializes plugin configuration
 		$this->init();
 
-		// get preselected filter from rootline
-		$this->getFilterPreselect();
-
 		// set pivars
 		$this->piVars = $data[$this->prefixId];
 		$this->piVars['sword'] = $this->div->removeXSS($this->piVars['sword']);
@@ -922,9 +927,6 @@ class tx_kesearch_lib extends tslib_pibase {
 				}
 			}
 		}
-
-		// get preselected filter from rootline
-		$this->getFilterPreselect();
 
 		// generate onload image
 		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/blank.gif';
@@ -1031,9 +1033,6 @@ class tx_kesearch_lib extends tslib_pibase {
 		foreach ($this->piVars as $key => $value) {
 			$this->piVars[$key] = $this->div->removeXSS($value);
 		}
-
-		// get preselected filter from rootline
-		$this->getFilterPreselect();
 
 		// generate onload image
 		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';

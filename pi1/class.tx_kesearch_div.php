@@ -160,6 +160,9 @@ class tx_kesearch_div {
 
 		// build tag searchphrase
 		$tagsAgainst = array();
+		foreach($this->pObj->preselectedFilter as $value) {
+			$tagsAgainst[0] .= ' +"#' . $value . '#"';
+		}
 		if(is_array($this->pObj->piVars['filter'])) {
 			foreach($this->pObj->piVars['filter'] as $key => $tag)  {
 				if(is_array($this->pObj->piVars['filter'][$key])) {

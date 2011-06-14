@@ -52,7 +52,11 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 		// initializes plugin configuration
 		$this->init();
 
-		// init XAJAX?
+		if($this->conf['resultPage'] != $GLOBALS['TSFE']->id) {
+			$content = '<div id="textmessage">' . $this->pi_getLL('error_resultPage') . '</div>';
+			return $this->pi_wrapInBaseClass($content);			
+		}
+		
 		if ($this->conf['renderMethod'] != 'static') $this->initXajax();
 
 		// get preselected filter from rootline

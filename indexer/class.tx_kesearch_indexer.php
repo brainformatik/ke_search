@@ -72,10 +72,9 @@ class tx_kesearch_indexer {
 			}
 		}
 		
-		$fields = t3lib_div::trimExplode(',', $this->additionalFields, 1);
-		foreach($fields as $value) {
-			$addUpdateQuery .= ', ' . $value . ' = ?';
-			$addInsertQueryFields .= ', ' . $value;
+		foreach($this->additionalFields as $value) {
+			$addUpdateQuery .= ', ' . $value[0] . ' = ?';
+			$addInsertQueryFields .= ', ' . $value[0];
 			$addInsertQueryValues .= ', ?';
 		}
 		
@@ -114,7 +113,7 @@ class tx_kesearch_indexer {
 		$GLOBALS['TYPO3_DB']->sql_query('PREPARE insertStmt FROM "
 			INSERT ' . $this->extConf['useDelayedForInsert'] . ' INTO tx_kesearch_index
 			(pid, title, type, targetpid, content, tags, params, abstract, language, starttime, endtime, fe_group, tstamp, crdate' . $addInsertQueryFields . ')
-			VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?' . $addInsertQueryValues . ')
+			VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?' . $addInsertQueryValues . ', ?)
 		"');
 		
 		foreach($configurations as $indexerConfig) {
@@ -240,19 +239,29 @@ class tx_kesearch_indexer {
 			'crdate' => $now,
 		);
 
-		if (count($additionalFields)) {
+		if(count($additionalFields)) {
 			// merge arrays
 			$fields_values = array_merge($fields_values, $additionalFields);
 		}
 		foreach($fields_values as $key => $value) {
 			$fields_values[$key] = htmlspecialchars($value);
 		}
+		
+		// prepare additional fields for queries
+		foreach($this->additionalFields as $value) {
+			if($value[1]) { // $value[1] is boolean and means if value is a string
+				$setQuery .= ', @' . $value[0] . ' = "' . $fields_values[$value[0]] . '"';
+			} else {
+				$setQuery .= ', @' . $value[0] . ' = ' . $fields_values[$value[0]];
+			}
+			$addQueryFields .= ', @' . $value[0];
+		}
 
 		// check if record already exists
 		$existingRecordUid = $this->indexRecordExists($storagepid, $targetpid, $type, $params);
 		if($existingRecordUid) {
 			// update existing record
-			$where = 'uid="'.intval($existingRecordUid).'" ';
+			$where = 'uid=' . intval($existingRecordUid);
 			unset($fields_values['crdate']);
 			if ($debugOnly) { // do not process - just debug query
 				t3lib_div::debug($GLOBALS['TYPO3_DB']->UPDATEquery($table,$where,$fields_values),1);
@@ -270,14 +279,14 @@ class tx_kesearch_indexer {
 					@starttime = ' . $fields_values['starttime'] . ',
 					@endtime = ' . $fields_values['endtime'] . ',
 					@fe_group = "' . $fields_values['fe_group'] . '",
-					@tstamp = ' . $fields_values['tstamp'] . ',
+					@tstamp = ' . $fields_values['tstamp'] . $setQuery . ',
 					@uid = ' . $existingRecordUid . '
 				';
 				$GLOBALS['TYPO3_DB']->sql_query($query);
 				//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 				
 				$query = '
-					EXECUTE updateStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp, @uid;
+					EXECUTE updateStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp' . $addQueryFields . ', @uid;
 				';
 				$GLOBALS['TYPO3_DB']->sql_query($query);
 				//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
@@ -305,13 +314,13 @@ class tx_kesearch_indexer {
 					@endtime = ' . $fields_values['endtime'] . ',
 					@fe_group = "' . $fields_values['fe_group'] . '",
 					@tstamp = ' . $fields_values['tstamp'] . ',
-					@crdate = ' . $fields_values['crdate'] . '
+					@crdate = ' . $fields_values['crdate'] . $setQuery . '
 				';
 				$GLOBALS['TYPO3_DB']->sql_query($query);
 				//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 				
 				$query = '
-					EXECUTE insertStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp, @crdate;
+					EXECUTE insertStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp, @crdate' . $addQueryFields . ';
 				';
 				$GLOBALS['TYPO3_DB']->sql_query($query);
 				//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));

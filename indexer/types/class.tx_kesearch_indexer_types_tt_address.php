@@ -121,20 +121,20 @@ class tx_kesearch_indexer_types_tt_address extends tx_kesearch_indexer_types {
 
 			// store in index
 			$this->pObj->storeInIndex(
-				$this->indexerConfig['storagepid'],	 // storage PID
-				$title,                       				// page/record title
+				$this->indexerConfig['storagepid'],     // storage PID
+				$title,                                 // page/record title
 				'tt_address',              				// content type
 				$targetPID,                   			// target PID: where is the single view?
 				$fullContent,                 			// indexed content, includes the title (linebreak after title)
 				$tagContent,                 			// tags
 				$params,                      			// typolink params for singleview
 				$abstract,                    			// abstract
-				0,                            					// language uid
-				0,                            					// starttime
-				0,                            					// endtime
-				0,                            					// fe_group
-				false,                        				// debug only?
-				$additionalFields             		// additional fields added by hooks
+				0,                                      // language uid
+				0,                                      // starttime
+				0,                                      // endtime
+				0,                                      // fe_group
+				false,                                  // debug only?
+				$additionalFields                       // additional fields added by hooks
 			);
 		}
 

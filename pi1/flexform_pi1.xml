@@ -475,26 +475,6 @@
 						</TCEforms>
 					</preselected_filters>
 
-					<resetFiltersOnSubmit>
-						<TCEforms>
-							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.resetFiltersOnSubmit</label>
-							<config>
-								<type>check</type>
-								<default>1</default>
-							</config>
-						</TCEforms>
-					</resetFiltersOnSubmit>
-
-					<redirectOnFilterChange>
-						<TCEforms>
-							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.redirectOnFilterChange</label>
-							<config>
-								<type>check</type>
-								<default>0</default>
-							</config>
-						</TCEforms>
-					</redirectOnFilterChange>
-
 					<checkFilterCondition>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.checkFilterCondition</label>
@@ -508,10 +488,6 @@
 									<numIndex index="1">
 										<numIndex index="0">LLL:EXT:ke_search/pi1/locallang.xml:ff.checkFilterCondition.I.1</numIndex>
 										<numIndex index="1">single</numIndex>
-									</numIndex>
-									<numIndex index="2">
-										<numIndex index="0">LLL:EXT:ke_search/pi1/locallang.xml:ff.checkFilterCondition.I.2</numIndex>
-										<numIndex index="1">none</numIndex>
 									</numIndex>
 								</items>
 								<size>1</size>
