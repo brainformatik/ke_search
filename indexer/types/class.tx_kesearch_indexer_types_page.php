@@ -112,7 +112,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 			// if indexing of content elements with restrictions is not allowed
 			// get only pages that have empty group restrictions
 			if($this->indexerConfig['index_content_with_restrictions'] != 'yes') {
-				$where .= ' AND fe_group = "" ';
+				$where .= ' AND (fe_group = "" OR fe_group = "0" ';
 			}
 			
 			$pageList .= $this->queryGen->getTreeList($pid, 99, 0, $where);			
@@ -214,7 +214,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		// if indexing of content elements with restrictions is not allowed
 		// get only content elements that have empty group restrictions
 		if($this->indexerConfig['index_content_with_restrictions'] != 'yes') {
-			$where .= ' AND fe_group = "" ';
+			$where .= ' AND (fe_group = "" OR fe_group = "0") ';
 		}
 
 		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where);
