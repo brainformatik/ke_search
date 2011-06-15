@@ -219,25 +219,25 @@ class tx_kesearch_indexer {
 			t3lib_div::debug($errorMessage, 'ERROR WHILE STORING INDEX FOR PAGE '.$targetpid.' - '.$params);
 		}
 
-
 		$table = 'tx_kesearch_index';
 		$now = time();
 		$fields_values = array(
 			'pid' => intval($storagepid),
 			'title' => $title,
 			'type' => $type,
-			'targetpid' => $targetpid,
+			'targetpid' => intval($targetpid),
 			'content' => $content,
 			'tags' => $tags,
 			'params' => $params,
 			'abstract' => $abstract,
-			'language' => $language,
-			'starttime' => $starttime,
-			'endtime' => $endtime,
+			'language' => intval($language),
+			'starttime' => intval($starttime),
+			'endtime' => intval($endtime),
 			'fe_group' => $fe_group,
 			'tstamp' => $now,
 			'crdate' => $now,
 		);
+		t3lib_div::devLog('fields', 'fields', -1, array($fields_values));
 
 		if(count($additionalFields)) {
 			// merge arrays
@@ -252,7 +252,7 @@ class tx_kesearch_indexer {
 			if($value[1]) { // $value[1] is boolean and means if value is a string
 				$setQuery .= ', @' . $value[0] . ' = "' . $fields_values[$value[0]] . '"';
 			} else {
-				$setQuery .= ', @' . $value[0] . ' = ' . $fields_values[$value[0]];
+				$setQuery .= ', @' . $value[0] . ' = ' . intval($fields_values[$value[0]]);
 			}
 			$addQueryFields .= ', @' . $value[0];
 		}
@@ -317,13 +317,13 @@ class tx_kesearch_indexer {
 					@crdate = ' . $fields_values['crdate'] . $setQuery . '
 				';
 				$GLOBALS['TYPO3_DB']->sql_query($query);
-				//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+				t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 				
 				$query = '
 					EXECUTE insertStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp, @crdate' . $addQueryFields . ';
 				';
 				$GLOBALS['TYPO3_DB']->sql_query($query);
-				//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+				t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 								
 				// count record for periodic notification?
 				if ($this->extConf['periodicNotification']) $this->periodicNotificationCount();
