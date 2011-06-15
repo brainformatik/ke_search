@@ -237,7 +237,6 @@ class tx_kesearch_indexer {
 			'tstamp' => $now,
 			'crdate' => $now,
 		);
-		t3lib_div::devLog('fields', 'fields', -1, array($fields_values));
 
 		if(count($additionalFields)) {
 			// merge arrays
@@ -317,13 +316,13 @@ class tx_kesearch_indexer {
 					@crdate = ' . $fields_values['crdate'] . $setQuery . '
 				';
 				$GLOBALS['TYPO3_DB']->sql_query($query);
-				t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+				//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 				
 				$query = '
 					EXECUTE insertStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp, @crdate' . $addQueryFields . ';
 				';
 				$GLOBALS['TYPO3_DB']->sql_query($query);
-				t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+				//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 								
 				// count record for periodic notification?
 				if ($this->extConf['periodicNotification']) $this->periodicNotificationCount();
