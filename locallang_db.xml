@@ -7,7 +7,7 @@
 	<data type="array">
 		<languageKey index="default" type="array">
 			<label index="pages.tx_kesearch_tags">Tags for faceted search</label>
-			<label index="tt_content.list_type_pi1">Faceted search</label>
+			<label index="tt_content.list_type_pi1">Faceted search - Searchbox and Filters</label>
 			<label index="tt_content.list_type_pi2">Faceted search - Results</label>
 			<label index="tx_kesearch_filters">Filters</label>
 			<label index="tx_kesearch_filters.title">Title</label>
@@ -64,7 +64,7 @@
 		</languageKey>
 		<languageKey index="de" type="array">
 			<label index="pages.tx_kesearch_tags">Schlagworte für facettierte Suche</label>
-			<label index="tt_content.list_type_pi1">Facettierte Suche</label>
+			<label index="tt_content.list_type_pi1">Facettierte Suche - Suchbox und Filter</label>
 			<label index="tt_content.list_type_pi2">Facettierte Suche - Ergebnisliste</label>
 			<label index="tx_kesearch_filters">Filter</label>
 			<label index="tx_kesearch_filters.title">Titel</label>
