@@ -90,13 +90,12 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 						);
 					}
 				}
-				$title = '';
 
 				// ... and store them
 				$this->pObj->storeInIndex(
 					$this->indexerConfig['storagepid'],    // storage PID
 					$title,                          // page title
-					'',                       // content type
+					'tt_news',                       // content type
 					$this->indexerConfig['targetpid'],     // target PID: where is the single view?
 					$fullContent,                    // indexed content, includes the title (linebreak after title)
 					$tags,                           // tags
