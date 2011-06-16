@@ -70,6 +70,12 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 				$title = strip_tags($newsRecord['title']);
 				$abstract = strip_tags($newsRecord['short']);
 				$content = strip_tags($newsRecord['bodytext']);
+
+				// add keywords to content if not empty
+				if (!empty($newsRecord['keywords'])) {
+					$content .= "\n".$newsRecord['keywords'];
+				}
+
 				$fullContent = $abstract . "\n" . $content;
 				$params = '&tx_ttnews[tt_news]=' . $newsRecord['uid'];
 				$tags = '';
