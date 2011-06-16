@@ -36,8 +36,9 @@ class tx_kesearch_indexer {
 	var $indexerConfig = array(); // saves the indexer configuration of current loop
 	var $lockFile = '';
 	var $additionalFields = '';
-	
-	
+	var $indexingErrors = array();
+
+
 	/**
 	 * Constructor of this class
 	 */
@@ -45,7 +46,7 @@ class tx_kesearch_indexer {
 		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search']);
 		$this->lockFile = PATH_site . 'typo3temp/ke_search_indexer.lock';
 	}
-	
+
 	/*
 	 * function startIndexing
 	 * @param $verbose boolean 	if set, information about the indexing process is returned, otherwise processing is quiet
@@ -60,10 +61,10 @@ class tx_kesearch_indexer {
 		$startTime = time() . CHR(10);
 		t3lib_div::unlink_tempfile($this->lockFile);
 		t3lib_div::writeFileToTypo3tempDir($this->lockFile, $startTime);
-		
+
 		// get configurations
 		$configurations = $this->getConfigurations();
-		
+
 		// register additional fields which should be written to DB
 		if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['registerAdditionalFields'])) {
 			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['registerAdditionalFields'] as $_classRef) {
@@ -71,13 +72,13 @@ class tx_kesearch_indexer {
 				$_procObj->registerAdditionalFields($this->additionalFields);
 			}
 		}
-		
+
 		foreach($this->additionalFields as $value) {
 			$addUpdateQuery .= ', ' . $value[0] . ' = ?';
 			$addInsertQueryFields .= ', ' . $value[0];
 			$addInsertQueryValues .= ', ?';
 		}
-		
+
 		$GLOBALS['TYPO3_DB']->sql_query('PREPARE searchStmtWithoutParams FROM "
 			SELECT SQL_SMALL_RESULT uid
 			FROM tx_kesearch_index
@@ -108,17 +109,17 @@ class tx_kesearch_indexer {
 			endtime=?,
 			fe_group=?,
 			tstamp=?' . $addUpdateQuery . '
-			WHERE uid=? 
+			WHERE uid=?
 		"');
 		$GLOBALS['TYPO3_DB']->sql_query('PREPARE insertStmt FROM "
 			INSERT ' . $this->extConf['useDelayedForInsert'] . ' INTO tx_kesearch_index
 			(pid, title, type, targetpid, content, tags, params, abstract, language, starttime, endtime, fe_group, tstamp, crdate' . $addInsertQueryFields . ')
 			VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?' . $addInsertQueryValues . ', ?)
 		"');
-		
+
 		foreach($configurations as $indexerConfig) {
 			$this->indexerConfig = $indexerConfig;
-			
+
 			$path = t3lib_extMgm::extPath('ke_search').'indexer/types/class.tx_kesearch_indexer_types_' . $this->indexerConfig['type'] . '.php';
 			if(is_file($path)) {
 				require_once($path);
@@ -134,19 +135,29 @@ class tx_kesearch_indexer {
 				}
 			}
 		}
-		
+
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE searchStmtWithoutParams');
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE searchStmtWithParams');
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE updateStmt');
-		
-		
+
+
 		// write ending timestamp into temp file
 		t3lib_div::unlink_tempfile($this->lockFile);
 		t3lib_div::writeFileToTypo3tempDir($this->lockFile, $startTime . time());
-				
+
 		// process index cleanup?
-		$content .= '<p><b>Index cleanup processed</b></p>'."\n";
+		$content .= "\n".'<p><b>Index cleanup processed</b></p>'."\n";
 		$content .= $this->cleanUpIndex();
+
+
+		// print indexing errors
+		if (sizeof($this->indexingErrors)) {
+			$content .= "\n\n".'<br /><br /><br /><b>INDEXING ERRORS ('.sizeof($this->indexingErrors).')<br /><br />'."\n";
+			foreach ($this->indexingErrors as $error) {
+				$content .= $error.'<br />'."\n";
+			}
+		}
+
 
 		// send notification in CLI mode
 		if ($mode == 'CLI') {
@@ -172,7 +183,7 @@ class tx_kesearch_indexer {
 
 	/**
 	* Delete all index elements that are older than starting timestamp in temporary file
-	* 
+	*
 	* @return string content for BE
 	*/
 	function cleanUpIndex() {
@@ -184,7 +195,7 @@ class tx_kesearch_indexer {
 				return;
 			}
 		}
-		
+
 		$table = 'tx_kesearch_index';
 		$where = 'tstamp < ' . $fileContent[0];
 		$GLOBALS['TYPO3_DB']->exec_DELETEquery($table, $where);
@@ -193,7 +204,7 @@ class tx_kesearch_indexer {
 		// calculate duration of indexing process
 		$endMicrotime = microtime(true);
 		$duration = ceil(($endMicrotime - $startMicrotime) * 1000);
-		$content .= '<p><i>Cleanup process took ' . $duration . ' ms.</i></p>';
+		$content .= '<p><i>Cleanup process took ' . $duration . ' ms.</i></p>'."\n";
 		return $content;
 	}
 
@@ -206,17 +217,31 @@ class tx_kesearch_indexer {
 
 		// check for errors
 		$errors = array();
+		// no storage pid
 		if ($type != 'xtypocommerce' && empty($storagepid)) $errors[] = 'No storage PID set';
+		// no title
 		if (empty($title)) $errors[] = 'No title set';
+		// no type
 		if (empty($type)) $errors[] = 'No type set';
+		// no target pid
 		if (empty($targetpid)) $errors[] = 'No target PID set';
 
-		// stop executing if errors occured
+		// collect error messages
 		if (sizeof($errors)) {
+			$errormessage = '';
 			foreach ($errors as $error) {
-				$errorMessage .= $error.chr(10).chr(13);
+				$errormessage .= $error.', ';
 			}
-			t3lib_div::debug($errorMessage, 'ERROR WHILE STORING INDEX FOR PAGE '.$targetpid.' - '.$params);
+			$errormessage = trim($errormessage);
+			$errormessage = t3lib_div::rm_endcomma($errormessage);
+			$errormessage .= ' (';
+			if (!empty($type)) $errormessage .= 'TYPE: '.$type.'; ';
+			if (!empty($params)) $errormessage .= 'PARAMS: '.$params.'; ';
+			if (!empty($title)) $errormessage .= 'TITLE: '.$title.'; ';
+			if (!empty($targetpid)) $errormessage .= 'TARGET PID: '.$targetpid.'; ';
+			if (!empty($storagepid)) $errormessage .= 'STORAGE PID: '.$storagepid.'; ';
+			$errormessage .= ')';
+			$this->indexingErrors[] = $errormessage;
 		}
 
 		$table = 'tx_kesearch_index';
@@ -245,7 +270,7 @@ class tx_kesearch_indexer {
 		foreach($fields_values as $key => $value) {
 			$fields_values[$key] = htmlspecialchars($value);
 		}
-		
+
 		// prepare additional fields for queries
 		foreach($this->additionalFields as $value) {
 			if($value[1]) { // $value[1] is boolean and means if value is a string
@@ -283,13 +308,13 @@ class tx_kesearch_indexer {
 				';
 				$GLOBALS['TYPO3_DB']->sql_query($query);
 				//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
-				
+
 				$query = '
 					EXECUTE updateStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp' . $addQueryFields . ', @uid;
 				';
 				$GLOBALS['TYPO3_DB']->sql_query($query);
 				//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
-								
+
 				// count record for periodic notification?
 				if ($this->extConf['periodicNotification']) $this->periodicNotificationCount();
 				return true;
@@ -317,13 +342,13 @@ class tx_kesearch_indexer {
 				';
 				$GLOBALS['TYPO3_DB']->sql_query($query);
 				//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
-				
+
 				$query = '
 					EXECUTE insertStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp, @crdate' . $addQueryFields . ';
 				';
 				$GLOBALS['TYPO3_DB']->sql_query($query);
 				//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
-								
+
 				// count record for periodic notification?
 				if ($this->extConf['periodicNotification']) $this->periodicNotificationCount();
 
@@ -387,7 +412,7 @@ class tx_kesearch_indexer {
 		$where .= t3lib_befunc::deleteClause($table);
 		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where);
 	}
-	
+
 
 	/*
 	 * function setRootlineTags

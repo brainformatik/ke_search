@@ -33,18 +33,18 @@ require_once(t3lib_extMgm::extPath('ke_search').'indexer/class.tx_kesearch_index
  * @subpackage	tx_kesearch
  */
 class tx_kesearch_indexer_types_ke_yac extends tx_kesearch_indexer_types {
-	
+
 	/**
 	 * Initializes indexer for ke_yac
 	 */
 	public function __construct($pObj) {
 		parent::__construct($pObj);
 	}
-	
-	
+
+
 	/**
 	 * This function was called from indexer object and saves content to index table
-	 * 
+	 *
 	 * @return string content which will be displayed in backend
 	 */
 	public function startIndexing() {
@@ -138,7 +138,7 @@ class tx_kesearch_indexer_types_ke_yac extends tx_kesearch_indexer_types {
 			}
 		}
 
-		$content = '<p><b>Indexer "' . $this->indexerConfig['title'] . '": ' . $resCount . ' YAC records have been indexed.</b></p>';
+		$content = '<p><b>Indexer "' . $this->indexerConfig['title'] . '": ' . $resCount . ' YAC records have been indexed.</b></p>'."\n";
 		return $content;
 	}
 }
