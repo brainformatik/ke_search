@@ -1127,7 +1127,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	protected function getSearchResults() {
 		// get search results
 		$query = $this->db->generateQueryForSearch();
-		//t3lib_div::devLog('db', 'db', -1, array($query));
+		t3lib_div::devLog('db', 'db', -1, array('Query: ' . $query));
 		
 		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
 			require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');

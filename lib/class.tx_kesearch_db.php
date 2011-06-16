@@ -228,8 +228,8 @@ class tx_kesearch_db {
 	 */
 	protected function getOrdering() {
 		$orderBy = $this->conf['sortWithoutSearchword'];
-		
-		if(!$this->pObj->isEmptySearch) {
+
+		if($this->pObj->sword || $this->pObj->sword == $this->pObj->pi_getLL('searchbox_default_value')) {
 			// if sorting in FE is allowed
 			if($this->conf['showSortInFrontend']) {
 				$tempField = strtolower(t3lib_div::removeXSS($this->pObj->piVars['orderByField']));
