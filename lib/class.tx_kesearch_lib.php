@@ -1127,8 +1127,20 @@ class tx_kesearch_lib extends tslib_pibase {
 	protected function getSearchResults() {
 		// get search results
 		$query = $this->db->generateQueryForSearch();
-		t3lib_div::devLog('db', 'db', -1, array($query));
-		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+		//t3lib_div::devLog('db', 'db', -1, array($query));
+		
+		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
+			require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');
+			$sphinx = t3lib_div::makeInstance('user_kesearchpremium');
+			$res = $sphinx->getResForSearchResults($this->sword);
+			t3lib_div::devLog('res', 'res', -1, array(
+				$res,
+				$sphinx->getLastWarning(),
+				$sphinx->getLastError()
+			));
+		} else {
+			$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+		}
 		
 		// Calculate Querytime
 		// we have two plugin. That's why we work with register here.

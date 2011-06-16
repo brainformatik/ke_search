@@ -160,7 +160,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$where .= t3lib_befunc::BEenableFields('tx_kesearch_filteroptions');
 		$where .= t3lib_befunc::deleteClause('tx_kesearch_filteroptions');
 
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where);
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where, 'pages.uid', '', '');
 		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 			$this->pageRecords[$row['uid']]['tags'] = $row['tags']; 
 		}
