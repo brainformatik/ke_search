@@ -308,7 +308,6 @@ class tx_kesearch_lib extends tslib_pibase {
 
 					// loop through filteroptions
 					while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-						t3lib_div::devLog('row1', 'row1', -1, array($row));
 						// Perform overlay on each record
 						if(is_array($row) && $GLOBALS['TSFE']->sys_language_contentOL) {
 							$row = $GLOBALS['TSFE']->sys_page->getRecordOverlay(
@@ -318,7 +317,6 @@ class tx_kesearch_lib extends tslib_pibase {
 								$GLOBALS['TSFE']->sys_language_contentOL
 							);
 						}
-						t3lib_div::devLog('row2', 'row2', -1, array($row));
 						
 						// reset options count
 						$optionsCount = 0;
@@ -1159,7 +1157,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	protected function getSearchResults() {
 		// get search results
 		$query = $this->db->generateQueryForSearch();
-		t3lib_div::devLog('db', 'db', -1, array('Query: ' . $query));
+		//t3lib_div::devLog('db', 'db', -1, array('Query: ' . $query));
 		
 		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
 			require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');

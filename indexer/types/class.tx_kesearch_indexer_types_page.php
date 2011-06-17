@@ -259,8 +259,6 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 			}
 		}
 		
-		t3lib_div::devLog('pages', 'pages', -1, array($pageContent));
-
 		// store record in index table
 		foreach($pageContent as $langKey => $content) {
 			$this->pObj->storeInIndex(
