@@ -63,7 +63,7 @@ class tx_kesearch_indexer_types_dam extends tx_kesearch_indexer_types {
 		$this->catList = t3lib_div::uniqueList($this->catList);
 
 		// get dam records from categories
-		$fields = 'tx_dam.*';
+		$fields = 'DISTINCT tx_dam.*';
 		$table = 'tx_dam_mm_cat, tx_dam';
 		$where = 'uid_foreign IN ('.$this->catList.')';
 		$where .= ' AND tx_dam_mm_cat.uid_local = tx_dam.uid ';
