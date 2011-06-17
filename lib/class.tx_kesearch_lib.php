@@ -778,7 +778,19 @@ class tx_kesearch_lib extends tslib_pibase {
 			$where = 'pid IN (' . $this->startingPoints . ')';
 			$where .= 'AND uid IN (' . $this->conf['filters'] . ')';
 			$where .= $this->cObj->enableFields($table);
-			$results = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields,$table,$where,$groupBy='',$orderBy='',$limit='', 'uid');
+			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where);
+			while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+				// Perform overlay on each record
+				if(is_array($row) && $GLOBALS['TSFE']->sys_language_contentOL) {
+					$row = $GLOBALS['TSFE']->sys_page->getRecordOverlay(
+						'tx_kesearch_filters',
+						$row,
+						$GLOBALS['TSFE']->sys_language_content,
+						$GLOBALS['TSFE']->sys_language_contentOL
+					);
+				}
+				$results[$row['uid']] = $row;
+			}
 		}
 		return $results;
 	}

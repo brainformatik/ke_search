@@ -4,10 +4,41 @@ if (!defined ('TYPO3_MODE')) 	die ('Access denied.');
 $TCA['tx_kesearch_filters'] = array (
 	'ctrl' => $TCA['tx_kesearch_filters']['ctrl'],
 	'interface' => array (
-		'showRecordFieldList' => 'hidden,title,options,rendertype'
+		'showRecordFieldList' => 'sys_language_uid,l10n_parent,l10n_diffsource,hidden,title,options,rendertype'
 	),
 	'feInterface' => $TCA['tx_kesearch_filters']['feInterface'],
 	'columns' => array (
+		'sys_language_uid' => array (
+			'exclude' => 1,
+			'label'  => 'LLL:EXT:lang/locallang_general.xml:LGL.language',
+			'config' => array (
+				'type'                => 'select',
+				'foreign_table'       => 'sys_language',
+				'foreign_table_where' => 'ORDER BY sys_language.title',
+				'items' => array(
+					array('LLL:EXT:lang/locallang_general.xml:LGL.allLanguages', -1),
+					array('LLL:EXT:lang/locallang_general.xml:LGL.default_value', 0)
+				)
+			)
+		),
+		'l10n_parent' => array (
+			'displayCond' => 'FIELD:sys_language_uid:>:0',
+			'exclude'     => 1,
+			'label'       => 'LLL:EXT:lang/locallang_general.xml:LGL.l18n_parent',
+			'config'      => array (
+				'type'  => 'select',
+				'items' => array (
+					array('', 0),
+				),
+				'foreign_table'       => 'tx_kesearch_filters',
+				'foreign_table_where' => 'AND tx_kesearch_filters.pid=###CURRENT_PID### AND tx_kesearch_filters.sys_language_uid IN (-1,0)',
+			)
+		),
+		'l10n_diffsource' => array (
+			'config' => array (
+				'type' => 'passthrough'
+			)
+		),
 		'hidden' => array (
 			'exclude' => 1,
 			'label'   => 'LLL:EXT:lang/locallang_general.xml:LGL.hidden',
@@ -95,9 +126,9 @@ $TCA['tx_kesearch_filters'] = array (
 		),
 	),
 	'types' => array (
-		'select' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, options, wrap;;;;4-4-4'),
-		'list' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, expandbydefault, cssclass, options, wrap;;;;4-4-4'),
-		'checkbox' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, expandbydefault, markAllCheckboxes, cssclass, options, wrap;;;;4-4-4')
+		'select' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, options, wrap;;;;4-4-4'),
+		'list' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, expandbydefault, cssclass, options, wrap;;;;4-4-4'),
+		'checkbox' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, expandbydefault, markAllCheckboxes, cssclass, options, wrap;;;;4-4-4')
 	),
 	'palettes' => array (
 		'1' => array('showitem' => '')
