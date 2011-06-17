@@ -85,6 +85,7 @@ class tx_kesearch_indexer {
 			WHERE pid = ?
 			AND targetpid = ?
 			AND type = ?
+			AND language = ?
 		"');
 		$GLOBALS['TYPO3_DB']->sql_query('PREPARE searchStmtWithParams FROM "
 			SELECT SQL_SMALL_RESULT uid
@@ -93,6 +94,7 @@ class tx_kesearch_indexer {
 			AND targetpid = ?
 			AND type = ?
 			AND params = ?
+			AND language = ?
 		"');
 		$GLOBALS['TYPO3_DB']->sql_query('PREPARE updateStmt FROM "
 			UPDATE tx_kesearch_index
@@ -282,7 +284,7 @@ class tx_kesearch_indexer {
 		}
 
 		// check if record already exists
-		$existingRecordUid = $this->indexRecordExists($storagepid, $targetpid, $type, $params);
+		$existingRecordUid = $this->indexRecordExists($storagepid, $targetpid, $type, $params, $language);
 		if($existingRecordUid) {
 			// update existing record
 			$where = 'uid=' . intval($existingRecordUid);
@@ -379,20 +381,21 @@ class tx_kesearch_indexer {
 	 * try to find an allready indexed record
 	 * THX to PREPARE-Statements. They speed up indexing up to 50%
 	 */
-	function indexRecordExists($storagepid, $targetpid, $type, $params='') {
+	function indexRecordExists($storagepid, $targetpid, $type, $params='', $language) {
 		$GLOBALS['TYPO3_DB']->sql_query('SET
 			@storage = ' . $storagepid . ',
 			@target = ' . $targetpid . ',
 			@type = "' . $type . '",
-			@params = "' . $params . '"
+			@params = "' . $params . '",
+			@language = ' . $language . '
 		');
 		if($params) {
 			$res = $GLOBALS['TYPO3_DB']->sql_query('
-				EXECUTE searchStmtWithParams USING @storage, @target, @type, @params;
+				EXECUTE searchStmtWithParams USING @storage, @target, @type, @params, $language;
 			');
 		} else {
 			$res = $GLOBALS['TYPO3_DB']->sql_query('
-				EXECUTE searchStmtWithoutParams USING @storage, @target, @type;
+				EXECUTE searchStmtWithoutParams USING @storage, @target, @type, $language;
 			');
 		}
 		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);

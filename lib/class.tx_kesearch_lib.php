@@ -307,8 +307,19 @@ class tx_kesearch_lib extends tslib_pibase {
 					$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
 
 					// loop through filteroptions
-					while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-
+					while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+						t3lib_div::devLog('row1', 'row1', -1, array($row));
+						// Perform overlay on each record
+						if(is_array($row) && $GLOBALS['TSFE']->sys_language_contentOL) {
+							$row = $GLOBALS['TSFE']->sys_page->getRecordOverlay(
+								'tx_kesearch_filteroptions',
+								$row,
+								$GLOBALS['TSFE']->sys_language_content,
+								$GLOBALS['TSFE']->sys_language_contentOL
+							);
+						}
+						t3lib_div::devLog('row2', 'row2', -1, array($row));
+						
 						// reset options count
 						$optionsCount = 0;
 
@@ -793,6 +804,15 @@ class tx_kesearch_lib extends tslib_pibase {
 			'', '', ''
 		);
 		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+			// Perform overlay on each record
+			if(is_array($row) && $GLOBALS['TSFE']->sys_language_contentOL) {
+				$row = $GLOBALS['TSFE']->sys_page->getRecordOverlay(
+					'tx_kesearch_filteroptions',
+					$row,
+					$GLOBALS['TSFE']->sys_language_content,
+					$GLOBALS['TSFE']->sys_language_contentOL
+				);
+			}
 			$optionArray[] = $row;
 		}
 

@@ -204,7 +204,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		// language id = pages_language_overlay.sys_language_uid
 
 		// get content elements for this page
-		$fields = 'header, bodytext, CType';
+		$fields = 'header, bodytext, CType, sys_language_uid';
 		$table = 'tt_content';
 		$where = 'pid = ' . intval($uid);
 		$where .= ' AND (' . $this->whereClauseForCType. ')';
@@ -221,7 +221,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		if(count($rows)) {
 			foreach($rows as $row) {
 				// header
-				$pageContent .= strip_tags($row['header']) . "\n";
+				$pageContent[$row['sys_language_uid']] .= strip_tags($row['header']) . "\n";
 
 				// bodytext
 				$bodytext = $row['bodytext'];
@@ -235,7 +235,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 				}
 				$bodytext = strip_tags($bodytext);
 
-				$pageContent .= $bodytext."\n";
+				$pageContent[$row['sys_language_uid']] .= $bodytext."\n";
 			}
 			$this->counter++;
 		} else {
@@ -258,24 +258,28 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 				);
 			}
 		}
+		
+		t3lib_div::devLog('pages', 'pages', -1, array($pageContent));
 
 		// store record in index table
-		$this->pObj->storeInIndex(
-			$this->indexerConfig['storagepid'],    // storage PID
-			$this->pageRecords[$uid]['title'],     // page title
-			'page',                                // content type
-			$uid,                                  // target PID: where is the single view?
-			$pageContent,                          // indexed content, includes the title (linebreak after title)
-			$tags,                                 // tags
-			'',                                    // typolink params for singleview
-			'',                                    // abstract
-			0,                                     // language uid
-			$this->pageRecords[$uid]['starttime'], // starttime
-			$this->pageRecords[$uid]['endtime'],   // endtime
-			$this->pageRecords[$uid]['fe_group'],  // fe_group
-			false,                                 // debug only?
-			$additionalFields                      // additional fields added by hooks
-		);
+		foreach($pageContent as $langKey => $content) {
+			$this->pObj->storeInIndex(
+				$this->indexerConfig['storagepid'],    // storage PID
+				$this->pageRecords[$uid]['title'],     // page title
+				'page',                                // content type
+				$uid,                                  // target PID: where is the single view?
+				$content,                          // indexed content, includes the title (linebreak after title)
+				$tags,                                 // tags
+				'',                                    // typolink params for singleview
+				'',                                    // abstract
+				$langKey,                              // language uid
+				$this->pageRecords[$uid]['starttime'], // starttime
+				$this->pageRecords[$uid]['endtime'],   // endtime
+				$this->pageRecords[$uid]['fe_group'],  // fe_group
+				false,                                 // debug only?
+				$additionalFields                      // additional fields added by hooks
+			);			
+		}
 
 		return;
 	}

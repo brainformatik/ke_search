@@ -209,6 +209,10 @@ class tx_kesearch_db {
 		// restrict to storage page
 		$where .= ' AND pid in (' . $this->pObj->startingPoints . ') ';
 
+		// add language
+		$lang = intval($GLOBALS['TSFE']->sys_language_uid);
+		$where .= ' AND language = ' . $lang . ' ';
+
 		// add "tagged content only" searchphrase
 		if($this->conf['showTaggedContentOnly']) {
 			$where .= ' AND tags <> ""';

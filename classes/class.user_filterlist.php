@@ -95,6 +95,7 @@ class user_filterlist {
 		$where .= t3lib_befunc::deleteClause($table,$inv=0);
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
 		$anz = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
+		t3lib_div::devLog('user', 'user', -1, array($GLOBALS['BE_USER']));
 		while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 
 			if (!empty($row['options'])) {
@@ -104,14 +105,12 @@ class user_filterlist {
 				$where2 .= t3lib_befunc::BEenableFields($table2);
 				$where2 .= t3lib_befunc::deleteClause($table2);
 				$res2 = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields2,$table2,$where2);
-				while ($row2=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res2)) {
+				while($row2 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res2)) {
 					$config['items'][] = array($row['title'].': '.$row2['title'], $row2['uid']);
 				}
 			}
-
 		}
 	}
-
 
 
 	function getListOfAvailableFilteroptionsForFlexforms(&$config) {

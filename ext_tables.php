@@ -80,19 +80,21 @@ $TCA['tx_kesearch_filters'] = array (
 
 $TCA['tx_kesearch_filteroptions'] = array (
 	'ctrl' => array (
-		'title'     => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filteroptions',
-		'label'     => 'title',
-		'tstamp'    => 'tstamp',
-		'crdate'    => 'crdate',
-		'cruser_id' => 'cruser_id',
-		// 'default_sortby' => 'ORDER BY sorting',
-		'sortby'    => 'sorting',
-		'delete' => 'deleted',
-		'enablecolumns' => array (
+		'title'                    => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filteroptions',
+		'label'                    => 'title',
+		'tstamp'                   => 'tstamp',
+		'crdate'                   => 'crdate',
+		'cruser_id'                => 'cruser_id',
+		'languageField'            => 'sys_language_uid',    
+        'transOrigPointerField'    => 'l10n_parent',    
+        'transOrigDiffSourceField' => 'l10n_diffsource',  
+		'sortby'                   => 'sorting',
+		'delete'                   => 'deleted',
+		'enablecolumns'            => array (
 			'disabled' => 'hidden',
 		),
-		'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY).'tca.php',
-		'iconfile'          => t3lib_extMgm::extRelPath($_EXTKEY).'icon_tx_kesearch_filteroptions.gif',
+		'dynamicConfigFile'        => t3lib_extMgm::extPath($_EXTKEY).'tca.php',
+		'iconfile'                 => t3lib_extMgm::extRelPath($_EXTKEY).'icon_tx_kesearch_filteroptions.gif',
 	),
 );
 
