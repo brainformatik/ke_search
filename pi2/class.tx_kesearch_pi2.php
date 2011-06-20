@@ -33,7 +33,7 @@ require_once(t3lib_extMgm::extPath('ke_search').'lib/class.tx_kesearch_lib.php')
  */
 class tx_kesearch_pi2 extends tx_kesearch_lib {
 	var $scriptRelPath      = 'pi1/class.tx_kesearch_pi1.php';	// Path to this script relative to the extension dir.
-	
+
 	/**
 	 * The main method of the PlugIn
 	 *
@@ -54,9 +54,9 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 
 		if($this->conf['resultPage'] != $GLOBALS['TSFE']->id) {
 			$content = '<div id="textmessage">' . $this->pi_getLL('error_resultPage') . '</div>';
-			return $this->pi_wrapInBaseClass($content);			
+			return $this->pi_wrapInBaseClass($content);
 		}
-		
+
 		if ($this->conf['renderMethod'] != 'static') $this->initXajax();
 
 		// get preselected filter from rootline
@@ -99,7 +99,7 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 
 		$content = $this->cObj->getSubpart($this->templateCode, '###RESULT_LIST###');
 		$this->getSearchResults(); //TODO We have to call it again, to get the numberOfResults. Maybe it's better to change it in Template and refreshResultsOnLoad
-		
+
 		if($this->conf['renderMethod'] == 'ajax_after_reload') {
 			$content = $this->cObj->substituteMarker($content,'###MESSAGE###', '');
 			$content = $this->cObj->substituteMarker($content,'###NUMBER_OF_RESULTS###', $this->numberOfResults);
@@ -111,7 +111,7 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 			$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###', '');
 			return $this->pi_wrapInBaseClass($content);
 		}
-		
+
 		// render pagebrowser
 		if ($GLOBALS['TSFE']->id == $this->conf['resultPage']) {
 			if ($this->conf['pagebrowserOnTop'] || $this->conf['pagebrowserAtBottom']) {
@@ -141,7 +141,7 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 }
 
 
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/pi1/class.tx_kesearch_pi1.php'])	{
-	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/pi1/class.tx_kesearch_pi1.php']);
+if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/pi2/class.tx_kesearch_pi2.php'])	{
+	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/pi2/class.tx_kesearch_pi2.php']);
 }
 ?>
