@@ -1177,7 +1177,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			$queryForShinx = '';
 			if($this->wordsAgainst) $queryForShinx .= ' @(title,content) ' . $this->wordsAgainst;
 			if($this->tagsAgainst) $queryForShinx .= ' @(tags) ' . $this->tagsAgainst;
-			$res = $sphinx->getResForSearchResults($queryForShinx);
+			$res = $sphinx->getResForSearchResults($queryForShinx, '*', $this->db->getOrdering());
 			// get number of records
 			$this->numberOfResults = $sphinx->getTotalFound();		
 		} else {
