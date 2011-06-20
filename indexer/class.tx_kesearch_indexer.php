@@ -391,11 +391,11 @@ class tx_kesearch_indexer {
 		');
 		if($params) {
 			$res = $GLOBALS['TYPO3_DB']->sql_query('
-				EXECUTE searchStmtWithParams USING @storage, @target, @type, @params, $language;
+				EXECUTE searchStmtWithParams USING @storage, @target, @type, @params, @language;
 			');
 		} else {
 			$res = $GLOBALS['TYPO3_DB']->sql_query('
-				EXECUTE searchStmtWithoutParams USING @storage, @target, @type, $language;
+				EXECUTE searchStmtWithoutParams USING @storage, @target, @type, @language;
 			');
 		}
 		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);

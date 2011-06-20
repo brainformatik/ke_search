@@ -230,7 +230,7 @@ class tx_kesearch_db {
 	 * 
 	 * @return string ordering (f.e. score DESC)
 	 */
-	protected function getOrdering() {
+	public function getOrdering() {
 		$orderBy = $this->conf['sortWithoutSearchword'];
 
 		if($this->pObj->sword || $this->pObj->sword == $this->pObj->pi_getLL('searchbox_default_value')) {

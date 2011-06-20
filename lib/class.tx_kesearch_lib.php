@@ -683,7 +683,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// get all tags of current searchresult
 		if(!is_array($this->tagsInSearchResult)) {
-
+			$start = t3lib_div::milliseconds();
 			// build words search phrase
 			$searchWordInformation = $this->div->buildSearchphrase();
 			$this->sword = $searchWordInformation['sword'];
@@ -741,13 +741,13 @@ class tx_kesearch_lib extends tslib_pibase {
 				'','',''
 			);
 			
-			if(t3lib_extMgm::isLoaded('ke_search_premium')) {
+			if(t3lib_extMgm::isLoaded('ke_search_premium') && !$this->isEmptySearch) {
 				require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');
 				$sphinx = t3lib_div::makeInstance('user_kesearchpremium');
 				$queryForShinx = '';
 				if($this->wordsAgainst) $queryForShinx .= ' @(title,content) ' . $this->wordsAgainst;
 				if($this->tagsAgainst) $queryForShinx .= ' @(tags) ' . $this->tagsAgainst;
-				$res = $sphinx->getResForSearchResults($this->wordsAgainst);
+				$res = $sphinx->getResForSearchResults($queryForShinx);
 			} else {
 				$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 			}
@@ -764,6 +764,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$tagArray[$val] = true;
 			}
 			$this->tagsInSearchResult = array_keys($tagArray);
+			t3lib_div::devLog('time', 'time', -1, array(t3lib_div::milliseconds()-$start));
 		}
 
 		if(array_search('#' . $tag . '#', $this->tagsInSearchResult) === false) {
@@ -1164,6 +1165,9 @@ class tx_kesearch_lib extends tslib_pibase {
 		if(t3lib_extMgm::isLoaded('ke_search_premium') && !$this->isEmptySearch) {
 			require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');
 			$sphinx = t3lib_div::makeInstance('user_kesearchpremium');
+			
+			// set ordering
+			$sphinx->setSorting($this->db->getOrdering());
 			
 			// set limit
 			$limit = $this->db->getLimit();
