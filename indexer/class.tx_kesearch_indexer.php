@@ -269,9 +269,7 @@ class tx_kesearch_indexer {
 			// merge arrays
 			$fields_values = array_merge($fields_values, $additionalFields);
 		}
-		foreach($fields_values as $key => $value) {
-			$fields_values[$key] = htmlspecialchars($value);
-		}
+		
 
 		// prepare additional fields for queries
 		foreach($this->additionalFields as $value) {
