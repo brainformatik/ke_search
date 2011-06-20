@@ -744,12 +744,10 @@ class tx_kesearch_lib extends tslib_pibase {
 			if(t3lib_extMgm::isLoaded('ke_search_premium')) {
 				require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');
 				$sphinx = t3lib_div::makeInstance('user_kesearchpremium');
+				$queryForShinx = '';
+				if($this->wordsAgainst) $queryForShinx .= ' @(title,content) ' . $this->wordsAgainst;
+				if($this->tagsAgainst) $queryForShinx .= ' @(tags) ' . $this->tagsAgainst;
 				$res = $sphinx->getResForSearchResults($this->wordsAgainst);
-				t3lib_div::devLog('res', 'res', -1, array(
-					$res,
-					$sphinx->getLastWarning(),
-					$sphinx->getLastError()
-				));
 			} else {
 				$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 			}
@@ -1161,15 +1159,21 @@ class tx_kesearch_lib extends tslib_pibase {
 		$query = $this->db->generateQueryForSearch();
 		//t3lib_div::devLog('db', 'db', -1, array('Query: ' . $query));
 		
-		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
+		// use sphinx mode only when a searchstring is given.
+		// TODO: Sphinx has problems to show results when no query is given
+		if(t3lib_extMgm::isLoaded('ke_search_premium') && !$this->isEmptySearch) {
 			require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');
 			$sphinx = t3lib_div::makeInstance('user_kesearchpremium');
-			$res = $sphinx->getResForSearchResults($this->sword);
-			t3lib_div::devLog('res', 'res', -1, array(
-				$res,
-				$sphinx->getLastWarning(),
-				$sphinx->getLastError()
-			));
+			
+			// set limit
+			$limit = $this->db->getLimit();
+			$sphinx->setLimit($limit[0], $limit[1]);
+			
+			// generate query
+			$queryForShinx = '';
+			if($this->wordsAgainst) $queryForShinx .= ' @(title,content) ' . $this->wordsAgainst;
+			if($this->tagsAgainst) $queryForShinx .= ' @(tags) ' . $this->tagsAgainst;
+			$res = $sphinx->getResForSearchResults($queryForShinx);
 			// get number of records
 			$this->numberOfResults = $sphinx->getTotalFound();		
 		} else {
@@ -1966,7 +1970,8 @@ class tx_kesearch_lib extends tslib_pibase {
 		// define some additional markers
 		$markerArray['###SITE_REL_PATH###'] = t3lib_extMgm::siteRelPath($this->extKey); 
 		$markerArray['###TARGET_URL###'] = $targetUrl;
-		$markerArray['###PREFIX_ID###'] = $this->prefixId; 
+		$markerArray['###PREFIX_ID###'] = $this->prefixId;
+		$markerArray['###SEARCHBOX_DEFAULT_VALUE###'] = $this->pi_getLL('searchbox_default_value'); 
 		
 		$content = $this->cObj->substituteMarkerArray($content, $markerArray);
 		

@@ -91,7 +91,7 @@ class tx_kesearch_db {
 		} else {
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields, $table, $where, '', $orderBy, $limit);
 		}*/
-		$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields, $table, $where, '', $orderBy, $limit);
+		$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields, $table, $where, '', $orderBy, $limit[0] . ',' . $limit[1]);
 		return $query;
 	}	
 	
@@ -254,16 +254,15 @@ class tx_kesearch_db {
 	/**
 	 * get limit for where query
 	 */
-	protected function getLimit() {
-		$limit = 10;
+	public function getLimit() {
+		$limit = $this->conf['resultsPerPage'] ? $this->conf['resultsPerPage'] : 10; 
 
 		if($this->pObj->piVars['page']) {
-			$start = ($this->pObj->piVars['page'] * $this->conf['resultsPerPage']) - $this->conf['resultsPerPage'];
+			$start = ($this->pObj->piVars['page'] * $limit) - $limit;
 			if($start < 0) $start = 0;
-			$limit = $start . ', ' . $this->conf['resultsPerPage'];
 		}
 		
-		return $limit;
+		return array($start, $limit);
 	}
 }
 ?>
