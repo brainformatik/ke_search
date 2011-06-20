@@ -261,7 +261,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		$resetUrl = $this->cObj->typoLink_URL($linkconf);
 		$resetLink = '<a href="'.$resetUrl.'" class="resetButton"><span>'.$this->pi_getLL('reset_button').'</span></a>';
 
-		$this->initOnloadImage;
+		$this->initOnloadImage();
 
 		$content = $this->cObj->substituteMarker($content,'###ONLOAD_IMAGE###', $this->onloadImage);
 
@@ -898,7 +898,6 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// show text instead of results if empty search
 		if($this->isEmptySearch && $this->conf['showTextInsteadOfResults']) {
-			/*
 			$objResponse->addAssign("kesearch_results", "innerHTML", $this->pi_RTEcssText($this->conf['textForResults']));
 			$objResponse->addAssign("kesearch_query_time", "innerHTML", '');
 			$objResponse->addAssign("kesearch_ordering", "innerHTML", '');
@@ -906,7 +905,6 @@ class tx_kesearch_lib extends tslib_pibase {
 			$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", '');
 			$objResponse->addAssign("kesearch_updating_results", "innerHTML", '');
 			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
-			*/
 		} else {
 			// get onclick action
 			$this->initOnclickActions();
@@ -988,14 +986,13 @@ class tx_kesearch_lib extends tslib_pibase {
 		$objResponse = new tx_xajax_response();
 
 		if(!$filterString && !$this->piVars['sword'] && $this->conf['showTextInsteadOfResults']) {
-			/*$objResponse->addAssign("kesearch_results", "innerHTML", $this->pi_RTEcssText($this->conf['textForResults']));
+			$objResponse->addAssign("kesearch_results", "innerHTML", $this->pi_RTEcssText($this->conf['textForResults']));
 			$objResponse->addAssign("kesearch_query_time", "innerHTML", '');
 			$objResponse->addAssign("kesearch_ordering", "innerHTML", '');
 			$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", '');
 			$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", '');
 			$objResponse->addAssign("kesearch_updating_results", "innerHTML", '');
 			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
-			*/
 		} else {
 			// set search results
 			// process if on result page
