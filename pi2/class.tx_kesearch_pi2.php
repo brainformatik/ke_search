@@ -85,19 +85,27 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 			}
 		}
 
-
+		$content = $this->cObj->getSubpart($this->templateCode, '###RESULT_LIST###');
+		
 		// show text instead of results if no searchparams set and activated in ff
 		if($this->isEmptySearch && $this->conf['showTextInsteadOfResults']) {
-			$content = '<div id="textmessage">'.$this->pi_RTEcssText($this->conf['textForResults']).'</div>';
+			/*$content = '<div id="textmessage">'.$this->pi_RTEcssText($this->conf['textForResults']).'</div>';
 			$content .= '<div id="kesearch_results"></div>';
 			$content .= '<div id="kesearch_updating_results"></div>';
 			$content .= '<div id="kesearch_pagebrowser_top"></div>';
 			$content .= '<div id="kesearch_pagebrowser_bottom"></div>';
-			$content .= '<div id="kesearch_query_time"></div>';
+			$content .= '<div id="kesearch_query_time"></div>';*/
+			$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $this->pi_RTEcssText($this->conf['textForResults']));
+			$content = $this->cObj->substituteMarker($content,'###NUMBER_OF_RESULTS###', '');
+			$content = $this->cObj->substituteMarker($content,'###ORDERING###', '');
+			$content = $this->cObj->substituteMarker($content,'###SPINNER###', '');
+			$content = $this->cObj->substituteMarker($content,'###LOADING###', '');
+			$content = $this->cObj->substituteMarker($content,'###QUERY_TIME###', '');
+			$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', '');
+			$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###', '');
 			return $content;
 		}
 
-		$content = $this->cObj->getSubpart($this->templateCode, '###RESULT_LIST###');
 		$this->getSearchResults(); //TODO We have to call it again, to get the numberOfResults. Maybe it's better to change it in Template and refreshResultsOnLoad
 
 		if($this->conf['renderMethod'] == 'ajax_after_reload') {
