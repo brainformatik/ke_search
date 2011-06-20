@@ -93,7 +93,7 @@ class tx_kesearch_pi1 extends tx_kesearch_lib {
 		$content = $this->getSearchboxContent();
 		$content = $this->cObj->substituteMarker($content,'###SPINNER###',$this->spinnerImageFilters);
 		$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
-
+		
 		return $this->pi_wrapInBaseClass($content);
 	}
 }

@@ -679,7 +679,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	/*
 	 * function checkIfFilterMatchesRecords
 	 */
-	protected function checkIfTagMatchesRecords($tag, $mode='multi', $filterId) {
+	public function checkIfTagMatchesRecords($tag, $mode='multi', $filterId) {
 
 		// get all tags of current searchresult
 		if(!is_array($this->tagsInSearchResult)) {
@@ -723,7 +723,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$where .= ' AND MATCH (tags) AGAINST (\''.$this->tagsAgainst.'\' IN BOOLEAN MODE) ';
 				$countMatches++;
 			}
-			if (count($this->swords)) {
+			if(count($this->swords)) {
 				$where .= ' AND MATCH (content) AGAINST (\''.$this->wordsAgainst.'\' IN BOOLEAN MODE) ';
 				$countMatches++;
 			}
@@ -740,7 +740,19 @@ class tx_kesearch_lib extends tslib_pibase {
 				$where,
 				'','',''
 			);
-			$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+			
+			if(t3lib_extMgm::isLoaded('ke_search_premium')) {
+				require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');
+				$sphinx = t3lib_div::makeInstance('user_kesearchpremium');
+				$res = $sphinx->getResForSearchResults($this->wordsAgainst);
+				t3lib_div::devLog('res', 'res', -1, array(
+					$res,
+					$sphinx->getLastWarning(),
+					$sphinx->getLastError()
+				));
+			} else {
+				$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+			}
 
 			while($tags = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 				foreach(explode('~~~', $tags['tags']) as $value) {
@@ -897,9 +909,6 @@ class tx_kesearch_lib extends tslib_pibase {
 			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
 			*/
 		} else {
-			// set start milliseconds for query time calculation
-			if($this->conf['showQueryTime']) $startMS = t3lib_div::milliseconds();
-
 			// get onclick action
 			$this->initOnclickActions();
 
@@ -918,9 +927,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			// set end milliseconds for query time calculation
 			if($this->conf['showQueryTime']) {
-				// calculate query time
-				$queryTime = t3lib_div::milliseconds() - $startMS;
-				$objResponse->addAssign('kesearch_query_time', 'innerHTML', sprintf($this->pi_getLL('query_time'), $queryTime));
+				$objResponse->addAssign('kesearch_query_time', 'innerHTML', sprintf($this->pi_getLL('query_time'), $GLOBALS['TSFE']->register['ke_search_queryTime']));
 			}
 		}
 		// return response xml
@@ -993,9 +1000,10 @@ class tx_kesearch_lib extends tslib_pibase {
 		} else {
 			// set search results
 			// process if on result page
+			$start = t3lib_div::milliseconds();
 			if ($GLOBALS['TSFE']->id == $this->conf['resultPage']) {
-				$objResponse->addAssign("kesearch_results", "innerHTML", $this->getSearchResults());
-				$objResponse->addAssign("kesearch_ordering", "innerHTML", $this->renderOrdering());
+				$objResponse->addAssign('kesearch_results', 'innerHTML', $this->getSearchResults());
+				$objResponse->addAssign('kesearch_ordering', 'innerHTML', $this->renderOrdering());
 			}
 
 			// set pagebrowser
@@ -1004,29 +1012,23 @@ class tx_kesearch_lib extends tslib_pibase {
 					$pagebrowserContent = $this->renderPagebrowser();
 				}
 				if ($this->conf['pagebrowserOnTop']) {
-					$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", $pagebrowserContent);
+					$objResponse->addAssign('kesearch_pagebrowser_top', 'innerHTML', $pagebrowserContent);
 				} else {
-					$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", '');
+					$objResponse->addAssign('kesearch_pagebrowser_top', 'innerHTML', '');
 				}
 				if ($this->conf['pagebrowserAtBottom']) {
-					$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", $pagebrowserContent);
+					$objResponse->addAssign('kesearch_pagebrowser_bottom', 'innerHTML', $pagebrowserContent);
 				} else {
-					$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", '');
+					$objResponse->addAssign('kesearch_pagebrowser_bottom', 'innerHTML', '');
 				}
 			}
 
-			// set start milliseconds for query time calculation
-			if ($this->conf['showQueryTime']) $startMS = t3lib_div::milliseconds();
-
 			// set filters
-			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
+			$objResponse->addAssign('kesearch_filters', 'innerHTML', $this->renderFilters().$this->onloadImage);
 
 			// set end milliseconds for query time calculation
 			if ($this->conf['showQueryTime']) {
-				$endMS = t3lib_div::milliseconds();
-				// calculate query time
-				$queryTime = $endMS - $startMS;
-				$objResponse->addAssign("kesearch_query_time", "innerHTML", sprintf($this->pi_getLL('query_time'), $queryTime));
+				$objResponse->addAssign('kesearch_query_time', 'innerHTML', sprintf($this->pi_getLL('query_time'), $GLOBALS['TSFE']->register['ke_search_queryTime']));
 			}
 
 			// Show error message
@@ -1168,16 +1170,17 @@ class tx_kesearch_lib extends tslib_pibase {
 				$sphinx->getLastWarning(),
 				$sphinx->getLastError()
 			));
+			// get number of records
+			$this->numberOfResults = $sphinx->getTotalFound();		
 		} else {
 			$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+			// get number of records
+			$this->numberOfResults = $this->db->getAmountOfSearchResults();		
 		}
 		
 		// Calculate Querytime
 		// we have two plugin. That's why we work with register here.
 		$GLOBALS['TSFE']->register['ke_search_queryTime'] = (t3lib_div::milliseconds() - $GLOBALS['TSFE']->register['ke_search_queryStartTime']);
-		
-		// get number of records
-		$this->numberOfResults = $this->db->getAmountOfSearchResults();
 		
 		// count searchword with ke_stats
 		$this->countSearchWordWithKeStats($this->sword);
