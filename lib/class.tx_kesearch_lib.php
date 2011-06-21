@@ -865,69 +865,15 @@ class tx_kesearch_lib extends tslib_pibase {
 		// Register the names of the PHP functions you want to be able to call through xajax
 		$this->xajax->registerFunction(array('refresh', &$this, 'refresh'));
 		if ($this->conf['renderMethod'] != 'static') {
-			// $this->xajax->registerFunction(array('refreshResultsOnLoad', &$this, 'refreshResultsOnLoad'));
 			$this->xajax->registerFunction(array('refreshFiltersOnLoad', &$this, 'refreshFiltersOnLoad'));
 		}
-		$this->xajax->registerFunction(array('resetSearchbox', &$this, 'resetSearchbox'));
+		// $this->xajax->registerFunction(array('resetSearchbox', &$this, 'resetSearchbox'));
 
 		// If this is an xajax request call our registered function, send output and exit
 		$this->xajax->processRequests();
 
 		// Create javacript and add it to the normal output
 		$GLOBALS['TSFE']->additionalHeaderData['xajax_search_filters'] = $this->xajax->getJavascript(t3lib_extMgm::siteRelPath('xajax'));
-	}
-
-
-	/**
-	* Description
-	*
-	* @param	type		desc
-	* @return	The content that is displayed on the website
-	*/
-	protected function refreshResultsOnLoad($data) {
-		// initializes plugin configuration
-		$this->init();
-
-		// set pivars
-		$this->piVars = $data[$this->prefixId];
-		$this->piVars['sword'] = $this->div->removeXSS($this->piVars['sword']);
-
-		// make xajax response object
-		$objResponse = new tx_xajax_response();
-
-		// show text instead of results if empty search
-		if($this->isEmptySearch && $this->conf['showTextInsteadOfResults']) {
-			$objResponse->addAssign("kesearch_results", "innerHTML", $this->pi_RTEcssText($this->conf['textForResults']));
-			$objResponse->addAssign("kesearch_query_time", "innerHTML", '');
-			$objResponse->addAssign("kesearch_ordering", "innerHTML", '');
-			$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", '');
-			$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", '');
-			$objResponse->addAssign("kesearch_updating_results", "innerHTML", '');
-			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
-		} else {
-			// get onclick action
-			$this->initOnclickActions();
-
-			// generate onload image
-			$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
-			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" /> ';
-			if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
-				$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
-			}
-
-			// set filters
-			$objResponse->addAssign('kesearch_filters', 'innerHTML', $this->renderFilters().$this->onloadImage);
-
-			// set search results
-			$objResponse->addAssign('kesearch_results', 'innerHTML', $this->getSearchResults().$this->onloadImage);
-
-			// set end milliseconds for query time calculation
-			if($this->conf['showQueryTime']) {
-				$objResponse->addAssign('kesearch_query_time', 'innerHTML', sprintf($this->pi_getLL('query_time'), $GLOBALS['TSFE']->register['ke_search_queryTime']));
-			}
-		}
-		// return response xml
-		return $objResponse->getXML();
 	}
 
 	/**
@@ -961,12 +907,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 		}
 
-		// generate onload image
-		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/blank.gif';
-		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" />';
-		if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
-			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
-		}
+
 
 		// init javascript onclick actions
 		$this->initOnclickActions();
@@ -991,7 +932,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", '');
 			$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", '');
 			$objResponse->addAssign("kesearch_updating_results", "innerHTML", '');
-			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
+			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters());
 		} else {
 			// set search results
 			// process if on result page
@@ -1019,7 +960,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 
 			// set filters
-			$objResponse->addAssign('kesearch_filters', 'innerHTML', $this->renderFilters().$this->onloadImage);
+			$objResponse->addAssign('kesearch_filters', 'innerHTML', $this->renderFilters());
 
 			// set end milliseconds for query time calculation
 			if ($this->conf['showQueryTime']) {
@@ -1061,13 +1002,6 @@ class tx_kesearch_lib extends tslib_pibase {
 			$this->piVars[$key] = $this->div->removeXSS($value);
 		}
 
-		// generate onload image
-		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
-		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" />';
-		if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
-			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
-		}
-
 		// init javascript onclick actions
 		$this->initOnclickActions();
 
@@ -1087,8 +1021,15 @@ class tx_kesearch_lib extends tslib_pibase {
 		// make xajax response object
 		$objResponse = new tx_xajax_response();
 
+		// generate onload image
+		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
+		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" />';
+		if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
+			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
+		}
+
 		// set filters
-		$objResponse->addAssign('kesearch_filters', 'innerHTML', $this->renderFilters() . $this->onloadImage);
+		$objResponse->addAssign('kesearch_filters', 'innerHTML', $this->renderFilters().$this->onloadImage );
 
 		// return response xml
 		return $objResponse->getXML();
@@ -1104,18 +1045,10 @@ class tx_kesearch_lib extends tslib_pibase {
 		// initializes plugin configuration
 		$this->init();
 
-		// generate onload image
-		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
-		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" /> ';
-		if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
-			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
-		}
-
 		$this->piVars = $data[$this->prefixId];
 		foreach ($this->piVars as $key => $value) {
 			$this->piVars[$key] = $this->div->removeXSS($value);
 		}
-
 
 		// onclick javascript actions
 		$this->initOnclickActions();
@@ -1141,7 +1074,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		$objResponse = new tx_xajax_response();
 
 		// set filters
-		$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters().$this->onloadImage);
+		$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters());
 
 		// return response xml
 		return $objResponse->getXML();
@@ -1228,8 +1161,6 @@ class tx_kesearch_lib extends tslib_pibase {
 				$content .= '<br />'.$query.'<br />';
 			}
 
-			// add onload image
-			$content .= $this->onloadImage;
 			return $content;
 		}
 
@@ -1433,7 +1364,12 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 		}
 
-		// add onload image
+		// generate and add onload image
+		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/blank.gif';
+		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" />';
+		if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
+			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
+		}
 		$content .= $this->onloadImage;
 
 		if ($this->UTF8QuirksMode) return utf8_encode($content);
