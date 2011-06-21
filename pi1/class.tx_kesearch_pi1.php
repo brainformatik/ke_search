@@ -33,7 +33,7 @@ require_once(t3lib_extMgm::extPath('ke_search').'lib/class.tx_kesearch_lib.php')
  */
 class tx_kesearch_pi1 extends tx_kesearch_lib {
 	var $scriptRelPath      = 'pi1/class.tx_kesearch_pi1.php';	// Path to this script relative to the extension dir.
-	
+
 	/**
 	 * The main method of the PlugIn
 	 *
@@ -51,10 +51,10 @@ class tx_kesearch_pi1 extends tx_kesearch_lib {
 
 		// initializes plugin configuration
 		$this->init();
-		
+
 		// add header parts when in searchbox mode
 		$this->addHeaderParts();
-		
+
 		// init XAJAX?
 		if ($this->conf['renderMethod'] != 'static') $this->initXajax();
 
@@ -93,9 +93,10 @@ class tx_kesearch_pi1 extends tx_kesearch_lib {
 		$content = $this->getSearchboxContent();
 		$content = $this->cObj->substituteMarker($content,'###SPINNER###',$this->spinnerImageFilters);
 		$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
-		
+
 		return $this->pi_wrapInBaseClass($content);
 	}
+	
 }
 
 

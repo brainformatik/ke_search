@@ -35,7 +35,7 @@ class tx_kesearch_db {
 	var $countResultsOfTags = 0;
 	var $countResultsOfContent = 0;
 	var $table = 'tx_kesearch_index';
-	
+
 	/**
 	 * Contains the parent object
 	 * @var tx_kesearch_pi1
@@ -46,7 +46,7 @@ class tx_kesearch_db {
 	 * @var tslib_cObj
 	 */
 	var $cObj;
-	
+
 	public function __construct($pObj) {
 		$this->pObj = $pObj;
 		$this->cObj = $this->pObj->cObj;
@@ -57,7 +57,7 @@ class tx_kesearch_db {
 		$fields = '*';
 		$table = $this->table . $this->bestIndex;
 		$where = '1=1';
-		
+
 		// if a searchword was given, calculate percent of score
 		if(count($this->pObj->swords)) {
 			$fields .= ',
@@ -83,7 +83,7 @@ class tx_kesearch_db {
 		/*if(count($this->pObj->swords)) {
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery(
 				$fields,
-				$table, 
+				$table,
 				$where,
 				'', '', $limit
 			);
@@ -93,39 +93,39 @@ class tx_kesearch_db {
 		}*/
 		$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields, $table, $where, '', $orderBy, $limit[0] . ',' . $limit[1]);
 		return $query;
-	}	
-	
+	}
+
 	/**
 	 * Counts the search results
 	 * It's better to make an additional query than working with SQL_CALC_FOUND_ROWS. Further we don't have to lock tables.
-	 * 
+	 *
 	 * @return integer Amount of SearchResults
 	 */
 	public function getAmountOfSearchResults() {
 		// Execute query only if we haven't count the results before
 		if(!$this->pObj->numberOfResults) {
 			$where = '1=1';
-	
+
 			// add where clause
 			$where .= $this->getWhere();
-	
+
 			// never add something like ORDER BY, GROUP BY or limit to this query!!!
 			// never insert something others like '*' to field part
 			$this->pObj->numberOfResults = $GLOBALS['TYPO3_DB']->exec_SELECTcountRows(
 				'*',
-				$this->table . $this->bestIndex, 
+				$this->table . $this->bestIndex,
 				$where
 			);
 		}
-		
+
 		return $this->pObj->numberOfResults;
-	}	
-	
+	}
+
 
 	/**
 	 * This function is useful to decide which index to use
 	 * In case of the individual amount of results (content and tags) another index can be much faster
-	 * 
+	 *
 	 * Never add ORDER BY, LIMIT or some additional MATCH-parts to this queries, because this slows down the query time.
 	 *
 	 * @param string $searchString
@@ -133,7 +133,7 @@ class tx_kesearch_db {
 	 */
 	public function chooseBestIndex($searchString = '', $tags) {
 		$countQueries = 0;
-		
+
 		// Count results only if it is the first run and a searchword is given
 		if(!$this->countResultsOfContent && $searchString != '') {
 			$count = $GLOBALS['TYPO3_DB']->exec_SELECTcountRows(
@@ -166,7 +166,7 @@ class tx_kesearch_db {
 				$this->bestIndex = ' USE INDEX (titlecontent)';
 			}
 		} else {
-			// MySQL chooses the best index for you, if only one part (content OR tags) are given 
+			// MySQL chooses the best index for you, if only one part (content OR tags) are given
 			// With this configuration we speed up our results from 7 sec. to 2 sec. with over 50.000 records
 			$this->bestIndex = '';
 		}
@@ -176,23 +176,23 @@ class tx_kesearch_db {
 	/**
 	 * In checkbox mode we have to create for each checkbox one MATCH-AGAINST-Construct
 	 * So this function returns the complete WHERE-Clause for each tag
-	 * 
+	 *
 	 * @param array $tags
 	 * @return string Query
 	 */
 	protected function createQueryForTags($tags) {
 		if(count($tags)) {
 			foreach($tags as $value) {
-				$where .= ' AND MATCH (tags) AGAINST (\'' . $value . '\' IN BOOLEAN MODE) '; 
+				$where .= ' AND MATCH (tags) AGAINST (\'' . $value . '\' IN BOOLEAN MODE) ';
 			}
 			return $where;
 		} return '';
 	}
-	
-	
+
+
 	/**
 	 * get where clause for search results
-	 * 
+	 *
 	 * @return string where clause
 	 */
 	public function getWhere() {
@@ -200,7 +200,7 @@ class tx_kesearch_db {
 		if($this->pObj->wordsAgainst != '') {
 			$where .= ' AND MATCH (title, content) AGAINST (\'' . $this->pObj->wordsAgainst . '\' IN BOOLEAN MODE) ';
 		}
-		
+
 		// add boolean where clause for tags
 		if(($tagWhere = $this->createQueryForTags($this->pObj->tagsAgainst))) {
 			$where .= $tagWhere;
@@ -220,14 +220,14 @@ class tx_kesearch_db {
 
 		// add enable fields
 		$where .= $this->cObj->enableFields($this->table);
-		
+
 		return $where;
 	}
-	
-	
+
+
 	/**
 	 * get ordering for where query
-	 * 
+	 *
 	 * @return string ordering (f.e. score DESC)
 	 */
 	public function getOrdering() {
@@ -246,22 +246,22 @@ class tx_kesearch_db {
 				}
 			} else { // if sorting is predefined by admin
 				$orderBy = $this->conf['sortByAdmin'];
-			}				
+			}
 		}
 		return $orderBy;
 	}
-	
+
 	/**
 	 * get limit for where query
 	 */
 	public function getLimit() {
-		$limit = $this->conf['resultsPerPage'] ? $this->conf['resultsPerPage'] : 10; 
+		$limit = $this->conf['resultsPerPage'] ? $this->conf['resultsPerPage'] : 10;
 
 		if($this->pObj->piVars['page']) {
 			$start = ($this->pObj->piVars['page'] * $limit) - $limit;
 			if($start < 0) $start = 0;
 		}
-		
+
 		return array($start, $limit);
 	}
 }

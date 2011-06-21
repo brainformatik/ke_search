@@ -269,7 +269,7 @@ class tx_kesearch_indexer {
 			// merge arrays
 			$fields_values = array_merge($fields_values, $additionalFields);
 		}
-		
+
 
 		// prepare additional fields for queries
 		foreach($this->additionalFields as $value) {
@@ -399,6 +399,7 @@ class tx_kesearch_indexer {
 		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 		return $row['uid'];
 	}
+	
 
 
 	/**

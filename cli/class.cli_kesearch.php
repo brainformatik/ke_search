@@ -86,9 +86,7 @@ class tx_kesearch_cli extends t3lib_cli {
 				$response = strip_tags($response);
 				$this->cli_echo($response.chr(10).chr(10));
 				break;
-
 		}
-
 
     }
 

@@ -30,15 +30,16 @@
  * @package	TYPO3
  * @subpackage	tx_kesearch
  */
+
 class tx_kesearch_indexer_types {
 	var $startMicrotime = 0;
 	var $indexerConfig = array(); // current indexer configuration
-	
+
 	/**
 	 * @var tx_kesearch_indexer
 	 */
 	var $pObj;
-	
+
 	public function __construct($pObj) {
 		$this->startMicrotime = microtime(true);
 		$this->pObj = $pObj;
@@ -47,7 +48,7 @@ class tx_kesearch_indexer_types {
 
 	/**
 	 * shows time used
-	 * 
+	 *
 	 * @author  Christian Buelter <buelter@kennziffer.com>
 	 * @return  string
  	*/

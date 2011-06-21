@@ -22,6 +22,7 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
+
 /**
  * Plugin 'Faceted search' for the 'ke_search' extension.
  *

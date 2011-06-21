@@ -22,6 +22,7 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
+
 /**
  * Plugin 'Faceted search - searchbox and filters' for the 'ke_search' extension.
  *
@@ -31,7 +32,7 @@
  */
 class tx_kesearch_div {
 	var $showShortMessage = false;
-	
+
 	/**
 	 * Contains the parent object
 	 * @var tx_kesearch_pi1
@@ -106,7 +107,7 @@ class tx_kesearch_div {
 		}
 	}
 
-	
+
 	/**
  	* Build search strings for SQL Query from piVars
  	*
@@ -175,17 +176,17 @@ class tx_kesearch_div {
 				}
 			}
 		}
-		
+
 		return array(
 			'sword' => $sword, // f.e. hello karl-heinz +mueller
 			'swords' => $swords, // f.e. Array: hello|karl|heinz|mueller
-			'wordsAgainst' => $wordsAgainst, // f.e. +hello* +karl* +heinz* +mueller* 
-			'tagsAgainst' => $tagsAgainst, // f.e. Array: +#category_213# +#color_123# +#city_42# 
+			'wordsAgainst' => $wordsAgainst, // f.e. +hello* +karl* +heinz* +mueller*
+			'tagsAgainst' => $tagsAgainst, // f.e. Array: +#category_213# +#color_123# +#city_42#
 			'scoreAgainst' => $scoreAgainst // f.e. hello karl heinz mueller
 		);
 	}
 
-	
+
 	/**
 	* Use removeXSS function from t3lib_div if exists
 	* otherwise use removeXSS class included in this extension

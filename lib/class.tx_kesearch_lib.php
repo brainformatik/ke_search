@@ -39,14 +39,14 @@ class tx_kesearch_lib extends tslib_pibase {
 
 	var $sword              = ''; // cleaned searchword (karl-heinz => karl heinz)
 	var $swords             = ''; // searchwords as array
-	var $wordsAgainst       = ''; // searchphrase for boolean mode (+karl* +heinz*) 
-	var $tagsAgainst        = ''; // tagsphrase for boolean mode (+#category_213# +#city_42#) 
+	var $wordsAgainst       = ''; // searchphrase for boolean mode (+karl* +heinz*)
+	var $tagsAgainst        = ''; // tagsphrase for boolean mode (+#category_213# +#city_42#)
 	var $scoreAgainst       = ''; // searchphrase for score/non boolean mode (karl heinz)
 	var $isEmptySearch      = true; // true if no searchparams given; otherwise false
-	
+
 	var $templateFile       = ''; // Template file
 	var $templateCode       = ''; // content of template file
-	
+
 	var $startingPoints     = 0; // comma seperated list of startingPoints
 	var $firstStartingPoint = 0; // comma seperated list of startingPoints
 	var $UTF8QuirksMode     = false; // if set non utf8 values will be converted to utf8
@@ -75,30 +75,30 @@ class tx_kesearch_lib extends tslib_pibase {
 
 	/**
 	 * Initializes flexform, conf vars and some more
-	 * 
+	 *
 	 * @return nothing
 	 */
 	protected function init() {
 		// get some helper functions
 		$this->div = t3lib_div::makeInstance('tx_kesearch_div', $this);
-		
+
 		// set start of query timer
 		if(!$GLOBALS['TSFE']->register['ke_search_queryStartTime']) $GLOBALS['TSFE']->register['ke_search_queryStartTime'] = t3lib_div::milliseconds();
-		
+
 		$this->moveFlexFormDataToConf();
-		
+
 		if(!empty($this->conf['loadFlexformsFromOtherCE'])) {
 			$data = $this->pi_getRecord('tt_content', intval($this->conf['loadFlexformsFromOtherCE']));
 			$this->cObj->data = $data;
 			$this->moveFlexFormDataToConf();
 		}
-		
+
 		// get preselected filter from rootline
 		$this->getFilterPreselect();
 
 		// prepare database object
 		$this->db = t3lib_div::makeInstance('tx_kesearch_db', $this);
-		
+
 		// add stdWrap properties to each config value
 		foreach($this->conf as $key => $value) {
 			$this->conf[$key] = $this->cObj->stdWrap($value, $this->conf[$key . '.']);
@@ -107,7 +107,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		// set some default values (this part have to be after stdWrap!!!)
 		if(!$this->conf['resultPage']) $this->conf['resultPage'] = $GLOBALS['TSFE']->id;
 		if(!isset($this->piVars['page'])) $this->piVars['page'] = 1;
-		
+
 		// hook: modifyFlexFormData
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFlexFormData'])) {
 			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFlexFormData'] as $_classRef) {
@@ -130,7 +130,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// get first startingpoint
 		$this->firstStartingPoint = $this->div->getFirstStartingPoint($this->startingPoints);
-		
+
 		// build words searchphrase
 		$searchWordInformation = $this->div->buildSearchphrase();
 		$this->sword = $searchWordInformation['sword'];
@@ -138,13 +138,13 @@ class tx_kesearch_lib extends tslib_pibase {
 		$this->wordsAgainst = $searchWordInformation['wordsAgainst'];
 		$this->tagsAgainst = $searchWordInformation['tagsAgainst'];
 		$this->scoreAgainst = $searchWordInformation['scoreAgainst'];
-				
+
 		$this->isEmptySearch = $this->isEmptySearch();
-		
+
 		// precount results to find the best index
 		$this->db->chooseBestIndex($this->wordsAgainst, $this->tagsAgainst);
 	}
-	
+
 
 	/**
 	 * Move all FlexForm data of current record to conf array
@@ -152,7 +152,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	protected function moveFlexFormDataToConf() {
 		// don't move this to init
 		$this->pi_initPIflexForm();
-		
+
 		$piFlexForm = $this->cObj->data['pi_flexform'];
 		if(is_array($piFlexForm['data'])) {
 			foreach($piFlexForm['data'] as $sheetKey => $sheet) {
@@ -199,7 +199,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// get main template code
 		$content = $this->cObj->getSubpart($this->templateCode,'###SEARCHBOX_STATIC###');
-		
+
 		// set page = 1 if not set yet
 		if (!$this->piVars['page']) $this->piVars['page'] = 1;
 		$content = $this->cObj->substituteMarker($content,'###HIDDEN_PAGE_VALUE###',$this->piVars['page']);
@@ -232,7 +232,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// get filters
 		$content = $this->cObj->substituteMarker($content, '###FILTER###', $this->renderFilters());
-		
+
 		// set form action pid
 		$content = $this->cObj->substituteMarker($content,'###FORM_TARGET_PID###', $this->conf['resultPage']);
 		// set form action
@@ -317,7 +317,7 @@ class tx_kesearch_lib extends tslib_pibase {
 								$GLOBALS['TSFE']->sys_language_contentOL
 							);
 						}
-						
+
 						// reset options count
 						$optionsCount = 0;
 
@@ -494,7 +494,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		if($this->conf['renderMethod'] == 'static') {
 			return $this->renderSelect($filterUid, $options);
 		}
-		
+
 		$filterSubpart = '###SUB_FILTER_LIST###';
 		$optionSubpart = '###SUB_FILTER_LIST_OPTION###';
 
@@ -609,7 +609,7 @@ class tx_kesearch_lib extends tslib_pibase {
 					$checkBoxParams['selected'] = ($this->piVars['filter'][$filterUid][$key]) ? 'checked="checked"' : '';
 					if(!is_array($this->piVars['filter'][$filterUid]) && $this->filters[$filterUid]['markAllCheckboxes']) {
 						$checkBoxParams['selected'] = 'checked="checked"';
-					}				
+					}
 					$checkBoxParams['disabled'] = '';
 				} else {
 					$checkBoxParams['disabled'] = 'disabled="disabled"';
@@ -728,7 +728,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$countMatches++;
 			}
 			$where .= $this->cObj->enableFields($table);
-			
+
 			// which index to use
 			if($countMatches == 2) {
 				$index = ' USE INDEX (' . $this->indexToUse . ')';
@@ -740,7 +740,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$where,
 				'','',''
 			);
-			
+
 			if(t3lib_extMgm::isLoaded('ke_search_premium') && !$this->isEmptySearch) {
 				require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');
 				$sphinx = t3lib_div::makeInstance('user_kesearchpremium');
@@ -777,7 +777,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 	/**
 	 * get all filters configured in FlexForm
-	 * 
+	 *
 	 * @return array Array with filter UIDs
 	 */
 	protected function getFiltersFromFlexform() {
@@ -870,7 +870,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			$this->xajax->registerFunction(array('refreshFiltersOnLoad', &$this, 'refreshFiltersOnLoad'));
 		}
 		$this->xajax->registerFunction(array('resetSearchbox', &$this, 'resetSearchbox'));
-		
+
 		// If this is an xajax request call our registered function, send output and exit
 		$this->xajax->processRequests();
 
@@ -933,13 +933,13 @@ class tx_kesearch_lib extends tslib_pibase {
 
 	/**
 	 * This function will be called from AJAX directly, so this must be public
-	 * 
+	 *
 	 * @param $data
 	 */
 	public function refresh($data) {
 		// initializes plugin configuration
 		$this->init();
-		
+
 		// set pivars
 		foreach($data[$this->prefixId] as $key => $value) {
 			if(is_array($data[$this->prefixId][$key])) {
@@ -1055,7 +1055,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	public function refreshFiltersOnload($data) {
 		// initializes plugin configuration
 		$this->init();
-		
+
 		// set pivars
 		$this->piVars = $data[$this->prefixId];
 		foreach ($this->piVars as $key => $value) {
@@ -1104,7 +1104,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// initializes plugin configuration
 		$this->init();
-		
+
 		// generate onload image
 		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
 		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" /> ';
@@ -1156,37 +1156,37 @@ class tx_kesearch_lib extends tslib_pibase {
 		// get search results
 		$query = $this->db->generateQueryForSearch();
 		//t3lib_div::devLog('db', 'db', -1, array('Query: ' . $query));
-		
+
 		// use sphinx mode only when a searchstring is given.
 		// TODO: Sphinx has problems to show results when no query is given
 		if(t3lib_extMgm::isLoaded('ke_search_premium') && !$this->isEmptySearch) {
 			require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');
 			$sphinx = t3lib_div::makeInstance('user_kesearchpremium');
-			
+
 			// set ordering
 			$sphinx->setSorting($this->db->getOrdering());
-			
+
 			// set limit
 			$limit = $this->db->getLimit();
 			$sphinx->setLimit($limit[0], $limit[1]);
-			
+
 			// generate query
 			$queryForShinx = '';
 			if($this->wordsAgainst) $queryForShinx .= ' @(title,content) ' . $this->wordsAgainst;
 			if($this->tagsAgainst) $queryForShinx .= ' @(tags) ' . $this->tagsAgainst;
 			$res = $sphinx->getResForSearchResults($queryForShinx);
 			// get number of records
-			$this->numberOfResults = $sphinx->getTotalFound();		
+			$this->numberOfResults = $sphinx->getTotalFound();
 		} else {
 			$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 			// get number of records
-			$this->numberOfResults = $this->db->getAmountOfSearchResults();		
+			$this->numberOfResults = $this->db->getAmountOfSearchResults();
 		}
-		
+
 		// Calculate Querytime
 		// we have two plugin. That's why we work with register here.
 		$GLOBALS['TSFE']->register['ke_search_queryTime'] = (t3lib_div::milliseconds() - $GLOBALS['TSFE']->register['ke_search_queryStartTime']);
-		
+
 		// count searchword with ke_stats
 		$this->countSearchWordWithKeStats($this->sword);
 
@@ -1442,6 +1442,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	}
 
 
+
 	/**
  	* Counts searchword and -phrase if ke_stats is installed
  	*
@@ -1495,7 +1496,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * function buildTeaserContent
 	 */
 	protected function buildTeaserContent($resultText) {
-		
+
 		// calculate substring params
 		// switch through all swords and use first word found for calculating
 		$resultPos = 0;
@@ -1511,7 +1512,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		$startPos = $resultPos - (ceil($this->conf['resultChars'] / 2));
 		if($startPos < 0) $startPos = 0;
 		$teaser = substr($resultText, $startPos);
-		
+
 		// crop til whitespace reached
 		$cropped = false;
 		if ($startPos != 0 && $teaser[0] != " " ) {
@@ -1523,11 +1524,11 @@ class tx_kesearch_lib extends tslib_pibase {
 				$cropped = true;
 			}
 		}
-		
+
 		// append dots when cropped
 		if ($startPos > 0) $teaser = '...' . $teaser;
 		$teaser = $this->betterSubstr($teaser, $this->conf['resultChars']);
-		
+
 		// highlight hits?
 		if ($this->conf['highlightSword'] && count($this->swords)) {
 			foreach ($this->swords as $word) {
@@ -1539,7 +1540,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		return $teaser;
 	}
 
-	
+
 	/**
 	 * Fetches configuration value given its name.
 	 * Merges flexform and TS configuration values.
@@ -1553,8 +1554,8 @@ class tx_kesearch_lib extends tslib_pibase {
 		);
 		return $value ? $value : $this->conf[$param];
 	}
-	
-	
+
+
 	/*
 	 * function betterSubstr
 	 *
@@ -1914,8 +1915,8 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * function isEmptySearch
 	 * checks if an empty search was loaded / submitted
@@ -1954,33 +1955,33 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		$content = $this->cObj->getSubpart($this->templateCode, '###JS_SEARCH_ALL###');
 		if($this->conf['renderMethod'] != 'static' ) {
-			$content .= $this->cObj->getSubpart($this->templateCode, '###JS_SEARCH_NON_STATIC###');		
+			$content .= $this->cObj->getSubpart($this->templateCode, '###JS_SEARCH_NON_STATIC###');
 		}
 
 		// include js for "ajax after page reload" mode
 		if ($this->conf['renderMethod'] == 'ajax_after_reload') {
-			$content .= $this->cObj->getSubpart($this->templateCode, '###JS_SEARCH_AJAX_RELOAD###');		
+			$content .= $this->cObj->getSubpart($this->templateCode, '###JS_SEARCH_AJAX_RELOAD###');
 		}
-		
+
 		// loop through LL and fill $markerArray
 		array_key_exists($this->LLkey, $this->LOCAL_LANG) ? $langKey = $this->LLkey : $langKey = 'default';
 		foreach($this->LOCAL_LANG[$langKey] as $key => $value) {
 			$markerArray['###' . strtoupper($key) . '###'] = $value;
 		}
-		
+
 		// define some additional markers
-		$markerArray['###SITE_REL_PATH###'] = t3lib_extMgm::siteRelPath($this->extKey); 
+		$markerArray['###SITE_REL_PATH###'] = t3lib_extMgm::siteRelPath($this->extKey);
 		$markerArray['###TARGET_URL###'] = $targetUrl;
 		$markerArray['###PREFIX_ID###'] = $this->prefixId;
-		$markerArray['###SEARCHBOX_DEFAULT_VALUE###'] = $this->pi_getLL('searchbox_default_value'); 
-		
+		$markerArray['###SEARCHBOX_DEFAULT_VALUE###'] = $this->pi_getLL('searchbox_default_value');
+
 		$content = $this->cObj->substituteMarkerArray($content, $markerArray);
-		
+
 		// minify JS?
 		if(version_compare(TYPO3_version, '4.2.0', '>=')) {
 			$content = t3lib_div::minifyJavaScript($content);
 		}
-		
+
 		// add JS to page header
 		$GLOBALS['TSFE']->additionalHeaderData['jsContent'] = $content;
 	}

@@ -1,4 +1,5 @@
 <?php
+
 /***************************************************************
 *  Copyright notice
 *
@@ -74,9 +75,6 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 		// get javascript onclick actions
 		$this->initOnclickActions();
 
-		// init onclick image
-		$this->initOnloadImage();
-
 		// hook for initials
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['initials'])) {
 			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['initials'] as $_classRef) {
@@ -86,7 +84,7 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 		}
 
 		$content = $this->cObj->getSubpart($this->templateCode, '###RESULT_LIST###');
-		
+
 		// show text instead of results if no searchparams set and activated in ff
 		if($this->isEmptySearch && $this->conf['showTextInsteadOfResults']) {
 			/*$content = '<div id="textmessage">'.$this->pi_RTEcssText($this->conf['textForResults']).'</div>';

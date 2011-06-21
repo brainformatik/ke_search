@@ -62,6 +62,7 @@ class user_filterlist {
 	}
 
 
+
 	function getListOfAvailableFiltersForTCA(&$config) {
 
 		// get current pid

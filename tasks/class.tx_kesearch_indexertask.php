@@ -23,6 +23,7 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
+
 // include indexer class
 require_once(t3lib_extMgm::extPath('ke_search').'indexer/class.tx_kesearch_indexer.php');
 
