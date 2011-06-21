@@ -510,6 +510,7 @@ class tx_kesearch_lib extends tslib_pibase {
 					$onclick = 'setOrderBy(' . $tempField . ', ' . $tempDir . ');';
 				}
 				$onclick = $onclick . ' document.getElementById(\'filter['.$filterUid.']\').value=\''.$data['value'].'\'; ';
+				$onclick .= ' document.getElementById(\'pagenumber\').value=\'1\'; ';
 				$onclick .= $this->onclickFilter;
 
 				$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
@@ -875,7 +876,12 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 		}
 
-
+		// generate onload image
+		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/blank.gif';
+		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" />';
+		if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
+			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
+		}
 
 		// init javascript onclick actions
 		$this->initOnclickActions();
@@ -900,13 +906,13 @@ class tx_kesearch_lib extends tslib_pibase {
 			$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", '');
 			$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", '');
 			$objResponse->addAssign("kesearch_updating_results", "innerHTML", '');
-			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters());
+			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters() . $this->onloadImage);
 		} else {
 			// set search results
 			// process if on result page
 			$start = t3lib_div::milliseconds();
 			if ($GLOBALS['TSFE']->id == $this->conf['resultPage']) {
-				$objResponse->addAssign('kesearch_results', 'innerHTML', $this->getSearchResults());
+				$objResponse->addAssign('kesearch_results', 'innerHTML', $this->getSearchResults() . $this->onloadImage);
 				$objResponse->addAssign('kesearch_ordering', 'innerHTML', $this->renderOrdering());
 			}
 
@@ -928,7 +934,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 
 			// set filters
-			$objResponse->addAssign('kesearch_filters', 'innerHTML', $this->renderFilters());
+			$objResponse->addAssign('kesearch_filters', 'innerHTML', $this->renderFilters() . $this->onloadImage);
 
 			// set end milliseconds for query time calculation
 			if ($this->conf['showQueryTime']) {
@@ -936,7 +942,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 
 			// Show error message
-			if ($this->showShortMessage) {
+			if ($this->div->showShortMessage) {
 				$errorMessage = $this->cObj->getSubpart($this->templateCode,'###GENERAL_MESSAGE###');
 				// attention icon
 				unset($imageConf);
@@ -1008,6 +1014,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * function refresh
 	 * @param $arg
 	 */
+	/*
 	public function resetSearchbox($data) {
 
 		// initializes plugin configuration
@@ -1047,7 +1054,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		// return response xml
 		return $objResponse->getXML();
 	}
-
+	*/
 
 	/*
 	 * function getSearchResults
@@ -1056,6 +1063,13 @@ class tx_kesearch_lib extends tslib_pibase {
 		// get search results
 		$query = $this->db->generateQueryForSearch();
 		//t3lib_div::devLog('db', 'db', -1, array('Query: ' . $query));
+
+		// generate and add onload image
+		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/blank.gif';
+		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" />';
+		if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
+			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
+		}
 
 		// use sphinx mode only when a searchstring is given.
 		// TODO: Sphinx has problems to show results when no query is given
@@ -1128,6 +1142,9 @@ class tx_kesearch_lib extends tslib_pibase {
 			if ($this->conf['showQuery']) {
 				$content .= '<br />'.$query.'<br />';
 			}
+
+			// add onload image
+			$content .= $this->onloadImage;
 
 			return $content;
 		}
@@ -1332,12 +1349,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 		}
 
-		// generate and add onload image
-		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/blank.gif';
-		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" />';
-		if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
-			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
-		}
+		// add onload image
 		$content .= $this->onloadImage;
 
 		if ($this->UTF8QuirksMode) return utf8_encode($content);

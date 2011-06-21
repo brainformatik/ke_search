@@ -59,7 +59,7 @@ class tx_kesearch_db {
 		$where = '1=1';
 
 		// if a searchword was given, calculate percent of score
-		if(count($this->pObj->swords)) {
+		if($this->pObj->sword) {
 			$fields .= ',
 				MATCH (title, content) AGAINST ("' . $this->pObj->scoreAgainst . '") + (' . $this->pObj->extConf['multiplyValueToTitle'] . ' * MATCH (title) AGAINST ("' . $this->pObj->scoreAgainst . '")) AS score,
 				IFNULL(ROUND(MATCH (title, content) AGAINST ("' . $this->pObj->scoreAgainst . '") + (' . $this->pObj->extConf['multiplyValueToTitle'] . ' * MATCH (title) AGAINST ("' . $this->pObj->scoreAgainst . '")) / maxScore * 100), 0) AS percent
