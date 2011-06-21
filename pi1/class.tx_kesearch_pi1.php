@@ -52,6 +52,9 @@ class tx_kesearch_pi1 extends tx_kesearch_lib {
 		// initializes plugin configuration
 		$this->init();
 
+		// init domReady action
+		$this->initDomReadyAction();
+
 		// add header parts when in searchbox mode
 		$this->addHeaderParts();
 
@@ -77,8 +80,7 @@ class tx_kesearch_pi1 extends tx_kesearch_lib {
 		// get javascript onclick actions
 		$this->initOnclickActions();
 
-		// init onclick image
-		$this->initOnloadImage();
+
 
 		// hook for initials
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['initials'])) {
@@ -96,7 +98,7 @@ class tx_kesearch_pi1 extends tx_kesearch_lib {
 
 		return $this->pi_wrapInBaseClass($content);
 	}
-	
+
 }
 
 

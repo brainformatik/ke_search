@@ -261,9 +261,8 @@ class tx_kesearch_lib extends tslib_pibase {
 		$resetUrl = $this->cObj->typoLink_URL($linkconf);
 		$resetLink = '<a href="'.$resetUrl.'" class="resetButton"><span>'.$this->pi_getLL('reset_button').'</span></a>';
 
-		$this->initOnloadImage();
-
-		$content = $this->cObj->substituteMarker($content,'###ONLOAD_IMAGE###', $this->onloadImage);
+		// init onDomReadyAction
+		$this->initDomReadyAction();
 
 		$content = $this->cObj->substituteMarker($content,'###RESET###',$resetLink);
 
@@ -1815,12 +1814,10 @@ class tx_kesearch_lib extends tslib_pibase {
 		return $image;
 	}
 
-
 	/*
-	 * function initOnloadImage
+	 * function initDomReadyAction
 	 */
-	protected function initOnloadImage() {
-		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
+	protected function initDomReadyAction() {
 
 		// is current page the result page?
 		$resultPage = ($GLOBALS['TSFE']->id == $this->conf['resultPage']) ? TRUE : FALSE;
@@ -1831,19 +1828,20 @@ class tx_kesearch_lib extends tslib_pibase {
 				// do not refresh results if default text is shown (before filters and swords are sent)
 				if ($resultPage) {
 					if($this->isEmptySearch && $this->conf['showTextInsteadOfResults']) {
-						$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFilters();" alt="" /> ';
+						$domReadyAction = 'onloadFilters();';
 					} else {
-						$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFiltersAndResults();" alt="" /> ';
+						$domReadyAction = 'onloadFiltersAndResults();';
 					}
 				} else {
-					$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onLoad="onloadFilters();" alt="" /> ';
+					$domReadyAction = 'onloadFilters();';
 				}
 				break;
 			case 'static':
 			default:
-				$this->onloadImage = '';
+				$domReadyAction = '';
 				break;
 		}
+		$this->onDomReady = empty($domReadyAction) ? '' : 'domReady(function() {'.$domReadyAction.'});';
 	}
 
 
@@ -1974,6 +1972,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		$markerArray['###TARGET_URL###'] = $targetUrl;
 		$markerArray['###PREFIX_ID###'] = $this->prefixId;
 		$markerArray['###SEARCHBOX_DEFAULT_VALUE###'] = $this->pi_getLL('searchbox_default_value');
+		$markerArray['###DOMREADYACTION###'] = $this->onDomReady;
 
 		$content = $this->cObj->substituteMarkerArray($content, $markerArray);
 

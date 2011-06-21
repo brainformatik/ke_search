@@ -1,3 +1,4 @@
+
 <!-- ###JS_SEARCH_ALL### begin -->
 <script type="text/javascript">
 // js for all render methods
@@ -99,7 +100,61 @@ function hideSpinner() {
 	document.getElementById("kesearch_pagebrowser_bottom").style.display="block";
 	document.getElementById("kesearch_query_time").style.display="block";
 }
+
+
+// domReady function
+!function (context, doc) {
+  var fns = [], ol, f = false,
+      testEl = doc.documentElement,
+      hack = testEl.doScroll,
+      domContentLoaded = 'DOMContentLoaded',
+      addEventListener = 'addEventListener',
+      onreadystatechange = 'onreadystatechange',
+      loaded = /^loade|c/.test(doc.readyState);
+
+  function flush(i) {
+    loaded = 1;
+    while (i = fns.shift()) { i() }
+  }
+  doc[addEventListener] && doc[addEventListener](domContentLoaded, function fn() {
+    doc.removeEventListener(domContentLoaded, fn, f);
+    flush();
+  }, f);
+
+
+  hack && doc.attachEvent(onreadystatechange, (ol = function ol() {
+    if (/^c/.test(doc.readyState)) {
+      doc.detachEvent(onreadystatechange, ol);
+      flush();
+    }
+  }));
+
+  context['domReady'] = hack ?
+    function (fn) {
+      self != top ?
+        loaded ? fn() : fns.push(fn) :
+        function () {
+          try {
+            testEl.doScroll('left');
+          } catch (e) {
+            return setTimeout(function() { domReady(fn) }, 50);
+          }
+          fn();
+        }()
+    } :
+    function (fn) {
+      loaded ? fn() : fns.push(fn);
+    };
+
+}(this, document);
+
+// domReadyAction
+###DOMREADYACTION###
+
 </script>
+
+
+
 <!-- ###JS_SEARCH_AJAX_RELOAD### end -->
 
 <!-- ###SEARCHBOX_STATIC### start -->
@@ -119,7 +174,6 @@ function hideSpinner() {
 	<div id="kesearch_updating_filters"><center>###SPINNER###<br /></center></div>
 	###RESET###
     </form>
-    ###ONLOAD_IMAGE###
 <!-- ###SEARCHBOX_STATIC### end -->
 
 
