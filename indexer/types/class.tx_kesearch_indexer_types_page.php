@@ -183,11 +183,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		foreach($rows as $row) {
 			$pageList = t3lib_div::trimExplode(',', $this->queryGen->getTreeList($row['automated_tagging'], 99, 0, $where));
 			foreach($pageList as $uid) {
-				if($this->pageRecords[$uid]['tags']) {
-					$this->pageRecords[$uid]['tags'] .= ',#' . $row['tag'] . '#';
-				} else {
-					$this->pageRecords[$uid]['tags'] = '#' . $row['tag'] . '#';
-				}
+				$this->pageRecords[$uid]['tags'] .= '#' . $row['tag'] . '#';
 			}
 		}
 	}
@@ -276,7 +272,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 				$this->pageRecords[$uid]['fe_group'],  // fe_group
 				false,                                 // debug only?
 				$additionalFields                      // additional fields added by hooks
-			);			
+			);
 		}
 
 		return;

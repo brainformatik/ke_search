@@ -601,7 +601,7 @@ class tx_kesearch_lib extends tslib_pibase {
 						break;
 					}
 				}
-
+				
 				// if option is in optionArray, we have to mark the checkboxes
 				// but only if customer has searched for filters
 				if($isOptionInOptionArray) {
@@ -682,37 +682,6 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// get all tags of current searchresult
 		if(!is_array($this->tagsInSearchResult)) {
-			$start = t3lib_div::milliseconds();
-			// build words search phrase
-			$searchWordInformation = $this->div->buildSearchphrase();
-			$this->sword = $searchWordInformation['sword'];
-			$this->swords = $searchWordInformation['swords'];
-			$this->wordsAgainst = $searchWordInformation['wordsAgainst'];
-
-			// get filter list
-			$filterList = explode(',', $this->conf['filters']);
-
-			// extend against-clause for multi check (in condition with other selected filters)
-			if ($mode == 'multi' && is_array($filterList)) {
-				// get all filteroptions from URL
-				foreach ($filterList as $key => $foreignFilterId) {
-					if(is_array($this->piVars['filter'][$foreignFilterId])) {
-						foreach($this->piVars['filter'][$foreignFilterId] as $optionKey => $optionValue) {
-							if(!empty($this->piVars['filter'][$foreignFilterId][$optionKey])) {
-								// Don't add a "+", because we are here in checkbox mode
-								$this->tagsAgainst .= ' "#'.$this->piVars['filter'][$foreignFilterId][$optionKey].'#" ';
-							}
-						}
-					} else {
-						if(!empty($this->piVars['filter'][$foreignFilterId])) {
-							$this->tagsAgainst .= ' +"#'.$this->piVars['filter'][$foreignFilterId].'#" ';
-						}
-					}
-				}
-			}
-			$this->tagsAgainst = $this->div->removeXSS($this->tagsAgainst);
-
-			$this->db->chooseBestIndex($this->wordsAgainst, $this->tagsAgainst);
 
 			$fields = 'uid';
 			$table = 'tx_kesearch_index';
@@ -745,8 +714,8 @@ class tx_kesearch_lib extends tslib_pibase {
 				$sphinx = t3lib_div::makeInstance('user_kesearchpremium');
 				$queryForShinx = '';
 				if($this->wordsAgainst) $queryForShinx .= ' @(title,content) ' . $this->wordsAgainst;
-				if($this->tagsAgainst) $queryForShinx .= ' @(tags) ' . $this->tagsAgainst;
-				$res = $sphinx->getResForSearchResults($queryForShinx);
+				if($this->tagsAgainst) $queryForShinx .= ' @(tags) ' . implode(' ', $this->tagsAgainst);
+				$res = $sphinx->getResForSearchResults($queryForShinx, '*', 'uid, REPLACE(tags, "##", "#~~~#") as tags');
 			} else {
 				$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 			}
@@ -763,7 +732,6 @@ class tx_kesearch_lib extends tslib_pibase {
 				$tagArray[$val] = true;
 			}
 			$this->tagsInSearchResult = array_keys($tagArray);
-			t3lib_div::devLog('time', 'time', -1, array(t3lib_div::milliseconds()-$start));
 		}
 
 		if(array_search('#' . $tag . '#', $this->tagsInSearchResult) === false) {
@@ -1105,7 +1073,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			// generate query
 			$queryForShinx = '';
 			if($this->wordsAgainst) $queryForShinx .= ' @(title,content) ' . $this->wordsAgainst;
-			if($this->tagsAgainst) $queryForShinx .= ' @(tags) ' . $this->tagsAgainst;
+			if($this->tagsAgainst) $queryForShinx .= ' @(tags) ' . implode(' ', $this->tagsAgainst);
 			$res = $sphinx->getResForSearchResults($queryForShinx);
 			// get number of records
 			$this->numberOfResults = $sphinx->getTotalFound();

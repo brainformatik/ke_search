@@ -162,17 +162,17 @@ class tx_kesearch_div {
 		// build tag searchphrase
 		$tagsAgainst = array();
 		foreach($this->pObj->preselectedFilter as $value) {
-			$tagsAgainst[0] .= ' +"#' . $value . '#"';
+			$tagsAgainst[0] .= ' +#' . $value . '#';
 		}
 		if(is_array($this->pObj->piVars['filter'])) {
 			foreach($this->pObj->piVars['filter'] as $key => $tag)  {
 				if(is_array($this->pObj->piVars['filter'][$key])) {
 					foreach($this->pObj->piVars['filter'][$key] as $subkey => $subtag)  {
 						// Don't add a "+", because we are here in checkbox mode. It's a OR.
-						if(!empty($subtag)) $tagsAgainst[($key + 1)] .= ' "#'.$subtag.'#" ';
+						if(!empty($subtag)) $tagsAgainst[($key + 1)] .= ' #'.$subtag.'# ';
 					}
 				} else {
-					if(!empty($tag)) $tagsAgainst[0] .= ' +"#'.$tag.'#" ';
+					if(!empty($tag)) $tagsAgainst[0] .= ' +#'.$tag.'# ';
 				}
 			}
 		}
