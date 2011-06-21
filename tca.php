@@ -439,6 +439,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 				'itemsProcFunc' => 'tx_kesearch_lib_items->fillIndexerConfig',
 				'size' => 1,
 				'maxitems' => 1,
+				'default' => 'page',
 			)
 		),
 		'startingpoints_recursive' => array (
