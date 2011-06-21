@@ -158,7 +158,7 @@ function hideSpinner() {
 <!-- ###JS_SEARCH_AJAX_RELOAD### end -->
 
 <!-- ###SEARCHBOX_STATIC### start -->
-    <form method="get" id="xajax_form_kesearch_pi1" name="xajax_form_kesearch_pi1"  action="###FORM_ACTION###" class="static">
+    <form method="get" id="xajax_form_kesearch_pi1" name="xajax_form_kesearch_pi1"  action="###FORM_ACTION###" class="static" ###ONSUBMIT###>
 	<div class="searchbox">
 	    <input type="hidden" name="id" value="###FORM_TARGET_PID###" />
 	    ###HIDDENFIELDS###

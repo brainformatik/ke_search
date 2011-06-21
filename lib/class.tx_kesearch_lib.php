@@ -228,7 +228,13 @@ class tx_kesearch_lib extends tslib_pibase {
 		$content = $this->cObj->substituteMarker($content,'###SWORD_VALUE###', $this->swordValue);
 		$content = $this->cObj->substituteMarker($content,'###SWORD_ONFOCUS###', $searchboxFocusJS);
 
-
+		// set onsubmit action
+		if ($this->conf['renderMethod'] != 'static') {
+			$onSubmitMarker = 'onsubmit="document.getElementById(\'pagenumber\').value=1;"';
+		} else {
+			$onSubmitMarker = '';
+		}
+		$content = $this->cObj->substituteMarker($content,'###ONSUBMIT###', $onSubmitMarker);
 
 		// get filters
 		$content = $this->cObj->substituteMarker($content, '###FILTER###', $this->renderFilters());
@@ -602,7 +608,7 @@ class tx_kesearch_lib extends tslib_pibase {
 						break;
 					}
 				}
-				
+
 				// if option is in optionArray, we have to mark the checkboxes
 				// but only if customer has searched for filters
 				if($isOptionInOptionArray) {
