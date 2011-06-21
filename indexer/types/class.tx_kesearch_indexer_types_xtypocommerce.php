@@ -121,7 +121,7 @@ class tx_kesearch_indexer_types_xtypocommerce extends tx_kesearch_indexer_types 
 					$lang = 'Englisch';
 				} else if (stristr($lang, 'niederl')) {
 					$lang = 'Niederlaendisch';
-				} else
+				}
 				$tagContent .= '#language_'.$lang.'#';
 			}
 			// publish date
