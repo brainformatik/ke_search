@@ -9,7 +9,7 @@
 		<languageKey index="default" type="array">
 			<label index="pi_title">Faceted Search</label>
 			<label index="pi_plus_wiz_description">Adds a faceted search to your page.</label>
-			
+
 			<label index="ff.page.main">General</label>
 			<label index="ff.resultPage">Page with result list</label>
 			<label index="ff.resultLinkTarget">Target for result link</label>
@@ -50,6 +50,11 @@
 			<label index="ff.showDate">Show date?</label>
 			<label index="ff.showPercentalScore">Show percental score?</label>
 			<label index="ff.showScoreScale">Show score scale?</label>
+
+			<label index="ff.page.debug">Debug (Admin)</label>
+			<label index="ff.showTags">Show tags?</label>
+			<label index="ff.showQuery">Show query?</label>
+			<label index="ff.showTaggedContentOnly">Show tagged content only?</label>
 
 			<label index="ff.page.filter">Filter</label>
 			<label index="ff.filters">Filters</label>
@@ -96,7 +101,7 @@
 		<languageKey index="de" type="array">
 			<label index="pi_title">Facettierte Suche</label>
 			<label index="pi_plus_wiz_description">Fügt eine facettierte Suche auf der Seite ein.</label>
-			
+
 			<label index="ff.page.main">Allgemein</label>
 			<label index="ff.resultPage">Suchergebnis-Seite (Zielseite)</label>
 			<label index="ff.resultLinkTarget">Ziel für Ergebnislink</label>
@@ -137,6 +142,11 @@
 			<label index="ff.showDate">Zeige Datum?</label>
 			<label index="ff.showPercentalScore">Zeige Prozentuale Relevanz?</label>
 			<label index="ff.showScoreScale">Zeige Relevanz-Skala?</label>
+
+			<label index="ff.page.debug">Debug (Admin)</label>
+			<label index="ff.showTags">Zeige Tags?</label>
+			<label index="ff.showQuery">Zeige Such-Query?</label>
+			<label index="ff.showTaggedContentOnly">Nur getaggte Inhalte zeigen?</label>
 
 			<label index="ff.page.filter">Filtereinstellungen</label>
 			<label index="ff.filters">Filter</label>

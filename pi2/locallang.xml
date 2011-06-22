@@ -7,16 +7,10 @@
 	<data type="array">
 		<languageKey index="default" type="array">
 			<label index="ff.main">General</label>
-			<label index="ff.showTags">Show tags? (for debugging)</label>
-			<label index="ff.showQuery">Show query? (for debugging)</label>
-			<label index="ff.showTaggedContentOnly">Show tagged content only? (for debugging)</label>
 			<label index="ff.loadFlexformsFromOtherCE">Load flexforms config from this search box</label>
 		</languageKey>
 		<languageKey index="de" type="array">
 			<label index="ff.main">Konfiguration der Suchergebnisse</label>
-			<label index="ff.showTags">Zeige Tags? (Debugging)</label>
-			<label index="ff.showQuery">Zeige Such-Query? (Debugging)</label>
-			<label index="ff.showTaggedContentOnly">Nur getaggte Inhalte zeigen? (Debugging)</label>
 			<label index="ff.loadFlexformsFromOtherCE">Flexform-Konfiguration von dieser Suchbox laden</label>
 		</languageKey>
 	</data>

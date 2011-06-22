@@ -499,5 +499,49 @@
 			</ROOT>
 		</filter>
 
+
+		<debug>
+				<ROOT>
+						<TCEforms>
+							<sheetTitle>LLL:EXT:ke_search/pi1/locallang.xml:ff.page.debug</sheetTitle>
+						</TCEforms>
+						<type>array</type>
+						<el>
+								<showTags>
+										<TCEforms>
+												<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showTags</label>
+												<displayCond>HIDE_FOR_NON_ADMINS</displayCond>
+												<config>
+														<type>check</type>
+														<default>0</default>
+												</config>
+										</TCEforms>
+								</showTags>
+
+								<showQuery>
+										<TCEforms>
+												<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showQuery</label>
+												<displayCond>HIDE_FOR_NON_ADMINS</displayCond>
+												<config>
+														<type>check</type>
+														<default>0</default>
+												</config>
+										</TCEforms>
+								</showQuery>
+
+								<showTaggedContentOnly>
+										<TCEforms>
+												<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showTaggedContentOnly</label>
+												<displayCond>HIDE_FOR_NON_ADMINS</displayCond>
+												<config>
+														<type>check</type>
+														<default>0</default>
+												</config>
+										</TCEforms>
+								</showTaggedContentOnly>
+						</el>
+				</ROOT>
+		</debug>
+
 	</sheets>
 </T3DataStructure>
