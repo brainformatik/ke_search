@@ -702,23 +702,24 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			// extend against-clause for multi check (in condition with other selected filters)
 			if ($mode == 'multi' && is_array($filterList)) {
+				$tagsAgainst = '';
 				// get all filteroptions from URL
 				foreach ($filterList as $key => $foreignFilterId) {
 					if(is_array($this->piVars['filter'][$foreignFilterId])) {
 						foreach($this->piVars['filter'][$foreignFilterId] as $optionKey => $optionValue) {
 							if(!empty($this->piVars['filter'][$foreignFilterId][$optionKey])) {
 								// Don't add a "+", because we are here in checkbox mode
-								$this->tagsAgainst .= ' "#'.$this->piVars['filter'][$foreignFilterId][$optionKey].'#" ';
+								$tagsAgainst .= ' "#'.$this->piVars['filter'][$foreignFilterId][$optionKey].'#" ';
 							}
 						}
 					} else {
 						if(!empty($this->piVars['filter'][$foreignFilterId])) {
-							$this->tagsAgainst .= ' +"#'.$this->piVars['filter'][$foreignFilterId].'#" ';
+							$tagsAgainst .= ' +"#'.$this->piVars['filter'][$foreignFilterId].'#" ';
 						}
 					}
 				}
 			}
-			$this->tagsAgainst = $this->div->removeXSS($this->tagsAgainst);
+			$tagsAgainst = $this->div->removeXSS($tagsAgainst);
 
 			$this->db->chooseBestIndex($this->wordsAgainst, $this->tagsAgainst);
 
@@ -728,7 +729,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			$where = '1=1';
 			$countMatches = 0;
 			if($this->tagsAgainst) {
-				$where .= ' AND MATCH (tags) AGAINST (\''.$this->tagsAgainst.'\' IN BOOLEAN MODE) ';
+				$where .= ' AND MATCH (tags) AGAINST (\''.$tagsAgainst.'\' IN BOOLEAN MODE) ';
 				$countMatches++;
 			}
 			if(count($this->swords)) {
