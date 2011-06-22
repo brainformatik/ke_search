@@ -172,6 +172,8 @@ class tx_kesearch_indexer {
 				$msg = 'Indexing process was finished:'."\n";
 				$msg .= "==============================\n\n";
 				$msg .= strip_tags($content);
+				$msg .= "\n\n".'Indexing process ran '.(time()-$this->startTime).' seconds.';
+
 				// send the notification message
 				mail($extConf['notificationRecipient'], $extConf['notificationSubject'], $msg);
 			}
