@@ -721,14 +721,14 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 			$tagsAgainst = $this->div->removeXSS($tagsAgainst);
 
-			$this->db->chooseBestIndex($this->wordsAgainst, $this->tagsAgainst);
+			$this->db->chooseBestIndex($this->wordsAgainst, $tagsAgainst);
 
 
 			$fields = 'uid';
 			$table = 'tx_kesearch_index';
 			$where = '1=1';
 			$countMatches = 0;
-			if($this->tagsAgainst) {
+			if($tagsAgainst) {
 				$where .= ' AND MATCH (tags) AGAINST (\''.$tagsAgainst.'\' IN BOOLEAN MODE) ';
 				$countMatches++;
 			}
