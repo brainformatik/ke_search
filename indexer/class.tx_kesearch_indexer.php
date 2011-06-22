@@ -37,6 +37,7 @@ class tx_kesearch_indexer {
 	var $lockFile = '';
 	var $additionalFields = '';
 	var $indexingErrors = array();
+	var $startTime;
 
 
 	/**
@@ -58,9 +59,9 @@ class tx_kesearch_indexer {
 		// write starting timestamp into temp file
 		// this is a little helper for clean up process
 		// delete all records which are older than starting timestamp in temp file
-		$startTime = time() . CHR(10);
+		$this->startTime = time() . CHR(10);
 		t3lib_div::unlink_tempfile($this->lockFile);
-		t3lib_div::writeFileToTypo3tempDir($this->lockFile, $startTime);
+		t3lib_div::writeFileToTypo3tempDir($this->lockFile, $this->startTime);
 
 		// get configurations
 		$configurations = $this->getConfigurations();
@@ -145,7 +146,7 @@ class tx_kesearch_indexer {
 
 		// write ending timestamp into temp file
 		t3lib_div::unlink_tempfile($this->lockFile);
-		t3lib_div::writeFileToTypo3tempDir($this->lockFile, $startTime . time());
+		t3lib_div::writeFileToTypo3tempDir($this->lockFile, $this->startTime . time());
 
 		// process index cleanup?
 		$content .= "\n".'<p><b>Index cleanup processed</b></p>'."\n";
@@ -399,7 +400,7 @@ class tx_kesearch_indexer {
 		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 		return $row['uid'];
 	}
-	
+
 
 
 	/**
@@ -466,7 +467,8 @@ class tx_kesearch_indexer {
 		if (($this->counter % $this->extConf['periodicNotification']) == 0) {
 			// send the notification message
 			if (t3lib_div::validEmail($this->extConf['notificationRecipient'])) {
-				$msg = $this->counter.' records have been indexed.';
+				$msg = $this->counter.' records have been indexed.'."\n";
+				$msg .= 'Indexer runs '.(time()-$this->startTime).' seconds \'til now.';
 				mail($this->extConf['notificationRecipient'], $this->extConf['notificationSubject'], $msg);
 			}
 		}
