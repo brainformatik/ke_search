@@ -690,6 +690,39 @@ class tx_kesearch_lib extends tslib_pibase {
 		// get all tags of current searchresult
 		if(!is_array($this->tagsInSearchResult)) {
 
+			$start = t3lib_div::milliseconds();
+			// build words search phrase
+			$searchWordInformation = $this->div->buildSearchphrase();
+			$this->sword = $searchWordInformation['sword'];
+			$this->swords = $searchWordInformation['swords'];
+			$this->wordsAgainst = $searchWordInformation['wordsAgainst'];
+
+			// get filter list
+			$filterList = explode(',', $this->conf['filters']);
+
+			// extend against-clause for multi check (in condition with other selected filters)
+			if ($mode == 'multi' && is_array($filterList)) {
+				// get all filteroptions from URL
+				foreach ($filterList as $key => $foreignFilterId) {
+					if(is_array($this->piVars['filter'][$foreignFilterId])) {
+						foreach($this->piVars['filter'][$foreignFilterId] as $optionKey => $optionValue) {
+							if(!empty($this->piVars['filter'][$foreignFilterId][$optionKey])) {
+								// Don't add a "+", because we are here in checkbox mode
+								$this->tagsAgainst .= ' "#'.$this->piVars['filter'][$foreignFilterId][$optionKey].'#" ';
+							}
+						}
+					} else {
+						if(!empty($this->piVars['filter'][$foreignFilterId])) {
+							$this->tagsAgainst .= ' +"#'.$this->piVars['filter'][$foreignFilterId].'#" ';
+						}
+					}
+				}
+			}
+			$this->tagsAgainst = $this->div->removeXSS($this->tagsAgainst);
+
+			$this->db->chooseBestIndex($this->wordsAgainst, $this->tagsAgainst);
+
+
 			$fields = 'uid';
 			$table = 'tx_kesearch_index';
 			$where = '1=1';
