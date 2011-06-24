@@ -54,7 +54,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	var $extConf            = array(); // Extension-Configuration
 	var $numberOfResults    = 0; // count search results
 	var $indexToUse         = ''; // it's for 'USE INDEX ($indexToUse)' to speed up queries
-	var $tagsInSearchResult = array(); // contains all tags of current search result
+	var $tagsInSearchResult = false; // contains all tags of current search result
 	var $preselectedFilter  = array(); // preselected filters by flexform
 
  	/**
@@ -687,7 +687,10 @@ class tx_kesearch_lib extends tslib_pibase {
 	 */
 	public function checkIfTagMatchesRecords($tag, $mode='multi', $filterId) {
 		// get all tags of current searchresult
-		if(count($this->tagsInSearchResult) == 0) {
+		if(!is_array($this->tagsInSearchResult)) {
+			// conv boolean to array
+			$this->tagsInSearchResult = array();
+
 			// build words search phrase
 			$searchWordInformation = $this->div->buildSearchphrase();
 			$this->sword = $searchWordInformation['sword'];
