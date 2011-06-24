@@ -119,6 +119,7 @@ class tx_kesearch_indexer {
 			(pid, title, type, targetpid, content, tags, params, abstract, language, starttime, endtime, fe_group, tstamp, crdate' . $addInsertQueryFields . ')
 			VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?' . $addInsertQueryValues . ', ?)
 		"');
+		$GLOBALS['TYPO3_DB']->sql_query('ALTER TABLE tx_kesearch_index DISABLE KEYS');
 
 		foreach($configurations as $indexerConfig) {
 			$this->indexerConfig = $indexerConfig;
@@ -138,7 +139,7 @@ class tx_kesearch_indexer {
 				}
 			}
 		}
-
+		$GLOBALS['TYPO3_DB']->sql_query('ALTER TABLE tx_kesearch_index ENABLE KEYS');
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE searchStmtWithoutParams');
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE searchStmtWithParams');
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE updateStmt');
