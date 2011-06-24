@@ -54,7 +54,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	var $extConf            = array(); // Extension-Configuration
 	var $numberOfResults    = 0; // count search results
 	var $indexToUse         = ''; // it's for 'USE INDEX ($indexToUse)' to speed up queries
-	var $tagsInSearchResult = false; // contains all tags of current search result
+	var $tagsInSearchResult = array(); // contains all tags of current search result
 	var $preselectedFilter  = array(); // preselected filters by flexform
 
  	/**
@@ -347,7 +347,7 @@ class tx_kesearch_lib extends tslib_pibase {
 									}
 								}
 								$options[$row['uid']] = array(
-									'title' => $row['title'],
+									'title' => $row['title'] . ' (' . $this->tagsInSearchResult['#' . $row['tag'] . '#'] . ')',
 									'value' => $row['tag'],
 									'selected' => $selected,
 								);
@@ -686,11 +686,8 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * function checkIfFilterMatchesRecords
 	 */
 	public function checkIfTagMatchesRecords($tag, $mode='multi', $filterId) {
-
 		// get all tags of current searchresult
-		if(!is_array($this->tagsInSearchResult)) {
-
-			$start = t3lib_div::milliseconds();
+		if(count($this->tagsInSearchResult) == 0) {
 			// build words search phrase
 			$searchWordInformation = $this->div->buildSearchphrase();
 			$this->sword = $searchWordInformation['sword'];
@@ -768,18 +765,12 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 
 			// the following is much faster than array_unique()
-			$tagArray = array();
 			foreach($tagTempArray as $key => $val) {
-				$tagArray[$val] = true;
+				$this->tagsInSearchResult[$val] += 1;
 			}
-			$this->tagsInSearchResult = array_keys($tagArray);
 		}
 
-		if(array_search('#' . $tag . '#', $this->tagsInSearchResult) === false) {
-			return false;
-		} else {
-			return true;
-		}
+		return array_key_exists('#' . $tag . '#', $this->tagsInSearchResult);
 	}
 
 
