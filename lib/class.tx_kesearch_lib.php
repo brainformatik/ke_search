@@ -970,6 +970,9 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			// set end milliseconds for query time calculation
 			if ($this->conf['showQueryTime']) {
+				// Calculate Querytime
+				// we have two plugin. That's why we work with register here.
+				$GLOBALS['TSFE']->register['ke_search_queryTime'] = (t3lib_div::milliseconds() - $GLOBALS['TSFE']->register['ke_search_queryStartTime']);
 				$objResponse->addAssign('kesearch_query_time', 'innerHTML', sprintf($this->pi_getLL('query_time'), $GLOBALS['TSFE']->register['ke_search_queryTime']));
 			}
 
@@ -1134,10 +1137,6 @@ class tx_kesearch_lib extends tslib_pibase {
 			// get number of records
 			$this->numberOfResults = $this->db->getAmountOfSearchResults();
 		}
-
-		// Calculate Querytime
-		// we have two plugin. That's why we work with register here.
-		$GLOBALS['TSFE']->register['ke_search_queryTime'] = (t3lib_div::milliseconds() - $GLOBALS['TSFE']->register['ke_search_queryStartTime']);
 
 		// count searchword with ke_stats
 		$this->countSearchWordWithKeStats($this->sword);
