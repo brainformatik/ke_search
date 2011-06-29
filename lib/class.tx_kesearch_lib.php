@@ -1097,7 +1097,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	protected function getSearchResults() {
 		// get search results
 		$query = $this->db->generateQueryForSearch();
-		t3lib_div::devLog('db', 'db', -1, array('Query: ' . $query));
+		//t3lib_div::devLog('db', 'db', -1, array('Query: ' . $query));
 
 		// generate and add onload image
 		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/blank.gif';
