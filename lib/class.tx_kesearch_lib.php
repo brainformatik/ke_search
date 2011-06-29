@@ -744,7 +744,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			} else $index = '';
 
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery(
-				'uid, REPLACE(tags, "##", "#~~~#") as tags',
+				'uid, REPLACE(tags, "##", "#,#") as tags',
 				'tx_kesearch_index' . $index,
 				$where,
 				'','',''
@@ -753,23 +753,21 @@ class tx_kesearch_lib extends tslib_pibase {
 			if(t3lib_extMgm::isLoaded('ke_search_premium') && !$this->isEmptySearch) {
 				require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');
 				$sphinx = t3lib_div::makeInstance('user_kesearchpremium');
-				$queryForShinx = '';
-				if($this->wordsAgainst) $queryForShinx .= ' @(title,content) ' . $this->wordsAgainst;
-				if($this->tagsAgainst) $queryForShinx .= ' @(tags) ' . implode(' ', $this->tagsAgainst);
-				$res = $sphinx->getResForSearchResults($queryForShinx, '*', 'uid, REPLACE(tags, "##", "#~~~#") as tags');
+				$sphinx->setLimit(0, 10000);
+				$queryForSphinx = '';
+				if($this->wordsAgainst) $queryForSphinx .= ' @(title,content) ' . $this->wordsAgainst;
+				if($this->tagsAgainst) $queryForSphinx .= ' @(tags) ' . implode(' ', $this->tagsAgainst);
+				$queryForSphinx .= ' @(language) _language_' . $GLOBALS['TSFE']->sys_language_uid;
+				$queryForSphinx .= ' @(fe_group) _group_NULL | _group_0';
+				$res = $sphinx->getResForSearchResults($queryForSphinx, '*', 'uid, REPLACE(tags, "##", "#,#") as tags');
 			} else {
 				$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 			}
 
 			while($tags = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-				foreach(explode('~~~', $tags['tags']) as $value) {
-					$tagTempArray[] = $value;
+				foreach(explode(',', $tags['tags']) as $value) {
+					$this->tagsInSearchResult[$value] += 1;
 				}
-			}
-
-			// the following is much faster than array_unique()
-			foreach($tagTempArray as $key => $val) {
-				$this->tagsInSearchResult[$val] += 1;
 			}
 		}
 
@@ -1096,7 +1094,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	protected function getSearchResults() {
 		// get search results
 		$query = $this->db->generateQueryForSearch();
-		//t3lib_div::devLog('db', 'db', -1, array('Query: ' . $query));
+		t3lib_div::devLog('db', 'db', -1, array('Query: ' . $query));
 
 		// generate and add onload image
 		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/blank.gif';
@@ -1119,10 +1117,16 @@ class tx_kesearch_lib extends tslib_pibase {
 			$sphinx->setLimit($limit[0], $limit[1]);
 
 			// generate query
-			$queryForShinx = '';
-			if($this->wordsAgainst) $queryForShinx .= ' @(title,content) ' . $this->wordsAgainst;
-			if($this->tagsAgainst) $queryForShinx .= ' @(tags) ' . implode(' ', $this->tagsAgainst);
-			$res = $sphinx->getResForSearchResults($queryForShinx);
+			$queryForSphinx = '';
+			if($this->wordsAgainst) $queryForSphinx .= ' @(title,content) ' . $this->wordsAgainst;
+			if($this->tagsAgainst) $queryForSphinx .= ' @(tags) ' . implode(' ', $this->tagsAgainst);
+			$queryForSphinx .= ' @(language) _language_' . $GLOBALS['TSFE']->sys_language_uid;
+			$queryForSphinx .= ' @(fe_group) _group_NULL | _group_0';
+			$res = $sphinx->getResForSearchResults($queryForSphinx);
+			/*t3lib_div::devLog('error', 'error', -1, array(
+				$sphinx->getLastWarning(),
+				$sphinx->getLastError()
+			));*/
 			// get number of records
 			$this->numberOfResults = $sphinx->getTotalFound();
 		} else {
