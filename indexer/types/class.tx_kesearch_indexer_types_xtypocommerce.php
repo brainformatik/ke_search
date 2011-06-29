@@ -51,7 +51,7 @@ class tx_kesearch_indexer_types_xtypocommerce extends tx_kesearch_indexer_types 
 		$content = '';
 
 		// get xtypocommerce products
-		$fields = '*';
+		$fields = 'products_name, tx_xtypocommerce_products.products_id as prod_id, products_description, products_keywords, products_region, products_countries, manufacturers_id, products_language, products_monat, products_jahr';
 		$table = 'tx_xtypocommerce_products, tx_xtypocommerce_products_description';
 		$where = 'tx_xtypocommerce_products.products_id = tx_xtypocommerce_products_description.products_id';
 		$where .= ' AND tx_xtypocommerce_products_description.products_name <> "" ';
@@ -65,7 +65,7 @@ class tx_kesearch_indexer_types_xtypocommerce extends tx_kesearch_indexer_types 
 			// prepare content for storing in index table
 			$title = strip_tags($prodRecord['products_name']);
 			$tags = '';
-			$params = '&xtypocommerce[product]='.intval($prodRecord['products_id']);
+			$params = '&xtypocommerce[product]='.intval($prodRecord['prod_id']);
 			$description = strip_tags($prodRecord['products_description']);
 
 			// keywords
@@ -86,7 +86,7 @@ class tx_kesearch_indexer_types_xtypocommerce extends tx_kesearch_indexer_types 
 			// get tags
 			$tagContent = '';
 			// categories
-			$catRootline = $this->getXTYPOCommerceCategories($prodRecord['products_id']);
+			$catRootline = $this->getXTYPOCommerceCategories($prodRecord['prod_id']);
 			if (is_array($catRootline)) {
 				foreach ($catRootline as $productId => $categories) {
 					$catArray = t3lib_div::trimExplode(',', $categories);
@@ -237,7 +237,7 @@ class tx_kesearch_indexer_types_xtypocommerce extends tx_kesearch_indexer_types 
 	 * @return void
 	 */
 	function getXTYPOCommerceParentCat($catId) {
-		$fields = '*';
+		$fields = 'categories_id, parent_id';
 		$table = 'tx_xtypocommerce_categories';
 		$where = 'categories_id="'.intval($catId).'" ';
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
