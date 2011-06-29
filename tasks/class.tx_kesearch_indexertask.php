@@ -43,8 +43,7 @@ class tx_kesearch_indexertask extends tx_scheduler_Task {
 		// process
 		$response = $indexer->startIndexing(true, $this->extConf, 'CLI');
 
-		if (!empty($response)) return true;
-		else return false;
+		return true;
 
 	}
 
