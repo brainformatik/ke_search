@@ -736,6 +736,11 @@ class tx_kesearch_lib extends tslib_pibase {
 				$where .= ' AND MATCH (content) AGAINST (\''.$this->wordsAgainst.'\' IN BOOLEAN MODE) ';
 				$countMatches++;
 			}
+
+			// add language
+			$lang = intval($GLOBALS['TSFE']->sys_language_uid);
+			$where .= ' AND language = ' . $lang . ' ';
+
 			$where .= $this->cObj->enableFields($table);
 
 			// which index to use

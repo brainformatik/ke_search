@@ -38,6 +38,7 @@ class tx_kesearch_indexer {
 	var $additionalFields = '';
 	var $indexingErrors = array();
 	var $startTime;
+	var $currentRow = array(); // current row which have to be inserted/updated to database
 
 
 	/**
@@ -81,7 +82,7 @@ class tx_kesearch_indexer {
 		}
 
 		$GLOBALS['TYPO3_DB']->sql_query('PREPARE searchStmtWithoutParams FROM "
-			SELECT SQL_SMALL_RESULT uid
+			SELECT *
 			FROM tx_kesearch_index
 			WHERE pid = ?
 			AND targetpid = ?
@@ -89,7 +90,7 @@ class tx_kesearch_indexer {
 			AND language = ?
 		"');
 		$GLOBALS['TYPO3_DB']->sql_query('PREPARE searchStmtWithParams FROM "
-			SELECT SQL_SMALL_RESULT uid
+			SELECT *
 			FROM tx_kesearch_index
 			WHERE pid = ?
 			AND targetpid = ?
@@ -112,6 +113,11 @@ class tx_kesearch_indexer {
 			endtime=?,
 			fe_group=?,
 			tstamp=?' . $addUpdateQuery . '
+			WHERE uid=?
+		"');
+		$GLOBALS['TYPO3_DB']->sql_query('PREPARE updateShortStmt FROM "
+			UPDATE tx_kesearch_index
+			SET tstamp=?
 			WHERE uid=?
 		"');
 		$GLOBALS['TYPO3_DB']->sql_query('PREPARE insertStmt FROM "
@@ -205,6 +211,22 @@ class tx_kesearch_indexer {
 		$table = 'tx_kesearch_index';
 		$where = 'tstamp < ' . $fileContent[0];
 		$GLOBALS['TYPO3_DB']->exec_DELETEquery($table, $where);
+		
+		// check if ke_search_premium is loaded
+		// in this case we have to update sphinx index, too.
+		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
+			$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search_premium']);
+			if(!$extConf['sphinxIndexerName']) $extConf['sphinxIndexerConf'] = '--all';
+			if(is_file($extConf['sphinxIndexerPath']) && is_executable($extConf['sphinxIndexerPath']) && file_exists($extConf['sphinxSearchdPath']) && is_executable($extConf['sphinxIndexerPath'])) {
+				$found = preg_match_all('/exec|system|passthrou/', ini_get('disable_functions'), $match);
+				if($found === 0) { // executables are allowed
+					$ret = system($extConf['sphinxIndexerPath'] . ' --rotate ' . $extConf['sphinxIndexerName']);
+					//t3lib_utility_Debug::debug($ret);
+				}
+			}
+		}
+		
+		// after unlinking this file a new indexer process can be started
 		t3lib_div::unlink_tempfile($this->lockFile); // delete lock file from temp direcory
 
 		// calculate duration of indexing process
@@ -284,40 +306,59 @@ class tx_kesearch_indexer {
 			}
 			$addQueryFields .= ', @' . $value[0];
 		}
+		
 
 		// check if record already exists
-		$existingRecordUid = $this->indexRecordExists($storagepid, $targetpid, $type, $params, $language);
-		if($existingRecordUid) {
-			// update existing record
-			$where = 'uid=' . intval($existingRecordUid);
+		$countRows = $this->indexRecordExists($storagepid, $targetpid, $type, $params, $language);
+		if($countRows) { // update existing record
+			$where = 'uid=' . intval($this->currentRow['uid']);
 			unset($fields_values['crdate']);
 			if ($debugOnly) { // do not process - just debug query
 				t3lib_div::debug($GLOBALS['TYPO3_DB']->UPDATEquery($table,$where,$fields_values),1);
 			} else { // process storing of index record and return uid
-				$query = 'SET
-					@pid = ' . $fields_values['pid'] . ',
-					@title = "' . $fields_values['title'] . '",
-					@type = "' . $fields_values['type'] . '",
-					@targetpid = "' . $fields_values['targetpid'] . '",
-					@content = "' . $fields_values['content'] . '",
-					@tags = "' . $fields_values['tags'] . '",
-					@params = "' . $fields_values['params'] . '",
-					@abstract = "' . $fields_values['abstract'] . '",
-					@language = ' . $fields_values['language'] . ',
-					@starttime = ' . $fields_values['starttime'] . ',
-					@endtime = ' . $fields_values['endtime'] . ',
-					@fe_group = "' . $fields_values['fe_group'] . '",
-					@tstamp = ' . $fields_values['tstamp'] . $setQuery . ',
-					@uid = ' . $existingRecordUid . '
-				';
-				$GLOBALS['TYPO3_DB']->sql_query($query);
-				//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+				$diff = array_diff($this->currentRow, $fields_values);
+				unset($diff['uid']);
+				unset($diff['tstamp']);
+				unset($diff['crdate']);
+				if(count($diff)) { // If there any fields left, do a complete UPDATE
+					$query = 'SET
+						@pid = ' . $fields_values['pid'] . ',
+						@title = "' . $fields_values['title'] . '",
+						@type = "' . $fields_values['type'] . '",
+						@targetpid = "' . $fields_values['targetpid'] . '",
+						@content = "' . $fields_values['content'] . '",
+						@tags = "' . $fields_values['tags'] . '",
+						@params = "' . $fields_values['params'] . '",
+						@abstract = "' . $fields_values['abstract'] . '",
+						@language = ' . $fields_values['language'] . ',
+						@starttime = ' . $fields_values['starttime'] . ',
+						@endtime = ' . $fields_values['endtime'] . ',
+						@fe_group = "' . $fields_values['fe_group'] . '",
+						@tstamp = ' . $fields_values['tstamp'] . $setQuery . ',
+						@uid = ' . $this->currentRow['uid'] . '
+					';
+					$GLOBALS['TYPO3_DB']->sql_query($query);
+					//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 
-				$query = '
-					EXECUTE updateStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp' . $addQueryFields . ', @uid;
-				';
-				$GLOBALS['TYPO3_DB']->sql_query($query);
-				//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+					$query = '
+						EXECUTE updateStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp' . $addQueryFields . ', @uid;
+					';
+					$GLOBALS['TYPO3_DB']->sql_query($query);
+					//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+				} else { // If there are no more fields in $diff, then UPDATE only tstamp
+					$query = 'SET
+						@tstamp = ' . $fields_values['tstamp'] . $setQuery . ',
+						@uid = ' . $this->currentRow['uid'] . '
+					';
+					$GLOBALS['TYPO3_DB']->sql_query($query);
+					//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+
+					$query = '
+						EXECUTE updateShortStmt USING @tstamp, @uid;
+					';
+					$GLOBALS['TYPO3_DB']->sql_query($query);
+					//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+				}
 
 				// count record for periodic notification?
 				if ($this->extConf['periodicNotification']) $this->periodicNotificationCount();
@@ -382,6 +423,9 @@ class tx_kesearch_indexer {
 	/**
 	 * try to find an allready indexed record
 	 * THX to PREPARE-Statements. They speed up indexing up to 50%
+	 * This function also sets $this->currentRow
+	 *
+	 * @return amount of search results
 	 */
 	function indexRecordExists($storagepid, $targetpid, $type, $params='', $language) {
 		$GLOBALS['TYPO3_DB']->sql_query('SET
@@ -400,10 +444,9 @@ class tx_kesearch_indexer {
 				EXECUTE searchStmtWithoutParams USING @storage, @target, @type, @language;
 			');
 		}
-		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
-		return $row['uid'];
+		$this->currentRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+		return $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 	}
-
 
 
 	/**
