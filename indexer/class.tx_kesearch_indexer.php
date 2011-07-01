@@ -224,7 +224,11 @@ class tx_kesearch_indexer {
 				if($found === 0) { // executables are allowed
 					$ret = system($extConf['sphinxIndexerPath'] . ' --rotate ' . $extConf['sphinxIndexerName']);
 					t3lib_div::sysLog($ret, 'ke_search', 1);
+				} else {
+					t3lib_div::sysLog('Check your php.ini configuration for disabled_functions. For now it is not allowed to execute a shell script.', 'ke_search', 1);
 				}
+			} else {
+				t3lib_div::sysLog('We can\'t find the sphinx executables or execution permission is missing.', 'ke_search', 1);
 			}
 		}
 		/*
