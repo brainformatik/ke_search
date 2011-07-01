@@ -224,6 +224,14 @@ class tx_kesearch_indexer {
 				if($found === 0) { // executables are allowed
 					$ret = system($extConf['sphinxIndexerPath'] . ' --rotate ' . $extConf['sphinxIndexerName']);
 					$content .= $ret;
+				} elseif($found === 1) { // one executable is allowed
+					if($match[0] == 'system') {
+						$ret = system($extConf['sphinxIndexerPath'] . ' --rotate ' . $extConf['sphinxIndexerName']);
+					} else { // use exec
+						exec($extConf['sphinxIndexerPath'] . ' --rotate ' . $extConf['sphinxIndexerName'], $retArr);
+						$ret = implode(';', $retArr);
+					}
+					$content .= $ret;
 				} else {
 					$content .= 'Check your php.ini configuration for disable_functions. For now it is not allowed to execute a shell script.';
 				}
