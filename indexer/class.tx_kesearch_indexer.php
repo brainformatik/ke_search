@@ -57,8 +57,8 @@ class tx_kesearch_indexer {
 	 * @return string							only if param $verbose is true
 	 */
 	function startIndexing($verbose=true, $extConf, $mode='')  {
-		$this->cleanUpIndex();
-		return "jipie";
+		$content = $this->cleanUpIndex();
+		return $content;
 		// write starting timestamp into temp file
 		// this is a little helper for clean up process
 		// delete all records which are older than starting timestamp in temp file
@@ -220,15 +220,15 @@ class tx_kesearch_indexer {
 			$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search_premium']);
 			if(!$extConf['sphinxIndexerName']) $extConf['sphinxIndexerConf'] = '--all';
 			if(is_file($extConf['sphinxIndexerPath']) && is_executable($extConf['sphinxIndexerPath']) && file_exists($extConf['sphinxSearchdPath']) && is_executable($extConf['sphinxIndexerPath'])) {
-				$found = preg_match_all('/exec|system|passthrou/', ini_get('disable_functions'), $match);
+				$found = preg_match_all('/exec|system/', ini_get('disable_functions'), $match);
 				if($found === 0) { // executables are allowed
 					$ret = system($extConf['sphinxIndexerPath'] . ' --rotate ' . $extConf['sphinxIndexerName']);
-					t3lib_div::sysLog($ret, 'ke_search', 1);
+					$content .= $ret;
 				} else {
-					t3lib_div::sysLog('Check your php.ini configuration for disabled_functions. For now it is not allowed to execute a shell script.', 'ke_search', 1);
+					$content .= 'Check your php.ini configuration for disable_functions. For now it is not allowed to execute a shell script.';
 				}
 			} else {
-				t3lib_div::sysLog('We can\'t find the sphinx executables or execution permission is missing.', 'ke_search', 1);
+				$content .= 'We can\'t find the sphinx executables or execution permission is missing.';
 			}
 		}
 		/*
@@ -241,7 +241,7 @@ class tx_kesearch_indexer {
 		$content .= '<p><i>Cleanup process took ' . $duration . ' ms.</i></p>'."\n";
 		return $content;
 		*/
-		return "Bin durch";
+		return $content;
 	}
 
 
