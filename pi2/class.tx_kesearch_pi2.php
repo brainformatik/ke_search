@@ -104,17 +104,18 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 			return $content;
 		}
 
-		$this->getSearchResults(); //TODO We have to call it again, to get the numberOfResults. Maybe it's better to change it in Template and refreshResultsOnLoad
+		//$this->getSearchResults(); //TODO We have to call it again, to get the numberOfResults. Maybe it's better to change it in Template and refreshResultsOnLoad
 
 		if($this->conf['renderMethod'] == 'ajax_after_reload') {
 			$content = $this->cObj->substituteMarker($content,'###MESSAGE###', '');
-			$content = $this->cObj->substituteMarker($content,'###NUMBER_OF_RESULTS###', $this->numberOfResults);
-			$content = $this->cObj->substituteMarker($content,'###ORDERING###', $this->renderOrdering());
-			$content = $this->cObj->substituteMarker($content,'###SPINNER###', $this->spinnerImageResults);
-			$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
 			$content = $this->cObj->substituteMarker($content,'###QUERY_TIME###', '');
 			$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', '');
 			$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###', '');
+
+			$content = $this->cObj->substituteMarker($content,'###NUMBER_OF_RESULTS###', '');
+			$content = $this->cObj->substituteMarker($content,'###ORDERING###', '');
+			$content = $this->cObj->substituteMarker($content,'###SPINNER###', '');
+			$content = $this->cObj->substituteMarker($content,'###LOADING###', '');
 			return $this->pi_wrapInBaseClass($content);
 		}
 
@@ -136,7 +137,7 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 		}
 
 		$content = $this->cObj->substituteMarker($content, '###MESSAGE###', $this->getSearchResults());
-		$content = $this->cObj->substituteMarker($content, '###NUMBER_OF_RESULTS###', $this->numberOfResults);
+		$content = $this->cObj->substituteMarker($content, '###NUMBER_OF_RESULTS###', $this->pi_getLL('num_results') . $this->numberOfResults);
 		$content = $this->cObj->substituteMarker($content, '###ORDERING###', $this->renderOrdering());
 		$content = $this->cObj->substituteMarker($content, '###SPINNER###', $this->spinnerImageResults);
 		$content = $this->cObj->substituteMarker($content, '###LOADING###', $this->pi_getLL('loading'));

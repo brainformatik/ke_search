@@ -937,19 +937,20 @@ class tx_kesearch_lib extends tslib_pibase {
 		$objResponse = new tx_xajax_response();
 
 		if(!$filterString && !$this->piVars['sword'] && $this->conf['showTextInsteadOfResults']) {
-			$objResponse->addAssign("kesearch_results", "innerHTML", $this->pi_RTEcssText($this->conf['textForResults']));
-			$objResponse->addAssign("kesearch_query_time", "innerHTML", '');
-			$objResponse->addAssign("kesearch_ordering", "innerHTML", '');
-			$objResponse->addAssign("kesearch_pagebrowser_top", "innerHTML", '');
-			$objResponse->addAssign("kesearch_pagebrowser_bottom", "innerHTML", '');
-			$objResponse->addAssign("kesearch_updating_results", "innerHTML", '');
-			$objResponse->addAssign("kesearch_filters", "innerHTML", $this->renderFilters() . $this->onloadImage);
+			$objResponse->addAssign('kesearch_results', 'innerHTML', $this->pi_RTEcssText($this->conf['textForResults']));
+			$objResponse->addAssign('kesearch_query_time', 'innerHTML', '');
+			$objResponse->addAssign('kesearch_ordering', 'innerHTML', '');
+			$objResponse->addAssign('kesearch_pagebrowser_top', 'innerHTML', '');
+			$objResponse->addAssign('kesearch_pagebrowser_bottom', 'innerHTML', '');
+			$objResponse->addAssign('kesearch_updating_results', 'innerHTML', '');
+			$objResponse->addAssign('kesearch_num_results', 'innerHTML', '');
+			$objResponse->addAssign('kesearch_filters', 'innerHTML', $this->renderFilters() . $this->onloadImage);
 		} else {
 			// set search results
 			// process if on result page
-			$start = t3lib_div::milliseconds();
 			if ($GLOBALS['TSFE']->id == $this->conf['resultPage']) {
 				$objResponse->addAssign('kesearch_results', 'innerHTML', $this->getSearchResults() . $this->onloadImage);
+				$objResponse->addAssign('kesearch_num_results', 'innerHTML', $this->pi_getLL('num_results') . $this->numberOfResults);
 				$objResponse->addAssign('kesearch_ordering', 'innerHTML', $this->renderOrdering());
 			}
 
