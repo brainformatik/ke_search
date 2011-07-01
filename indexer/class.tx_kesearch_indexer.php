@@ -57,8 +57,6 @@ class tx_kesearch_indexer {
 	 * @return string							only if param $verbose is true
 	 */
 	function startIndexing($verbose=true, $extConf, $mode='')  {
-		$content = $this->cleanUpIndex();
-		return $content;
 		// write starting timestamp into temp file
 		// this is a little helper for clean up process
 		// delete all records which are older than starting timestamp in temp file
@@ -201,7 +199,7 @@ class tx_kesearch_indexer {
 	* @return string content for BE
 	*/
 	function cleanUpIndex() {
-		/*$startMicrotime = microtime(true);
+		$startMicrotime = microtime(true);
 		$fileContent = t3lib_div::trimExplode(CHR(10), t3lib_div::getURL($this->lockFile));
 		if(count($fileContent) != 2) return; // There must be exactly 2 rows (start and end time)
 		foreach($fileContent as $row) {
@@ -213,7 +211,7 @@ class tx_kesearch_indexer {
 		$table = 'tx_kesearch_index';
 		$where = 'tstamp < ' . $fileContent[0];
 		$GLOBALS['TYPO3_DB']->exec_DELETEquery($table, $where);
-		*/
+
 		// check if ke_search_premium is loaded
 		// in this case we have to update sphinx index, too.
 		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
@@ -239,7 +237,7 @@ class tx_kesearch_indexer {
 				$content .= 'We can\'t find the sphinx executables or execution permission is missing.';
 			}
 		}
-		/*
+
 		// after unlinking this file a new indexer process can be started
 		t3lib_div::unlink_tempfile($this->lockFile); // delete lock file from temp direcory
 
@@ -247,8 +245,6 @@ class tx_kesearch_indexer {
 		$endMicrotime = microtime(true);
 		$duration = ceil(($endMicrotime - $startMicrotime) * 1000);
 		$content .= '<p><i>Cleanup process took ' . $duration . ' ms.</i></p>'."\n";
-		return $content;
-		*/
 		return $content;
 	}
 
