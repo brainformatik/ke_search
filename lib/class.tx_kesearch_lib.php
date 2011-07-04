@@ -141,8 +141,11 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		$this->isEmptySearch = $this->isEmptySearch();
 
-		// precount results to find the best index
-		$this->db->chooseBestIndex($this->wordsAgainst, $this->tagsAgainst);
+		// chooseBestIndex is only needed for MySQL-Search. Not for Sphinx
+		if(!t3lib_extMgm::isLoaded('ke_search_premium')) {
+			// precount results to find the best index
+			$this->db->chooseBestIndex($this->wordsAgainst, $this->tagsAgainst);
+		}
 	}
 
 
@@ -721,8 +724,10 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 			$tagsAgainst = $this->div->removeXSS($tagsAgainst);
 
-			$this->db->chooseBestIndex($this->wordsAgainst, $tagsAgainst);
-
+			// chooseBestIndex is only needed for MySQL-Search. Not for Sphinx
+			if(!t3lib_extMgm::isLoaded('ke_search_premium')) {
+				$this->db->chooseBestIndex($this->wordsAgainst, $tagsAgainst);
+			}
 
 			$fields = 'uid';
 			$table = 'tx_kesearch_index';
@@ -1101,10 +1106,6 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * function getSearchResults
 	 */
 	protected function getSearchResults() {
-		// get search results
-		$query = $this->db->generateQueryForSearch();
-		//t3lib_div::devLog('db', 'db', -1, array('Query: ' . $query));
-
 		// generate and add onload image
 		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/blank.gif';
 		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" />';
@@ -1139,6 +1140,10 @@ class tx_kesearch_lib extends tslib_pibase {
 			// get number of records
 			$this->numberOfResults = $sphinx->getTotalFound();
 		} else {
+			// get search results
+			$query = $this->db->generateQueryForSearch();
+			//t3lib_div::devLog('db', 'db', -1, array('Query: ' . $query));
+
 			$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 			// get number of records
 			$this->numberOfResults = $this->db->getAmountOfSearchResults();

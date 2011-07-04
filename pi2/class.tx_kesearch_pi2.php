@@ -111,7 +111,6 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 			$content = $this->cObj->substituteMarker($content,'###QUERY_TIME###', '');
 			$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_TOP###', '');
 			$content = $this->cObj->substituteMarker($content,'###PAGEBROWSER_BOTTOM###', '');
-
 			$content = $this->cObj->substituteMarker($content,'###NUMBER_OF_RESULTS###', '');
 			$content = $this->cObj->substituteMarker($content,'###ORDERING###', '');
 			$content = $this->cObj->substituteMarker($content,'###SPINNER###', '');
