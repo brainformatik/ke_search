@@ -187,7 +187,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$this->onclickPagebrowser = 'pagebrowserAction(); ';
 
 				// $this->onclickFilter = 'this.form.submit();';
-				$this->onclickFilter = 'document.getElementById(\'xajax_form_kesearch_pi1\').submit();';
+				$this->onclickFilter = 'document.getElementById(\'pagenumber\').value=1; document.getElementById(\'xajax_form_kesearch_pi1\').submit();';
 
 				break;
 
