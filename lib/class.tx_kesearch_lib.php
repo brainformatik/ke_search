@@ -771,7 +771,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$sphinx = t3lib_div::makeInstance('user_kesearchpremium');
 				$sphinx->setLimit(0, 10000);
 				$queryForSphinx = '';
-				if($this->wordsAgainst) $queryForSphinx .= ' @(title,content) ' . $this->wordsAgainst;
+				if($this->wordsAgainst) $queryForSphinx .= ' @title ' . $this->wordsAgainst . ' @content ' . $this->wordsAgainst;
 				if($this->tagsAgainst) $queryForSphinx .= ' @(tags) ' . implode(' ', $this->tagsAgainst);
 				$queryForSphinx .= ' @(language) _language_' . $GLOBALS['TSFE']->sys_language_uid;
 				$queryForSphinx .= ' @(fe_group) _group_NULL | _group_0';
@@ -1134,7 +1134,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			// generate query
 			$queryForSphinx = '';
-			if($this->wordsAgainst) $queryForSphinx .= ' @(title,content) ' . $this->wordsAgainst;
+			if($this->wordsAgainst) $queryForSphinx .= ' @title ' . $this->wordsAgainst . ' @content ' . $this->wordsAgainst;
 			if($this->tagsAgainst) $queryForSphinx .= ' @(tags) ' . implode(' ', $this->tagsAgainst);
 			$queryForSphinx .= ' @(language) _language_' . $GLOBALS['TSFE']->sys_language_uid;
 			$queryForSphinx .= ' @(fe_group) _group_NULL | _group_0';
