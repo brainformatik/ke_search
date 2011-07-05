@@ -66,8 +66,9 @@ class tx_kesearch_indexer_types_xtypocommerce extends tx_kesearch_indexer_types 
 			$title = strip_tags($prodRecord['products_name']);
 			$tags = '';
 			$params = '&xtypocommerce[product]='.intval($prodRecord['prod_id']);
-			$description = strip_tags($prodRecord['products_description']);
-
+			//$description = strip_tags($prodRecord['products_description']);
+			$description = strip_tags(html_entity_decode($prodRecord['products_description']));
+			
 			// keywords
 			$keywordsContent = '';
 			$keywords = t3lib_div::trimExplode(',', $prodRecord['products_keywords'], true);
