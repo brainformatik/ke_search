@@ -349,8 +349,11 @@ class tx_kesearch_lib extends tslib_pibase {
 										$this->piVars['filter'][$filterUid] = $row['tag'];
 									}
 								}
+								
+								if($this->conf['showResultsPerFilter']) $row['title'] .= ' (' . $this->tagsInSearchResult['#' . $row['tag'] . '#'] . ')';
+								 
 								$options[$row['uid']] = array(
-									'title' => $row['title'] . ' (' . $this->tagsInSearchResult['#' . $row['tag'] . '#'] . ')',
+									'title' => $row['title'],
 									'value' => $row['tag'],
 									'selected' => $selected,
 								);

@@ -411,6 +411,16 @@
 						</TCEforms>
 					</showDate>
 
+					<showResultsPerFilter>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showResultsPerFilter</label>
+							<config>
+								<type>check</type>
+								<default>0</default>
+							</config>
+						</TCEforms>
+					</showResultsPerFilter>
+
 					<showPercentalScore>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showPercentalScore</label>
