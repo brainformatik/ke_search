@@ -236,9 +236,15 @@ class tx_kesearch_div {
 
 				// string arrays
 				case 'filter':
-					if (is_array($piVars[$key])) {
-						foreach ($piVars[$key] as $filterId => $filterValue)  {
-							$piVars[$key][$filterId] = htmlspecialchars($filterValue);
+					if(is_array($piVars[$key])) {
+						foreach($piVars[$key] as $filterId => $filterValue)  {
+							if(is_array($piVars[$key][$filterId])) {
+								foreach($piVars[$key][$filterId] as $key => $value) {
+									$piVars[$key][$filterId][$key] = htmlspecialchars($value);
+								}
+							} else {
+								$piVars[$key][$filterId] = htmlspecialchars($filterValue);
+							}
 						}
 					}
 					break;
