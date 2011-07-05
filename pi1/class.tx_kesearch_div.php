@@ -77,8 +77,6 @@ class tx_kesearch_div {
 	}
 
 	function getSearchString() {
-		$searchString = $this->removeXSS($this->piVars['sword']);
-
 		// replace plus and minus chars
 		$searchString = str_replace('-', ' ', $searchString);
 		$searchString = str_replace('+', ' ', $searchString);
@@ -92,10 +90,10 @@ class tx_kesearch_div {
 				// ignore words under length of 4 chars
 				if (strlen($searchWord) > 3) {
 					if($this->UTF8QuirksMode) {
-						$newSearchString .= '+'.utf8_encode($searchWord).'* ';
+						$newSearchString .= '+'.utf8_encode($GLOBALS['TYPO3_DB']->quoteStr($searchWord, 'tx_kesearch_index').'* ');
 					}
 					else {
-						$newSearchString .= '+'.$searchWord.'* ';
+						$newSearchString .= '+'.$GLOBALS['TYPO3_DB']->quoteStr($searchWord, 'tx_kesearch_index').'* ';
 					}
 				} else {
 					unset ($searchWordArray[$key]);
@@ -201,6 +199,68 @@ class tx_kesearch_div {
 			require_once(t3lib_extMgm::extPath($this->extKey).'res/scripts/RemoveXSS.php');
 			return RemoveXSS::process($value);
 		}
+	}
+
+
+	/**
+	 * function cleanPiVars
+	 *
+	 * cleans all piVars used in this EXT
+	 * uses removeXSS(...), htmlspecialchars(...) and / or intval(...)
+	 *
+	 * @param $piVars array		array containing all piVars
+	 *
+	 */
+	function cleanPiVars($piVars) {
+
+		// run through all piVars
+		foreach ($piVars as $key => $value) {
+
+			// process removeXSS(...) for all piVars
+			$piVars[$key] = $this->removeXSS($value);
+
+			// process further cleaning regarding to param type
+			switch ($key) {
+
+				// intvals - default 1
+				case 'page':
+					$piVars[$key] = intval($value);
+					// set to "1" if no value set
+					if (!$piVars[$key]) $piVars[$key] = 1;
+					break;
+
+				// intvals
+				case 'resetFilters':
+					$piVars[$key] = intval($value);
+					break;
+
+				// string arrays
+				case 'filter':
+					if (is_array($piVars[$key])) {
+						foreach ($piVars[$key] as $filterId => $filterValue)  {
+							$piVars[$key][$filterId] = htmlspecialchars($filterValue);
+						}
+					}
+					break;
+
+				// string
+				case 'sword':
+				case 'orderByField':
+					$piVars[$key] = htmlspecialchars($value);
+					break;
+
+				// "asc" or "desc"
+				case 'orderByDir':
+					$piVars[$key] = htmlspecialchars($value);
+					if (strtolower($piVars[$key]) != 'asc' && strtolower($piVars[$key]) != 'desc') {
+						$piVars[$key] = '';
+					}
+					break;
+			}
+		}
+
+		// return cleaned piVars values
+		return $piVars;
 	}
 }
 

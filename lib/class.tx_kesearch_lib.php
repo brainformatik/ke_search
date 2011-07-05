@@ -56,6 +56,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	var $indexToUse         = ''; // it's for 'USE INDEX ($indexToUse)' to speed up queries
 	var $tagsInSearchResult = false; // contains all tags of current search result
 	var $preselectedFilter  = array(); // preselected filters by flexform
+	var $filtersFromFlexform = array(); // array with filter-uids as key and whole data as value
 
  	/**
 	* @var tx_xajax
@@ -92,6 +93,9 @@ class tx_kesearch_lib extends tslib_pibase {
 			$this->cObj->data = $data;
 			$this->moveFlexFormDataToConf();
 		}
+
+		// clean piVars
+		$this->piVars = $this->div->cleanPiVars($this->piVars);
 
 		// get preselected filter from rootline
 		$this->getFilterPreselect();
@@ -252,14 +256,13 @@ class tx_kesearch_lib extends tslib_pibase {
 		// language parameter
 		$lParam = t3lib_div::_GET('L');
 		if (isset($lParam)) {
-			$hiddenFieldValue = $this->div->removeXSS($lParam);
+			$hiddenFieldValue = intval($lParam);
 			$hiddenFieldsContent .= '<input type="hidden" name="L" value="'.$hiddenFieldValue.'" />';
 		}
 		// mountpoint parameter
 		$mpParam = t3lib_div::_GET('MP');
 		if (isset($mpParam)) {
-			$hiddenFieldValue = t3lib_div::_GET('MP');
-			$hiddenFieldValue = $this->div->removeXSS($hiddenFieldValue);
+			$hiddenFieldValue = htmlentities($mpParam);
 			$hiddenFieldsContent .= '<input type="hidden" name="MP" value="'.$hiddenFieldValue.'" />';
 		}
 		$content = $this->cObj->substituteMarker($content,'###HIDDENFIELDS###', $hiddenFieldsContent);
@@ -309,8 +312,8 @@ class tx_kesearch_lib extends tslib_pibase {
 					// get filter options
 					$fields = '*';
 					$table = 'tx_kesearch_filteroptions';
-					$where = 'uid in ('.$this->filters[$filterUid]['options'].')';
-					$where .= ' AND pid in ('.$this->startingPoints.')';
+					$where = 'uid in ('.$GLOBALS['TYPO3_DB']->quoteStr($this->filters[$filterUid]['options'],'tx_kesearch_index').')';
+					$where .= ' AND pid in ('.$GLOBALS['TYPO3_DB']->quoteStr($this->startingPoints,'tx_kesearch_index').')';
 					$where .= $this->cObj->enableFields($table);
 					$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
 
@@ -715,12 +718,12 @@ class tx_kesearch_lib extends tslib_pibase {
 						foreach($this->piVars['filter'][$foreignFilterId] as $optionKey => $optionValue) {
 							if(!empty($this->piVars['filter'][$foreignFilterId][$optionKey])) {
 								// Don't add a "+", because we are here in checkbox mode
-								$tagsAgainst .= ' "#'.$this->piVars['filter'][$foreignFilterId][$optionKey].'#" ';
+								$tagsAgainst .= ' "#'.$GLOBALS['TYPO3_DB']->quoteStr($this->piVars['filter'][$foreignFilterId][$optionKey], 'tx_kesearch_index').'#" ';
 							}
 						}
 					} else {
 						if(!empty($this->piVars['filter'][$foreignFilterId])) {
-							$tagsAgainst .= ' +"#'.$this->piVars['filter'][$foreignFilterId].'#" ';
+							$tagsAgainst .= ' +"#'.$GLOBALS['TYPO3_DB']->quoteStr($this->piVars['filter'][$foreignFilterId], 'tx_kesearch_index').'#" ';
 						}
 					}
 				}
@@ -794,11 +797,11 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * @return array Array with filter UIDs
 	 */
 	protected function getFiltersFromFlexform() {
-		if(!empty($this->conf['filters'])) {
+		if(!empty($this->conf['filters']) && count($this->filtersFromFlexform) == 0) {
 			$fields = '*';
 			$table = 'tx_kesearch_filters';
-			$where = 'pid IN (' . $this->startingPoints . ')';
-			$where .= 'AND uid IN (' . $this->conf['filters'] . ')';
+			$where = 'pid in ('.$GLOBALS['TYPO3_DB']->quoteStr($this->startingPoints, $table).')';
+			$where .= ' AND uid in ('.$GLOBALS['TYPO3_DB']->quoteStr($this->conf['filters'], 'tx_kesearch_filters').')';
 			$where .= $this->cObj->enableFields($table);
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where);
 			while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
@@ -811,10 +814,10 @@ class tx_kesearch_lib extends tslib_pibase {
 						$GLOBALS['TSFE']->sys_language_contentOL
 					);
 				}
-				$results[$row['uid']] = $row;
+				$this->filtersFromFlexform[$row['uid']] = $row;
 			}
 		}
-		return $results;
+		return $this->filtersFromFlexform;
 	}
 
 	/**
@@ -833,7 +836,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			'*',
 			'tx_kesearch_filteroptions',
 			'pid in ('.$this->startingPoints.') ' .
-			'AND uid in (' . $optionList . ') ' .
+			'AND uid in (' . $GLOBALS['TYPO3_DB']->quoteStr($optionList, 'tx_kesearch_filteroptions') . ') ' .
 			$this->cObj->enableFields('tx_kesearch_filteroptions'),
 			'', '', ''
 		);
@@ -899,17 +902,17 @@ class tx_kesearch_lib extends tslib_pibase {
 		// initializes plugin configuration
 		$this->init();
 
-		// set pivars
+			// set pivars
 		foreach($data[$this->prefixId] as $key => $value) {
 			if(is_array($data[$this->prefixId][$key])) {
 				foreach($data[$this->prefixId][$key] as $subkey => $subtag)  {
-					$this->piVars[$key][$subkey] = $this->div->removeXSS($subtag);
+					$this->piVars[$key][$subkey] = $subtag;
 				}
 			} else {
-				$this->piVars[$key] = $this->div->removeXSS($value);
+				$this->piVars[$key] = $value;
 			}
 		}
-
+		
 		// create a list of all filters in piVars
 		if (is_array($this->piVars['filter'])) {
 			foreach($this->piVars['filter'] as $key => $value) {
@@ -1022,9 +1025,9 @@ class tx_kesearch_lib extends tslib_pibase {
 		// set pivars
 		$this->piVars = $data[$this->prefixId];
 		foreach ($this->piVars as $key => $value) {
-			$this->piVars[$key] = $this->div->removeXSS($value);
+			$this->piVars[$key] = $value;
 		}
-
+		
 		// init javascript onclick actions
 		$this->initOnclickActions();
 
@@ -1870,8 +1873,8 @@ class tx_kesearch_lib extends tslib_pibase {
 			foreach ($preselectedArray as $key => $option) {
 				$fields = '*, tx_kesearch_filters.uid as filteruid';
 				$table = 'tx_kesearch_filters, tx_kesearch_filteroptions';
-				$where = $GLOBALS['TYPO3_DB']->listQuery('options', $option, 'tx_kesearch_filters');
-				$where .= ' AND tx_kesearch_filteroptions.uid = '.$option;
+				$where = $GLOBALS['TYPO3_DB']->listQuery('options', intval($option), 'tx_kesearch_filters');
+				$where .= ' AND tx_kesearch_filteroptions.uid = ' . intval($option);
 				$where .= $this->cObj->enableFields('tx_kesearch_filters');
 				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
 				while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {

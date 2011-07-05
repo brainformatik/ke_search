@@ -183,6 +183,7 @@ class tx_kesearch_db {
 	protected function createQueryForTags($tags) {
 		if(count($tags)) {
 			foreach($tags as $value) {
+				$value = $GLOBALS['TYPO3_DB']->quoteStr($value, 'tx_kesearch_index');
 				$where .= ' AND MATCH (tags) AGAINST (\'' . $value . '\' IN BOOLEAN MODE) ';
 			}
 			return $where;
