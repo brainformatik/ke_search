@@ -63,7 +63,7 @@ class tx_kesearch_pi1 extends tx_kesearch_lib {
 
 		// get css file (include only in searchbox -> avoid duplicate css)
 		$cssFile = $this->conf['cssFile'] ? $this->conf['cssFile'] : t3lib_extMgm::siteRelPath($this->extKey).'res/ke_search_pi1.css';
-		$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId.'_css'] = '<link rel="stylesheet" type="text/css" href="'.$cssFile.'" / >';
+		$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId.'_css'] = '<link rel="stylesheet" type="text/css" href="'.$cssFile.'" />';
 
 		// get preselected filter from rootline
 		$this->getFilterPreselect();
