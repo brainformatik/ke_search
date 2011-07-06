@@ -69,6 +69,14 @@ class tx_kesearch_indexer_types_xtypocommerce extends tx_kesearch_indexer_types 
 			//$description = strip_tags($prodRecord['products_description']);
 			$description = strip_tags(html_entity_decode($prodRecord['products_description']));
 			
+			// manufacturer name
+			$fields = 'manufacturers_name';
+			$table = 'tx_xtypocommerce_manufacturers';
+			$where = 'manufacturers_id="'.intval($prodRecord['products_id']).'" ';
+			$manufacturerRes = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='1');
+			$manufacturerRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($manufacturerRes);
+			$manufacturerName = $manufacturerRow['manufacturers_name'];
+
 			// keywords
 			$keywordsContent = '';
 			$keywords = t3lib_div::trimExplode(',', $prodRecord['products_keywords'], true);
@@ -79,7 +87,7 @@ class tx_kesearch_indexer_types_xtypocommerce extends tx_kesearch_indexer_types 
 			}
 
 			// build full content
-			$fullContent = $description. "\n" . $keywordsContent;
+			$fullContent = $description. "\n" . $keywordsContent . "\n" . $manufacturerName;
 
 			// set target pid
 			$targetPID = $this->indexerConfig['targetpid'];
