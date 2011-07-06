@@ -1946,11 +1946,6 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		$content = $this->cObj->substituteMarkerArray($content, $markerArray);
 
-		// minify JS?
-		if(version_compare(TYPO3_version, '4.2.0', '>=')) {
-			$content = t3lib_div::minifyJavaScript($content);
-		}
-
 		// add JS to page header
 		$GLOBALS['TSFE']->additionalHeaderData['jsContent'] = $content;
 	}
