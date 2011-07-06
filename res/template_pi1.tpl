@@ -1,6 +1,7 @@
 
 <!-- ###JS_SEARCH_ALL### begin -->
 <script type="text/javascript">
+//<![CDATA[
 // js for all render methods
 function searchboxFocus(searchbox) {
 	if(searchbox.value == "###SEARCHBOX_DEFAULT_VALUE###") {
@@ -30,11 +31,13 @@ function enableCheckboxes(filter) {
 		}
 	}
 }
+//]]>
 </script>
 <!-- ###JS_SEARCH_ALL### end -->
 
 <!-- ###JS_SEARCH_NON_STATIC### begin -->
 <script type="text/javascript">
+//<![CDATA[
 function switchArea(objid) {
 	if (document.getElementById("options_" + objid).className == "expanded") {
 		document.getElementById("options_" + objid).className = "closed";
@@ -65,11 +68,13 @@ function onloadFilters() {
 	document.getElementById("kesearch_updating_filters").style.display="block";
 	tx_kesearch_pi1refreshFiltersOnLoad(xajax.getFormValues("xajax_form_kesearch_pi1"));
 }
+//]]>
 </script>
 <!-- ###JS_SEARCH_NON_STATIC### end -->
 
 <!-- ###JS_SEARCH_AJAX_RELOAD### begin -->
 <script type="text/javascript">
+//<![CDATA[
 // refresh result list onload
 function onloadResults() {
 	document.getElementById("kesearch_pagebrowser_top").style.display="none";
@@ -150,7 +155,7 @@ function hideSpinner() {
 
 // domReadyAction
 ###DOMREADYACTION###
-
+//]]>
 </script>
 
 
