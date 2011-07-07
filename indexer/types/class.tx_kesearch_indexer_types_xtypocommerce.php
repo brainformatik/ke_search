@@ -68,11 +68,11 @@ class tx_kesearch_indexer_types_xtypocommerce extends tx_kesearch_indexer_types 
 			$params = '&xtypocommerce[product]='.intval($prodRecord['prod_id']);
 			//$description = strip_tags($prodRecord['products_description']);
 			$description = strip_tags(html_entity_decode($prodRecord['products_description']));
-			
+
 			// manufacturer name
 			$fields = 'manufacturers_name';
 			$table = 'tx_xtypocommerce_manufacturers';
-			$where = 'manufacturers_id="'.intval($prodRecord['products_id']).'" ';
+			$where = 'manufacturers_id="'.intval($prodRecord['prod_id']).'" ';
 			$manufacturerRes = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='1');
 			$manufacturerRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($manufacturerRes);
 			$manufacturerName = $manufacturerRow['manufacturers_name'];
