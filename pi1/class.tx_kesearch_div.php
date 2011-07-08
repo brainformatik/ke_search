@@ -89,12 +89,7 @@ class tx_kesearch_div {
 			foreach ($searchWordArray as $key => $searchWord) {
 				// ignore words under length of 4 chars
 				if (strlen($searchWord) > 3) {
-					if($this->UTF8QuirksMode) {
-						$newSearchString .= '+'.utf8_encode($GLOBALS['TYPO3_DB']->quoteStr($searchWord, 'tx_kesearch_index').'* ');
-					}
-					else {
-						$newSearchString .= '+'.$GLOBALS['TYPO3_DB']->quoteStr($searchWord, 'tx_kesearch_index').'* ';
-					}
+					$newSearchString .= '+'.$GLOBALS['TYPO3_DB']->quoteStr($searchWord, 'tx_kesearch_index').'* ';
 				} else {
 					unset ($searchWordArray[$key]);
 				}
@@ -138,16 +133,8 @@ class tx_kesearch_div {
 			foreach ($swords as $key => $word) {
 				// ignore words under length of 4 chars
 				if (strlen($word) > 3) {
-
-					if ($this->pObj->UTF8QuirksMode) {
-						$scoreAgainst .= utf8_decode($word).' ';
-						$wordsAgainst .= '+'.utf8_decode($word).'* ';
-					}
-					else {
-						$scoreAgainst .= $word.' ';
-						$wordsAgainst .= '+'.$word.'* ';
-					}
-
+					$scoreAgainst .= $word.' ';
+					$wordsAgainst .= '+'.$word.'* ';
 				} else {
 					unset ($swords[$key]);
 

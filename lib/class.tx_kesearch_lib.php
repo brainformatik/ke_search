@@ -49,7 +49,6 @@ class tx_kesearch_lib extends tslib_pibase {
 
 	var $startingPoints     = 0; // comma seperated list of startingPoints
 	var $firstStartingPoint = 0; // comma seperated list of startingPoints
-	var $UTF8QuirksMode     = false; // if set non utf8 values will be converted to utf8
 	var $conf               = array(); // FlexForm-Configuration
 	var $extConf            = array(); // Extension-Configuration
 	var $numberOfResults    = 0; // count search results
@@ -136,7 +135,6 @@ class tx_kesearch_lib extends tslib_pibase {
 			// but we have wrapped # with " and it works.
 			$this->extConf['prePostTagChar'] = '#';
 		}
-				$this->UTF8QuirksMode = $this->extConf['useUTF8QuirksMode'];
 		$this->extConf['multiplyValueToTitle'] = ($this->extConf['multiplyValueToTitle']) ? $this->extConf['multiplyValueToTitle'] : 1;
 
 		// get html template
@@ -569,9 +567,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		$filterContent = $this->cObj->getSubpart($this->templateCode, $filterSubpart);
 		$filterContent = $this->cObj->substituteSubpart ($filterContent, $optionSubpart, $optionsContent);
 
-		if ($this->UTF8QuirksMode) $filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', utf8_encode($this->filters[$filterUid]['title']));
-		else $filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $this->filters[$filterUid]['title']);
-
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $this->filters[$filterUid]['title']);
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $this->filters[$filterUid]['title']);
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERNAME###', 'tx_kesearch_pi1[filter]['.$filterUid.']');
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERID###', 'filter['.$filterUid.']');
@@ -683,7 +679,6 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// get title
 		$filterTitle = $this->filters[$filterUid]['title'];
-		if($this->UTF8QuirksMode) $filterTitle = utf8_encode($filterTitle);
 
 		// get bullet image
 		$bulletSrc = $this->filters[$filterUid]['expandbydefault'] ? 'list-head-expanded.gif' : 'list-head-closed.gif';
@@ -1039,9 +1034,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$errorMessage = $this->cObj->substituteMarker($errorMessage,'###IMAGE###', $this->cObj->IMAGE($imageConf));
 				$errorMessage = $this->cObj->substituteMarker($errorMessage,'###MESSAGE###', $this->pi_getLL('searchword_length_error'));
 
-				if ($this->UTF8QuirksMode) $objResponse->addAssign("kesearch_error", "innerHTML", utf8_encode($errorMessage));
-				else $objResponse->addAssign("kesearch_error", "innerHTML", $errorMessage);
-
+				$objResponse->addAssign("kesearch_error", "innerHTML", $errorMessage);
 			} else {
 				$objResponse->addAssign("kesearch_error", "innerHTML", '');
 			}
@@ -1447,8 +1440,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		// add onload image
 		$content .= $this->onloadImage;
 
-		if ($this->UTF8QuirksMode) return utf8_encode($content);
-		else return $content;
+		return $content;
 	}
 
 
