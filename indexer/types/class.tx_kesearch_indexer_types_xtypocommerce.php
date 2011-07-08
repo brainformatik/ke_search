@@ -48,6 +48,7 @@ class tx_kesearch_indexer_types_xtypocommerce extends tx_kesearch_indexer_types 
 	 * @return string content which will be displayed in backend
 	 */
 	public function startIndexing() {
+		$tagChar = $this->pObj->extConf['prePostTagChar'];
 		$content = '';
 
 		// get xtypocommerce products
@@ -100,7 +101,7 @@ class tx_kesearch_indexer_types_xtypocommerce extends tx_kesearch_indexer_types 
 				foreach ($catRootline as $productId => $categories) {
 					$catArray = t3lib_div::trimExplode(',', $categories);
 					foreach($catArray as $key => $catId)  {
-						$tagContent .= '#category_'.$catId.'#';
+						$tagContent .= $tagChar . 'category_' . $catId . $tagChar;
 					}
 				}
 			}
@@ -112,7 +113,7 @@ class tx_kesearch_indexer_types_xtypocommerce extends tx_kesearch_indexer_types 
 			// manufacturer
 			if (!empty($prodRecord['manufacturers_id'])) {
 				// publisher
-				$tagContent .= '#publisher_'.$prodRecord['manufacturers_id'].'#';
+				$tagContent .= $tagChar . 'publisher_' . $prodRecord['manufacturers_id'] . $tagChar;
 			}
 			// language
 			if (!empty($prodRecord['products_language'])) {
@@ -131,12 +132,12 @@ class tx_kesearch_indexer_types_xtypocommerce extends tx_kesearch_indexer_types 
 				} else if (stristr($lang, 'niederl')) {
 					$lang = 'Niederlaendisch';
 				}
-				$tagContent .= '#language_'.$lang.'#';
+				$tagContent .= $tagChar . 'language_' . $lang . $tagChar;
 			}
 			// publish date
 			if (!empty($prodRecord['products_monat']) && !empty($prodRecord['products_jahr'])) {
 				// date
-				$tagContent .= '#year_'.$prodRecord['products_jahr'].'#';
+				$tagContent .= $tagChar . 'year_' . $prodRecord['products_jahr'] . $tagChar;
 
 				// set date as sortdate
 				$additionalFields['sortdate'] = mktime(0,0,0,$prodRecord['products_monat'], 1, $prodRecord['products_jahr']);
@@ -189,19 +190,20 @@ class tx_kesearch_indexer_types_xtypocommerce extends tx_kesearch_indexer_types 
 	 * @param $arg
 	 */
 	function getXTYPOCommerceRegionAndCountryTags($regions, $countries) {
+		$tagChar = $this->pObj->extConf['prePostTagChar'];
 		$tagContent = '';
 
 		$regions = t3lib_div::trimExplode(',', $regions, true);
 		if (is_array($regions)) {
 			foreach ($regions as $key => $region) {
-				$tagContent .= '#region_'.$region.'#';
+				$tagContent .= $tagChar . 'region_' . $region . $tagChar;
 			}
 		}
 
 		$countries = t3lib_div::trimExplode(',', $countries, true);
 		if (is_array($countries)) {
 			foreach ($countries as $key => $country) {
-				$tagContent .= '#country_'.$country.'#';
+				$tagContent .= $tagChar . 'country_' . $country . $tagChar;
 			}
 		}
 
