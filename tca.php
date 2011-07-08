@@ -362,6 +362,16 @@ $TCA['tx_kesearch_index'] = array (
 				'default' => '0'
 			)
 		),
+		'orig_uid' => array (
+			'config' => array (
+				'type' => 'passthrough'
+			)
+		),
+		'orig_pid' => array (
+			'config' => array (
+				'type' => 'passthrough'
+			)
+		),
 	),
 	'types' => array (
 		'0' => array('showitem' => 'starttime;;;;1-1-1, endtime, fe_group, targetpid, content, params, type, tags, abstract, title;;;;2-2-2, language;;;;3-3-3')

@@ -78,6 +78,8 @@ CREATE TABLE tx_kesearch_index (
 	tags text,
 	abstract text,
 	sortdate int(11) DEFAULT '0' NOT NULL,
+	orig_uid int(11) DEFAULT '0' NOT NULL,
+	orig_pid int(11) DEFAULT '0' NOT NULL,
 	title tinytext,
 	language int(11) DEFAULT '0' NOT NULL,
 

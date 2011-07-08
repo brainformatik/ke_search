@@ -167,7 +167,7 @@ class tx_kesearch_div {
 				$tagsAgainst[$key] .= ' "' . $tagChar . implode($tagChar . '" "' . $tagChar, $value) . $tagChar . '"';
 			// if we are in select or list mode
 			} elseif(count($this->pObj->preselectedFilter[$key]) == 1) {
-				$tagsAgainst[$key] .= ' +"' . $tagChar. $value[0] . $tagChar . '"';
+				$tagsAgainst[$key] .= ' +"' . $tagChar. current($value) . $tagChar . '"';
 			}
 		}
 		if(is_array($this->pObj->piVars['filter'])) {
@@ -182,7 +182,7 @@ class tx_kesearch_div {
 					}
 				} else {
 					// Don't add the tag if it is already inserted by preselected filters
-					if(!empty($tag) && strstr($tagsAgainst[0], $subtag) === false) {
+					if(!empty($tag) && strstr($tagsAgainst[$key], $subtag) === false) {
 						$tagsAgainst[$key] .= ' +"' . $tagChar . $tag . $tagChar . '" ';
 					}
 				}

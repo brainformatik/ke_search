@@ -32,7 +32,13 @@
 
 class user_kesearch_sortdate {
 	public function registerAdditionalFields(&$additionalFields) {
+		// first entry = field name
+		// second entry = is string or not
 		$newField = array('sortdate', 0);
+		$additionalFields[] = $newField;
+		$newField = array('orig_uid', 0);
+		$additionalFields[] = $newField;
+		$newField = array('orig_pid', 0);
 		$additionalFields[] = $newField;
 	}
 
@@ -49,6 +55,15 @@ class user_kesearch_sortdate {
 		if(isset($pageRecord['lastUpdated']) && $pageRecord['lastUpdated'] > 0) {
 			$additionalFields['sortdate'] = $pageRecord['lastUpdated'];
 		}
+
+		// fill orig_uid
+		if(isset($pageRecord['uid']) && $pageRecord['uid'] > 0) {
+			$additionalFields['orig_uid'] = $pageRecord['uid'];
+		}
+		// fill orig_pid
+		if(isset($pageRecord['pid']) && $pageRecord['pid'] > 0) {
+			$additionalFields['orig_pid'] = $pageRecord['pid'];
+		}
 	}
 
 	public function modifyNewsIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tags, $newsRecord, &$additionalFields) {
@@ -60,6 +75,15 @@ class user_kesearch_sortdate {
 		if(isset($newsRecord['datetime']) && $newsRecord['datetime'] > 0) {
 			$additionalFields['sortdate'] = $newsRecord['datetime'];
 		}
+
+		// fill orig_uid
+		if(isset($newsRecord['uid']) && $newsRecord['uid'] > 0) {
+			$additionalFields['orig_uid'] = $newsRecord['uid'];
+		}
+		// fill orig_pid
+		if(isset($newsRecord['pid']) && $newsRecord['pid'] > 0) {
+			$additionalFields['orig_pid'] = $newsRecord['pid'];
+		}
 	}
 
 	public function modifyYACIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tags, $yacRecord, $targetPID, &$additionalFields) {
@@ -70,6 +94,15 @@ class user_kesearch_sortdate {
 		// if TYPO3 sets last changed
 		if(isset($yacRecord['starttime']) && $yacRecord['starttime'] > 0) {
 			$additionalFields['sortdate'] = $yacRecord['starttime'];
+		}
+
+		// fill orig_uid
+		if(isset($yacRecord['uid']) && $yacRecord['uid'] > 0) {
+			$additionalFields['orig_uid'] = $yacRecord['uid'];
+		}
+		// fill orig_pid
+		if(isset($yacRecord['pid']) && $yacRecord['pid'] > 0) {
+			$additionalFields['orig_pid'] = $yacRecord['pid'];
 		}
 	}
 
@@ -86,11 +119,31 @@ class user_kesearch_sortdate {
 		if(isset($damRecord['file_mtime']) && $damRecord['file_mtime'] > 0) {
 			$additionalFields['sortdate'] = $damRecord['file_mtime'];
 		}
+
+		// fill orig_uid
+		if(isset($damRecord['uid']) && $damRecord['uid'] > 0) {
+			$additionalFields['orig_uid'] = $damRecord['uid'];
+		}
+		// fill orig_pid
+		if(isset($damRecord['pid']) && $damRecord['pid'] > 0) {
+			$additionalFields['orig_pid'] = $damRecord['pid'];
+		}
+	}
+
+	public function modifyAddressIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tagContent, &$addressRow, &$additionalFields) {
+		// fill orig_uid
+		if(isset($addressRow['uid']) && $addressRow['uid'] > 0) {
+			$additionalFields['orig_uid'] = $addressRow['uid'];
+		}
+		// fill orig_pid
+		if(isset($addressRow['pid']) && $addressRow['pid'] > 0) {
+			$additionalFields['orig_pid'] = $addressRow['pid'];
+		}
 	}
 
 	public function modifyXTYPOCommerceIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tagContent, $prodRecord, &$additionalFields) {
 
 	}
-	
+
 }
 ?>

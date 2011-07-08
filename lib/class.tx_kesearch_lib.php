@@ -1919,6 +1919,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$option = intval($option);
 				$fields = '
 					tx_kesearch_filters.uid as filteruid,
+					tx_kesearch_filteroptions.uid as optionuid,
 					tx_kesearch_filteroptions.tag
 				';
 				$table = 'tx_kesearch_filters, tx_kesearch_filteroptions';
@@ -1927,7 +1928,8 @@ class tx_kesearch_lib extends tslib_pibase {
 				$where .= $this->cObj->enableFields('tx_kesearch_filters');
 				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
 				while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-					$this->preselectedFilter[$row['filteruid']][] = $row['tag'];
+					//$this->preselectedFilter[$row['filteruid']][] = $row['tag'];
+					$this->preselectedFilter[$row['filteruid']][$row['optionuid']] = $row['tag'];
 				}
 			}
 		}
