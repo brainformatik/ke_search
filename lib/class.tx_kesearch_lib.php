@@ -125,7 +125,18 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// get extension configuration array
 		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->extKey]);
-		$this->UTF8QuirksMode = $this->extConf['useUTF8QuirksMode'];
+		// sphinx has problems with # in query string.
+		// so you have the possibility to change # against some other char
+		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
+			$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search_premium']);
+			if(!$extConf['prePostTagChar']) $extConf['prePostTagChar'] = '_';
+			$this->extConf['prePostTagChar'] = $extConf['prePostTagChar'];
+		} else {
+			// MySQL has problems also with #
+			// but we have wrapped # with " and it works.
+			$this->extConf['prePostTagChar'] = '#';
+		}
+				$this->UTF8QuirksMode = $this->extConf['useUTF8QuirksMode'];
 		$this->extConf['multiplyValueToTitle'] = ($this->extConf['multiplyValueToTitle']) ? $this->extConf['multiplyValueToTitle'] : 1;
 
 		// get html template
@@ -777,7 +788,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			} else $index = '';
 
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery(
-				'uid, REPLACE(tags, "' . $tagChar . $tagChar . '", "' . $tagChar . ',' . $tagChar .'") as tags',
+				'uid, tags',
 				'tx_kesearch_index' . $index,
 				$where,
 				'','',''
@@ -794,13 +805,12 @@ class tx_kesearch_lib extends tslib_pibase {
 				if(count($this->tagsAgainst)) {
 					foreach($this->tagsAgainst as $value) {
 						// in normal case only checkbox mode has spaces
-						$tagQueryForSphinx .= ' ' . str_replace(' ', ' | ', trim($value));
+						$queryForSphinx .= ' @tags ' . str_replace('" "', '" | "', trim($value));
 					}
-					$queryForSphinx .= ' @tags ' . $tagQueryForSphinx;
 				}
 				$queryForSphinx .= ' @(language) _language_' . $GLOBALS['TSFE']->sys_language_uid;
 				$queryForSphinx .= ' @(fe_group) _group_NULL | _group_0';
-				$res = $sphinx->getResForSearchResults($queryForSphinx, '*', 'uid, REPLACE(tags, "' . $tagChar . $tagChar . '", "' . $tagChar . ',' . $tagChar . '") as tags');
+				$res = $sphinx->getResForSearchResults($queryForSphinx, '*', 'uid, tags');
 			} else {
 				$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 			}
@@ -1164,9 +1174,8 @@ class tx_kesearch_lib extends tslib_pibase {
 			if(count($this->tagsAgainst)) {
 				foreach($this->tagsAgainst as $value) {
 					// in normal case only checkbox mode has spaces
-					$tagQueryForSphinx .= ' ' . str_replace(' ', ' | ', trim($value));
+					$queryForSphinx .= ' @tags ' . str_replace('" "', '" | "', trim($value));
 				}
-				$queryForSphinx .= ' @tags ' . $tagQueryForSphinx;
 			}
 			$queryForSphinx .= ' @(language) _language_' . $GLOBALS['TSFE']->sys_language_uid;
 			$queryForSphinx .= ' @(fe_group) _group_NULL | _group_0';

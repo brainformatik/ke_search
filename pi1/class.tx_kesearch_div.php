@@ -177,14 +177,12 @@ class tx_kesearch_div {
 						// Don't add the tag if it is already inserted by preselected filters
 						if(!empty($subtag) && strstr($tagsAgainst[$key], $subtag) === false) {
 							// Don't add a "+", because we are here in checkbox mode. It's a OR.
-							$subtag = str_replace(' ', '_', $subtag);
 							$tagsAgainst[$key] .= ' "' . $tagChar . $subtag . $tagChar . '" ';
 						}
 					}
 				} else {
 					// Don't add the tag if it is already inserted by preselected filters
 					if(!empty($tag) && strstr($tagsAgainst[0], $subtag) === false) {
-						$tag = str_replace(' ', '_', $tag);
 						$tagsAgainst[$key] .= ' +"' . $tagChar . $tag . $tagChar . '" ';
 					}
 				}

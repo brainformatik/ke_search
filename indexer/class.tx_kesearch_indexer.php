@@ -46,6 +46,17 @@ class tx_kesearch_indexer {
 	 */
 	public function __construct() {
 		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search']);
+		// sphinx has problems with # in query string.
+		// so you have the possibility to change # against some other char
+		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
+			$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search_premium']);
+			if(!$extConf['prePostTagChar']) $extConf['prePostTagChar'] = '_';
+			$this->extConf['prePostTagChar'] = $extConf['prePostTagChar'];
+		} else {
+			// MySQL has problems also with #
+			// but we have wrapped # with " and it works.
+			$this->extConf['prePostTagChar'] = '#';
+		}
 		$this->lockFile = PATH_site . 'typo3temp/ke_search_indexer.lock';
 	}
 
