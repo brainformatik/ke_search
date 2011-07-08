@@ -49,6 +49,8 @@ class tx_kesearch_indexer_types_dam extends tx_kesearch_indexer_types {
 	 */
 	public function startIndexing() {
 
+		$tagChar = $this->pObj->extConf['prePostTagChar'];
+
 		// get categories
 		$this->catList = $this->indexerConfig['index_dam_categories'].',';
 
@@ -99,7 +101,7 @@ class tx_kesearch_indexer_types_dam extends tx_kesearch_indexer_types {
 					$clearTextTags = '';
 					if (count($damRecordTags)) {
 						foreach ($damRecordTags as $key => $tagUid)  {
-							$tags .= '#'.$this->getTag($tagUid).'#';
+							$tags .= $tagChar . $this->getTag($tagUid) . $tagChar;
 							$clearTextTags .= chr(13).$this->getTag($tagUid, true);
 						}
 					}

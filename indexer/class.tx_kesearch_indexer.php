@@ -318,7 +318,7 @@ class tx_kesearch_indexer {
 			}
 			$addQueryFields .= ', @' . $value[0];
 		}
-		
+
 
 		// check if record already exists
 		$countRows = $this->indexRecordExists($storagepid, $targetpid, $type, $params, $language);
@@ -480,9 +480,10 @@ class tx_kesearch_indexer {
 	 * @param $pid
 	 */
 	function setRootlineTags($pid, $rootlineTags, $tagsContent) {
-		if (count($this->rootlineTags)) {
+		$tagChar = $this->extConf['prePostTagChar'];
+		if(count($this->rootlineTags)) {
 			foreach($this->rootlineTags as $key => $data) {
-				if ($this->checkPIDUpInRootline($pid, $data['foreign_pid']) && !strstr($tagsContent,'#'.$data['tag'].'#')) $tagsContent .= '#'.$data['tag'].'#';
+				if ($this->checkPIDUpInRootline($pid, $data['foreign_pid']) && !strstr($tagsContent, $tagChar . $data['tag'] . $tagChar)) $tagsContent .= $tagChar . $data['tag'] . $tagChar;
 			}
 		}
 

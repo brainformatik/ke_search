@@ -96,7 +96,6 @@ class user_filterlist {
 		$where .= t3lib_befunc::deleteClause($table,$inv=0);
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
 		$anz = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-		t3lib_div::devLog('user', 'user', -1, array($GLOBALS['BE_USER']));
 		while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 
 			if (!empty($row['options'])) {

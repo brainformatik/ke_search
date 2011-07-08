@@ -48,6 +48,7 @@ class tx_kesearch_indexer_types_ke_yac extends tx_kesearch_indexer_types {
 	 * @return string content which will be displayed in backend
 	 */
 	public function startIndexing() {
+		$tagChar = $this->pObj->extConf['prePostTagChar'];
 		$now = strtotime('today');
 
 		// get YAC records from specified pid
@@ -93,7 +94,7 @@ class tx_kesearch_indexer_types_ke_yac extends tx_kesearch_indexer_types {
 				$clearTextTags = '';
 				if (count($yacRecordTags)) {
 					foreach ($yacRecordTags as $key => $tagUid)  {
-						$tags .= '#'.$this->getTag($tagUid).'#';
+						$tags .= $tagChar . $this->getTag($tagUid) . $tagChar;
 						$clearTextTags .= chr(13).$this->getTag($tagUid, true);
 					}
 				}

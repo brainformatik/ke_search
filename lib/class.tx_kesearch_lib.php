@@ -296,6 +296,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 */
 	protected function renderFilters() {
 
+		$tagChar = $this->extConf['prePostTagChar'];
 		// get filters from db
 		$this->filters = $this->getFiltersFromFlexform();
 
@@ -352,9 +353,9 @@ class tx_kesearch_lib extends tslib_pibase {
 										$this->piVars['filter'][$filterUid] = $row['tag'];
 									}
 								}
-								
-								if($this->conf['showResultsPerFilter']) $row['title'] .= ' (' . $this->tagsInSearchResult['#' . $row['tag'] . '#'] . ')';
-								 
+
+								if($this->conf['showResultsPerFilter']) $row['title'] .= ' (' . $this->tagsInSearchResult[$tagChar . $row['tag'] . $tagChar] . ')';
+
 								$options[$row['uid']] = array(
 									'title' => $row['title'],
 									'value' => $row['tag'],
@@ -587,30 +588,30 @@ class tx_kesearch_lib extends tslib_pibase {
 	}
 
 
-
-
-	/*
-	 * function renderCheckbox
-	 * @param $arg
+	/**
+	 * renders the filters which are in checkbox mode
+	 *
+	 * @param $filterUid UID of the filter which we have to render
+	 * @param $options contains all options which are found in the seach result
+	 * @return $string HTML of rendered checkbox filter
 	 */
 	protected function renderCheckbox($filterUid, $options) {
-
+		// getFiltersFromFlexform is much faster than an additional SQL-Query
 		$filters = $this->getFiltersFromFlexform();
 		$allOptionsOfCurrentFilter = $this->getFilterOptions($filters[$filterUid]['options']);
 
-		$filterSubpart = '###SUB_FILTER_CHECKBOX###';
-		$optionSubpart = '###SUB_FILTER_CHECKBOX_OPTION###';
-
-		$optionsCount = 0;
+		// getSubparts
+		$template['filter'] = $this->cObj->getSubpart($this->templateCode, '###SUB_FILTER_CHECKBOX###');
+		$template['options'] = $this->cObj->getSubpart($this->templateCode, '###SUB_FILTER_CHECKBOX_OPTION###');
 
 		// loop through options
 		if(is_array($allOptionsOfCurrentFilter)) {
 			foreach($allOptionsOfCurrentFilter as $key => $data) {
 				$checkBoxParams['selected'] = '';
 				$checkBoxParams['disabled'] = '';
+				$isOptionInOptionArray = 0;
 
 				// check if current option (of searchresults) is in array of all possible options
-				$isOptionInOptionArray = 0;
 				foreach($options as $optionKey => $optionValue) {
 					if(is_array($options[$optionKey]) && t3lib_div::inArray($options[$optionKey], $data['title'])) {
 						$isOptionInOptionArray = 1;
@@ -619,75 +620,90 @@ class tx_kesearch_lib extends tslib_pibase {
 				}
 
 				// if option is in optionArray, we have to mark the checkboxes
-				// but only if customer has searched for filters
 				if($isOptionInOptionArray) {
-					$checkBoxParams['selected'] = ($this->piVars['filter'][$filterUid][$key]) ? 'checked="checked"' : '';
-					if(!is_array($this->piVars['filter'][$filterUid]) && $this->filters[$filterUid]['markAllCheckboxes']) {
+					// if user has selected a checkbox it must be selected on the resultpage, too.
+					if($this->piVars['filter'][$filterUid][$key]) {
 						$checkBoxParams['selected'] = 'checked="checked"';
 					}
-					$checkBoxParams['disabled'] = '';
-				} else {
+
+					// mark all checkboxes if set and no search string was given
+					if($this->isEmptySearch && $this->filters[$filterUid]['markAllCheckboxes']) {
+						$checkBoxParams['selected'] = 'checked="checked"';
+					}
+
+					// always mark checkboxes which are preselected
+					if($this->preselectedFilter[$filterUid][$data['uid']]) {
+						$checkBoxParams['selected'] = 'checked="checked"';
+					}
+				} else { // if an option was not found in the search results
 					$checkBoxParams['disabled'] = 'disabled="disabled"';
 				}
 
-				$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $data['title']);
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###VALUE###', $data['tag']);
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONKEY###', $key);
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONID###', 'filter[' . $filterUid . '][' . $key . ']');
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONCSSCLASS###', 'optionCheckBox optionCheckBox' . $key);
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONNAME###', 'optionCheckBox' . $filterUid);
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONSELECT###', $checkBoxParams['selected']);
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONDISABLED###', $checkBoxParams['disabled']);
-
-				$optionsCount++;
+				$markerArray['###TITLE###'] = $data['title'];
+				$markerArray['###VALUE###'] = $data['tag'];
+				$markerArray['###OPTIONKEY###'] = $key;
+				$markerArray['###OPTIONID###'] = 'filter[' . $filterUid . '][' . $key . ']';
+				$markerArray['###OPTIONCSSCLASS###'] = 'optionCheckBox optionCheckBox' . $key;
+				$markerArray['###OPTIONNAME###'] = 'optionCheckBox' . $filterUid;
+				$markerArray['###OPTIONSELECT###'] = $checkBoxParams['selected'];
+				$markerArray['###OPTIONDISABLED###'] = $checkBoxParams['disabled'];
+				$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
 			}
+			$optionsCount = count($allOptionsOfCurrentFilter);
 		}
 
 		// modify filter options by hook
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'])) {
 			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'] as $_classRef) {
 				$_procObj = & t3lib_div::getUserObj($_classRef);
-				$optionsContent .= $_procObj->modifyFilterOptions(
+				$contentOptions .= $_procObj->modifyFilterOptions(
 					$filterUid,
-					$optionsContent,
+					$contentOptions,
 					$optionsCount,
 					$this
 				);
 			}
 		}
 
-		// fill markers
-		$filterContent = $this->cObj->getSubpart($this->templateCode, $filterSubpart);
-		$filterContent = $this->cObj->substituteSubpart ($filterContent, $optionSubpart, $optionsContent);
+		unset($markerArray);
 
-		if ($this->UTF8QuirksMode) $filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', utf8_encode($this->filters[$filterUid]['title']));
-		else $filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $this->filters[$filterUid]['title']);
+		// render filter
+		$contentFilters = $this->cObj->substituteSubpart($template['filter'], '###SUB_FILTER_CHECKBOX_OPTION###', $contentOptions);
 
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###LABEL_ALL###', $this->pi_getLL('label_all'));
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $this->filters[$filterUid]['title']);
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERNAME###', 'tx_kesearch_pi1[filter]['.$filterUid.']');
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERID###', 'filter['.$filterUid.']');
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTER_UID###', $filterUid);
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCHANGE###', $this->onclickFilter);
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCLICK_RESET###', $this->onclickFilter);
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###DISABLED###', $optionsCount > 0 ? '' : ' disabled="disabled" ');
+		// get title
+		$filterTitle = $this->filters[$filterUid]['title'];
+		if($this->UTF8QuirksMode) $filterTitle = utf8_encode($filterTitle);
 
-		// bullet
-		unset($imageConf);
+		// get bullet image
 		$bulletSrc = $this->filters[$filterUid]['expandbydefault'] ? 'list-head-expanded.gif' : 'list-head-closed.gif';
-		$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/'.$bulletSrc;
-		$imageConf['params'] = 'class="bullet" id="bullet_filter['.$filterUid.']" ';
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###BULLET###', $this->cObj->IMAGE($imageConf));
+		$bulletConf['file'] = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/' . $bulletSrc;
+		$bulletConf['params'] = 'class="bullet" id="bullet_filter['.$filterUid.']" ';
+		$bulletImage = $this->cObj->IMAGE($bulletConf);
 
-		// expand by default ?
-		$class = $this->filters[$filterUid]['expandbydefault'] || !empty($this->piVars['filter'][$filterUid]) || $this->conf['renderMethod'] == 'static' ? 'expanded' : 'closed';
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###LISTCSSCLASS###', $class);
+		/**
+		 * if "expand by default" is set
+		 * if value in current filter is not empty
+		 * if we are in static mode
+		 */
+		if($this->filters[$filterUid]['expandbydefault'] || !empty($this->piVars['filter'][$filterUid]) || $this->conf['renderMethod'] == 'static') {
+			$class = 'expanded';
+		} else $class = 'closed';
 
-		// special css class (outer options list for scrollbox)
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###SPECIAL_CSS_CLASS###', $this->filters[$filterUid]['cssclass'] ? $this->filters[$filterUid]['cssclass'] : '');
+		// fill markers
+		$markerArray['###LABEL_ALL###'] = $this->pi_getLL('label_all');
+		$markerArray['###FILTERTITLE###'] = $filterTitle;
+		$markerArray['###FILTERNAME###'] = 'tx_kesearch_pi1[filter]['.$filterUid.']';
+		$markerArray['###FILTERID###'] = 'filter['.$filterUid.']';
+		$markerArray['###FILTER_UID###'] = $filterUid;
+		$markerArray['###ONCHANGE###'] = $this->onclickFilter;
+		$markerArray['###ONCLICK_RESET###'] = $this->onclickFilter;
+		$markerArray['###DISABLED###'] = $optionsCount > 0 ? '' : ' disabled="disabled" ';
+		$markerArray['###BULLET###'] = $bulletImage;
+		$markerArray['###LISTCSSCLASS###'] = $class;
+		$markerArray['###SPECIAL_CSS_CLASS###'] = $this->filters[$filterUid]['cssclass'] ? $this->filters[$filterUid]['cssclass'] : '';
+		$contentFilters = $this->cObj->substituteMarkerArray($contentFilters, $markerArray);
 
-		return $filterContent;
+		return $contentFilters;
 	}
 
 
@@ -695,6 +711,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * function checkIfFilterMatchesRecords
 	 */
 	public function checkIfTagMatchesRecords($tag, $mode='multi', $filterId) {
+		$tagChar = $this->extConf['prePostTagChar'];
 		// get all tags of current searchresult
 		if(!is_array($this->tagsInSearchResult)) {
 			// conv boolean to array
@@ -718,12 +735,12 @@ class tx_kesearch_lib extends tslib_pibase {
 						foreach($this->piVars['filter'][$foreignFilterId] as $optionKey => $optionValue) {
 							if(!empty($this->piVars['filter'][$foreignFilterId][$optionKey])) {
 								// Don't add a "+", because we are here in checkbox mode
-								$tagsAgainst .= ' "#'.$GLOBALS['TYPO3_DB']->quoteStr($this->piVars['filter'][$foreignFilterId][$optionKey], 'tx_kesearch_index').'#" ';
+								$tagsAgainst .= ' "' . $tagChar . $GLOBALS['TYPO3_DB']->quoteStr($this->piVars['filter'][$foreignFilterId][$optionKey], 'tx_kesearch_index') . $tagChar . '" ';
 							}
 						}
 					} else {
 						if(!empty($this->piVars['filter'][$foreignFilterId])) {
-							$tagsAgainst .= ' +"#'.$GLOBALS['TYPO3_DB']->quoteStr($this->piVars['filter'][$foreignFilterId], 'tx_kesearch_index').'#" ';
+							$tagsAgainst .= ' +"' . $tagChar . $GLOBALS['TYPO3_DB']->quoteStr($this->piVars['filter'][$foreignFilterId], 'tx_kesearch_index') . $tagChar . '" ';
 						}
 					}
 				}
@@ -760,11 +777,13 @@ class tx_kesearch_lib extends tslib_pibase {
 			} else $index = '';
 
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery(
-				'uid, REPLACE(tags, "##", "#,#") as tags',
+				'uid, REPLACE(tags, "' . $tagChar . $tagChar . '", "' . $tagChar . ',' . $tagChar .'") as tags',
 				'tx_kesearch_index' . $index,
 				$where,
 				'','',''
 			);
+
+			$tagChar = $this->extConf['prePostTagChar'];
 
 			if(t3lib_extMgm::isLoaded('ke_search_premium') && !$this->isEmptySearch) {
 				require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');
@@ -772,10 +791,16 @@ class tx_kesearch_lib extends tslib_pibase {
 				$sphinx->setLimit(0, 10000);
 				$queryForSphinx = '';
 				if($this->wordsAgainst) $queryForSphinx .= ' @title ' . $this->wordsAgainst . ' | @(title,content) ' . $this->wordsAgainst;
-				if($this->tagsAgainst) $queryForSphinx .= ' @(tags) ' . implode(' ', $this->tagsAgainst);
+				if(count($this->tagsAgainst)) {
+					foreach($this->tagsAgainst as $value) {
+						// in normal case only checkbox mode has spaces
+						$tagQueryForSphinx .= ' ' . str_replace(' ', ' | ', trim($value));
+					}
+					$queryForSphinx .= ' @tags ' . $tagQueryForSphinx;
+				}
 				$queryForSphinx .= ' @(language) _language_' . $GLOBALS['TSFE']->sys_language_uid;
 				$queryForSphinx .= ' @(fe_group) _group_NULL | _group_0';
-				$res = $sphinx->getResForSearchResults($queryForSphinx, '*', 'uid, REPLACE(tags, "##", "#,#") as tags');
+				$res = $sphinx->getResForSearchResults($queryForSphinx, '*', 'uid, REPLACE(tags, "' . $tagChar . $tagChar . '", "' . $tagChar . ',' . $tagChar . '") as tags');
 			} else {
 				$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 			}
@@ -787,7 +812,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 		}
 
-		return array_key_exists('#' . $tag . '#', $this->tagsInSearchResult);
+		return array_key_exists($tagChar . $tag . $tagChar, $this->tagsInSearchResult);
 	}
 
 
@@ -893,6 +918,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		$GLOBALS['TSFE']->additionalHeaderData['xajax_search_filters'] = $this->xajax->getJavascript(t3lib_extMgm::siteRelPath('xajax'));
 	}
 
+
 	/**
 	 * This function will be called from AJAX directly, so this must be public
 	 *
@@ -912,7 +938,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$this->piVars[$key] = $value;
 			}
 		}
-		
+
 		// create a list of all filters in piVars
 		if (is_array($this->piVars['filter'])) {
 			foreach($this->piVars['filter'] as $key => $value) {
@@ -1027,7 +1053,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		foreach ($this->piVars as $key => $value) {
 			$this->piVars[$key] = $value;
 		}
-		
+
 		// init javascript onclick actions
 		$this->initOnclickActions();
 
@@ -1135,7 +1161,13 @@ class tx_kesearch_lib extends tslib_pibase {
 			// generate query
 			$queryForSphinx = '';
 			if($this->wordsAgainst) $queryForSphinx .= ' @title ' . $this->wordsAgainst . ' | @(title,content) ' . $this->wordsAgainst;
-			if($this->tagsAgainst) $queryForSphinx .= ' @(tags) ' . implode(' ', $this->tagsAgainst);
+			if(count($this->tagsAgainst)) {
+				foreach($this->tagsAgainst as $value) {
+					// in normal case only checkbox mode has spaces
+					$tagQueryForSphinx .= ' ' . str_replace(' ', ' | ', trim($value));
+				}
+				$queryForSphinx .= ' @tags ' . $tagQueryForSphinx;
+			}
 			$queryForSphinx .= ' @(language) _language_' . $GLOBALS['TSFE']->sys_language_uid;
 			$queryForSphinx .= ' @(fe_group) _group_NULL | _group_0';
 			$res = $sphinx->getResForSearchResults($queryForSphinx);
@@ -1863,22 +1895,30 @@ class tx_kesearch_lib extends tslib_pibase {
 	}
 
 
-	/*
-	 * function getFilterPreselect
+	/**
+	 * gets all preselected filters from flexform
+	 *
+	 * @return none but fills global var with needed data
 	 */
 	protected function getFilterPreselect() {
 		// get definitions from plugin settings
-		if($this->conf['preselected_filters']) {
+		// and proceed only when preselectedFilter was not set
+		// this reduces the amount of sql queries, too
+		if($this->conf['preselected_filters'] && count($this->preselectedFilter) == 0) {
 			$preselectedArray = t3lib_div::trimExplode(',', $this->conf['preselected_filters'], true);
-			foreach ($preselectedArray as $key => $option) {
-				$fields = '*, tx_kesearch_filters.uid as filteruid';
+			foreach ($preselectedArray as $option) {
+				$option = intval($option);
+				$fields = '
+					tx_kesearch_filters.uid as filteruid,
+					tx_kesearch_filteroptions.tag
+				';
 				$table = 'tx_kesearch_filters, tx_kesearch_filteroptions';
-				$where = $GLOBALS['TYPO3_DB']->listQuery('options', intval($option), 'tx_kesearch_filters');
-				$where .= ' AND tx_kesearch_filteroptions.uid = ' . intval($option);
+				$where = $GLOBALS['TYPO3_DB']->listQuery('tx_kesearch_filters.options', $option, 'tx_kesearch_filters');
+				$where .= ' AND tx_kesearch_filteroptions.uid = ' . $option;
 				$where .= $this->cObj->enableFields('tx_kesearch_filters');
 				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
 				while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-					$this->preselectedFilter[$row['filteruid']] = $row['tag'];
+					$this->preselectedFilter[$row['filteruid']][] = $row['tag'];
 				}
 			}
 		}

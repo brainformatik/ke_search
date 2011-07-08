@@ -159,18 +159,34 @@ class tx_kesearch_div {
 
 		// build tag searchphrase
 		$tagsAgainst = array();
-		foreach($this->pObj->preselectedFilter as $value) {
-			$tagsAgainst[0] .= ' +"#' . $value . '#"';
+		$tagChar = $this->pObj->extConf['prePostTagChar'];
+
+		foreach($this->pObj->preselectedFilter as $key => $value) {
+			// if we are in checkbox mode
+			if(count($this->pObj->preselectedFilter[$key]) >= 2) {
+				$tagsAgainst[$key] .= ' "' . $tagChar . implode($tagChar . '" "' . $tagChar, $value) . $tagChar . '"';
+			// if we are in select or list mode
+			} elseif(count($this->pObj->preselectedFilter[$key]) == 1) {
+				$tagsAgainst[$key] .= ' +"' . $tagChar. $value[0] . $tagChar . '"';
+			}
 		}
 		if(is_array($this->pObj->piVars['filter'])) {
 			foreach($this->pObj->piVars['filter'] as $key => $tag)  {
 				if(is_array($this->pObj->piVars['filter'][$key])) {
 					foreach($this->pObj->piVars['filter'][$key] as $subkey => $subtag)  {
-						// Don't add a "+", because we are here in checkbox mode. It's a OR.
-						if(!empty($subtag)) $tagsAgainst[($key + 1)] .= ' "#'.$subtag.'#" ';
+						// Don't add the tag if it is already inserted by preselected filters
+						if(!empty($subtag) && strstr($tagsAgainst[$key], $subtag) === false) {
+							// Don't add a "+", because we are here in checkbox mode. It's a OR.
+							$subtag = str_replace(' ', '_', $subtag);
+							$tagsAgainst[$key] .= ' "' . $tagChar . $subtag . $tagChar . '" ';
+						}
 					}
 				} else {
-					if(!empty($tag)) $tagsAgainst[0] .= ' +"#'.$tag.'#" ';
+					// Don't add the tag if it is already inserted by preselected filters
+					if(!empty($tag) && strstr($tagsAgainst[0], $subtag) === false) {
+						$tag = str_replace(' ', '_', $tag);
+						$tagsAgainst[$key] .= ' +"' . $tagChar . $tag . $tagChar . '" ';
+					}
 				}
 			}
 		}
@@ -217,7 +233,7 @@ class tx_kesearch_div {
 		foreach ($piVars as $key => $value) {
 
 			// process removeXSS(...) for all piVars
-			$piVars[$key] = $this->removeXSS($value);
+			if(!is_array($piVars)) $piVars[$key] = $this->removeXSS($value);
 
 			// process further cleaning regarding to param type
 			switch ($key) {

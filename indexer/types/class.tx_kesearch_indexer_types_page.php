@@ -117,7 +117,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
 			$pageList .= $this->queryGen->getTreeList($pid, 99, 0, $where);
 		}
-		
+
 		// add non-recursive pids
 		foreach($pidsNonRecursive as $pid) {
 			$pageList .= $pid.',';
@@ -151,8 +151,9 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 * @return array extended array with uids and tags for pages
 	 */
 	protected function addTagsToPageRecords($uids) {
+		$tagChar = $this->pObj->extConf['prePostTagChar'];
 		// add tags which are defined by page properties
-		$fields = 'pages.*, REPLACE(GROUP_CONCAT(CONCAT("#", tx_kesearch_filteroptions.tag, "#")), ",", "") as tags';
+		$fields = 'pages.*, GROUP_CONCAT(CONCAT("' . $tagChar . '", tx_kesearch_filteroptions.tag, "' . $tagChar . '")) as tags';
 		$table = 'pages, tx_kesearch_filteroptions';
 		$where = 'pages.uid IN (' . implode(',', $uids) . ')';
 		$where .= ' AND pages.tx_kesearch_tags <> "" ';
@@ -181,9 +182,12 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$where .= ' AND no_search <> 1 ';
 
 		foreach($rows as $row) {
+			$tempTags = array();
 			$pageList = t3lib_div::trimExplode(',', $this->queryGen->getTreeList($row['automated_tagging'], 99, 0, $where));
 			foreach($pageList as $uid) {
-				$this->pageRecords[$uid]['tags'] .= '#' . $row['tag'] . '#';
+				if($this->pageRecords[$uid]['tags']) {
+					$this->pageRecords[$uid]['tags'] .= ',' . $tagChar . $row['tag'] . $tagChar;
+				} else $this->pageRecords[$uid]['tags'] = $tagChar . $row['tag'] . $tagChar;
 			}
 		}
 	}
@@ -254,7 +258,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 				);
 			}
 		}
-		
+
 		// store record in index table
 		foreach($pageContent as $langKey => $content) {
 			$this->pObj->storeInIndex(
