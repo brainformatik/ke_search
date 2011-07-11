@@ -1233,7 +1233,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			// add onload image if in AJAX mode
 			if($this->conf['renderMethod'] != 'static') {
-				$content .= $this->onloadImage;			
+				$content .= $this->onloadImage;
 			}
 
 			return $content;
