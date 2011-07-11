@@ -107,7 +107,9 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 			// index only pages of doktype standard, advanced and "not in menu"
 			$where = ' (doktype = 1 OR doktype = 2 OR doktype = 5) ';
 			// index only pages which are searchable
-			$where .= ' AND no_search <> 1 ';
+			// index only page which are not hidden
+			// deleted clause is integrated in getTreeList. So don't add this here.
+			$where .= ' AND no_search <> 1 AND hidden=0';
 
 			// if indexing of content elements with restrictions is not allowed
 			// get only pages that have empty group restrictions
