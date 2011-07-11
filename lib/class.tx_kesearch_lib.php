@@ -258,7 +258,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		// set form action pid
 		$content = $this->cObj->substituteMarker($content,'###FORM_TARGET_PID###', $this->conf['resultPage']);
 		// set form action
-		$content = $this->cObj->substituteMarker($content,'###FORM_ACTION###', t3lib_div::getIndpEnv('TYPO3_SITE_URL'));
+		$content = $this->cObj->substituteMarker($content,'###FORM_ACTION###', t3lib_div::getIndpEnv('TYPO3_SITE_URL').'index.php');
 
 		// set other hidden fields
 		$hiddenFieldsContent = '';
