@@ -1182,7 +1182,6 @@ class tx_kesearch_lib extends tslib_pibase {
 		} else {
 			// get search results
 			$query = $this->db->generateQueryForSearch();
-			//t3lib_div::devLog('db', 'db', -1, array('Query: ' . $query));
 
 			$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 			// get number of records
