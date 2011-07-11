@@ -1231,8 +1231,10 @@ class tx_kesearch_lib extends tslib_pibase {
 				$content .= '<br />'.$query.'<br />';
 			}
 
-			// add onload image
-			$content .= $this->onloadImage;
+			// add onload image if in AJAX mode
+			if($this->conf['renderMethod'] != 'static') {
+				$content .= $this->onloadImage;			
+			}
 
 			return $content;
 		}
@@ -1437,8 +1439,10 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 		}
 
-		// add onload image
-		$content .= $this->onloadImage;
+		// add onload image if in AJAX mode
+		if($this->conf['renderMethod'] != 'static') {
+			$content .= $this->onloadImage;
+		}
 
 		return $content;
 	}
