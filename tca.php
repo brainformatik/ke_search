@@ -64,7 +64,8 @@ $TCA['tx_kesearch_filters'] = array (
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.rendertype.I.0', 'select'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.rendertype.I.1', 'list'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.rendertype.I.2', 'checkbox'),
-				),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.rendertype.I.3', 'textlinks'),
+					),
 				'size' => 1,
 				'maxitems' => 1,
 				'default' => 'select',
@@ -116,6 +117,18 @@ $TCA['tx_kesearch_filters'] = array (
 				),
 			),
 		),
+		'target_pid' => array (
+			'exclude' => 1,
+			'label'   => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.target_pid',
+			'config' => array (
+				'type' => 'group',
+				'internal_type' => 'db',
+				'allowed' => 'pages',
+				'size' => 1,
+				'minitems' => 0,
+				'maxitems' => 1,
+			)
+		),
 		'wrap' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.wrap',
@@ -128,7 +141,8 @@ $TCA['tx_kesearch_filters'] = array (
 	'types' => array (
 		'select' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, options, wrap;;;;4-4-4'),
 		'list' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, expandbydefault, cssclass, options, wrap;;;;4-4-4'),
-		'checkbox' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, expandbydefault, markAllCheckboxes, cssclass, options, wrap;;;;4-4-4')
+		'checkbox' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, expandbydefault, markAllCheckboxes, cssclass, options, wrap;;;;4-4-4'),
+		'textlinks' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, target_pid, options, wrap;;;;4-4-4')
 	),
 	'palettes' => array (
 		'1' => array('showitem' => '')

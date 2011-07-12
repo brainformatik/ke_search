@@ -60,9 +60,6 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 
 		if ($this->conf['renderMethod'] != 'static') $this->initXajax();
 
-		// get preselected filter from rootline
-		$this->getFilterPreselect();
-
 		// Spinner Image
 		if ($this->conf['spinnerImageFile']) {
 			$spinnerSrc = $this->conf['spinnerImageFile'];

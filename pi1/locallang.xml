@@ -64,7 +64,6 @@
 			<label index="ff.checkFilterCondition.I.0">Check in condition to other filters</label>
 			<label index="ff.checkFilterCondition.I.1">no check</label>
 
-
 			<label index="results">Search results</label>
 			<label index="num_results">Results: </label>
 			<label index="until">until</label>
@@ -97,6 +96,8 @@
 			<label index="orderlink_sortdate">Date</label>
 
 			<label index="searchbox_default_value">Your search phrase</label>
+			<label index="linktext_filtertitle">Reduce searchresults on following category: %s</label>
+			<label index="linktext_more">Choose additional options of category: %s</label>
 		</languageKey>
 
 		<!-- GERMAN -->
@@ -190,7 +191,8 @@
 			<label index="orderlink_sortdate">Datum</label>
 
 			<label index="searchbox_default_value">Suchbegriff</label>
+			<label index="linktext_filtertitle">Ergebnisse auf den Bereich: %s begrenzen</label>
+			<label index="linktext_more">Weitere Auswahlmöglichkeiten in der Categorie: %s</label>
 		</languageKey>
-
 	</data>
 </T3locallang>

@@ -143,6 +143,9 @@ class tx_kesearch_indexer_types_xtypocommerce extends tx_kesearch_indexer_types 
 				$additionalFields['sortdate'] = mktime(0,0,0,$prodRecord['products_monat'], 1, $prodRecord['products_jahr']);
 			}
 
+			// add colon between each tag
+			$tagContent = str_replace($tagChar . $tagChar, $tagChar . ',' . $tagChar, $tagContent);
+
 			// hook for custom modifications of the indexed data, e. g. the tags
 			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyXTYPOCommerceIndexEntry'])) {
 				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyXTYPOCommerceIndexEntry'] as $_classRef) {

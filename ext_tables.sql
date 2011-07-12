@@ -27,6 +27,7 @@ CREATE TABLE tx_kesearch_filters (
 	expandbydefault tinyint(1) DEFAULT '0' NOT NULL,
 	markAllCheckboxes tinyint(1) DEFAULT '0' NOT NULL,
 	cssclass varchar(90) DEFAULT '' NOT NULL,
+	target_pid int(11) DEFAULT '0' NOT NULL,
 	wrap tinytext,
 
 	PRIMARY KEY (uid),

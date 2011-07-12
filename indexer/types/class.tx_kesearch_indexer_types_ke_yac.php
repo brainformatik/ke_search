@@ -94,7 +94,9 @@ class tx_kesearch_indexer_types_ke_yac extends tx_kesearch_indexer_types {
 				$clearTextTags = '';
 				if (count($yacRecordTags)) {
 					foreach ($yacRecordTags as $key => $tagUid)  {
-						$tags .= $tagChar . $this->getTag($tagUid) . $tagChar;
+						if($tags) {
+							$tags .= $tagChar . $this->getTag($tagUid) . $tagChar;
+						} else $tags = $tagChar . $this->getTag($tagUid) . $tagChar;
 						$clearTextTags .= chr(13).$this->getTag($tagUid, true);
 					}
 				}

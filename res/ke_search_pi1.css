@@ -352,3 +352,27 @@
 .tx-kesearch-pi1 #kesearch_ordering div.clearer {
 	clear: left;
 }
+
+.tx-kesearch-pi1 .multiselect .multi-option {
+	float: left;
+	height: 20px;
+	padding-right: 15px;
+	width: 200px;
+}
+
+.tx-kesearch-pi1 .multiselect .last {
+	float: left;
+	height: 20px;
+	padding-right: 0;
+	width: 200px;
+}
+
+.tx-kesearch-pi1 .multiselect label {
+	display: inline-block;
+	font-weight: normal;
+	margin-left: 10px;
+}
+
+.tx-kesearch-pi1 .textlinks li.active {
+	border-left: 5px solid #00FF00;
+}

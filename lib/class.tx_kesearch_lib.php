@@ -108,7 +108,13 @@ class tx_kesearch_lib extends tslib_pibase {
 		}
 
 		// set some default values (this part have to be after stdWrap!!!)
-		if(!$this->conf['resultPage']) $this->conf['resultPage'] = $GLOBALS['TSFE']->id;
+		if(!$this->conf['resultPage']) {
+			if($this->cObj->data['pid']) {
+				$this->conf['resultPage'] = $this->cObj->data['pid'];
+			} else {
+				$this->conf['resultPage'] = $GLOBALS['TSFE']->id;
+			}
+		}
 		if(!isset($this->piVars['page'])) $this->piVars['page'] = 1;
 
 		// hook: modifyFlexFormData
@@ -159,6 +165,10 @@ class tx_kesearch_lib extends tslib_pibase {
 			// precount results to find the best index
 			$this->db->chooseBestIndex($this->wordsAgainst, $this->tagsAgainst);
 		}
+
+		// get css file
+		$cssFile = $this->conf['cssFile'] ? $this->conf['cssFile'] : t3lib_extMgm::siteRelPath($this->extKey) . 'res/ke_search_pi1.css';
+		$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId . '_css'] = '<link rel="stylesheet" type="text/css" href="' . $cssFile . '" />';
 	}
 
 
@@ -364,6 +374,7 @@ class tx_kesearch_lib extends tslib_pibase {
 								}
 
 								if($this->conf['showResultsPerFilter']) $row['title'] .= ' (' . $this->tagsInSearchResult[$tagChar . $row['tag'] . $tagChar] . ')';
+								echo "title: " . $row['title'];
 
 								$options[$row['uid']] = array(
 									'title' => $row['title'],
@@ -426,6 +437,10 @@ class tx_kesearch_lib extends tslib_pibase {
 
 					case 'checkbox':
 						$filterContent .= $wrap[0] . $this->renderCheckbox($filterUid, $options) . $wrap[1];
+						break;
+
+					case 'textlinks':
+						$filterContent .= $wrap[0] . $this->renderTextlinks($filterUid, $options) . $wrap[1];
 						break;
 
 						// use custom render code
@@ -713,6 +728,94 @@ class tx_kesearch_lib extends tslib_pibase {
 	}
 
 
+	protected function renderTextlinks($filterUid, $options) {
+		// getFiltersFromFlexform is much faster than an additional SQL-Query
+		$filters = $this->getFiltersFromFlexform();
+		$allOptionsOfCurrentFilter = $this->getFilterOptions($filters[$filterUid]['options']);
+
+		// getSubparts
+		$template['filter'] = $this->cObj->getSubpart($this->templateCode, '###SUB_FILTER_TEXTLINKS###');
+		$template['options'] = $this->cObj->getSubpart($this->templateCode, '###SUB_FILTER_TEXTLINK_OPTION###');
+
+		// loop through options
+		if(is_array($allOptionsOfCurrentFilter)) {
+			foreach($allOptionsOfCurrentFilter as $key => $data) {
+				$isOptionInOptionArray = 0;
+
+				// check if current option (of searchresults) is in array of all possible options
+				foreach($options as $optionKey => $optionValue) {
+					if(is_array($options[$optionKey]) && t3lib_div::inArray($options[$optionKey], $data['title'])) {
+						$isOptionInOptionArray = 1;
+						break;
+					}
+				}
+
+				// if option is in optionArray, we have to mark the checkboxes
+				if($isOptionInOptionArray) {
+					// if user has selected a checkbox it must be selected on the resultpage, too.
+					if($this->piVars['filter'][$filterUid][$key]) {
+						$markerArray['###CLASS###'] = 'active';
+					} else {
+						$markerArray['###CLASS###'] = 'normal';
+					}
+					$markerArray['###TEXTLINK###'] = $this->cObj->typoLink(
+						$data['title'],
+						array(
+							'parameter' => $this->conf['resultPage'],
+							'additionalParams' => '&tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']=' . $data['tag'] . '&tx_kesearch_pi1[page]=1'
+						)
+					);
+					$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
+				}
+			}
+			$optionsCount = count($allOptionsOfCurrentFilter);
+		}
+
+		// modify filter options by hook
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$contentOptions .= $_procObj->modifyFilterOptions(
+					$filterUid,
+					$contentOptions,
+					$optionsCount,
+					$this
+				);
+			}
+		}
+
+		unset($markerArray);
+
+		// render filter
+		$contentFilters = $this->cObj->substituteSubpart(
+			$template['filter'],
+			'###SUB_FILTER_TEXTLINK_OPTION###',
+			$contentOptions
+		);
+
+		// get title
+		$filterTitle = $this->filters[$filterUid]['title'];
+		$this->filters[$filterUid]['target_pid'] = ($this->filters[$filterUid]['target_pid']) ? $this->filters[$filterUid]['target_pid'] : $this->conf['resultPage'];
+
+		// fill markers
+		$markerArray['###FILTERTITLE###'] = sprintf($this->pi_getLL('linktext_filtertitle'), $filterTitle);
+		$markerArray['###LINK_MULTISELECT###'] = $this->cObj->typoLink(
+			sprintf($this->pi_getLL('linktext_more'), $filterTitle),
+			array(
+				'parameter' => $this->filters[$filterUid]['target_pid'],
+				'addQueryString' => 1,
+				'addQueryString.' => array(
+					'exclude' => 'id,tx_kesearch_pi1[page]'
+				)
+			)
+		);
+
+		$contentFilters = $this->cObj->substituteMarkerArray($contentFilters, $markerArray);
+
+		return $contentFilters;
+	}
+
+
 	/*
 	 * function checkIfFilterMatchesRecords
 	 */
@@ -783,7 +886,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			} else $index = '';
 
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery(
-				'uid, tags',
+				'uid, REPLACE(tags, "' . $tagChar . $tagChar . '", "' . $tagChar . ',' . $tagChar .'") as tags',
 				'tx_kesearch_index' . $index,
 				$where,
 				'','',''
@@ -805,7 +908,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				}
 				$queryForSphinx .= ' @(language) _language_' . $GLOBALS['TSFE']->sys_language_uid;
 				$queryForSphinx .= ' @(fe_group) _group_NULL | _group_0';
-				$res = $sphinx->getResForSearchResults($queryForSphinx, '*', 'uid, tags');
+				$res = $sphinx->getResForSearchResults($queryForSphinx, '*', 'uid, REPLACE(tags, "' . $tagChar . $tagChar . '", "' . $tagChar . ',' . $tagChar . '") as tags');
 			} else {
 				$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 			}

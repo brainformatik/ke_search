@@ -157,77 +157,74 @@ function hideSpinner() {
 ###DOMREADYACTION###
 //]]>
 </script>
-
-
-
 <!-- ###JS_SEARCH_AJAX_RELOAD### end -->
 
 <!-- ###SEARCHBOX_STATIC### start -->
-    <form method="get" id="xajax_form_kesearch_pi1" name="xajax_form_kesearch_pi1"  action="###FORM_ACTION###" class="static" ###ONSUBMIT###>
+<form method="get" id="xajax_form_kesearch_pi1" name="xajax_form_kesearch_pi1"  action="###FORM_ACTION###" class="static" ###ONSUBMIT###>
 	<div class="searchbox">
-	    <input type="hidden" name="id" value="###FORM_TARGET_PID###" />
-	    ###HIDDENFIELDS###
-	    <div class="search_input">
-		<b><input type="text" name="tx_kesearch_pi1[sword]" id="ke_search_sword" value="###SWORD_VALUE###" onfocus="###SWORD_ONFOCUS###" /></b>
-	    </div>
-	    <div class=clearer"">&nbsp;</div>
-	    <input type="image" src="typo3conf/ext/ke_search/res/img/go.gif" id="kesearch_submit" class="submit" value="###SUBMIT_VALUE###" onclick="document.getElementById('pagenumber').value=1; document.getElementById('xajax_form_kesearch_pi1').submit();" />
-	    <input id="pagenumber" type="hidden" name="tx_kesearch_pi1[page]" value="###HIDDEN_PAGE_VALUE###" />
-	    <input id="resetFilters" type="hidden" name="tx_kesearch_pi1[resetFilters]" value="0" />
+		<input type="hidden" name="id" value="###FORM_TARGET_PID###" />
+		###HIDDENFIELDS###
+		<div class="search_input">
+			<b><input type="text" name="tx_kesearch_pi1[sword]" id="ke_search_sword" value="###SWORD_VALUE###" onfocus="###SWORD_ONFOCUS###" /></b>
+		</div>
+		<div class=clearer"">&nbsp;</div>
+		<input type="image" src="typo3conf/ext/ke_search/res/img/go.gif" id="kesearch_submit" class="submit" value="###SUBMIT_VALUE###" onclick="document.getElementById('pagenumber').value=1; document.getElementById('xajax_form_kesearch_pi1').submit();" />
+		<input id="pagenumber" type="hidden" name="tx_kesearch_pi1[page]" value="###HIDDEN_PAGE_VALUE###" />
+		<input id="resetFilters" type="hidden" name="tx_kesearch_pi1[resetFilters]" value="0" />
 	</div>
 	<div id="kesearch_filters">###FILTER###</div>
 	<div id="kesearch_updating_filters"><center>###SPINNER###<br /></center></div>
 	###RESET###
-    </form>
+</form>
 <!-- ###SEARCHBOX_STATIC### end -->
 
 
 <!-- ###RESULT_LIST### start -->
-    <span id="kesearch_error"></span>
+	<span id="kesearch_error"></span>
 
 	<div id="kesearch_num_results">###NUMBER_OF_RESULTS###</div>
 
 	<div id="kesearch_pagebrowser_top">###PAGEBROWSER_TOP###</div>
-    <div id="kesearch_ordering">###ORDERING###</div>
-    <ul id="kesearch_results"><li>###MESSAGE###</li></ul>
+	<div id="kesearch_ordering">###ORDERING###</div>
+	<ul id="kesearch_results"><li>###MESSAGE###</li></ul>
 
-    <div id="kesearch_updating_results"><center>###SPINNER###<br /></center></div>
-    <div id="kesearch_pagebrowser_bottom">###PAGEBROWSER_BOTTOM###</div>
-    <!-- ###SUB_QUERY_TIME### start -->
+	<div id="kesearch_updating_results"><center>###SPINNER###<br /></center></div>
+	<div id="kesearch_pagebrowser_bottom">###PAGEBROWSER_BOTTOM###</div>
+	<!-- ###SUB_QUERY_TIME### start -->
 	<div id="kesearch_query_time">###QUERY_TIME###</div>
-    <!-- ###SUB_QUERY_TIME### end -->
+	<!-- ###SUB_QUERY_TIME### end -->
 <!-- ###RESULT_LIST### end -->
 
 
 <!-- ###PAGEBROWSER### start -->
-    <div class="pages_total">
+<div class="pages_total">
 	###RESULTS### ###START### ###UNTIL### ###END### ###OF### ###TOTAL###<br />
 	<table cellpadding="2" align="center">
-	    <tr>
-		<td nowrap="nowrap">###PREVIOUS###</td>
-		<td nowrap="nowrap">###PAGES_LIST###</td>
-		<td nowrap="nowrap">###NEXT###</td>
-	    </tr>
+		<tr>
+			<td nowrap="nowrap">###PREVIOUS###</td>
+			<td nowrap="nowrap">###PAGES_LIST###</td>
+			<td nowrap="nowrap">###NEXT###</td>
+		</tr>
 	</table>
-    </div>
+</div>
 <!-- ###PAGEBROWSER### end -->
 
 
 <!-- ###ORDERNAVIGATION### start -->
-    <div class="ordering">
-		<ul>
-			<li><strong>###LABEL_SORT###</strong></li>
-			<!-- ###SORT_LINK### begin -->
-				<li class="sortlink sortlink-###FIELDNAME###">###URL###<span class="###CLASS###"></span></li>
-			<!-- ###SORT_LINK### end -->
-		</ul>
-		<div class="clearer"></div>
-    </div>
+<div class="ordering">
+	<ul>
+		<li><strong>###LABEL_SORT###</strong></li>
+		<!-- ###SORT_LINK### begin -->
+			<li class="sortlink sortlink-###FIELDNAME###">###URL###<span class="###CLASS###"></span></li>
+		<!-- ###SORT_LINK### end -->
+	</ul>
+	<div class="clearer"></div>
+</div>
 <!-- ###ORDERNAVIGATION### end -->
 
 
 <!-- ###RESULT_ROW### start -->
-    <li>
+	<li>
 	<!-- ###SUB_NUMERATION### start -->###NUMBER###.<!-- ###SUB_NUMERATION### end -->
 	<b>###TITLE###</b>
 	<!-- ###SUB_SCORE_SCALE### start --><span style="float:right;">###SCORE_SCALE###</span><!-- ###SUB_SCORE_SCALE### end -->
@@ -316,3 +313,36 @@ function hideSpinner() {
 	<!-- <input type="hidden" name="###FILTERNAME###" id="###FILTERID###" value="###VALUE###" /> -->
     </div>
 <!-- ###SUB_FILTER_CHECKBOX### end -->
+
+
+<!-- ###SUB_FILTER_TEXTLINKS### begin ### -->
+<div class="textlinks">
+	<h3>###FILTERTITLE###</h3>
+	<ul>
+	<!-- ###SUB_FILTER_TEXTLINK_OPTION### begin -->
+		<li class="###CLASS###">###TEXTLINK###</li>
+	<!-- ###SUB_FILTER_TEXTLINK_OPTION### end -->
+	</ul>
+	<div>###LINK_MULTISELECT###</div>
+</div>
+<!-- ###SUB_FILTER_TEXTLINKS### end ### -->
+
+
+<!-- ###SUB_FILTER_MULTISELECT### begin ### -->
+<div class="multiselect">
+	<form method="get" action="###FORM_ACTION###">
+		<input type="hidden" name="id" value="###PAGEID###" />
+		<input type="hidden" name="page" value="1" />
+		<!-- ###SUB_FILTER_MULTISELECT_FILTER### begin -->
+			<h3>###TITLE###</h3>
+			<!-- ###SUB_FILTER_MULTISELECT_OPTION### begin -->
+				<div class="multi-option###ADDCLASS###">
+					<input type="checkbox" name="###FILTERNAME###[###OPTIONKEY###]" id="###FILTERNAME###[###OPTIONKEY###]" value="###OPTIONTAG###" ###SELECTED### /><label for="###FILTERNAME###[###OPTIONKEY###]">###OPTIONTITLE###</label>
+				</div>
+			<!-- ###SUB_FILTER_MULTISELECT_OPTION### end -->
+			<div class="clearer"></div>
+		<!-- ###SUB_FILTER_MULTISELECT_FILTER### end -->
+		<div class="submit"><input type="submit" value="Speichern" /></div>
+	</form>
+</div>
+<!-- ###SUB_FILTER_MULTISELECT### end ### -->

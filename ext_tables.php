@@ -27,9 +27,11 @@ t3lib_extMgm::addLLrefForTCAdescr('tx_kesearch_filters','EXT:ke_search/locallang
 // Show FlexForm field in plugin configuration
 $TCA['tt_content']['types']['list']['subtypes_addlist'][$_EXTKEY.'_pi1']='pi_flexform';
 $TCA['tt_content']['types']['list']['subtypes_addlist'][$_EXTKEY.'_pi2']='pi_flexform';
+$TCA['tt_content']['types']['list']['subtypes_addlist'][$_EXTKEY.'_pi3']='pi_flexform';
 // Configure FlexForm field
 t3lib_extMgm::addPiFlexFormValue($_EXTKEY.'_pi1','FILE:EXT:ke_search/pi1/flexform_pi1.xml');
 t3lib_extMgm::addPiFlexFormValue($_EXTKEY.'_pi2','FILE:EXT:ke_search/pi2/flexform_pi2.xml');
+t3lib_extMgm::addPiFlexFormValue($_EXTKEY.'_pi3','FILE:EXT:ke_search/pi3/flexform_pi3.xml');
 
 t3lib_div::loadTCA('pages');
 t3lib_extMgm::addTCAcolumns('pages',$tempColumns,1);
@@ -46,6 +48,7 @@ if (TYPO3_MODE == 'BE') {
 t3lib_div::loadTCA('tt_content');
 $TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY.'_pi1']='layout,select_key';
 $TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY.'_pi2']='layout,select_key';
+$TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY.'_pi3']='layout,select_key';
 
 
 t3lib_extMgm::addPlugin(array(
@@ -57,6 +60,12 @@ t3lib_extMgm::addPlugin(array(
 t3lib_extMgm::addPlugin(array(
 	'LLL:EXT:ke_search/locallang_db.xml:tt_content.list_type_pi2',
 	$_EXTKEY . '_pi2',
+	t3lib_extMgm::extRelPath($_EXTKEY) . 'ext_icon.gif'
+),'list_type');
+
+t3lib_extMgm::addPlugin(array(
+	'LLL:EXT:ke_search/locallang_db.xml:tt_content.list_type_pi3',
+	$_EXTKEY . '_pi3',
 	t3lib_extMgm::extRelPath($_EXTKEY) . 'ext_icon.gif'
 ),'list_type');
 
