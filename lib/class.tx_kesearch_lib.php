@@ -374,7 +374,6 @@ class tx_kesearch_lib extends tslib_pibase {
 								}
 
 								if($this->conf['showResultsPerFilter']) $row['title'] .= ' (' . $this->tagsInSearchResult[$tagChar . $row['tag'] . $tagChar] . ')';
-								echo "title: " . $row['title'];
 
 								$options[$row['uid']] = array(
 									'title' => $row['title'],
