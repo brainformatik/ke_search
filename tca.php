@@ -108,7 +108,6 @@ $TCA['tx_kesearch_filters'] = array (
 			'config' => Array(
 				'type' => 'inline',
 				'foreign_table' => 'tx_kesearch_filteroptions',
-				'foreign_sortby' => 'sorting',
 				'maxitems' => 500,
 				'appearance' => Array(
 					'collapseAll' => 0,
@@ -189,7 +188,7 @@ $TCA['tx_kesearch_filteroptions'] = array (
 				'type' => 'passthrough'
 			)
 		),
-        'hidden' => array (
+		'hidden' => array (
 			'exclude' => 1,
 			'label'   => 'LLL:EXT:lang/locallang_general.xml:LGL.hidden',
 			'config'  => array (

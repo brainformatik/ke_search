@@ -184,6 +184,8 @@ class tx_kesearch_lib extends tslib_pibase {
 			foreach($piFlexForm['data'] as $sheetKey => $sheet) {
 				foreach($sheet as $lang) {
 					foreach($lang as $key => $value) {
+						// delete all conf from pi1.
+						unset($this->conf[$key]);
 						$this->conf[$key] = $this->fetchConfigurationValue($key, $sheetKey);
 					}
 				}
@@ -332,10 +334,10 @@ class tx_kesearch_lib extends tslib_pibase {
 					// get filter options
 					$fields = '*';
 					$table = 'tx_kesearch_filteroptions';
-					$where = 'uid in ('.$GLOBALS['TYPO3_DB']->quoteStr($this->filters[$filterUid]['options'],'tx_kesearch_index').')';
+					$where = 'FIND_IN_SET(uid, "'.$GLOBALS['TYPO3_DB']->quoteStr($this->filters[$filterUid]['options'],'tx_kesearch_index').'")';
 					$where .= ' AND pid in ('.$GLOBALS['TYPO3_DB']->quoteStr($this->startingPoints,'tx_kesearch_index').')';
 					$where .= $this->cObj->enableFields($table);
-					$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
+					$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='','FIND_IN_SET(uid, "'.$GLOBALS['TYPO3_DB']->quoteStr($this->filters[$filterUid]['options'],'tx_kesearch_index').'")',$limit='');
 
 					// loop through filteroptions
 					while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
@@ -348,9 +350,6 @@ class tx_kesearch_lib extends tslib_pibase {
 								$GLOBALS['TSFE']->sys_language_contentOL
 							);
 						}
-
-						// reset options count
-						$optionsCount = 0;
 
 						// check filter availability?
 						if ($this->conf['checkFilterCondition'] != 'none') {
@@ -373,14 +372,12 @@ class tx_kesearch_lib extends tslib_pibase {
 									}
 								}
 
-								if($this->conf['showResultsPerFilter']) $row['title'] .= ' (' . $this->tagsInSearchResult[$tagChar . $row['tag'] . $tagChar] . ')';
-
 								$options[$row['uid']] = array(
 									'title' => $row['title'],
 									'value' => $row['tag'],
+									'results' => $this->tagsInSearchResult[$tagChar . $row['tag'] . $tagChar],
 									'selected' => $selected,
 								);
-								$optionsCount++;
 							}
 						} else {
 							// do not process check; show all filters
@@ -389,20 +386,9 @@ class tx_kesearch_lib extends tslib_pibase {
 								'value' => $row['tag'],
 								'selected' => $selected,
 							);
-							$optionsCount++;
 						}
 					}
 				}
-
-				// sorting of options as set in filter record by IRRE
-				$sorting = t3lib_div::trimExplode(',', $this->filters[$filterUid]['options'], true);
-				foreach ($sorting as $key => $uid) {
-					if (is_array($options[$uid])) {
-						$sortedOptions[] = $options[$uid];
-					}
-				}
-				$options = $sortedOptions;
-				unset($sortedOptions);
 
 				// hook for modifying filter options
 				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptionsArray'])) {
@@ -731,6 +717,18 @@ class tx_kesearch_lib extends tslib_pibase {
 		// getFiltersFromFlexform is much faster than an additional SQL-Query
 		$filters = $this->getFiltersFromFlexform();
 		$allOptionsOfCurrentFilter = $this->getFilterOptions($filters[$filterUid]['options']);
+		$allOptionsOfCurrentFilter = t3lib_div::array_merge_recursive_overrule($allOptionsOfCurrentFilter, (array)$options);
+		$allOptionKeys = array_keys($allOptionsOfCurrentFilter);
+
+		// sorting multidimensional array
+		foreach((array)$allOptionsOfCurrentFilter as $key => $array) {
+			$results[$key] = $array['results'];
+			$tags[$key] = $array['tag'];
+		}
+		array_multisort($results, SORT_DESC, SORT_NUMERIC, $tags, SORT_ASC, SORT_STRING, $allOptionKeys, SORT_DESC, SORT_NUMERIC, $allOptionsOfCurrentFilter);
+
+		// after multisort all keys are 0,1,2,3. So we have to restore our old keys
+		$allOptionsOfCurrentFilter = array_combine($allOptionKeys, array_values($allOptionsOfCurrentFilter));
 
 		// getSubparts
 		$template['filter'] = $this->cObj->getSubpart($this->templateCode, '###SUB_FILTER_TEXTLINKS###');
@@ -738,33 +736,57 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// loop through options
 		if(is_array($allOptionsOfCurrentFilter)) {
+			$counter = 1;
 			foreach($allOptionsOfCurrentFilter as $key => $data) {
 				$isOptionInOptionArray = 0;
 
 				// check if current option (of searchresults) is in array of all possible options
-				foreach($options as $optionKey => $optionValue) {
-					if(is_array($options[$optionKey]) && t3lib_div::inArray($options[$optionKey], $data['title'])) {
+				foreach((array)$options as $optionKey => $optionValue) {
+					if(is_array($options[$optionKey]) && t3lib_div::inArray($options[$optionKey], $data['tag'])) {
 						$isOptionInOptionArray = 1;
 						break;
 					}
 				}
 
-				// if option is in optionArray, we have to mark the checkboxes
-				if($isOptionInOptionArray) {
-					// if user has selected a checkbox it must be selected on the resultpage, too.
+				if($this->piVars['multi']) {
 					if($this->piVars['filter'][$filterUid][$key]) {
+						if($isOptionInOptionArray) {
+							$markerArray['###TEXTLINK###'] = $this->cObj->typoLink(
+								$data['title'],
+								array(
+									'parameter' => $this->conf['resultPage'],
+									'additionalParams' => '&tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']=' . $data['tag'] . '&tx_kesearch_pi1[page]=1'
+								)
+							);
+						} else {
+							$markerArray['###TEXTLINK###'] = $data['title'];
+						}
 						$markerArray['###CLASS###'] = 'active';
-					} else {
-						$markerArray['###CLASS###'] = 'normal';
+						$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
 					}
-					$markerArray['###TEXTLINK###'] = $this->cObj->typoLink(
-						$data['title'],
-						array(
-							'parameter' => $this->conf['resultPage'],
-							'additionalParams' => '&tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']=' . $data['tag'] . '&tx_kesearch_pi1[page]=1'
-						)
-					);
-					$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
+				} else {
+					// if option is in optionArray, we have to mark the checkboxes
+					if($isOptionInOptionArray && $counter < 5) {
+						// if user has clicked on a link it must be selected on the resultpage, too.
+						if($this->piVars['filter'][$filterUid][$key]) {
+							echo "Geht rein";
+							$markerArray['###CLASS###'] = 'active';
+							$markerArray['###TEXTLINK###'] = $options[$optionKey]['title'];
+							$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
+						}
+						if(empty($this->piVars['filter'][$filterUid])) {
+							$markerArray['###CLASS###'] = 'normal';
+							$markerArray['###TEXTLINK###'] = $this->cObj->typoLink(
+								$options[$optionKey]['title'] . ' (' . $options[$optionKey]['results'] . ')',
+								array(
+									'parameter' => $this->conf['resultPage'],
+									'additionalParams' => '&tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']=' . $data['tag'] . '&tx_kesearch_pi1[page]=1'
+								)
+							);
+							$counter++;
+							$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
+						}
+					}
 				}
 			}
 			$optionsCount = count($allOptionsOfCurrentFilter);
@@ -804,7 +826,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				'parameter' => $this->filters[$filterUid]['target_pid'],
 				'addQueryString' => 1,
 				'addQueryString.' => array(
-					'exclude' => 'id,tx_kesearch_pi1[page]'
+					'exclude' => 'id,page,tx_kesearch_pi1[page],tx_kesearch_pi1[multi]'
 				)
 			)
 		);
@@ -968,9 +990,9 @@ class tx_kesearch_lib extends tslib_pibase {
 			'*',
 			'tx_kesearch_filteroptions',
 			'pid in ('.$this->startingPoints.') ' .
-			'AND uid in (' . $GLOBALS['TYPO3_DB']->quoteStr($optionList, 'tx_kesearch_filteroptions') . ') ' .
+			'AND FIND_IN_SET(uid, "' . $GLOBALS['TYPO3_DB']->quoteStr($optionList, 'tx_kesearch_filteroptions') . '") ' .
 			$this->cObj->enableFields('tx_kesearch_filteroptions'),
-			'', '', ''
+			'', 'FIND_IN_SET(uid, "' . $GLOBALS['TYPO3_DB']->quoteStr($optionList, 'tx_kesearch_filteroptions') . '")', ''
 		);
 		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 			// Perform overlay on each record
@@ -982,7 +1004,7 @@ class tx_kesearch_lib extends tslib_pibase {
 					$GLOBALS['TSFE']->sys_language_contentOL
 				);
 			}
-			$optionArray[] = $row;
+			$optionArray[$row['uid']] = $row;
 		}
 
 		return $optionArray;
@@ -1609,7 +1631,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		$resultPos = 0;
 		if(count($this->swords)) {
 			for($i = 0; $i < count($this->swords); $i++) {
-				$newResultPos = intval(stripos($resultText, $this->swords[$i]));
+				$newResultPos = intval(stripos($resultText, (string)$this->swords[$i]));
 				if($resultPos == 0) {
 					$resultPos = $newResultPos;
 				}
@@ -2096,6 +2118,45 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// add JS to page header
 		$GLOBALS['TSFE']->additionalHeaderData['jsContent'] = $content;
+	}
+
+
+	function sortArrayRecursive($array, $field) {
+		#debug ($array);
+
+		$sortArray = Array();
+		$mynewArray = Array();
+
+		$i=1;
+		foreach ($array as $point) {
+			$sortArray[] = $point[$field].$i;
+			$i++;
+		}
+		rsort($sortArray);
+
+		foreach ($sortArray as $sortet) {
+			$i=1;
+			foreach ($array as $point) {
+				$newpoint[$field]= $point[$field].$i;
+				if ($newpoint[$field]==$sortet) $mynewArray[] = $point;
+				$i++;
+			}
+		}
+		return $mynewArray;
+
+	}
+
+
+	function sortArrayRecursive2($wert_a, $wert_b) {
+		// Sortierung nach dem zweiten Wert des Array (Index: 1)
+		$a = $wert_a[2];
+		$b = $wert_b[2];
+
+		if ($a == $b) {
+			return 0;
+		}
+
+		return ($a < $b) ? -1 : +1;
 	}
 }
 ?>

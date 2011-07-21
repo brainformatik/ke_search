@@ -284,7 +284,7 @@ class tx_kesearch_indexer {
 				$errormessage .= $error.', ';
 			}
 			$errormessage = trim($errormessage);
-			$errormessage = t3lib_div::rm_endcomma($errormessage);
+			$errormessage = rtrim($errormessage, ',');
 			$errormessage .= ' (';
 			if (!empty($type)) $errormessage .= 'TYPE: '.$type.'; ';
 			if (!empty($params)) $errormessage .= 'PARAMS: '.$params.'; ';
@@ -318,7 +318,6 @@ class tx_kesearch_indexer {
 			// merge arrays
 			$fields_values = array_merge($fields_values, $additionalFields);
 		}
-
 
 		// prepare additional fields for queries
 		foreach($this->additionalFields as $value) {

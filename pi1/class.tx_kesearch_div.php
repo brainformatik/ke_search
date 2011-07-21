@@ -164,13 +164,13 @@ class tx_kesearch_div {
 						// Don't add the tag if it is already inserted by preselected filters
 						if(!empty($subtag) && strstr($tagsAgainst[$key], $subtag) === false) {
 							// Don't add a "+", because we are here in checkbox mode. It's a OR.
-							$tagsAgainst[$key] .= ' "' . $tagChar . $subtag . $tagChar . '" ';
+							$tagsAgainst[$key] .= ' "' . $tagChar . $subtag . $tagChar . '"';
 						}
 					}
 				} else {
 					// Don't add the tag if it is already inserted by preselected filters
 					if(!empty($tag) && strstr($tagsAgainst[$key], $subtag) === false) {
-						$tagsAgainst[$key] .= ' +"' . $tagChar . $tag . $tagChar . '" ';
+						$tagsAgainst[$key] .= ' +"' . $tagChar . $tag . $tagChar . '"';
 					}
 				}
 			}

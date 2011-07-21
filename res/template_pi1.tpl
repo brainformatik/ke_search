@@ -332,6 +332,7 @@ function hideSpinner() {
 <div class="multiselect">
 	<form method="get" action="###FORM_ACTION###">
 		<input type="hidden" name="id" value="###PAGEID###" />
+		<input type="hidden" name="tx_kesearch_pi1[multi]" value="1" />
 		<input type="hidden" name="page" value="1" />
 		<!-- ###SUB_FILTER_MULTISELECT_FILTER### begin -->
 			<h3>###TITLE###</h3>
