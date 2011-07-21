@@ -95,19 +95,10 @@ class tx_kesearch_indexer {
 		$GLOBALS['TYPO3_DB']->sql_query('PREPARE searchStmtWithoutParams FROM "
 			SELECT *
 			FROM tx_kesearch_index
-			WHERE pid = ?
-			AND targetpid = ?
+			WHERE uid = ?
+			AND pid = ?
 			AND type = ?
-			AND language = ?
-		"');
-		$GLOBALS['TYPO3_DB']->sql_query('PREPARE searchStmtWithParams FROM "
-			SELECT *
-			FROM tx_kesearch_index
-			WHERE pid = ?
-			AND targetpid = ?
-			AND type = ?
-			AND params = ?
-			AND language = ?
+			LIMIT 1
 		"');
 		$GLOBALS['TYPO3_DB']->sql_query('PREPARE updateStmt FROM "
 			UPDATE tx_kesearch_index
@@ -301,7 +292,7 @@ class tx_kesearch_indexer {
 			'pid' => intval($storagepid),
 			'title' => $title,
 			'type' => $type,
-			'targetpid' => intval($targetpid),
+			'targetpid' => $targetpid,
 			'content' => $content,
 			'tags' => $tags,
 			'params' => $params,
@@ -329,9 +320,8 @@ class tx_kesearch_indexer {
 			$addQueryFields .= ', @' . $value[0];
 		}
 
-
 		// check if record already exists
-		$countRows = $this->indexRecordExists($storagepid, $targetpid, $type, $params, $language);
+		$countRows = $this->indexRecordExists($fields_values['orig_uid'], $fields_values['pid'], $fields_values['type']);
 		if($countRows) { // update existing record
 			$where = 'uid=' . intval($this->currentRow['uid']);
 			unset($fields_values['crdate']);
@@ -449,23 +439,15 @@ class tx_kesearch_indexer {
 	 *
 	 * @return amount of search results
 	 */
-	function indexRecordExists($storagepid, $targetpid, $type, $params='', $language) {
+	function indexRecordExists($uid, $pid, $type) {
 		$GLOBALS['TYPO3_DB']->sql_query('SET
-			@storage = ' . $storagepid . ',
-			@target = ' . $targetpid . ',
-			@type = "' . $type . '",
-			@params = "' . $params . '",
-			@language = ' . $language . '
+			@uid = ' . $uid . ',
+			@pid = ' . $pid . ',
+			@type = "' . $type . '"
 		');
-		if($params) {
-			$res = $GLOBALS['TYPO3_DB']->sql_query('
-				EXECUTE searchStmtWithParams USING @storage, @target, @type, @params, @language;
-			');
-		} else {
-			$res = $GLOBALS['TYPO3_DB']->sql_query('
-				EXECUTE searchStmtWithoutParams USING @storage, @target, @type, @language;
-			');
-		}
+		$res = $GLOBALS['TYPO3_DB']->sql_query('
+			EXECUTE searchStmt USING @uid, @pid, @type;
+		');
 		$this->currentRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 		return $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 	}

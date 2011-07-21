@@ -145,5 +145,24 @@ class user_kesearch_sortdate {
 
 	}
 
+	public function modifyContentIndexEntry(&$title, &$contentRecord, &$tags, $contentUid, &$additionalFields) {
+		// crdate is always given, but can be overwritten
+		if(isset($contentRecord['crdate']) && $contentRecord['crdate'] > 0) {
+			$additionalFields['sortdate'] = $contentRecord['crdate'];
+		}
+		// if TYPO3 sets last changed
+		if(isset($contentRecord['tstamp']) && $contentRecord['tstamp'] > 0) {
+			$additionalFields['sortdate'] = $contentRecord['tstamp'];
+		}
+
+		// fill orig_uid
+		if(isset($contentRecord['uid']) && $contentRecord['uid'] > 0) {
+			$additionalFields['orig_uid'] = $contentRecord['uid'];
+		}
+		// fill orig_pid
+		if(isset($contentRecord['pid']) && $contentRecord['pid'] > 0) {
+			$additionalFields['orig_pid'] = $contentRecord['pid'];
+		}
+	}
 }
 ?>

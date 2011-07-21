@@ -434,7 +434,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 			)
 		),
 		'targetpid' => array (
-			'displayCond' => 'FIELD:type:!IN:page',
+			'displayCond' => 'FIELD:type:!IN:page,tt_content',
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.targetpid',
 			'config' => array (
@@ -458,6 +458,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.3', 'dam', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_3.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.4', 'xtypocommerce', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_4.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.5', 'tt_address', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_5.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.6', 'tt_content', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_1.gif'),
 				),
 				'itemsProcFunc' => 'tx_kesearch_lib_items->fillIndexerConfig',
 				'size' => 1,
@@ -468,7 +469,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'startingpoints_recursive' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.startingpoints_recursive',
-			'displayCond' => 'FIELD:type:=:page',
+			'displayCond' => 'FIELD:type:=:page,tt_content',
 			'config' => array (
 				'type' => 'group',
 				'internal_type' => 'db',
@@ -481,7 +482,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'single_pages' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.single_pages',
-			'displayCond' => 'FIELD:type:=:page',
+			'displayCond' => 'FIELD:type:=:page,tt_content',
 			'config' => array (
 				'type' => 'group',
 				'internal_type' => 'db',
@@ -507,7 +508,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'index_content_with_restrictions' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.index_content_with_restrictions',
-			'displayCond' => 'FIELD:type:=:page',
+			'displayCond' => 'FIELD:type:=:page,tt_content',
 			'config' => array (
 				'type' => 'select',
 				'items' => array (
