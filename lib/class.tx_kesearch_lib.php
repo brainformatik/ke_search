@@ -717,7 +717,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		// getFiltersFromFlexform is much faster than an additional SQL-Query
 		$filters = $this->getFiltersFromFlexform();
 		$allOptionsOfCurrentFilter = $this->getFilterOptions($filters[$filterUid]['options']);
-		$allOptionsOfCurrentFilter = t3lib_div::array_merge_recursive_overrule($allOptionsOfCurrentFilter, (array)$options);
+		$allOptionsOfCurrentFilter = t3lib_div::array_merge_recursive_overrule((array)$allOptionsOfCurrentFilter, (array)$options);
 		$allOptionKeys = array_keys($allOptionsOfCurrentFilter);
 
 		// sorting multidimensional array
