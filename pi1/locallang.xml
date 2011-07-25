@@ -89,15 +89,17 @@
 			<label index="message_before_search">Please choose your search parameters.</label>
 			<label index="query_time">The search query was processed in %s ms.</label>
 			<label index="reset_button">Reset</label>
+			<label index="reset_filter">Reset filter</label>
 			<label index="submit">Submit</label>
+			<label index="back">Back</label>
 
 			<label index="orderlink_title">Title</label>
 			<label index="orderlink_score">Relevance</label>
 			<label index="orderlink_sortdate">Date</label>
 
 			<label index="searchbox_default_value">Your search phrase</label>
-			<label index="linktext_filtertitle">Reduce searchresults on following category: %s</label>
-			<label index="linktext_more">Choose additional options of category: %s</label>
+			<label index="linktext_more">More %s and Multiselection</label>
+			<label index="show_results">Show results</label>
 		</languageKey>
 
 		<!-- GERMAN -->
@@ -184,15 +186,17 @@
 			<label index="message_before_search">Bitte geben Sie Ihre Suchkriterien an.</label>
 			<label index="query_time">Die Suchabfrage hat %s ms in Anspruch genommen.</label>
 			<label index="reset_button">Alle Eingaben löschen</label>
+			<label index="reset_filter">Filter zurücksetzen</label>
 			<label index="submit">Schnellsuche starten</label>
+			<label index="back">Zurück</label>
 
 			<label index="orderlink_title">Titel</label>
 			<label index="orderlink_score">Relevanz</label>
 			<label index="orderlink_sortdate">Datum</label>
 
 			<label index="searchbox_default_value">Suchbegriff</label>
-			<label index="linktext_filtertitle">Ergebnisse auf den Bereich: %s begrenzen</label>
-			<label index="linktext_more">Weitere Auswahlmöglichkeiten in der Categorie: %s</label>
+			<label index="linktext_more">Weitere %s und Mehrfachauswahl</label>
+			<label index="show_results">Ergebnisse anzeigen</label>
 		</languageKey>
 	</data>
 </T3locallang>

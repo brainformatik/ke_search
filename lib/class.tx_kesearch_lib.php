@@ -737,6 +737,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		// loop through options
 		if(is_array($allOptionsOfCurrentFilter)) {
 			$counter = 1;
+			$countActives = 0;
 			foreach($allOptionsOfCurrentFilter as $key => $data) {
 				$isOptionInOptionArray = 0;
 
@@ -751,6 +752,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				if($this->piVars['multi']) {
 					if($this->piVars['filter'][$filterUid][$key]) {
 						if($isOptionInOptionArray) {
+							$countActives++;
 							$markerArray['###TEXTLINK###'] = $this->cObj->typoLink(
 								$data['title'],
 								array(
@@ -765,13 +767,14 @@ class tx_kesearch_lib extends tslib_pibase {
 						$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
 					}
 				} else {
-					// if option is in optionArray, we have to mark the checkboxes
-					if($isOptionInOptionArray && $counter < 5) {
+					// if option is in optionArray, we have to mark the selection
+					if($isOptionInOptionArray && $counter < (int)$filters[$filterUid]['amount']) {
 						// if user has clicked on a link it must be selected on the resultpage, too.
 						if($this->piVars['filter'][$filterUid][$key]) {
-							echo "Geht rein";
+							$countActives++;
 							$markerArray['###CLASS###'] = 'active';
 							$markerArray['###TEXTLINK###'] = $options[$optionKey]['title'];
+							$hiddenFields .= '<input type="hidden" name="tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']" id="tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']" value="' . $data['tag'] . '" />';
 							$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
 						}
 						if(empty($this->piVars['filter'][$filterUid])) {
@@ -780,7 +783,11 @@ class tx_kesearch_lib extends tslib_pibase {
 								$options[$optionKey]['title'] . ' (' . $options[$optionKey]['results'] . ')',
 								array(
 									'parameter' => $this->conf['resultPage'],
-									'additionalParams' => '&tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']=' . $data['tag'] . '&tx_kesearch_pi1[page]=1'
+									'additionalParams' => '&tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']=' . $data['tag'] . '&tx_kesearch_pi1[page]=1',
+									'addQueryString' => 1,
+									'addQueryString.' => array(
+										'exclude' => 'uid'
+									)
 								)
 							);
 							$counter++;
@@ -818,18 +825,41 @@ class tx_kesearch_lib extends tslib_pibase {
 		$filterTitle = $this->filters[$filterUid]['title'];
 		$this->filters[$filterUid]['target_pid'] = ($this->filters[$filterUid]['target_pid']) ? $this->filters[$filterUid]['target_pid'] : $this->conf['resultPage'];
 
-		// fill markers
-		$markerArray['###FILTERTITLE###'] = sprintf($this->pi_getLL('linktext_filtertitle'), $filterTitle);
-		$markerArray['###LINK_MULTISELECT###'] = $this->cObj->typoLink(
-			sprintf($this->pi_getLL('linktext_more'), $filterTitle),
-			array(
-				'parameter' => $this->filters[$filterUid]['target_pid'],
-				'addQueryString' => 1,
-				'addQueryString.' => array(
-					'exclude' => 'id,page,tx_kesearch_pi1[page],tx_kesearch_pi1[multi]'
+			// fill markers
+		$markerArray['###FILTERTITLE###'] = $filterTitle;
+		$markerArray['###HIDDEN_FIELDS###'] = $hiddenFields;
+
+		if(count($this->piVars['filter']) <= 1) {
+			$exclude = 'tx_kesearch_pi1[page],tx_kesearch_pi1[multi],tx_kesearch_pi1[filter][' . $filterUid . ']';
+		} else $exclude = 'tx_kesearch_pi1[page],tx_kesearch_pi1[filter][' . $filterUid . ']';
+		
+		if($countActives) {
+			$markerArray['###LINK_MULTISELECT###'] = '';
+			$markerArray['###LINK_RESET_FILTER###'] = $this->cObj->typoLink(
+				$this->pi_getLL('reset_filter'),
+				array(
+					'parameter' => $this->conf['resultPage'],
+					'addQueryString' => 1,
+					'addQueryString.' => array(
+						'exclude' => $exclude
+					)
 				)
-			)
-		);
+			);
+		} else {
+			// check if there is a special translation for current filter
+			$linkTextMore = $this->pi_getLL('linktext_more_' . $filterUid, $this->pi_getLL('linktext_more'));
+			$markerArray['###LINK_MULTISELECT###'] = $this->cObj->typoLink(
+				sprintf($linkTextMore, $filterTitle),
+				array(
+					'parameter' => $this->filters[$filterUid]['target_pid'],
+					'addQueryString' => 1,
+					'addQueryString.' => array(
+						'exclude' => 'id,tx_kesearch_pi1[page],tx_kesearch_pi1[multi]'
+					)
+				)
+			);
+			$markerArray['###LINK_RESET_FILTER###'] = '';
+		}
 
 		$contentFilters = $this->cObj->substituteMarkerArray($contentFilters, $markerArray);
 

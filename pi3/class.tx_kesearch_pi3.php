@@ -65,13 +65,19 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 
 		// get templates
 		$template['multiselect'] = $this->cObj->getSubpart($this->templateCode, '###SUB_FILTER_MULTISELECT###');
+		$template['multihidden'] = $this->cObj->getSubpart($template['multiselect'], '###SUB_FILTER_MULTISELECT_HIDDEN###');
 		$template['multifilter'] = $this->cObj->getSubpart($template['multiselect'], '###SUB_FILTER_MULTISELECT_FILTER###');
 		$template['multioption'] = $this->cObj->getSubpart($template['multifilter'], '###SUB_FILTER_MULTISELECT_OPTION###');
 
-		// get defined filters from FlexForm
-		$filters = $this->getFiltersFromFlexform();
+		// get current filter
+		$filter = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow(
+			'*',
+			'tx_kesearch_filters',
+			'target_pid = ' . intval($GLOBALS['TSFE']->id),
+			'', '', ''
+		);
 
-		foreach($filters as $filter) {
+		if($filter != NULL) {
 			$contentOptions = '';
 			$countLoops = 1;
 			$this->piVars['filter'][$filter['uid']] = array_unique($this->piVars['filter'][$filter['uid']]);
@@ -109,7 +115,35 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 			'###FORM_ACTION###',
 			$this->pi_getPageLink($GLOBALS['TSFE']->id)
 		);
+		$content = $this->cObj->substituteMarker(
+			$content,
+			'###SHOW_RESULTS###',
+			$this->pi_getLL('show_results')
+		);
+		$content = $this->cObj->substituteMarker(
+			$content,
+			'###LINK_BACK###',
+			$this->cObj->typoLink(
+				$this->pi_getLL('back'),
+				array(
+					'parameter' => $this->conf['resultPage'],
+					'addQueryString' => 1,
+					'addQueryString.' => array(
+						'exclude' => 'id'
+					)
+				)
+			)
+		);
+		foreach($this->piVars['filter'] as $filterKey => $filterValue) {
+			if($filterKey == $filter['uid']) continue;
+			foreach($this->piVars['filter'][$filterKey] as $optionKey => $option) {
+				$hidden .= $this->cObj->substituteMarker($template['multihidden'], '###NAME###', 'tx_kesearch_pi1[filter][' . $filterKey . '][' . $optionKey . ']');
+				$hidden = $this->cObj->substituteMarker($hidden, '###VALUE###', $option);
+			}
+		}
+		$content = $this->cObj->substituteSubpart($content, '###SUB_FILTER_MULTISELECT_HIDDEN###', $hidden);
 		$content = $this->cObj->substituteMarker($content, '###PAGEID###', $this->conf['resultPage']);
+		$content = $this->cObj->substituteMarker($content, '###SWORD###', $this->piVars['sword']);
 
 		return $this->pi_wrapInBaseClass($content);
 	}

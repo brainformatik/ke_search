@@ -291,7 +291,7 @@ function hideSpinner() {
 	    <span class="resetlink" onclick="document.getElementById('###FILTERID###').value=''; ###ONCLICK_RESET###">Filter zur&uuml;cksetzen</span>
 	</ul>
 	<input type="hidden" name="###FILTERNAME###" id="###FILTERID###" value="###VALUE###" />
-    </div>
+	</div>
 <!-- ###SUB_FILTER_LIST### end -->
 
 <!-- ###SUB_FILTER_CHECKBOX### start -->
@@ -317,6 +317,7 @@ function hideSpinner() {
 
 <!-- ###SUB_FILTER_TEXTLINKS### begin ### -->
 <div class="textlinks">
+	###HIDDEN_FIELDS###
 	<h3>###FILTERTITLE###</h3>
 	<ul>
 	<!-- ###SUB_FILTER_TEXTLINK_OPTION### begin -->
@@ -324,6 +325,7 @@ function hideSpinner() {
 	<!-- ###SUB_FILTER_TEXTLINK_OPTION### end -->
 	</ul>
 	<div>###LINK_MULTISELECT###</div>
+	<div class="resetlink">###LINK_RESET_FILTER###</div>
 </div>
 <!-- ###SUB_FILTER_TEXTLINKS### end ### -->
 
@@ -333,7 +335,13 @@ function hideSpinner() {
 	<form method="get" action="###FORM_ACTION###">
 		<input type="hidden" name="id" value="###PAGEID###" />
 		<input type="hidden" name="tx_kesearch_pi1[multi]" value="1" />
-		<input type="hidden" name="page" value="1" />
+		<input type="hidden" name="tx_kesearch_pi1[sword]" value="###SWORD###" />
+		<input type="hidden" name="tx_kesearch_pi1[page]" value="1" />
+		
+		<!-- ###SUB_FILTER_MULTISELECT_HIDDEN### begin -->
+			<input type="hidden" name="###NAME###" value="###VALUE###" />
+		<!-- ###SUB_FILTER_MULTISELECT_HIDDEN### end -->
+		
 		<!-- ###SUB_FILTER_MULTISELECT_FILTER### begin -->
 			<h3>###TITLE###</h3>
 			<!-- ###SUB_FILTER_MULTISELECT_OPTION### begin -->
@@ -343,7 +351,8 @@ function hideSpinner() {
 			<!-- ###SUB_FILTER_MULTISELECT_OPTION### end -->
 			<div class="clearer"></div>
 		<!-- ###SUB_FILTER_MULTISELECT_FILTER### end -->
-		<div class="submit"><input type="submit" value="Speichern" /></div>
+		<div class="submit"><input type="submit" value="###SHOW_RESULTS###" /></div>
+		<div class="back">###LINK_BACK###</div>
 	</form>
 </div>
 <!-- ###SUB_FILTER_MULTISELECT### end ### -->
