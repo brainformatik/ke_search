@@ -142,7 +142,8 @@ class tx_kesearch_lib extends tslib_pibase {
 			$this->extConf['prePostTagChar'] = '#';
 		}
 		$this->extConf['multiplyValueToTitle'] = ($this->extConf['multiplyValueToTitle']) ? $this->extConf['multiplyValueToTitle'] : 1;
-
+		$this->extConf['searchWordLength'] = ($this->extConf['searchWordLength']) ? $this->extConf['searchWordLength'] : 4;
+		
 		// get html template
 		$this->templateFile = $this->conf['templateFile'] ? $this->conf['templateFile'] : t3lib_extMgm::siteRelPath($this->extKey).'res/template_pi1.tpl';
 		$this->templateCode = $this->cObj->fileResource($this->templateFile);
