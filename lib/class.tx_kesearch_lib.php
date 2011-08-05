@@ -736,7 +736,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// loop through options
 		if(is_array($allOptionsOfCurrentFilter)) {
-			$counter = 1;
+			$counter = 0;
 			$countActives = 0;
 			foreach($allOptionsOfCurrentFilter as $key => $data) {
 				$isOptionInOptionArray = 0;

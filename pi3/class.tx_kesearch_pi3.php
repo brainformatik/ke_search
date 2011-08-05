@@ -113,7 +113,7 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 		$content = $this->cObj->substituteMarker(
 			$content,
 			'###FORM_ACTION###',
-			$this->pi_getPageLink($GLOBALS['TSFE']->id)
+			$this->pi_getPageLink($this->conf['resultPage'])
 		);
 		$content = $this->cObj->substituteMarker(
 			$content,
@@ -127,6 +127,7 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 				$this->pi_getLL('back'),
 				array(
 					'parameter' => $this->conf['resultPage'],
+					'additionalParams' => '&tx_kesearch_pi1[multi]=0',
 					'addQueryString' => 1,
 					'addQueryString.' => array(
 						'exclude' => 'id'

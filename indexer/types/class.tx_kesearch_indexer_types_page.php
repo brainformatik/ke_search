@@ -97,7 +97,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 *
 	 * @return array List of page UIDs
 	 */
-	function getPagelist() {
+	public function getPagelist() {
 		// make array from list
 		$pidsRecursive = t3lib_div::trimExplode(',', $this->indexerConfig['startingpoints_recursive'], true);
 		$pidsNonRecursive = t3lib_div::trimExplode(',', $this->indexerConfig['single_pages'], true);
@@ -133,7 +133,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 * get array with all pages
 	 * @param array Array with all page cols
 	 */
-	protected function getPageRecords($uids) {
+	public function getPageRecords($uids) {
 		$fields = '*';
 		$table = 'pages';
 		$where = 'uid IN (' . implode(',', $uids) . ')';
@@ -152,7 +152,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 * @param array Simple array with uids of pages
 	 * @return array extended array with uids and tags for pages
 	 */
-	protected function addTagsToPageRecords($uids) {
+	public function addTagsToPageRecords($uids) {
 		$tagChar = $this->pObj->extConf['prePostTagChar'];
 		// add tags which are defined by page properties
 		$fields = 'pages.*, GROUP_CONCAT(CONCAT("' . $tagChar . '", tx_kesearch_filteroptions.tag, "' . $tagChar . '")) as tags';
@@ -199,7 +199,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 * get content of current page and save data to db
 	 * @param $uid page-UID that has to be indexed
 	 */
-	function getPageContent($uid) {
+	public function getPageContent($uid) {
 
 		// TODO: index all language versions of this page
 		// pages.uid <=> pages_language_overlay.pid

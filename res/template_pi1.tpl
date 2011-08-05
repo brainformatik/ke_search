@@ -330,7 +330,7 @@ function hideSpinner() {
 <!-- ###SUB_FILTER_TEXTLINKS### end ### -->
 
 
-<!-- ###SUB_FILTER_MULTISELECT### begin ### -->
+<!-- ###SUB_FILTER_MULTISELECT### begin -->
 <div class="multiselect">
 	<form method="get" action="###FORM_ACTION###">
 		<input type="hidden" name="id" value="###PAGEID###" />
@@ -355,4 +355,4 @@ function hideSpinner() {
 		<div class="back">###LINK_BACK###</div>
 	</form>
 </div>
-<!-- ###SUB_FILTER_MULTISELECT### end ### -->
+<!-- ###SUB_FILTER_MULTISELECT### end -->
