@@ -73,7 +73,7 @@ CREATE TABLE tx_kesearch_index (
 	endtime int(11) DEFAULT '0' NOT NULL,
 	fe_group varchar(100) DEFAULT '0' NOT NULL,
 	targetpid text,
-	content text,
+	content mediumtext,
 	params tinytext,
 	type tinytext,
 	tags text,
