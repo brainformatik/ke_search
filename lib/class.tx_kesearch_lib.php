@@ -832,7 +832,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		if(count($this->piVars['filter']) <= 1) {
 			$exclude = 'tx_kesearch_pi1[page],tx_kesearch_pi1[multi],tx_kesearch_pi1[filter][' . $filterUid . ']';
 		} else $exclude = 'tx_kesearch_pi1[page],tx_kesearch_pi1[filter][' . $filterUid . ']';
-		
+
 		if($countActives) {
 			$markerArray['###LINK_MULTISELECT###'] = '';
 			$markerArray['###LINK_RESET_FILTER###'] = $this->cObj->typoLink(
@@ -1800,7 +1800,11 @@ class tx_kesearch_lib extends tslib_pibase {
 
 				if (is_array($this->piVars['filter'])) {
 					foreach($this->piVars['filter'] as $filterId => $data) {
-						$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.']='.$this->piVars['filter'][$filterId];
+						if(is_array($data)) {
+							foreach($data as $tagKey => $tag) {
+								$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.'][' . $tagKey . ']='.$tag;
+							}
+						} else $linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.']='.$this->piVars['filter'][$filterId];
 					}
 				}
 
@@ -1827,7 +1831,11 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			if (is_array($this->piVars['filter'])) {
 				foreach($this->piVars['filter'] as $filterId => $data) {
-					$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.']='.$this->piVars['filter'][$filterId];
+					if(is_array($data)) {
+						foreach($data as $tagKey => $tag) {
+							$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.'][' . $tagKey . ']='.$tag;
+						}
+					} else $linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.']='.$this->piVars['filter'][$filterId];
 				}
 			}
 
@@ -1851,7 +1859,11 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			if (is_array($this->piVars['filter'])) {
 				foreach($this->piVars['filter'] as $filterId => $data) {
-					$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.']='.$this->piVars['filter'][$filterId];
+					if(is_array($data)) {
+						foreach($data as $tagKey => $tag) {
+							$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.'][' . $tagKey . ']='.$tag;
+						}
+					} else $linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterId.']='.$this->piVars['filter'][$filterId];
 				}
 			}
 
