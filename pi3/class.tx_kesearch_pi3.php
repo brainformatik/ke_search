@@ -127,7 +127,6 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 				$this->pi_getLL('back'),
 				array(
 					'parameter' => $this->conf['resultPage'],
-					'additionalParams' => '&tx_kesearch_pi1[multi]=0',
 					'addQueryString' => 1,
 					'addQueryString.' => array(
 						'exclude' => 'id'

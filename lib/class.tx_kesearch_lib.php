@@ -750,50 +750,49 @@ class tx_kesearch_lib extends tslib_pibase {
 					}
 				}
 
-				if($this->piVars['multi']) {
+				// if multi is set, then more than one entry can be selected
+				if($this->piVars['multi'] && $this->piVars['filter'][$filterUid][$key]) {
+					if($isOptionInOptionArray) {
+						$countActives++;
+						$markerArray['###TEXTLINK###'] = $this->cObj->typoLink(
+							$data['title'],
+							array(
+								'parameter' => $this->conf['resultPage'],
+								'additionalParams' => '&tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']=' . $data['tag'] . '&tx_kesearch_pi1[page]=1'
+							)
+						);
+					} else {
+						$markerArray['###TEXTLINK###'] = $data['title'];
+					}
+					$markerArray['###CLASS###'] = 'active';
+					$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
+					continue;
+				}
+				// if option is in optionArray, we have to mark the selection
+				if($isOptionInOptionArray && $counter < (int)$filters[$filterUid]['amount']) {
+					// if user has clicked on a link it must be selected on the resultpage, too.
 					if($this->piVars['filter'][$filterUid][$key]) {
-						if($isOptionInOptionArray) {
-							$countActives++;
-							$markerArray['###TEXTLINK###'] = $this->cObj->typoLink(
-								$data['title'],
-								array(
-									'parameter' => $this->conf['resultPage'],
-									'additionalParams' => '&tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']=' . $data['tag'] . '&tx_kesearch_pi1[page]=1'
-								)
-							);
-						} else {
-							$markerArray['###TEXTLINK###'] = $data['title'];
-						}
+						$countActives++;
 						$markerArray['###CLASS###'] = 'active';
+						$markerArray['###TEXTLINK###'] = $options[$optionKey]['title'];
+						$hiddenFields .= '<input type="hidden" name="tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']" id="tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']" value="' . $data['tag'] . '" />';
 						$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
 					}
-				} else {
-					// if option is in optionArray, we have to mark the selection
-					if($isOptionInOptionArray && $counter < (int)$filters[$filterUid]['amount']) {
-						// if user has clicked on a link it must be selected on the resultpage, too.
-						if($this->piVars['filter'][$filterUid][$key]) {
-							$countActives++;
-							$markerArray['###CLASS###'] = 'active';
-							$markerArray['###TEXTLINK###'] = $options[$optionKey]['title'];
-							$hiddenFields .= '<input type="hidden" name="tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']" id="tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']" value="' . $data['tag'] . '" />';
-							$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
-						}
-						if(empty($this->piVars['filter'][$filterUid])) {
-							$markerArray['###CLASS###'] = 'normal';
-							$markerArray['###TEXTLINK###'] = $this->cObj->typoLink(
-								$options[$optionKey]['title'] . ' (' . $options[$optionKey]['results'] . ')',
-								array(
-									'parameter' => $this->conf['resultPage'],
-									'additionalParams' => '&tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']=' . $data['tag'] . '&tx_kesearch_pi1[page]=1',
-									'addQueryString' => 1,
-									'addQueryString.' => array(
-										'exclude' => 'uid'
-									)
+					if(empty($this->piVars['filter'][$filterUid])) {
+						$markerArray['###CLASS###'] = 'normal';
+						$markerArray['###TEXTLINK###'] = $this->cObj->typoLink(
+							$options[$optionKey]['title'] . ' (' . $options[$optionKey]['results'] . ')',
+							array(
+								'parameter' => $this->conf['resultPage'],
+								'additionalParams' => '&tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']=' . $data['tag'] . '&tx_kesearch_pi1[page]=1',
+								'addQueryString' => 1,
+								'addQueryString.' => array(
+									'exclude' => 'uid'
 								)
-							);
-							$counter++;
-							$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
-						}
+							)
+						);
+						$counter++;
+						$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
 					}
 				}
 			}
@@ -855,7 +854,7 @@ class tx_kesearch_lib extends tslib_pibase {
 					'parameter' => $this->filters[$filterUid]['target_pid'],
 					'addQueryString' => 1,
 					'addQueryString.' => array(
-						'exclude' => 'id,tx_kesearch_pi1[page],tx_kesearch_pi1[multi]'
+						'exclude' => 'id,tx_kesearch_pi1[page]'
 					)
 				)
 			);
