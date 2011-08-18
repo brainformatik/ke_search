@@ -86,7 +86,13 @@ class tx_kesearch_pi1 extends tx_kesearch_lib {
 
 		// get content
 		$content = $this->getSearchboxContent();
-		$content = $this->cObj->substituteMarker($content,'###SPINNER###',$this->spinnerImageFilters);
+		$subpart = $this->cObj->getSubpart($content, '###SHOW_SPINNER###');
+		if($this->conf['renderMethod'] == 'static') {
+			$content = $this->cObj->substituteSubpart($content, '###SHOW_SPINNER###', '');
+		} else {
+			$subpart = $this->cObj->substituteMarker($subpart, '###SPINNER###', $this->spinnerImageFilters);
+			$content = $this->cObj->substituteSubpart($content, '###SHOW_SPINNER###', $subpart);
+		}
 		$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
 
 		return $this->pi_wrapInBaseClass($content);

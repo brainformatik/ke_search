@@ -754,16 +754,8 @@ class tx_kesearch_lib extends tslib_pibase {
 				if($this->piVars['multi'] && $this->piVars['filter'][$filterUid][$key]) {
 					if($isOptionInOptionArray) {
 						$countActives++;
-						$markerArray['###TEXTLINK###'] = $this->cObj->typoLink(
-							$data['title'],
-							array(
-								'parameter' => $this->conf['resultPage'],
-								'additionalParams' => '&tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']=' . $data['tag'] . '&tx_kesearch_pi1[page]=1'
-							)
-						);
-					} else {
-						$markerArray['###TEXTLINK###'] = $data['title'];
 					}
+					$markerArray['###TEXTLINK###'] = $data['title'];
 					$markerArray['###CLASS###'] = 'active';
 					$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
 					continue;
@@ -1654,7 +1646,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	/*
 	 * function buildTeaserContent
 	 */
-	protected function buildTeaserContent($resultText) {
+	public function buildTeaserContent($resultText) {
 
 		// calculate substring params
 		// switch through all swords and use first word found for calculating
@@ -1695,7 +1687,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$teaser = preg_replace('/('.$word.')/iu','<span class="hit">\0</span>',$teaser);
 			}
 		}
-
+		
 		return $teaser;
 	}
 
@@ -1939,14 +1931,10 @@ class tx_kesearch_lib extends tslib_pibase {
 					);
 
 					// add classname for sorting arrow
-					if($value == $orderByField) {
-						if($orderByDir == 'asc') {
-							$markerArray['###CLASS###'] = 'down';
-						} else {
-							$markerArray['###CLASS###'] = 'up';
-						}
+					if($orderByDir == 'asc') {
+						$markerArray['###CLASS###'] = 'down';
 					} else {
-						$markerArray['###CLASS###'] = '';
+						$markerArray['###CLASS###'] = 'up';
 					}
 
 					$links .= $this->cObj->substituteMarkerArray($subpartArray['###SORT_LINK###'], $markerArray);

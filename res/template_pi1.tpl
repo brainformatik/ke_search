@@ -173,7 +173,9 @@ function hideSpinner() {
 		<input id="resetFilters" type="hidden" name="tx_kesearch_pi1[resetFilters]" value="0" />
 	</div>
 	<div id="kesearch_filters">###FILTER###</div>
+	<!-- ###SHOW_SPINNER### begin -->
 	<div id="kesearch_updating_filters"><center>###SPINNER###<br /></center></div>
+	<!-- ###SHOW_SPINNER### end -->
 	###RESET###
 </form>
 <!-- ###SEARCHBOX_STATIC### end -->

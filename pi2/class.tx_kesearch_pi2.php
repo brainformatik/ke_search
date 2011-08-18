@@ -110,9 +110,15 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 		$content = $this->cObj->substituteMarker($content, '###MESSAGE###', $this->getSearchResults());
 		$content = $this->cObj->substituteMarker($content, '###NUMBER_OF_RESULTS###', $this->pi_getLL('num_results') . $this->numberOfResults);
 		$content = $this->cObj->substituteMarker($content, '###ORDERING###', $this->renderOrdering());
-		$content = $this->cObj->substituteMarker($content, '###SPINNER###', $this->spinnerImageResults);
+		$subpart = $this->cObj->getSubpart($content, '###SHOW_SPINNER###');
+		if($this->conf['renderMethod'] == 'static') {
+			$content = $this->cObj->substituteSubpart($content, '###SHOW_SPINNER###', '');
+		} else {
+			$subpart = $this->cObj->substituteMarker($subpart, '###SPINNER###', $this->spinnerImageResults);
+			$content = $this->cObj->substituteSubpart($content, '###SHOW_SPINNER###', $subpart);
+		}
 		$content = $this->cObj->substituteMarker($content, '###LOADING###', $this->pi_getLL('loading'));
-
+		
 		// process query time
 		if($this->conf['showQueryTime']) {
 			$queryTime = (t3lib_div::milliseconds() - $GLOBALS['TSFE']->register['ke_search_queryStartTime']);
