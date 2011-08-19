@@ -13,7 +13,7 @@
 			<label index="ff.loadFlexformsFromOtherCE">Load flexforms config from this search box</label>
 		</languageKey>
 		<languageKey index="de" type="array">
-			<label index="pi_title">Faceted Search</label>
+			<label index="pi_title">Facettierte Suche</label>
 			<label index="pi_plus_wiz_description">Mehrfachauswahl anzeigen.</label>
 
 			<label index="ff.main">Konfiguration der Suchergebnisse</label>
