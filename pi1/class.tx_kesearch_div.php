@@ -177,7 +177,7 @@ class tx_kesearch_div {
 		}
 
 		return array(
-			'sword' => $sword, // f.e. hello karl-heinz +mueller
+			'sword' => implode(' ', $swords), // f.e. hello karl-heinz +mueller
 			'swords' => $swords, // f.e. Array: hello|karl|heinz|mueller
 			'wordsAgainst' => $wordsAgainst, // f.e. +hello* +karl* +heinz* +mueller*
 			'tagsAgainst' => $tagsAgainst, // f.e. Array: +#category_213# +#color_123# +#city_42#
