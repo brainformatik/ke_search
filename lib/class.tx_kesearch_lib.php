@@ -1333,6 +1333,10 @@ class tx_kesearch_lib extends tslib_pibase {
 			// get number of records
 			$this->numberOfResults = $this->db->getAmountOfSearchResults();
 		}
+		
+		if(!empty($this->piVars['sword']) && empty($this->sword)) {
+			$this->numberOfResults = 0;
+		}
 
 		// count searchword with ke_stats
 		$this->countSearchWordWithKeStats($this->sword);
