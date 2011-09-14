@@ -773,7 +773,7 @@ class tx_kesearch_lib extends tslib_pibase {
 					if(empty($this->piVars['filter'][$filterUid])) {
 						$markerArray['###CLASS###'] = 'normal';
 						$markerArray['###TEXTLINK###'] = $this->cObj->typoLink(
-							$options[$optionKey]['title'] . ' (' . $options[$optionKey]['results'] . ')',
+							$options[$optionKey]['title'] . '<span> (' . $options[$optionKey]['results'] . ')</span>',
 							array(
 								'parameter' => $this->conf['resultPage'],
 								'additionalParams' => '&tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']=' . $data['tag'] . '&tx_kesearch_pi1[page]=1',
