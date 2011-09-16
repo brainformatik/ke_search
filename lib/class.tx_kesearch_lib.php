@@ -1318,6 +1318,15 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 			$queryForSphinx .= ' @(language) _language_' . $GLOBALS['TSFE']->sys_language_uid;
 			$queryForSphinx .= ' @(fe_group) _group_NULL | _group_0';
+			
+			// hook for appending additional where clause to sphinx query
+			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['appendWhereToSphinx'])) {
+				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['appendWhereToSphinx'] as $_classRef) {
+					$_procObj = & t3lib_div::getUserObj($_classRef);
+					$queryForSphinx = $_procObj->appendWhereToSphinx($queryForSphinx, $sphinx, $this);
+				}
+			}
+			
 			$res = $sphinx->getResForSearchResults($queryForSphinx);
 			/*t3lib_div::devLog('error', 'error', -1, array(
 				$sphinx->getLastWarning(),

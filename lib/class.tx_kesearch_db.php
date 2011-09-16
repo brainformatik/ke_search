@@ -219,6 +219,14 @@ class tx_kesearch_db {
 			$where .= ' AND tags <> ""';
 		}
 
+		// hook for appending additional where clause to query
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['appendWhereToQuery'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['appendWhereToQuery'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$where = $_procObj->appendWhereToQuery($where, $this->pObj);
+			}
+		}
+		
 		// add enable fields
 		$where .= $this->cObj->enableFields($this->table);
 
