@@ -77,6 +77,13 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 			'', '', ''
 		);
 
+		// hook for modifying content
+		if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyMultiselectContent'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyMultiselectContent'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$content = $_procObj->modifyMultiselectContent($template['multiselect'], $filter, $this);
+			}
+		}
 		if($filter != NULL) {
 			$contentOptions = '';
 			$countLoops = 1;
@@ -144,14 +151,6 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 		$content = $this->cObj->substituteSubpart($content, '###SUB_FILTER_MULTISELECT_HIDDEN###', $hidden);
 		$content = $this->cObj->substituteMarker($content, '###PAGEID###', $this->conf['resultPage']);
 		$content = $this->cObj->substituteMarker($content, '###SWORD###', $this->piVars['sword']);
-		
-		// hook for modifying content
-		if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyMultiselectContent'])) {
-			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyMultiselectContent'] as $_classRef) {
-				$_procObj = & t3lib_div::getUserObj($_classRef);
-				$content = $_procObj->modifyMultiselectContent($content, $filter, $this);
-			}
-		}
 		
 		return $this->pi_wrapInBaseClass($content);
 	}

@@ -951,6 +951,15 @@ class tx_kesearch_lib extends tslib_pibase {
 				}
 				$queryForSphinx .= ' @(language) _language_' . $GLOBALS['TSFE']->sys_language_uid;
 				$queryForSphinx .= ' @(fe_group) _group_NULL | _group_0';
+				
+				// hook for appending additional where clause to sphinx query
+				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['appendWhereToSphinx'])) {
+					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['appendWhereToSphinx'] as $_classRef) {
+						$_procObj = & t3lib_div::getUserObj($_classRef);
+						$queryForSphinx = $_procObj->appendWhereToSphinx($queryForSphinx, $sphinx, $this);
+					}
+				}
+			
 				$res = $sphinx->getResForSearchResults($queryForSphinx, '*', 'uid, REPLACE(tags, "' . $tagChar . $tagChar . '", "' . $tagChar . ',' . $tagChar . '") as tags');
 			} else {
 				$res = $GLOBALS['TYPO3_DB']->sql_query($query);
@@ -1328,10 +1337,9 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 			
 			$res = $sphinx->getResForSearchResults($queryForSphinx);
-			/*t3lib_div::devLog('error', 'error', -1, array(
-				$sphinx->getLastWarning(),
-				$sphinx->getLastError()
-			));*/
+			//t3lib_utility_Debug::debug($sphinx->getLastWarning());
+			//t3lib_utility_Debug::debug($sphinx->getLastError());
+			
 			// get number of records
 			$this->numberOfResults = $sphinx->getTotalFound();
 		} else {
@@ -1343,10 +1351,6 @@ class tx_kesearch_lib extends tslib_pibase {
 			$this->numberOfResults = $this->db->getAmountOfSearchResults();
 		}
 		
-		if(!empty($this->piVars['sword']) && empty($this->sword)) {
-			$this->numberOfResults = 0;
-		}
-
 		// count searchword with ke_stats
 		$this->countSearchWordWithKeStats($this->sword);
 
@@ -1354,7 +1358,6 @@ class tx_kesearch_lib extends tslib_pibase {
 		if ($this->conf['countSearchPhrases']) {
 			$this->countSearchPhrase($this->sword, $this->swords, $this->numberOfResults, $this->tagsAgainst);
 		}
-
 		if($this->numberOfResults == 0) {
 
 			// get subpart for general message
