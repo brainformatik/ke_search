@@ -1930,6 +1930,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			$orderBy = t3lib_div::trimExplode(',', $this->conf['sortByVisitor']);
 
 			// loop all allowed orderings
+			$dbSorting = t3lib_div::trimExplode(' ', $this->db->getOrdering());
 			foreach($orderBy as $value) {
 				// we can't sort by score if there is no sword given
 				if($this->sword != '' || $value != 'score') {
@@ -1947,10 +1948,14 @@ class tx_kesearch_lib extends tslib_pibase {
 					);
 
 					// add classname for sorting arrow
-					if($orderByDir == 'asc') {
-						$markerArray['###CLASS###'] = 'down';
+					if($value == $dbSorting[0]) {
+						if($orderByDir == 'asc') {
+							$markerArray['###CLASS###'] = 'down';
+						} else {
+							$markerArray['###CLASS###'] = 'up';
+						}
 					} else {
-						$markerArray['###CLASS###'] = 'up';
+						$markerArray['###CLASS###'] = '';
 					}
 
 					$links .= $this->cObj->substituteMarkerArray($subpartArray['###SORT_LINK###'], $markerArray);
