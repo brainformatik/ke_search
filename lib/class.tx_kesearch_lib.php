@@ -86,7 +86,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		if(!$GLOBALS['TSFE']->register['ke_search_queryStartTime']) $GLOBALS['TSFE']->register['ke_search_queryStartTime'] = t3lib_div::milliseconds();
 
 		$this->moveFlexFormDataToConf();
-
+		
 		if(!empty($this->conf['loadFlexformsFromOtherCE'])) {
 			$data = $this->pi_getRecord('tt_content', intval($this->conf['loadFlexformsFromOtherCE']));
 			$this->cObj->data = $data;
@@ -116,7 +116,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 		}
 		if(!isset($this->piVars['page'])) $this->piVars['page'] = 1;
-
+		
 		// hook: modifyFlexFormData
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFlexFormData'])) {
 			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFlexFormData'] as $_classRef) {
@@ -185,9 +185,12 @@ class tx_kesearch_lib extends tslib_pibase {
 			foreach($piFlexForm['data'] as $sheetKey => $sheet) {
 				foreach($sheet as $lang) {
 					foreach($lang as $key => $value) {
-						// delete all conf from pi1.
-						unset($this->conf[$key]);
-						$this->conf[$key] = $this->fetchConfigurationValue($key, $sheetKey);
+						// delete current conf value from conf-array when FF-Value differs from TS-Conf and FF-Value is not empty
+						$value = $this->fetchConfigurationValue($key, $sheetKey);
+						if($this->conf[$key] != $value && !empty($value)) {
+							unset($this->conf[$key]);
+							$this->conf[$key] = $this->fetchConfigurationValue($key, $sheetKey);
+						}
 					}
 				}
 			}
