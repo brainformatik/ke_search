@@ -92,10 +92,10 @@ class tx_kesearch_indexer {
 			$addInsertQueryValues .= ', ?';
 		}
 
-		$GLOBALS['TYPO3_DB']->sql_query('PREPARE searchStmtWithoutParams FROM "
+		$GLOBALS['TYPO3_DB']->sql_query('PREPARE searchStmt FROM "
 			SELECT *
 			FROM tx_kesearch_index
-			WHERE uid = ?
+			WHERE orig_uid = ?
 			AND pid = ?
 			AND type = ?
 			LIMIT 1
@@ -148,8 +148,7 @@ class tx_kesearch_indexer {
 			}
 		}
 		$GLOBALS['TYPO3_DB']->sql_query('ALTER TABLE tx_kesearch_index ENABLE KEYS');
-		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE searchStmtWithoutParams');
-		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE searchStmtWithParams');
+		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE searchStmt');
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE updateStmt');
 
 
@@ -441,12 +440,12 @@ class tx_kesearch_indexer {
 	 */
 	function indexRecordExists($uid, $pid, $type) {
 		$GLOBALS['TYPO3_DB']->sql_query('SET
-			@uid = ' . $uid . ',
+			@orig_uid = ' . $uid . ',
 			@pid = ' . $pid . ',
 			@type = "' . $type . '"
 		');
 		$res = $GLOBALS['TYPO3_DB']->sql_query('
-			EXECUTE searchStmt USING @uid, @pid, @type;
+			EXECUTE searchStmt USING @orig_uid, @pid, @type;
 		');
 		$this->currentRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 		return $GLOBALS['TYPO3_DB']->sql_num_rows($res);
