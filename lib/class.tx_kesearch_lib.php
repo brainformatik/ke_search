@@ -1912,7 +1912,8 @@ class tx_kesearch_lib extends tslib_pibase {
 			$subpartArray['###ORDERNAVIGATION###'] = $this->cObj->getSubpart($this->templateCode, '###ORDERNAVIGATION###');
 			$subpartArray['###SORT_LINK###'] = $this->cObj->getSubpart($subpartArray['###ORDERNAVIGATION###'], '###SORT_LINK###');
 			$defaultOrdering = 'asc';
-
+			$dbSorting = t3lib_div::trimExplode(' ', $this->db->getOrdering());
+			
 			$orderByDir = $this->piVars['orderByDir'];
 			$orderByField = $this->piVars['orderByField'];
 			if(!$orderByField) {
@@ -1925,7 +1926,6 @@ class tx_kesearch_lib extends tslib_pibase {
 			$orderBy = t3lib_div::trimExplode(',', $this->conf['sortByVisitor']);
 
 			// loop all allowed orderings
-			$dbSorting = t3lib_div::trimExplode(' ', $this->db->getOrdering());
 			foreach($orderBy as $value) {
 				// we can't sort by score if there is no sword given
 				if($this->sword != '' || $value != 'score') {

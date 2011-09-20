@@ -74,7 +74,6 @@ class tx_kesearch_db {
 
 		// add ordering
 		$orderBy = $this->getOrdering();
-		t3lib_utility_Debug::debug($orderBy);
 		
 		// add limitation
 		$limit = $this->getLimit();
