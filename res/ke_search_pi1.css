@@ -1,9 +1,5 @@
 
-.tx-kesearch-pi1 {
-    background: #fcfcfc;
-    border: 1px solid black;
-    padding: 5px;
-}
+.tx-kesearch-pi1 { }
 
 /* Clearer */
 .tx-kesearch-pi1 .clearer {
@@ -171,12 +167,7 @@
     clear: left;
 }
 
-.tx-kesearch-pi1 #kesearch_filters .resetlink {
-    cursor: pointer;
-    border-top: 1px solid black;
-    display:block;
-    padding-top: 5px;
-}
+.tx-kesearch-pi1 #kesearch_filters .resetlink {}
 
 
 .tx-kesearch-pi1 #kesearch_filters .list li.region {
@@ -373,6 +364,77 @@
 	margin-left: 10px;
 }
 
-.tx-kesearch-pi1 .textlinks li.active {
-	border-left: 5px solid #00FF00;
+/* Filter */
+
+#kesearch_filters div.textlinks{
+    margin:0 0 20px 0;
 }
+
+#kesearch_filters label{
+    display:block;
+    font-weight:bold;
+    font-size:11px;
+    color:#353535;
+    margin:0 0 6px 0;
+}
+
+
+/* Filter-Listen */
+
+#kesearch_filters ul {
+    list-style-type:none;
+    margin:0;
+    padding:0 0 5px 5px;
+}
+#kesearch_filters ul li{
+    display:block;
+    list-style-type:none;
+    margin:0 0 5px 0;
+    
+    font-size:12px;
+    line-height:16px
+}
+
+#kesearch_filters ul li a{
+    display:block;
+    padding:0 0 0 18px;
+    
+    font-size:12px;
+    line-height:16px
+}
+
+#kesearch_filters ul li a{
+    background-image: url("../../../../fileadmin/img/pagelayout/sprite_searchfilter.png");
+    background-repeat: no-repeat;
+    background-position: 0 3px;
+}
+#kesearch_filters ul li a:hover{
+    background-position: 0 -157px;
+}
+
+#kesearch_filters ul li.active{
+    padding:0 0 0 18px;
+    background-image: url("../../../../fileadmin/img/pagelayout/sprite_searchfilter.png");
+    background-repeat: no-repeat;
+    background-position: 0 -38px;
+}
+
+/* resetLink */
+#kesearch_filters div.resetlink a,
+#kesearch_filters div.multiselect a{
+    display:block;
+    padding:0 0 0 18px;
+    margin:0 0 0 5px;
+    font-size:11px;
+    background-image: url("../../../../fileadmin/img/pagelayout/sprite_searchfilter.png");
+    background-repeat: no-repeat;
+    background-position: 0 -118px;
+}
+#kesearch_filters div.multiselect a{
+    background-position: 0 -78px;
+}
+
+
+
+
+
