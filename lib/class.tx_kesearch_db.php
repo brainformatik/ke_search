@@ -74,7 +74,8 @@ class tx_kesearch_db {
 
 		// add ordering
 		$orderBy = $this->getOrdering();
-
+		t3lib_utility_Debug::debug($orderBy);
+		
 		// add limitation
 		$limit = $this->getLimit();
 
@@ -219,14 +220,6 @@ class tx_kesearch_db {
 			$where .= ' AND tags <> ""';
 		}
 
-		// hook for appending additional where clause to query
-		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['appendWhereToQuery'])) {
-			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['appendWhereToQuery'] as $_classRef) {
-				$_procObj = & t3lib_div::getUserObj($_classRef);
-				$where = $_procObj->appendWhereToQuery($where, $this->pObj);
-			}
-		}
-		
 		// add enable fields
 		$where .= $this->cObj->enableFields($this->table);
 
@@ -240,22 +233,21 @@ class tx_kesearch_db {
 	 * @return string ordering (f.e. score DESC)
 	 */
 	public function getOrdering() {
+		// if the following code fails, fall back to this default ordering
 		$orderBy = $this->conf['sortWithoutSearchword'];
-
-		if($this->pObj->sword || $this->pObj->sword == $this->pObj->pi_getLL('searchbox_default_value')) {
-			// if sorting in FE is allowed
-			if($this->conf['showSortInFrontend']) {
-				$tempField = strtolower(t3lib_div::removeXSS($this->pObj->piVars['orderByField']));
-				$tempDir = strtolower(t3lib_div::removeXSS($this->pObj->piVars['orderByDir']));
-				if($tempField != '' && $tempDir != '') {
-					// overwrite ordering with piVars when allowed
-					if($this->conf['sortByVisitor'] != '' && t3lib_div::inList($this->conf['sortByVisitor'], $tempField)) {
-						$orderBy = $tempField . ' ' . $tempDir;
-					}
-				}
-			} else { // if sorting is predefined by admin
-				$orderBy = $this->conf['sortByAdmin'];
-			}
+		
+		// if sorting in FE is allowed
+		if($this->conf['showSortInFrontend']) {
+			$piVarsField = $this->pObj->piVars['orderByField'];
+			$piVarsDir = $this->pObj->piVars['orderByDir'];
+			$piVarsDir = ($piVarsDir == '') ? 'asc' : $piVarsDir;
+			if(!empty($piVarsField)) { // if an ordering field is defined by GET/POST
+				if($this->conf['sortByVisitor'] != '' && t3lib_div::inList($this->conf['sortByVisitor'], $piVarsField)) {
+					$orderBy = $piVarsField . ' ' . $piVarsDir;
+				} // if sortByVisitor is not set OR not in the list of allowed fields then use fallback ordering in "sortWithoutSearchword"
+			} // if sortByVisitor is not set OR not in the list of allowed fields then use fallback ordering in "sortWithoutSearchword"
+		} else { // if sorting is predefined by admin
+			$orderBy = $this->conf['sortByAdmin'];
 		}
 		return $orderBy;
 	}

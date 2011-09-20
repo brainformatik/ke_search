@@ -78,7 +78,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 *
 	 * @return nothing
 	 */
-	protected function init() {
+	public function init() {
 		// get some helper functions
 		$this->div = t3lib_div::makeInstance('tx_kesearch_div', $this);
 
@@ -176,7 +176,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	/**
 	 * Move all FlexForm data of current record to conf array
 	 */
-	protected function moveFlexFormDataToConf() {
+	public function moveFlexFormDataToConf() {
 		// don't move this to init
 		$this->pi_initPIflexForm();
 
@@ -201,7 +201,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	/*
 	 * function initOnclickActions
 	 */
-	protected function initOnclickActions() {
+	public function initOnclickActions() {
 
 		switch ($this->conf['renderMethod']) {
 
@@ -227,7 +227,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	/*
 	 * function getSearchboxContent
 	 */
-	protected function getSearchboxContent() {
+	public function getSearchboxContent() {
 
 		// get main template code
 		$content = $this->cObj->getSubpart($this->templateCode,'###SEARCHBOX_STATIC###');
@@ -319,7 +319,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	/*
 	 * function renderFilters()
 	 */
-	protected function renderFilters() {
+	public function renderFilters() {
 
 		$tagChar = $this->extConf['prePostTagChar'];
 		// get filters from db
@@ -457,7 +457,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * function renderSelect
 	 * @param $arg
 	 */
-	protected function renderSelect($filterUid, $options) {
+	public function renderSelect($filterUid, $options) {
 
 		$filterSubpart = '###SUB_FILTER_SELECT###';
 		$optionSubpart = '###SUB_FILTER_SELECT_OPTION###';
@@ -517,7 +517,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * function renderList
 	 * @param $arg
 	 */
-	protected function renderList($filterUid, $options) {
+	public function renderList($filterUid, $options) {
 		// onClick don't works in static mode
 		if($this->conf['renderMethod'] == 'static') {
 			return $this->renderSelect($filterUid, $options);
@@ -606,7 +606,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * @param $options contains all options which are found in the seach result
 	 * @return $string HTML of rendered checkbox filter
 	 */
-	protected function renderCheckbox($filterUid, $options) {
+	public function renderCheckbox($filterUid, $options) {
 		// getFiltersFromFlexform is much faster than an additional SQL-Query
 		$filters = $this->getFiltersFromFlexform();
 		$allOptionsOfCurrentFilter = $this->getFilterOptions($filters[$filterUid]['options']);
@@ -717,7 +717,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	}
 
 
-	protected function renderTextlinks($filterUid, $options) {
+	public function renderTextlinks($filterUid, $options) {
 		// getFiltersFromFlexform is much faster than an additional SQL-Query
 		$filters = $this->getFiltersFromFlexform();
 		$allOptionsOfCurrentFilter = $this->getFilterOptions($filters[$filterUid]['options']);
@@ -984,7 +984,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 *
 	 * @return array Array with filter UIDs
 	 */
-	protected function getFiltersFromFlexform() {
+	public function getFiltersFromFlexform() {
 		if(!empty($this->conf['filters']) && count($this->filtersFromFlexform) == 0) {
 			$fields = '*';
 			$table = 'tx_kesearch_filters';
@@ -1014,7 +1014,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * @param string $optionList
 	 * @return array Filteroptions
 	 */
-	protected function getFilterOptions($optionList) {
+	public function getFilterOptions($optionList) {
 		// check/convert if list contains only integers
 		$optionIdArray = t3lib_div::intExplode(',', $optionList, true);
 		$optionList = implode(',', $optionIdArray);
@@ -1048,7 +1048,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	/**
 	 * Init XAJAX
 	 */
-	protected function initXajax()	{
+	public function initXajax()	{
 		// Include xaJax
 		if(!class_exists('xajax')) {
 			require_once(t3lib_extMgm::extPath('xajax') . 'class.tx_xajax.php');
@@ -1298,7 +1298,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	/*
 	 * function getSearchResults
 	 */
-	protected function getSearchResults() {
+	public function getSearchResults() {
 		// generate and add onload image
 		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/blank.gif';
 		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" />';
@@ -1621,7 +1621,7 @@ class tx_kesearch_lib extends tslib_pibase {
  	* @author  Christian Buelter <buelter@kennziffer.com>
  	* @since   Tue Mar 01 2011 12:34:25 GMT+0100
  	*/
-	protected function countSearchWordWithKeStats($searchphrase='') {
+	public function countSearchWordWithKeStats($searchphrase='') {
 
 		$searchphrase = trim($searchphrase);
 		if (t3lib_extMgm::isLoaded('ke_stats') && !empty($searchphrase)) {
@@ -1718,7 +1718,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * @param	string	$param	Configuration value name
 	 * @return	string	Parameter value
 	 */
-	protected function fetchConfigurationValue($param, $sheet = 'sDEF') {
+	public function fetchConfigurationValue($param, $sheet = 'sDEF') {
 		$value = trim($this->pi_getFFvalue(
 			$this->cObj->data['pi_flexform'], $param, $sheet)
 		);
@@ -1735,7 +1735,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * @param $length
 	 * @param $minword
 	 */
-	protected function betterSubstr($str, $length, $minword = 3) {
+	public function betterSubstr($str, $length, $minword = 3) {
 		$sub = '';
 		$len = 0;
 		foreach (explode(' ', $str) as $word) {
@@ -1754,7 +1754,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * function renderPagebrowser
 	 * @param $arg
 	 */
-	protected function renderPagebrowser() {
+	public function renderPagebrowser() {
 
 		$this->initOnclickActions();
 
@@ -1906,30 +1906,22 @@ class tx_kesearch_lib extends tslib_pibase {
 	}
 
 
-	protected function renderOrdering() {
+	public function renderOrdering() {
 		// show ordering only if is set in FlexForm
-		if($this->conf['showSortInFrontend'] && $this->conf['sortByVisitor'] != '' && $this->numberOfResults) {
+		if($this->conf['showSortInFrontend'] && !empty($this->conf['sortByVisitor']) && $this->numberOfResults) {
 			$subpartArray['###ORDERNAVIGATION###'] = $this->cObj->getSubpart($this->templateCode, '###ORDERNAVIGATION###');
 			$subpartArray['###SORT_LINK###'] = $this->cObj->getSubpart($subpartArray['###ORDERNAVIGATION###'], '###SORT_LINK###');
+			$defaultOrdering = 'asc';
 
-			if($this->conf['showSortInFrontend']) {
-				$orderByDir = strtolower($this->div->removeXSS($this->piVars['orderByDir']));
-				$orderByField = strtolower($this->div->removeXSS($this->piVars['orderByField']));
-				if(!$orderByField) {
-					$orderByField = $this->conf['sortWithoutSearchword'];
-					$orderByField = str_replace(' UP', '', $this->conf['sortWithoutSearchword']);
-					$orderByField = str_replace(' DOWN', '', $this->conf['sortWithoutSearchword']);
-				}
-				if($orderByDir != 'desc' && $orderByDir != 'asc') $orderByDir = 'desc';
-				if($orderByDir == 'desc') {
-					$orderByDir = 'asc';
-				} else {
-					$orderByDir = 'desc';
-				}
-			} else {
-				$orderByDir = 'desc';
+			$orderByDir = $this->piVars['orderByDir'];
+			$orderByField = $this->piVars['orderByField'];
+			if(!$orderByField) {
+				$orderByField = $this->conf['sortWithoutSearchword'];
+				$orderByField = str_replace(' UP', '', $this->conf['sortWithoutSearchword']);
+				$orderByField = str_replace(' DOWN', '', $this->conf['sortWithoutSearchword']);
 			}
-
+			if(empty($orderByDir)) $orderByDir = $defaultOrdering;
+			$orderByDir = ($orderByDir == 'desc') ? 'asc' : 'desc';
 			$orderBy = t3lib_div::trimExplode(',', $this->conf['sortByVisitor']);
 
 			// loop all allowed orderings
@@ -1945,8 +1937,8 @@ class tx_kesearch_lib extends tslib_pibase {
 						array(
 							'parameter' => $GLOBALS['TSFE']->id,
 							'addQueryString' => 1,
+							'addQueryString.' => array('exclude' => 'id'),
 							'additionalParams' => '&' . $this->prefixId . '[orderByField]=' . $value . '&' . $this->prefixId . '[orderByDir]=' . $orderByDir,
-							'section' => 'kesearch_ordering'
 						)
 					);
 
@@ -1980,7 +1972,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * function renderSVGScale
 	 * @param $arg
 	 */
-	protected function renderSVGScale($percent) {
+	public function renderSVGScale($percent) {
 		$svgScriptPath = t3lib_extMgm::siteRelPath($this->extKey).'res/scripts/SVG.php?p='.$percent;
 		return '<embed src="'.$svgScriptPath.'" style="margin-top: 5px;" width="50" height="12" type="image/svg+xml"	pluginspage="http://www.adobe.com/svg/viewer/install/" />';
 	}
@@ -1990,7 +1982,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * function renderTypeIcon
 	 * @param $type string
 	 */
-	protected function renderTypeIcon($type) {
+	public function renderTypeIcon($type) {
 		$type = $this->div->removeXSS($type);
 		unset($imageConf);
 		$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/types/'.$type.'.gif';
@@ -2001,7 +1993,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	/*
 	 * function initDomReadyAction
 	 */
-	protected function initDomReadyAction() {
+	public function initDomReadyAction() {
 
 		// is current page the result page?
 		$resultPage = ($GLOBALS['TSFE']->id == $this->conf['resultPage']) ? TRUE : FALSE;
@@ -2039,7 +2031,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * @return void
 	 *
 	 */
-	protected function countSearchPhrase($searchPhrase, $searchWordsArray, $hits, $tagsAgainst) {
+	public function countSearchPhrase($searchPhrase, $searchWordsArray, $hits, $tagsAgainst) {
 
 		// prepare "tagsAgainst"
 		$search = array('"', ' ', '+');
@@ -2082,7 +2074,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 *
 	 * @return none but fills global var with needed data
 	 */
-	protected function getFilterPreselect() {
+	public function getFilterPreselect() {
 		// get definitions from plugin settings
 		// and proceed only when preselectedFilter was not set
 		// this reduces the amount of sql queries, too
@@ -2115,7 +2107,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 *
 	 * @return boolean true if no searchparams given; otherwise false
 	 */
-	protected function isEmptySearch() {
+	public function isEmptySearch() {
 		// check if searchword is emtpy or equal with default searchbox value
 		$emptySearchword = (empty($this->sword) || $this->sword == $this->pi_getLL('searchbox_default_value')) ? true : false;
 
@@ -2137,7 +2129,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	/**
 	 * function includeJavascript
 	 */
-	protected function addHeaderParts() {
+	public function addHeaderParts() {
 		// build target URL if not result page
 		unset($linkconf);
 		$linkconf['parameter'] = $this->conf['resultPage'];
@@ -2175,7 +2167,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	}
 
 
-	function sortArrayRecursive($array, $field) {
+	public function sortArrayRecursive($array, $field) {
 		#debug ($array);
 
 		$sortArray = Array();
@@ -2201,7 +2193,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	}
 
 
-	function sortArrayRecursive2($wert_a, $wert_b) {
+	public function sortArrayRecursive2($wert_a, $wert_b) {
 		// Sortierung nach dem zweiten Wert des Array (Index: 1)
 		$a = $wert_a[2];
 		$b = $wert_b[2];

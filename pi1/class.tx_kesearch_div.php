@@ -43,7 +43,7 @@ class tx_kesearch_div {
 		$this->pObj = $pObj;
 	}
 
-	function getStartingPoint() {
+	public function getStartingPoint() {
 		// if loadFlexformsFromOtherCE is set
 		// try to get startingPoint of given page
 		if($uid = intval($this->pObj->conf['loadFlexformsFromOtherCE'])) {
@@ -71,12 +71,12 @@ class tx_kesearch_div {
 	 * @param string comma seperated list of page-uids
 	 * @return int first page uid
 	 */
-	function getFirstStartingPoint($pages = 0) {
+	public function getFirstStartingPoint($pages = 0) {
 		$pageArray = explode(',', $pages);
 		return intval($pageArray[0]);
 	}
 
-	function getSearchString() {
+	public function getSearchString() {
 		// replace plus and minus chars
 		$searchString = str_replace('-', ' ', $searchString);
 		$searchString = str_replace('+', ' ', $searchString);
@@ -193,7 +193,7 @@ class tx_kesearch_div {
 	* @param string value
 	* @return string XSS safe value
 	*/
-	function removeXSS($value) {
+	public function removeXSS($value) {
 		if(method_exists(t3lib_div, 'removeXSS')) {
 			return t3lib_div::removeXSS($value);
 		} else {
@@ -212,7 +212,7 @@ class tx_kesearch_div {
 	 * @param $piVars array		array containing all piVars
 	 *
 	 */
-	function cleanPiVars($piVars) {
+	public function cleanPiVars($piVars) {
 
 		// run through all piVars
 		foreach ($piVars as $key => $value) {
@@ -258,9 +258,9 @@ class tx_kesearch_div {
 
 				// "asc" or "desc"
 				case 'orderByDir':
-					$piVars[$key] = htmlspecialchars($value);
-					if (strtolower($piVars[$key]) != 'asc' && strtolower($piVars[$key]) != 'desc') {
-						$piVars[$key] = '';
+					$piVars[$key] = strtolower(htmlspecialchars($value));
+					if ($piVars[$key] != 'asc' && $piVars[$key] != 'desc') {
+						$piVars[$key] = 'asc';
 					}
 					break;
 			}
