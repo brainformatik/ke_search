@@ -1911,8 +1911,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		if($this->conf['showSortInFrontend'] && !empty($this->conf['sortByVisitor']) && $this->numberOfResults) {
 			$subpartArray['###ORDERNAVIGATION###'] = $this->cObj->getSubpart($this->templateCode, '###ORDERNAVIGATION###');
 			$subpartArray['###SORT_LINK###'] = $this->cObj->getSubpart($subpartArray['###ORDERNAVIGATION###'], '###SORT_LINK###');
-			$defaultOrdering = 'asc';
-			$dbSorting = t3lib_div::trimExplode(' ', $this->db->getOrdering());
+			$dbOrdering = t3lib_div::trimExplode(' ', $this->db->getOrdering());
 			
 			$orderByDir = $this->piVars['orderByDir'];
 			$orderByField = $this->piVars['orderByField'];
@@ -1921,7 +1920,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$orderByField = str_replace(' UP', '', $this->conf['sortWithoutSearchword']);
 				$orderByField = str_replace(' DOWN', '', $this->conf['sortWithoutSearchword']);
 			}
-			if(empty($orderByDir)) $orderByDir = $defaultOrdering;
+			if(empty($orderByDir)) $orderByDir = $dbOrdering[1];
 			$orderByDir = ($orderByDir == 'desc') ? 'asc' : 'desc';
 			$orderBy = t3lib_div::trimExplode(',', $this->conf['sortByVisitor']);
 
@@ -1943,7 +1942,7 @@ class tx_kesearch_lib extends tslib_pibase {
 					);
 
 					// add classname for sorting arrow
-					if($value == $dbSorting[0]) {
+					if($value == $dbOrderingSorting[0]) {
 						if($orderByDir == 'asc') {
 							$markerArray['###CLASS###'] = 'down';
 						} else {
