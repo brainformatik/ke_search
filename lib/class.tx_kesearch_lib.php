@@ -1914,16 +1914,10 @@ class tx_kesearch_lib extends tslib_pibase {
 			$dbOrdering = t3lib_div::trimExplode(' ', $this->db->getOrdering());
 			
 			$orderByDir = $this->piVars['orderByDir'];
-			$orderByField = $this->piVars['orderByField'];
-			if(!$orderByField) {
-				$orderByField = $this->conf['sortWithoutSearchword'];
-				$orderByField = str_replace(' UP', '', $this->conf['sortWithoutSearchword']);
-				$orderByField = str_replace(' DOWN', '', $this->conf['sortWithoutSearchword']);
-			}
 			if(empty($orderByDir)) $orderByDir = $dbOrdering[1];
 			$orderByDir = ($orderByDir == 'desc') ? 'asc' : 'desc';
 			$orderBy = t3lib_div::trimExplode(',', $this->conf['sortByVisitor']);
-
+			
 			// loop all allowed orderings
 			foreach($orderBy as $value) {
 				// we can't sort by score if there is no sword given
@@ -1942,7 +1936,7 @@ class tx_kesearch_lib extends tslib_pibase {
 					);
 
 					// add classname for sorting arrow
-					if($value == $dbOrderingSorting[0]) {
+					if($value == $dbOrdering[0]) {
 						if($orderByDir == 'asc') {
 							$markerArray['###CLASS###'] = 'down';
 						} else {

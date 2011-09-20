@@ -33,16 +33,16 @@ class tx_kesearch_classes_flexform {
 		$fieldLabel = $this->lang->sL('LLL:EXT:ke_search/locallang_db.php:tx_kesearch_index.relevance');
 		$notAllowedFields = 'uid,pid,tstamp,crdate,cruser_id,starttime,endtime,fe_group,targetpid,content,params,type,tags,abstract,language';
 		if(!$config['config']['relevanceNotAllowed']) {
-			$config['items'][] = array($fieldLabel . ' UP', 'score ASC');
-			$config['items'][] = array($fieldLabel . ' DOWN', 'score DESC');
+			$config['items'][] = array($fieldLabel . ' UP', 'score asc');
+			$config['items'][] = array($fieldLabel . ' DOWN', 'score desc');
 		}
 		$res = $GLOBALS['TYPO3_DB']->sql_query('SHOW COLUMNS FROM tx_kesearch_index');
 		while($col = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 			if(!t3lib_div::inList($notAllowedFields, $col['Field'])) {
 				$file = $GLOBALS['TCA']['tx_kesearch_index']['columns'][$col['Field']]['label'];
 				$fieldLabel = $this->lang->sL($file);
-				$config['items'][] = array($fieldLabel . ' UP', $col['Field'] . ' ASC');
-				$config['items'][] = array($fieldLabel . ' DOWN', $col['Field'] . ' DESC');
+				$config['items'][] = array($fieldLabel . ' UP', $col['Field'] . ' asc');
+				$config['items'][] = array($fieldLabel . ' DOWN', $col['Field'] . ' desc');
 			}
 		}
 	}
