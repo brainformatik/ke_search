@@ -325,7 +325,7 @@ class tx_kesearch_indexer {
 			}
 			$addQueryFields .= ', @' . $value[0];
 		}
-		$this->registry->set('ke_search', 'addQueryFields', $addQueryFields);
+		$this->registry->set('tx_kesearch', 'addQueryFields', $addQueryFields);
 		
 		// check if record already exists
 		$countRows = $this->indexRecordExists($fields_values['orig_uid'], $fields_values['pid'], $fields_values['type']);
