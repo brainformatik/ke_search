@@ -39,6 +39,11 @@ class tx_kesearch_indexer {
 	var $indexingErrors = array();
 	var $startTime;
 	var $currentRow = array(); // current row which have to be inserted/updated to database
+	
+	/**
+	 * @var t3lib_Registry
+	 */
+	var $registry;
 
 
 	/**
@@ -57,6 +62,7 @@ class tx_kesearch_indexer {
 			// but we have wrapped # with " and it works.
 			$this->extConf['prePostTagChar'] = '#';
 		}
+		$this->registry = t3lib_div::makeInstance('t3lib_Registry');
 		$this->lockFile = PATH_site . 'typo3temp/ke_search_indexer.lock';
 	}
 
@@ -256,7 +262,6 @@ class tx_kesearch_indexer {
 	 * function storeInIndex
 	 */
 	function storeInIndex($storagepid, $title, $type, $targetpid, $content, $tags='', $params='', $abstract='', $language=0, $starttime=0, $endtime=0, $fe_group, $debugOnly=false, $additionalFields=array()) {
-
 		// check for errors
 		$errors = array();
 		// no storage pid
@@ -311,6 +316,7 @@ class tx_kesearch_indexer {
 		}
 
 		// prepare additional fields for queries
+		$this->registry->set('ke_search', 'addFields', $this->additionalFields);
 		foreach($this->additionalFields as $value) {
 			if($value[1]) { // $value[1] is boolean and means if value is a string
 				$setQuery .= ', @' . $value[0] . ' = "' . $fields_values[$value[0]] . '"';
@@ -319,7 +325,8 @@ class tx_kesearch_indexer {
 			}
 			$addQueryFields .= ', @' . $value[0];
 		}
-
+		$this->registry->set('ke_search', 'addQueryFields', $addQueryFields);
+		
 		// check if record already exists
 		$countRows = $this->indexRecordExists($fields_values['orig_uid'], $fields_values['pid'], $fields_values['type']);
 		if($countRows) { // update existing record
