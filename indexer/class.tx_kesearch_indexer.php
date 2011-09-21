@@ -389,7 +389,6 @@ class tx_kesearch_indexer {
 			if ($debugOnly) { // do not process - just debug query
 				t3lib_utility_Debug::debug($GLOBALS['TYPO3_DB']->INSERTquery($table, $fields_values, $no_quote_fields = FALSE), 1);
 			} else { // process storing of index record and return uid
-				t3lib_div::devLog('test', 'test', -1, array($fields_values));
 				$query = 'SET
 					@pid = ' . $fields_values['pid'] . ',
 					@title = "' . $fields_values['title'] . '",
@@ -407,13 +406,13 @@ class tx_kesearch_indexer {
 					@crdate = ' . $fields_values['crdate'] . $setQuery . '
 				';
 				$GLOBALS['TYPO3_DB']->sql_query($query);
-				//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+				t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 
 				$query = '
 					EXECUTE insertStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp, @crdate' . $addQueryFields . ';
 				';
 				$GLOBALS['TYPO3_DB']->sql_query($query);
-				//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+				t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 
 				// count record for periodic notification?
 				if ($this->extConf['periodicNotification']) $this->periodicNotificationCount();
