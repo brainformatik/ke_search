@@ -377,7 +377,7 @@ class tx_kesearch_indexer {
 						EXECUTE updateShortStmt USING @tstamp, @uid;
 					';
 					$GLOBALS['TYPO3_DB']->sql_query($query);
-					t3lib_div::devLog('dbUpdateTstamp', 'dbUpdateTstamp', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+					//t3lib_div::devLog('dbUpdateTstamp', 'dbUpdateTstamp', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 				}
 
 				// count record for periodic notification?
