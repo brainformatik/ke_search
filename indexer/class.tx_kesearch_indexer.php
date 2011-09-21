@@ -338,6 +338,8 @@ class tx_kesearch_indexer {
 				unset($diff['tstamp']);
 				unset($diff['crdate']);
 				if(count($diff)) { // If there any fields left, do a complete UPDATE
+					$this->registry->set('tx_kesearch', 'currentRow', $this->currentRow);
+					$this->registry->set('tx_kesearch', 'fieldValues', $fields_values);
 					$this->registry->set('tx_kesearch', 'diff', $diff);
 					$query = 'SET
 						@pid = ' . $fields_values['pid'] . ',
