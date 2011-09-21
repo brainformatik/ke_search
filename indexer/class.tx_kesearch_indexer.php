@@ -389,6 +389,7 @@ class tx_kesearch_indexer {
 			if ($debugOnly) { // do not process - just debug query
 				t3lib_utility_Debug::debug($GLOBALS['TYPO3_DB']->INSERTquery($table, $fields_values, $no_quote_fields = FALSE), 1);
 			} else { // process storing of index record and return uid
+				t3lib_div::devLog('test', 'test', -1, array($fields_values));
 				$query = 'SET
 					@pid = ' . $fields_values['pid'] . ',
 					@title = "' . $fields_values['title'] . '",
