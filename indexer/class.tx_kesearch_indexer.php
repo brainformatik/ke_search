@@ -150,8 +150,9 @@ class tx_kesearch_indexer {
 		$GLOBALS['TYPO3_DB']->sql_query('ALTER TABLE tx_kesearch_index ENABLE KEYS');
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE searchStmt');
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE updateStmt');
-
-
+		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE insertStmt');
+		
+		
 		// write ending timestamp into temp file
 		t3lib_div::unlink_tempfile($this->lockFile);
 		t3lib_div::writeFileToTypo3tempDir($this->lockFile, $this->startTime . time());
@@ -195,9 +196,9 @@ class tx_kesearch_indexer {
 
 
 	/**
-	* Delete all index elements that are older than starting timestamp in temporary file
-	*
-	* @return string content for BE
+	 * Delete all index elements that are older than starting timestamp in temporary file
+	 *
+	 * @return string content for BE
 	*/
 	function cleanUpIndex() {
 		$startMicrotime = microtime(true);
@@ -325,7 +326,7 @@ class tx_kesearch_indexer {
 			$where = 'uid=' . intval($this->currentRow['uid']);
 			unset($fields_values['crdate']);
 			if ($debugOnly) { // do not process - just debug query
-				t3lib_div::debug($GLOBALS['TYPO3_DB']->UPDATEquery($table,$where,$fields_values),1);
+				t3lib_utility_Debug::debug($GLOBALS['TYPO3_DB']->UPDATEquery($table,$where,$fields_values),1);
 			} else { // process storing of index record and return uid
 				$diff = array_diff($this->currentRow, $fields_values);
 				unset($diff['uid']);
@@ -349,26 +350,26 @@ class tx_kesearch_indexer {
 						@uid = ' . $this->currentRow['uid'] . '
 					';
 					$GLOBALS['TYPO3_DB']->sql_query($query);
-					//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+					//t3lib_div::devLog('dbSetUpdateComplete', 'dbSetUpdateComplete', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 
 					$query = '
 						EXECUTE updateStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp' . $addQueryFields . ', @uid;
 					';
 					$GLOBALS['TYPO3_DB']->sql_query($query);
-					//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+					t3lib_div::devLog('dbUpdateComplete', 'dbUpdateComplete', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 				} else { // If there are no more fields in $diff, then UPDATE only tstamp
 					$query = 'SET
 						@tstamp = ' . $fields_values['tstamp'] . $setQuery . ',
 						@uid = ' . $this->currentRow['uid'] . '
 					';
 					$GLOBALS['TYPO3_DB']->sql_query($query);
-					//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+					//t3lib_div::devLog('dbSetUpdateTstamp', 'dbSetUpdateTstamp', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 
 					$query = '
 						EXECUTE updateShortStmt USING @tstamp, @uid;
 					';
 					$GLOBALS['TYPO3_DB']->sql_query($query);
-					//t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+					t3lib_div::devLog('dbUpdateTstamp', 'dbUpdateTstamp', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 				}
 
 				// count record for periodic notification?
@@ -378,7 +379,7 @@ class tx_kesearch_indexer {
 		} else {
 			// insert new record
 			if ($debugOnly) { // do not process - just debug query
-				t3lib_div::debug($GLOBALS['TYPO3_DB']->INSERTquery($table,$fields_values,$no_quote_fields=FALSE),1);
+				t3lib_utility_Debug::debug($GLOBALS['TYPO3_DB']->INSERTquery($table, $fields_values, $no_quote_fields = FALSE), 1);
 			} else { // process storing of index record and return uid
 				$query = 'SET
 					@pid = ' . $fields_values['pid'] . ',
@@ -414,23 +415,6 @@ class tx_kesearch_indexer {
 	}
 
 
-	/*
-	 * function clearIndex
-	 * @param $storagepid			storage pid
-	 * @param $targetpid			target pid for index record
-	 * @param $type string		type ("page" or "ke_yac" yet)
-	 * @param $params string		needed if other elements than pages are used
-	 */
-	function clearIndex($storagepid, $targetpid, $type, $params='') {
-		$table = 'tx_kesearch_index';
-		$where = 'pid="'.intval($storagepid).'" ';
-		$where .= 'AND targetpid="'.intval($targetpid).'" ';
-		$where .= 'AND type="'.$type.'" ';
-		if (!empty($params))$where .= 'AND params="'.$params.'" ';
-		$GLOBALS['TYPO3_DB']->exec_DELETEquery($table,$where);
-	}
-
-
 	/**
 	 * try to find an allready indexed record
 	 * THX to PREPARE-Statements. They speed up indexing up to 50%
@@ -463,45 +447,6 @@ class tx_kesearch_indexer {
 		$where .= t3lib_befunc::BEenableFields($table);
 		$where .= t3lib_befunc::deleteClause($table);
 		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where);
-	}
-
-
-	/*
-	 * function setRootlineTags
-	 * @param $pid
-	 */
-	function setRootlineTags($pid, $rootlineTags, $tagsContent) {
-		$tagChar = $this->extConf['prePostTagChar'];
-		if(count($this->rootlineTags)) {
-			foreach($this->rootlineTags as $key => $data) {
-				if ($this->checkPIDUpInRootline($pid, $data['foreign_pid']) && !strstr($tagsContent, $tagChar . $data['tag'] . $tagChar)) $tagsContent .= $tagChar . $data['tag'] . $tagChar;
-			}
-		}
-
-		return $tagsContent;
-	}
-
-
-	/*
-	 * function checkPIDUpInRootline
-	 * @param $localPid
-	 * @param $foreignPid
-	 */
-	function checkPIDUpInRootline($localPid, $foreignPid) {
-
-		if ($localPid == $foreignPid) return true;
-
-		// make instance of t3lib_pageSelect if not exists
-		if (!is_object($this->sys_page)) {
-			$this->sys_page = t3lib_div::makeInstance('t3lib_pageSelect');
-		}
-		// Get the root line
-		$rootline = $this->sys_page->getRootLine($localPid);
-		// run through pids and check for parent pid in rootline
-		foreach ($rootline as $rootlineNode) {
-			if ($rootlineNode['pid'] == $foreignPid) return true;
-		}
-		return false;
 	}
 
 
