@@ -316,7 +316,6 @@ class tx_kesearch_indexer {
 		}
 
 		// prepare additional fields for queries
-		$this->registry->set('tx_kesearch', 'addFields', $this->additionalFields);
 		foreach($this->additionalFields as $value) {
 			if($value[1]) { // $value[1] is boolean and means if value is a string
 				$setQuery .= ', @' . $value[0] . ' = "' . $fields_values[$value[0]] . '"';
@@ -325,7 +324,6 @@ class tx_kesearch_indexer {
 			}
 			$addQueryFields .= ', @' . $value[0];
 		}
-		$this->registry->set('tx_kesearch', 'addQueryFields', $addQueryFields);
 		
 		// check if record already exists
 		$countRows = $this->indexRecordExists($fields_values['orig_uid'], $fields_values['pid'], $fields_values['type']);
@@ -340,6 +338,7 @@ class tx_kesearch_indexer {
 				unset($diff['tstamp']);
 				unset($diff['crdate']);
 				if(count($diff)) { // If there any fields left, do a complete UPDATE
+					$this->registry->set('tx_kesearch', 'diff', $diff);
 					$query = 'SET
 						@pid = ' . $fields_values['pid'] . ',
 						@title = "' . $fields_values['title'] . '",
