@@ -945,7 +945,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$sphinx = t3lib_div::makeInstance('user_kesearchpremium');
 				$sphinx->setLimit(0, 10000);
 				$queryForSphinx = '';
-				if($this->wordsAgainst) $queryForSphinx .= ' @title ' . $this->wordsAgainst . ' | @(title,content) ' . $this->wordsAgainst;
+				if($this->wordsAgainst) $queryForSphinx .= ' @(title,content) ' . $this->wordsAgainst;
 				if(count($this->tagsAgainst)) {
 					foreach($this->tagsAgainst as $value) {
 						// in normal case only checkbox mode has spaces
@@ -1321,7 +1321,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			// generate query
 			$queryForSphinx = '';
-			if($this->wordsAgainst) $queryForSphinx .= ' @title ' . $this->wordsAgainst . ' | @(title,content) ' . $this->wordsAgainst;
+			if($this->wordsAgainst) $queryForSphinx .= ' @(title,content) ' . $this->wordsAgainst;
 			if(count($this->tagsAgainst)) {
 				foreach($this->tagsAgainst as $value) {
 					// in normal case only checkbox mode has spaces
