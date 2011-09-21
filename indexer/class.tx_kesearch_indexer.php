@@ -321,11 +321,7 @@ class tx_kesearch_indexer {
 
 		// prepare additional fields for queries
 		foreach($this->additionalFields as $value) {
-			if($value[1]) { // $value[1] is boolean and means if value is a string
-				$setQuery .= ', @' . $value[0] . ' = "' . $fields_values[$value[0]] . '"';
-			} else {
-				$setQuery .= ', @' . $value[0] . ' = ' . intval($fields_values[$value[0]]);
-			}
+			$setQuery .= ', @' . $value[0] . ' = ' . $fields_values[$value[0]];
 			$addQueryFields .= ', @' . $value[0];
 		}
 		
@@ -395,28 +391,28 @@ class tx_kesearch_indexer {
 			} else { // process storing of index record and return uid
 				$query = 'SET
 					@pid = ' . $fields_values['pid'] . ',
-					@title = "' . $fields_values['title'] . '",
-					@type = "' . $fields_values['type'] . '",
-					@targetpid = "' . $fields_values['targetpid'] . '",
-					@content = "' . $fields_values['content'] . '",
-					@tags = "' . $fields_values['tags'] . '",
-					@params = "' . $fields_values['params'] . '",
-					@abstract = "' . $fields_values['abstract'] . '",
+					@title = ' . $fields_values['title'] . ',
+					@type = ' . $fields_values['type'] . ',
+					@targetpid = ' . $fields_values['targetpid'] . ',
+					@content = ' . $fields_values['content'] . ',
+					@tags = ' . $fields_values['tags'] . ',
+					@params = ' . $fields_values['params'] . ',
+					@abstract = ' . $fields_values['abstract'] . ',
 					@language = ' . $fields_values['language'] . ',
 					@starttime = ' . $fields_values['starttime'] . ',
 					@endtime = ' . $fields_values['endtime'] . ',
-					@fe_group = "' . $fields_values['fe_group'] . '",
+					@fe_group = ' . $fields_values['fe_group'] . ',
 					@tstamp = ' . $fields_values['tstamp'] . ',
 					@crdate = ' . $fields_values['crdate'] . $setQuery . '
 				';
 				$GLOBALS['TYPO3_DB']->sql_query($query);
-				t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+				t3lib_div::devLog('dbSetInsert', 'dbSetInsert', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 
 				$query = '
 					EXECUTE insertStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp, @crdate' . $addQueryFields . ';
 				';
 				$GLOBALS['TYPO3_DB']->sql_query($query);
-				t3lib_div::devLog('db', 'db', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+				//t3lib_div::devLog('dbInsert', 'dbInsert', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 
 				// count record for periodic notification?
 				if ($this->extConf['periodicNotification']) $this->periodicNotificationCount();
