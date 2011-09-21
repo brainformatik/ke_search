@@ -262,7 +262,6 @@ class tx_kesearch_indexer {
 	 * function storeInIndex
 	 */
 	function storeInIndex($storagepid, $title, $type, $targetpid, $content, $tags='', $params='', $abstract='', $language=0, $starttime=0, $endtime=0, $fe_group, $debugOnly=false, $additionalFields=array()) {
-		$start = t3lib_div::milliseconds();
 		// check for errors
 		$errors = array();
 		// no storage pid
@@ -381,7 +380,6 @@ class tx_kesearch_indexer {
 
 				// count record for periodic notification?
 				if ($this->extConf['periodicNotification']) $this->periodicNotificationCount();
-				t3lib_div::devLog('Update:' . (t3lib_div::milliseconds() - $start), 'ms');
 				return true;
 			}
 		} else {
@@ -416,8 +414,6 @@ class tx_kesearch_indexer {
 
 				// count record for periodic notification?
 				if ($this->extConf['periodicNotification']) $this->periodicNotificationCount();
-				t3lib_div::devLog('Insert: ' . (t3lib_div::milliseconds() - $start), 'ms');
-				
 				return $GLOBALS['TYPO3_DB']->sql_insert_id();
 			}
 		}
