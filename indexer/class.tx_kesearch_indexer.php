@@ -262,6 +262,7 @@ class tx_kesearch_indexer {
 	 * function storeInIndex
 	 */
 	function storeInIndex($storagepid, $title, $type, $targetpid, $content, $tags='', $params='', $abstract='', $language=0, $starttime=0, $endtime=0, $fe_group, $debugOnly=false, $additionalFields=array()) {
+		$start = t3lib_div::milliseconds();
 		// check for errors
 		$errors = array();
 		// no storage pid
@@ -315,9 +316,7 @@ class tx_kesearch_indexer {
 			$fields_values = array_merge($fields_values, $additionalFields);
 		}
 		
-		foreach($fields_values as $key => $value) {
-			$fields_values[$key] = $GLOBALS['TYPO3_DB']->fullQuoteStr($value);
-		}
+		$fields_values = $GLOBALS['TYPO3_DB']->fullQuoteArray($fields_values, 'tx_kesearch_index');
 
 		// prepare additional fields for queries
 		foreach($this->additionalFields as $value) {
@@ -364,7 +363,7 @@ class tx_kesearch_indexer {
 						EXECUTE updateStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp' . $addQueryFields . ', @uid;
 					';
 					$GLOBALS['TYPO3_DB']->sql_query($query);
-					t3lib_div::devLog('dbUpdateComplete', 'dbUpdateComplete', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+					//t3lib_div::devLog('dbUpdateComplete', 'dbUpdateComplete', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 				} else { // If there are no more fields in $diff, then UPDATE only tstamp
 					$query = 'SET
 						@tstamp = ' . $fields_values['tstamp'] . $setQuery . ',
@@ -382,6 +381,7 @@ class tx_kesearch_indexer {
 
 				// count record for periodic notification?
 				if ($this->extConf['periodicNotification']) $this->periodicNotificationCount();
+				t3lib_div::devLog('Update:' . (t3lib_div::milliseconds() - $start), 'ms');
 				return true;
 			}
 		} else {
@@ -406,7 +406,7 @@ class tx_kesearch_indexer {
 					@crdate = ' . $fields_values['crdate'] . $setQuery . '
 				';
 				$GLOBALS['TYPO3_DB']->sql_query($query);
-				t3lib_div::devLog('dbSetInsert', 'dbSetInsert', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
+				//t3lib_div::devLog('dbSetInsert', 'dbSetInsert', -1, array($query, $GLOBALS['TYPO3_DB']->sql_error()));
 
 				$query = '
 					EXECUTE insertStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp, @crdate' . $addQueryFields . ';
@@ -416,7 +416,8 @@ class tx_kesearch_indexer {
 
 				// count record for periodic notification?
 				if ($this->extConf['periodicNotification']) $this->periodicNotificationCount();
-
+				t3lib_div::devLog('Insert: ' . (t3lib_div::milliseconds() - $start), 'ms');
+				
 				return $GLOBALS['TYPO3_DB']->sql_insert_id();
 			}
 		}
