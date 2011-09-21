@@ -439,8 +439,13 @@ class tx_kesearch_indexer {
 		$res = $GLOBALS['TYPO3_DB']->sql_query('
 			EXECUTE searchStmt USING @orig_uid, @pid, @type;
 		');
-		$this->currentRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
-		return $GLOBALS['TYPO3_DB']->sql_num_rows($res);
+		if(is_resource($res)) {
+			$this->currentRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+			return $GLOBALS['TYPO3_DB']->sql_num_rows($res);
+		} else {
+			$this->currentRow = array();
+			return false;
+		}
 	}
 
 
