@@ -316,7 +316,7 @@ class tx_kesearch_indexer {
 		}
 
 		// prepare additional fields for queries
-		$this->registry->set('ke_search', 'addFields', $this->additionalFields);
+		$this->registry->set('tx_kesearch', 'addFields', $this->additionalFields);
 		foreach($this->additionalFields as $value) {
 			if($value[1]) { // $value[1] is boolean and means if value is a string
 				$setQuery .= ', @' . $value[0] . ' = "' . $fields_values[$value[0]] . '"';
