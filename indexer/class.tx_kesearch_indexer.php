@@ -341,17 +341,17 @@ class tx_kesearch_indexer {
 					$this->registry->set('tx_kesearch', 'diff', $diff);
 					$query = 'SET
 						@pid = ' . $fields_values['pid'] . ',
-						@title = "' . $fields_values['title'] . '",
-						@type = "' . $fields_values['type'] . '",
-						@targetpid = "' . $fields_values['targetpid'] . '",
-						@content = "' . $fields_values['content'] . '",
-						@tags = "' . $fields_values['tags'] . '",
-						@params = "' . $fields_values['params'] . '",
-						@abstract = "' . $fields_values['abstract'] . '",
+						@title = ' . $fields_values['title'] . ',
+						@type = ' . $fields_values['type'] . ',
+						@targetpid = ' . $fields_values['targetpid'] . ',
+						@content = ' . $fields_values['content'] . ',
+						@tags = ' . $fields_values['tags'] . ',
+						@params = ' . $fields_values['params'] . ',
+						@abstract = ' . $fields_values['abstract'] . ',
 						@language = ' . $fields_values['language'] . ',
 						@starttime = ' . $fields_values['starttime'] . ',
 						@endtime = ' . $fields_values['endtime'] . ',
-						@fe_group = "' . $fields_values['fe_group'] . '",
+						@fe_group = ' . $fields_values['fe_group'] . ',
 						@tstamp = ' . $fields_values['tstamp'] . $setQuery . ',
 						@uid = ' . $this->currentRow['uid'] . '
 					';
