@@ -88,7 +88,7 @@ class tx_kesearch_div {
 		if(count($searchWordArray)) {
 			foreach ($searchWordArray as $key => $searchWord) {
 				// ignore words under length of 4 chars
-				if (strlen($searchWord) >= $this->pObj->extConf['searchWordLength']) {
+				if (t3lib_cs::utf8_strlen($searchWord) >= $this->pObj->extConf['searchWordLength']) {
 					$newSearchString .= '+'.$GLOBALS['TYPO3_DB']->quoteStr($searchWord, 'tx_kesearch_index').'* ';
 				} else {
 					unset ($searchWordArray[$key]);
@@ -132,7 +132,7 @@ class tx_kesearch_div {
 		if(count($swords)) {
 			foreach ($swords as $key => $word) {
 				// ignore words under length of 4 chars
-				if (strlen($word) >= $this->pObj->extConf['searchWordLength']) {
+				if (t3lib_cs::utf8_strlen($word) >= $this->pObj->extConf['searchWordLength']) {
 					$scoreAgainst .= $word.' ';
 					$wordsAgainst .= '+'.$word.'* ';
 				} else {
