@@ -104,39 +104,36 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
 		// add recursive pids
 		foreach($pidsRecursive as $pid) {
-			// index only pages of doktype standard, advanced and "not in menu"
-			$where = ' (doktype = 1 OR doktype = 2 OR doktype = 5) ';
-			// index only pages which are searchable
-			// index only page which are not hidden
-			// deleted clause is integrated in getTreeList. So don't add this here.
-			$where .= ' AND no_search <> 1 AND hidden=0';
-
-			// if indexing of content elements with restrictions is not allowed
-			// get only pages that have empty group restrictions
-			if($this->indexerConfig['index_content_with_restrictions'] != 'yes') {
-				$where .= ' AND (fe_group = "" OR fe_group = "0") ';
-			}
-
-			$pageList .= $this->queryGen->getTreeList($pid, 99, 0, $where);
+			$pageList .= $this->queryGen->getTreeList($pid, 99, 0, '');
 		}
 
 		// add non-recursive pids
 		foreach($pidsNonRecursive as $pid) {
-			$pageList .= $pid.',';
+			$pageList .= $pid . ',';
 		}
 
-		return t3lib_div::trimExplode(',', $pageList);
+		return t3lib_div::trimExplode(',', $pageList, true);
 	}
 
 
 	/**
 	 * get array with all pages
+	 * but remove all pages we don't want to have
+	 *
 	 * @param array Array with all page cols
 	 */
 	public function getPageRecords($uids) {
 		$fields = '*';
 		$table = 'pages';
 		$where = 'uid IN (' . implode(',', $uids) . ')';
+		
+		// index only pages of doktype standard, advanced and "not in menu"
+		$where .= ' AND (doktype = 1 OR doktype = 2 OR doktype = 5) ';
+		
+		// index only pages which are searchable
+		// index only page which are not hidden
+		$where .= ' AND no_search <> 1 AND hidden=0';
+		
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where);
 
 		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
@@ -212,7 +209,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$where .= ' AND (' . $this->whereClauseForCType. ')';
 		$where .= t3lib_BEfunc::BEenableFields($table);
 		$where .= t3lib_BEfunc::deleteClause($table);
-
+		
 		// if indexing of content elements with restrictions is not allowed
 		// get only content elements that have empty group restrictions
 		if($this->indexerConfig['index_content_with_restrictions'] != 'yes') {
@@ -268,7 +265,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 				$this->pageRecords[$uid]['title'],     // page title
 				'page',                                // content type
 				$uid,                                  // target PID: where is the single view?
-				$content,                          // indexed content, includes the title (linebreak after title)
+				$content,                              // indexed content, includes the title (linebreak after title)
 				$tags,                                 // tags
 				'',                                    // typolink params for singleview
 				'',                                    // abstract
