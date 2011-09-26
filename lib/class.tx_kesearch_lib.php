@@ -1402,11 +1402,16 @@ class tx_kesearch_lib extends tslib_pibase {
 		if($this->hasTooShortWords) {
 			// get subpart for general message
 			$content = $this->cObj->getSubpart($this->templateCode, '###GENERAL_MESSAGE###');
+			$content = $this->cObj->substituteMarker($content, '###MESSAGE###', $this->pi_getLL('searchword_length_error'));
 
-			// check if searchwords were too short
-			if(!count($this->swords)) {
-				$content = $this->cObj->substituteMarker($content, '###MESSAGE###', $this->pi_getLL('searchword_length_error'));
-			}
+			// attention icon
+			unset($imageConf);
+			$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/attention.gif';
+			$imageConf['altText'] = $this->pi_getLL('no_results_found');
+			$attentionImage=$this->cObj->IMAGE($imageConf);
+
+			// set attention icon?
+			$content = $this->cObj->substituteMarker($content,'###IMAGE###', $attentionImage);
 		}
 
 		// loop through results
