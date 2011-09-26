@@ -104,7 +104,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
 		// add recursive pids
 		foreach($pidsRecursive as $pid) {
-			$pageList .= $this->queryGen->getTreeList($pid, 99, 0, '');
+			$pageList .= $this->queryGen->getTreeList($pid, 99, 0, '1=1');
 		}
 
 		// add non-recursive pids
