@@ -133,7 +133,10 @@ class tx_kesearch_indexer {
 			(pid, title, type, targetpid, content, tags, params, abstract, language, starttime, endtime, fe_group, tstamp, crdate' . $addInsertQueryFields . ')
 			VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?' . $addInsertQueryValues . ', ?)
 		"');
-		$GLOBALS['TYPO3_DB']->sql_query('ALTER TABLE tx_kesearch_index DISABLE KEYS');
+		
+		// disable keys only if indexer table was truncated (has 0 records)
+		$countIndex = $GLOBALS['TYPO3_DB']->exec_SELECTcountRows('*', 'tx_kesearch_index', '');
+		if($countIndex == 0) $GLOBALS['TYPO3_DB']->sql_query('ALTER TABLE tx_kesearch_index DISABLE KEYS');
 
 		foreach($configurations as $indexerConfig) {
 			$this->indexerConfig = $indexerConfig;
@@ -153,7 +156,9 @@ class tx_kesearch_indexer {
 				}
 			}
 		}
-		$GLOBALS['TYPO3_DB']->sql_query('ALTER TABLE tx_kesearch_index ENABLE KEYS');
+		// enable keys
+		if($countIndex == 0) $GLOBALS['TYPO3_DB']->sql_query('ALTER TABLE tx_kesearch_index ENABLE KEYS');
+		
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE searchStmt');
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE updateStmt');
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE insertStmt');
@@ -315,15 +320,16 @@ class tx_kesearch_indexer {
 			$fields_values = array_merge($fields_values, $additionalFields);
 		}
 		
+		// full quoting record. Average speed: 0-1ms
 		$fields_values = $GLOBALS['TYPO3_DB']->fullQuoteArray($fields_values, 'tx_kesearch_index');
-
+		
 		// prepare additional fields for queries
 		foreach($this->additionalFields as $value) {
 			$setQuery .= ', @' . $value[0] . ' = ' . $fields_values[$value[0]];
 			$addQueryFields .= ', @' . $value[0];
 		}
 		
-		// check if record already exists
+		// check if record already exists. Average speed: 1-2ms
 		$countRows = $this->indexRecordExists($fields_values['orig_uid'], $fields_values['pid'], $fields_values['type']);
 		if($countRows) { // update existing record
 			$where = 'uid=' . intval($this->currentRow['uid']);
@@ -424,6 +430,7 @@ class tx_kesearch_indexer {
 	 * try to find an allready indexed record
 	 * THX to PREPARE-Statements. They speed up indexing up to 50%
 	 * This function also sets $this->currentRow
+	 * parameters are already fullQuoted
 	 *
 	 * @return amount of search results
 	 */
@@ -431,7 +438,7 @@ class tx_kesearch_indexer {
 		$GLOBALS['TYPO3_DB']->sql_query('SET
 			@orig_uid = ' . $uid . ',
 			@pid = ' . $pid . ',
-			@type = "' . $type . '"
+			@type = ' . $type . '
 		');
 		$res = $GLOBALS['TYPO3_DB']->sql_query('
 			EXECUTE searchStmt USING @orig_uid, @pid, @type;
