@@ -34,29 +34,30 @@ require_once(t3lib_extMgm::extPath('ke_search').'pi1/class.tx_kesearch_div.php')
  * @subpackage	tx_kesearch
  */
 class tx_kesearch_lib extends tslib_pibase {
-	var $prefixId           = 'tx_kesearch_pi1';		// Same as class name
-	var $extKey             = 'ke_search';	// The extension key.
+	var $prefixId            = 'tx_kesearch_pi1';		// Same as class name
+	var $extKey              = 'ke_search';	// The extension key.
 
-	var $sword              = ''; // cleaned searchword (karl-heinz => karl heinz)
-	var $swords             = ''; // searchwords as array
-	var $wordsAgainst       = ''; // searchphrase for boolean mode (+karl* +heinz*)
-	var $tagsAgainst        = ''; // tagsphrase for boolean mode (+#category_213# +#city_42#)
-	var $scoreAgainst       = ''; // searchphrase for score/non boolean mode (karl heinz)
-	var $isEmptySearch      = true; // true if no searchparams given; otherwise false
+	var $sword               = ''; // cleaned searchword (karl-heinz => karl heinz)
+	var $swords              = ''; // searchwords as array
+	var $wordsAgainst        = ''; // searchphrase for boolean mode (+karl* +heinz*)
+	var $tagsAgainst         = ''; // tagsphrase for boolean mode (+#category_213# +#city_42#)
+	var $scoreAgainst        = ''; // searchphrase for score/non boolean mode (karl heinz)
+	var $isEmptySearch       = true; // true if no searchparams given; otherwise false
 
-	var $templateFile       = ''; // Template file
-	var $templateCode       = ''; // content of template file
+	var $templateFile        = ''; // Template file
+	var $templateCode        = ''; // content of template file
 
-	var $startingPoints     = 0; // comma seperated list of startingPoints
-	var $firstStartingPoint = 0; // comma seperated list of startingPoints
-	var $conf               = array(); // FlexForm-Configuration
-	var $extConf            = array(); // Extension-Configuration
-	var $numberOfResults    = 0; // count search results
-	var $indexToUse         = ''; // it's for 'USE INDEX ($indexToUse)' to speed up queries
-	var $tagsInSearchResult = false; // contains all tags of current search result
-	var $preselectedFilter  = array(); // preselected filters by flexform
+	var $startingPoints      = 0; // comma seperated list of startingPoints
+	var $firstStartingPoint  = 0; // comma seperated list of startingPoints
+	var $conf                = array(); // FlexForm-Configuration
+	var $extConf             = array(); // Extension-Configuration
+	var $numberOfResults     = 0; // count search results
+	var $indexToUse          = ''; // it's for 'USE INDEX ($indexToUse)' to speed up queries
+	var $tagsInSearchResult  = false; // contains all tags of current search result
+	var $preselectedFilter   = array(); // preselected filters by flexform
 	var $filtersFromFlexform = array(); // array with filter-uids as key and whole data as value
-
+	var $hasTooShortWords    = false; // contains a boolean value which represents if there are too short words in the searchstring
+	
  	/**
 	* @var tx_xajax
 	*/
@@ -1366,11 +1367,6 @@ class tx_kesearch_lib extends tslib_pibase {
 			// get subpart for general message
 			$content = $this->cObj->getSubpart($this->templateCode, '###GENERAL_MESSAGE###');
 
-			// check if searchwords were too short
-			if(!count($this->swords)) {
-				$content = $this->cObj->substituteMarker($content, '###MESSAGE###', $this->pi_getLL('searchword_length_error'));
-			}
-
 			// no results found
 			if($this->conf['showNoResultsText']) {
 				// use individual text set in flexform
@@ -1401,6 +1397,16 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 
 			return $content;
+		}
+		
+		if($this->hasTooShortWords) {
+			// get subpart for general message
+			$content = $this->cObj->getSubpart($this->templateCode, '###GENERAL_MESSAGE###');
+
+			// check if searchwords were too short
+			if(!count($this->swords)) {
+				$content = $this->cObj->substituteMarker($content, '###MESSAGE###', $this->pi_getLL('searchword_length_error'));
+			}
 		}
 
 		// loop through results

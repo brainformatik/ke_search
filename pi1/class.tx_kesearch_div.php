@@ -135,6 +135,7 @@ class tx_kesearch_div {
 				if (t3lib_cs::utf8_strlen($word) >= $this->pObj->extConf['searchWordLength']) {
 					$scoreAgainst .= $word.' ';
 					$wordsAgainst .= '+'.$word.'* ';
+					$this->pObj->hasTooShortWords = true;
 				} else {
 					unset ($swords[$key]);
 
