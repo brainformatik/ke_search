@@ -74,7 +74,7 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 			'*',
 			'tx_kesearch_filters',
 			'target_pid = ' . intval($GLOBALS['TSFE']->id),
-			'', 'title', ''
+			'', '', ''
 		);
 
 		// hook for modifying content
@@ -88,7 +88,7 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 			$contentOptions = '';
 			$countLoops = 1;
 			$this->piVars['filter'][$filter['uid']] = array_unique($this->piVars['filter'][$filter['uid']]);
-			$options = $this->getFilterOptions($filter['options']);
+			$options = $this->getFilterOptions($filter['options'], true);
 			foreach($options as $optionKey => $option) {
 				$selected = ($this->piVars['filter'][$filter['uid']][$optionKey]) ? 'checked="checked"' : '';
 				$markerArray['###ADDCLASS###'] = ($countLoops%3) ? '' : ' last';

@@ -1013,12 +1013,16 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * get optionrecords of given list of option-IDs
 	 *
 	 * @param string $optionList
+	 * @param boolean $returnSortedByTitle Default: Sort by the exact order as they appear in optionlist. This is usefull if the customer want's the same ordering as in the filterRecord (inline)
 	 * @return array Filteroptions
 	 */
-	public function getFilterOptions($optionList) {
+	public function getFilterOptions($optionList, $returnSortedByTitle = false) {
 		// check/convert if list contains only integers
 		$optionIdArray = t3lib_div::intExplode(',', $optionList, true);
 		$optionList = implode(',', $optionIdArray);
+		if($returnSortedByTitle) {
+			$sortBy = 'title';
+		} else $sortBy = 'FIND_IN_SET(uid, "' . $GLOBALS['TYPO3_DB']->quoteStr($optionList, 'tx_kesearch_filteroptions') . '")';
 
 		// search for filteroptions
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
@@ -1027,7 +1031,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			'pid in ('.$this->startingPoints.') ' .
 			'AND FIND_IN_SET(uid, "' . $GLOBALS['TYPO3_DB']->quoteStr($optionList, 'tx_kesearch_filteroptions') . '") ' .
 			$this->cObj->enableFields('tx_kesearch_filteroptions'),
-			'', 'FIND_IN_SET(uid, "' . $GLOBALS['TYPO3_DB']->quoteStr($optionList, 'tx_kesearch_filteroptions') . '")', ''
+			'', $sortBy, ''
 		);
 		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 			// Perform overlay on each record
