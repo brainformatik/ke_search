@@ -74,7 +74,7 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 			'*',
 			'tx_kesearch_filters',
 			'target_pid = ' . intval($GLOBALS['TSFE']->id),
-			'', '', ''
+			'', 'title', ''
 		);
 
 		// hook for modifying content
