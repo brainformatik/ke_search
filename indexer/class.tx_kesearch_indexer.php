@@ -206,17 +206,9 @@ class tx_kesearch_indexer {
 			WHERE uid=?
 		"');
 		
-		// Statement to update an existing record in indexer table
-		// This is a short version which only updates the timestamp to prevent deleting from cleanUp-Process later on
-		$GLOBALS['TYPO3_DB']->sql_query('PREPARE updateShortStmt FROM "
-			UPDATE tx_kesearch_index
-			SET tstamp=?
-			WHERE uid=?
-		"');
-		
 		// Statement to insert a new records to index table
 		$GLOBALS['TYPO3_DB']->sql_query('PREPARE insertStmt FROM "
-			INSERT ' . $this->extConf['useDelayedForInsert'] . ' INTO tx_kesearch_index
+			INSERT INTO tx_kesearch_index
 			(pid, title, type, targetpid, content, tags, params, abstract, language, starttime, endtime, fe_group, tstamp, crdate' . $addInsertQueryFields . ')
 			VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?' . $addInsertQueryValues . ', ?)
 		"');
@@ -243,7 +235,6 @@ class tx_kesearch_indexer {
 		
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE searchStmt');
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE updateStmt');
-		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE updateShortStmt');
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE insertStmt');
 		
 		// remove all entries from ke_search registry
