@@ -27,6 +27,7 @@
  * Plugin 'Faceted search' for the 'ke_search' extension.
  *
  * @author	Andreas Kiefer (kennziffer.com) <kiefer@kennziffer.com>
+ * @author	Stefan Froemken (kennziffer.com) <froemken@kennziffer.com>
  * @package	TYPO3
  * @subpackage	tx_kesearch
  */
@@ -69,7 +70,6 @@ class tx_kesearch_indexer {
 			$this->extConf['prePostTagChar'] = '#';
 		}
 		$this->registry = t3lib_div::makeInstance('t3lib_Registry');
-		$this->lockFile = PATH_site . 'typo3temp/ke_search_indexer.lock';
 	}
 
 	/*
@@ -91,6 +91,7 @@ class tx_kesearch_indexer {
 
 		// get configurations
 		$configurations = $this->getConfigurations();
+		
 		$this->amountOfRecordsToSaveInMem = intval($this->extConf['periodicNotification']);
 		if(!$this->amountOfRecordsToSaveInMem) $this->amountOfRecordsToSaveInMem = 100;
 		
