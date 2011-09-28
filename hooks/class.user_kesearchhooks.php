@@ -32,14 +32,9 @@
 
 class user_kesearch_sortdate {
 	public function registerAdditionalFields(&$additionalFields) {
-		// first entry = field name
-		// second entry = is string or not
-		$newField = array('sortdate', 0);
-		$additionalFields[] = $newField;
-		$newField = array('orig_uid', 0);
-		$additionalFields[] = $newField;
-		$newField = array('orig_pid', 0);
-		$additionalFields[] = $newField;
+		$additionalFields[] = 'sortdate';
+		$additionalFields[] = 'orig_uid';
+		$additionalFields[] = 'orig_pid';
 	}
 
 	public function modifyPagesIndexEntry(&$title, &$pageContent, &$tags, $pageRecord, &$additionalFields) {
