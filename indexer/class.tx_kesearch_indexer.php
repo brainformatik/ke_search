@@ -126,14 +126,13 @@ class tx_kesearch_indexer {
 			}
 		}
 		
-		// clean up process after indezing to free memory
-		$this->cleanUpProcessAfterIndexing();
-		
 		// process index cleanup?
 		$content .= "\n".'<p><b>Index cleanup processed</b></p>'."\n";
 		$content .= $this->cleanUpIndex();
-
-
+		
+		// clean up process after indezing to free memory
+		$this->cleanUpProcessAfterIndexing();
+		
 		// print indexing errors
 		if (sizeof($this->indexingErrors)) {
 			$content .= "\n\n".'<br /><br /><br /><b>INDEXING ERRORS ('.sizeof($this->indexingErrors).')<br /><br />'."\n";
@@ -220,8 +219,6 @@ class tx_kesearch_indexer {
 		// if you activate this for updating 40.000 existing records, indexing process needs 1 hour longer
 		$countIndex = $GLOBALS['TYPO3_DB']->exec_SELECTcountRows('*', 'tx_kesearch_index', '');
 		if($countIndex == 0) $GLOBALS['TYPO3_DB']->sql_query('ALTER TABLE tx_kesearch_index DISABLE KEYS');
-		
-		return true;
 	}
 	
 	
@@ -250,16 +247,8 @@ class tx_kesearch_indexer {
 	*/
 	function cleanUpIndex() {
 		$startMicrotime = microtime(true);
-		$fileContent = t3lib_div::trimExplode(CHR(10), t3lib_div::getURL($this->lockFile));
-		if(count($fileContent) != 2) return; // There must be exactly 2 rows (start and end time)
-		foreach($fileContent as $row) {
-			if(!intval($row)) { // both rows must contain an integer value
-				return;
-			}
-		}
-
 		$table = 'tx_kesearch_index';
-		$where = 'tstamp < ' . $fileContent[0];
+		$where = 'tstamp < ' . $this->registry->get('tx_kesearch', 'startTimeOfIndexer');
 		$GLOBALS['TYPO3_DB']->exec_DELETEquery($table, $where);
 
 		// check if ke_search_premium is loaded
@@ -288,12 +277,8 @@ class tx_kesearch_indexer {
 			}
 		}
 
-		// after unlinking this file a new indexer process can be started
-		t3lib_div::unlink_tempfile($this->lockFile); // delete lock file from temp direcory
-
 		// calculate duration of indexing process
-		$endMicrotime = microtime(true);
-		$duration = ceil(($endMicrotime - $startMicrotime) * 1000);
+		$duration = ceil((microtime(true) - $startMicrotime) * 1000);
 		$content .= '<p><i>Cleanup process took ' . $duration . ' ms.</i></p>'."\n";
 		return $content;
 	}
