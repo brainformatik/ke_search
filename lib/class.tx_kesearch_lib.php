@@ -944,8 +944,9 @@ class tx_kesearch_lib extends tslib_pibase {
 			if(t3lib_extMgm::isLoaded('ke_search_premium') && !$this->isEmptySearch) {
 				require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');
 				$sphinx = t3lib_div::makeInstance('user_kesearchpremium');
-				$sphinx->setLimit(0, 10000);
+				$sphinx->setLimit(0, 10000, 10000);
 				$queryForSphinx = '';
+				
 				if($this->wordsAgainst) $queryForSphinx .= ' @(title,content) ' . $this->wordsAgainst;
 				if(count($this->tagsAgainst)) {
 					foreach($this->tagsAgainst as $value) {
@@ -963,12 +964,12 @@ class tx_kesearch_lib extends tslib_pibase {
 						$queryForSphinx = $_procObj->appendWhereToSphinx($queryForSphinx, $sphinx, $this);
 					}
 				}
-			
 				$res = $sphinx->getResForSearchResults($queryForSphinx, '*', 'uid, REPLACE(tags, "' . $tagChar . $tagChar . '", "' . $tagChar . ',' . $tagChar . '") as tags');
 			} else {
 				$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 			}
 
+			$i = 1;
 			while($tags = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 				foreach(explode(',', $tags['tags']) as $value) {
 					$this->tagsInSearchResult[$value] += 1;
