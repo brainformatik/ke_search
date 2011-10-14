@@ -956,6 +956,18 @@ class tx_kesearch_lib extends tslib_pibase {
 				$queryForSphinx .= ' @(language) _language_' . $GLOBALS['TSFE']->sys_language_uid;
 				$queryForSphinx .= ' @(fe_group) _group_NULL | _group_0';
 				
+				// add fe_groups to query
+				if(!empty($GLOBALS['TSFE']->gr_list)) {
+					$feGroups = t3lib_div::trimExplode(',', $GLOBALS['TSFE']->gr_list, 1);
+					foreach($feGroups as $key => $group) {
+						if(t3lib_div::intval_positive($group)) {
+							$feGroups[$key] = '_group_' . $group;
+						} else unset($feGroups[$key]);
+					}
+					
+					$queryForSphinx .= ' | ' . implode(' | ', $feGroups);
+				}
+				
 				// hook for appending additional where clause to sphinx query
 				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['appendWhereToSphinx'])) {
 					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['appendWhereToSphinx'] as $_classRef) {
@@ -1333,8 +1345,20 @@ class tx_kesearch_lib extends tslib_pibase {
 					$queryForSphinx .= ' @tags ' . str_replace('" "', '" | "', trim($value));
 				}
 			}
-			$queryForSphinx .= ' @(language) _language_' . $GLOBALS['TSFE']->sys_language_uid;
-			$queryForSphinx .= ' @(fe_group) _group_NULL | _group_0';
+			$queryForSphinx .= ' @language _language_' . $GLOBALS['TSFE']->sys_language_uid;
+			$queryForSphinx .= ' @fe_group _group_NULL | _group_0';
+			
+			// add fe_groups to query
+			if(!empty($GLOBALS['TSFE']->gr_list)) {
+				$feGroups = t3lib_div::trimExplode(',', $GLOBALS['TSFE']->gr_list, 1);
+				foreach($feGroups as $key => $group) {
+					if(t3lib_div::intval_positive($group)) {
+						$feGroups[$key] = '_group_' . $group;
+					} else unset($feGroups[$key]);
+				}
+				
+				$queryForSphinx .= ' | ' . implode(' | ', $feGroups);
+			}
 			
 			// hook for appending additional where clause to sphinx query
 			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['appendWhereToSphinx'])) {
@@ -1343,7 +1367,6 @@ class tx_kesearch_lib extends tslib_pibase {
 					$queryForSphinx = $_procObj->appendWhereToSphinx($queryForSphinx, $sphinx, $this);
 				}
 			}
-			
 			$res = $sphinx->getResForSearchResults($queryForSphinx);
 			//t3lib_utility_Debug::debug($sphinx->getLastWarning());
 			//t3lib_utility_Debug::debug($sphinx->getLastError());
