@@ -760,7 +760,7 @@ class tx_kesearch_lib extends tslib_pibase {
 					}
 					$markerArray['###TEXTLINK###'] = $data['title'];
 					$markerArray['###CLASS###'] = 'active';
-					$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
+					$hiddenFields .= '<input type="hidden" name="tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']" id="tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']" value="' . $data['tag'] . '" />';					$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
 					continue;
 				}
 				// if option is in optionArray, we have to mark the selection
