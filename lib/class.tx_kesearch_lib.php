@@ -1356,8 +1356,7 @@ class tx_kesearch_lib extends tslib_pibase {
 						$feGroups[$key] = '_group_' . $group;
 					} else unset($feGroups[$key]);
 				}
-				
-				$queryForSphinx .= ' | ' . implode(' | ', $feGroups);
+				if(is_array($feGroups) && count($feGroups)) $queryForSphinx .= ' | ' . implode(' | ', $feGroups);
 			}
 			
 			// hook for appending additional where clause to sphinx query
