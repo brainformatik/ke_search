@@ -130,15 +130,15 @@ class tx_kesearch_div {
 
 		// build against clause for all searchwords
 		if(count($swords)) {
-			foreach ($swords as $key => $word) {
+			foreach($swords as $key => $word) {
 				// ignore words under length of 4 chars
-				if (t3lib_cs::utf8_strlen($word) >= $this->pObj->extConf['searchWordLength']) {
+				if(t3lib_cs::utf8_strlen($word) >= $this->pObj->extConf['searchWordLength']) {
 					$scoreAgainst .= $word.' ';
-					$wordsAgainst .= '+'.$word.'* ';
-					$this->pObj->hasTooShortWords = true;
+					$wordsAgainst .= '+' . $word . '* ';
 				} else {
+					$this->pObj->hasTooShortWords = true;
 					unset ($swords[$key]);
-
+					
 					// if any of the search words is below 3 characters
 					$this->showShortMessage = true;
 				}
@@ -176,14 +176,16 @@ class tx_kesearch_div {
 				}
 			}
 		}
-
-		return array(
+		
+		$searchArray = array(
 			'sword' => implode(' ', $swords), // f.e. hello karl-heinz +mueller
 			'swords' => $swords, // f.e. Array: hello|karl|heinz|mueller
 			'wordsAgainst' => $wordsAgainst, // f.e. +hello* +karl* +heinz* +mueller*
 			'tagsAgainst' => $tagsAgainst, // f.e. Array: +#category_213# +#color_123# +#city_42#
 			'scoreAgainst' => $scoreAgainst // f.e. hello karl heinz mueller
 		);
+		
+		return $searchArray;
 	}
 
 

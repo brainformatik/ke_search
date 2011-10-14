@@ -331,7 +331,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			foreach ($filterList as $key => $filterUid) {
 
-				unset($options);
+				$options = array();
 
 				// current filter has options
 				if (!empty($this->filters[$filterUid]['options'])) {
@@ -344,57 +344,56 @@ class tx_kesearch_lib extends tslib_pibase {
 					$where .= $this->cObj->enableFields($table);
 					$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='','FIND_IN_SET(uid, "'.$GLOBALS['TYPO3_DB']->quoteStr($this->filters[$filterUid]['options'],'tx_kesearch_index').'")',$limit='');
 
-					// loop through filteroptions
-					while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+					while($option = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 						// Perform overlay on each record
-						if(is_array($row) && $GLOBALS['TSFE']->sys_language_contentOL) {
-							$row = $GLOBALS['TSFE']->sys_page->getRecordOverlay(
+						if(is_array($option) && $GLOBALS['TSFE']->sys_language_contentOL) {
+							$option = $GLOBALS['TSFE']->sys_page->getRecordOverlay(
 								'tx_kesearch_filteroptions',
-								$row,
+								$option,
 								$GLOBALS['TSFE']->sys_language_content,
 								$GLOBALS['TSFE']->sys_language_contentOL
 							);
 						}
-
+						
 						// check filter availability?
-						if ($this->conf['checkFilterCondition'] != 'none') {
-							if ($this->checkIfTagMatchesRecords($row['tag'],$this->conf['checkFilterCondition'], $filterUid)) {
+						if($this->conf['checkFilterCondition'] != 'none') {
+							if($this->checkIfTagMatchesRecords($option['tag'], $this->conf['checkFilterCondition'], $filterUid)) {
 								// process check in condition to other filters or without condition
 
 								// selected / preselected?
 								$selected = 0;
 
-								if ($this->piVars['filter'][$filterUid] == $row['tag']) {
+								if($this->piVars['filter'][$filterUid] == $option['tag']) {
 									$selected = 1;
-								} else if (is_array($this->piVars['filter'][$filterUid])) {
-									if(t3lib_div::inArray($this->piVars['filter'][$filterUid], $row['tag'])) {
+								} elseif(is_array($this->piVars['filter'][$filterUid])) {
+									if(t3lib_div::inArray($this->piVars['filter'][$filterUid], $option['tag'])) {
 										$selected = 1;
 									}
-								} else if (!isset($this->piVars['filter'][$filterUid]) && !is_array($this->piVars['filter'][$filterUid])) {
-									if (is_array($this->preselectedFilter) && in_array($row['tag'], $this->preselectedFilter)) {
+								} elseif(!isset($this->piVars['filter'][$filterUid]) && !is_array($this->piVars['filter'][$filterUid])) {
+									if (is_array($this->preselectedFilter) && in_array($option['tag'], $this->preselectedFilter)) {
 										$selected = 1;
-										$this->piVars['filter'][$filterUid] = $row['tag'];
+										$this->piVars['filter'][$filterUid] = $option['tag'];
 									}
 								}
 
-								$options[$row['uid']] = array(
-									'title' => $row['title'],
-									'value' => $row['tag'],
-									'results' => $this->tagsInSearchResult[$tagChar . $row['tag'] . $tagChar],
+								$options[$option['uid']] = array(
+									'title' => $option['title'],
+									'value' => $option['tag'],
+									'results' => $this->tagsInSearchResult[$tagChar . $option['tag'] . $tagChar],
 									'selected' => $selected,
 								);
 							}
 						} else {
 							// do not process check; show all filters
-							$options[$row['uid']] = array(
-								'title' => $row['title'],
-								'value' => $row['tag'],
+							$options[$option['uid']] = array(
+								'title' => $option['title'],
+								'value' => $option['tag'],
 								'selected' => $selected,
 							);
 						}
 					}
 				}
-
+				
 				// hook for modifying filter options
 				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptionsArray'])) {
 					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptionsArray'] as $_classRef) {
@@ -964,7 +963,7 @@ class tx_kesearch_lib extends tslib_pibase {
 						$queryForSphinx = $_procObj->appendWhereToSphinx($queryForSphinx, $sphinx, $this);
 					}
 				}
-				$res = $sphinx->getResForSearchResults($queryForSphinx, '*', 'uid, REPLACE(tags, "' . $tagChar . $tagChar . '", "' . $tagChar . ',' . $tagChar . '") as tags');
+				$res = $sphinx->getResForSearchResults($queryForSphinx, '*', 'uid, tags');
 			} else {
 				$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 			}
