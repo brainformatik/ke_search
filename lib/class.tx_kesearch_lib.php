@@ -73,7 +73,12 @@ class tx_kesearch_lib extends tslib_pibase {
 	*/
 	var $div;
 
+	/**
+	* @var user_kesearchpremium
+	*/
+	var $user_kesearchpremium;
 
+	
 	/**
 	 * Initializes flexform, conf vars and some more
 	 *
@@ -1326,14 +1331,14 @@ class tx_kesearch_lib extends tslib_pibase {
 		// TODO: Sphinx has problems to show results when no query is given
 		if(t3lib_extMgm::isLoaded('ke_search_premium') && !$this->isEmptySearch) {
 			require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');
-			$sphinx = t3lib_div::makeInstance('user_kesearchpremium');
+			$this->user_kesearchpremium = t3lib_div::makeInstance('user_kesearchpremium');
 
 			// set ordering
-			$sphinx->setSorting($this->db->getOrdering());
+			$this->user_kesearchpremium->setSorting($this->db->getOrdering());
 
 			// set limit
 			$limit = $this->db->getLimit();
-			$sphinx->setLimit($limit[0], $limit[1]);
+			$this->user_kesearchpremium->setLimit($limit[0], $limit[1]);
 
 			// generate query
 			$queryForSphinx = '';
@@ -1362,15 +1367,15 @@ class tx_kesearch_lib extends tslib_pibase {
 			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['appendWhereToSphinx'])) {
 				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['appendWhereToSphinx'] as $_classRef) {
 					$_procObj = & t3lib_div::getUserObj($_classRef);
-					$queryForSphinx = $_procObj->appendWhereToSphinx($queryForSphinx, $sphinx, $this);
+					$queryForSphinx = $_procObj->appendWhereToSphinx($queryForSphinx, $this->user_kesearchpremium, $this);
 				}
 			}
-			$res = $sphinx->getResForSearchResults($queryForSphinx);
-			//t3lib_utility_Debug::debug($sphinx->getLastWarning());
-			//t3lib_utility_Debug::debug($sphinx->getLastError());
+			$res = $this->user_kesearchpremium->getResForSearchResults($queryForSphinx);
+			//t3lib_utility_Debug::debug($this->user_kesearchpremium->getLastWarning());
+			//t3lib_utility_Debug::debug($this->user_kesearchpremium->getLastError());
 			
 			// get number of records
-			$this->numberOfResults = $sphinx->getTotalFound();
+			$this->numberOfResults = $this->user_kesearchpremium->getTotalFound();
 		} else {
 			// get search results
 			$query = $this->db->generateQueryForSearch();
