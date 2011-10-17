@@ -1388,10 +1388,10 @@ class tx_kesearch_lib extends tslib_pibase {
 			$this->countSearchPhrase($this->sword, $this->swords, $this->numberOfResults, $this->tagsAgainst);
 		}
 		if($this->numberOfResults == 0) {
-
+		
 			// get subpart for general message
 			$content = $this->cObj->getSubpart($this->templateCode, '###GENERAL_MESSAGE###');
-
+			
 			// no results found
 			if($this->conf['showNoResultsText']) {
 				// use individual text set in flexform
@@ -1406,21 +1406,30 @@ class tx_kesearch_lib extends tslib_pibase {
 				$imageConf['altText'] = $this->pi_getLL('no_results_found');
 				$attentionImage=$this->cObj->IMAGE($imageConf);
 			}
+			
+			// hook to implement your own idea of a no result message
+			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['noResultsHandler'])) {
+				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['noResultsHandler'] as $_classRef) {
+					$_procObj = & t3lib_div::getUserObj($_classRef);
+					$noResultsText = $_procObj->noResultsHandler($noResultsText, $this);
+				}
+			}
+			
 			// set text for "no results found"
 			$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $noResultsText);
 			// set attention icon?
 			$content = $this->cObj->substituteMarker($content,'###IMAGE###', $attentionImage);
-
+			
 			// add query
 			if ($this->conf['showQuery']) {
 				$content .= '<br />'.$query.'<br />';
 			}
-
+			
 			// add onload image if in AJAX mode
 			if($this->conf['renderMethod'] != 'static') {
 				$content .= $this->onloadImage;
 			}
-
+			
 			return $content;
 		}
 		
