@@ -1951,66 +1951,123 @@ class tx_kesearch_lib extends tslib_pibase {
 			'of' => $this->pi_getLL('of'),
 		);
 		$content = $this->cObj->substituteMarkerArray($content,$markerArray,$wrap='###|###',$uppercase=1);
-
+		
 		return $content;
 	}
-
-
+	
+	
 	public function renderOrdering() {
 		// show ordering only if is set in FlexForm
 		if($this->conf['showSortInFrontend'] && !empty($this->conf['sortByVisitor']) && $this->numberOfResults) {
 			$subpartArray['###ORDERNAVIGATION###'] = $this->cObj->getSubpart($this->templateCode, '###ORDERNAVIGATION###');
 			$subpartArray['###SORT_LINK###'] = $this->cObj->getSubpart($subpartArray['###ORDERNAVIGATION###'], '###SORT_LINK###');
-			$dbOrdering = t3lib_div::trimExplode(' ', $this->db->getOrdering());
 			
-			$orderByDir = $this->piVars['orderByDir'];
-			if(empty($orderByDir)) $orderByDir = $dbOrdering[1];
-			$orderByDir = ($orderByDir == 'desc') ? 'asc' : 'desc';
-			$orderBy = t3lib_div::trimExplode(',', $this->conf['sortByVisitor']);
+			$orderBy = t3lib_div::trimExplode(',', $this->conf['sortByVisitor'], true);
 			
 			// loop all allowed orderings
-			foreach($orderBy as $value) {
+			foreach($orderBy as $field) {
 				// we can't sort by score if there is no sword given
-				if($this->sword != '' || $value != 'score') {
-					$markerArray['###FIELDNAME###'] = $value;
-
+				if($this->sword != '' || $field != 'score') {
+					$markerArray['###FIELDNAME###'] = $field;
+					
+					// get a default ordering direction for current field
+					$orderByDir = $this->getDefaultOrderingDirection($field);
+					
+					// get the ordering from current db request
+					$dbOrdering = t3lib_div::trimExplode(' ', $this->db->getOrdering());
+					
+					/* if ordering direction is the same change it
+					 *
+					 * Explaintation:
+					 * No ordering is active. Default Ordering by db is "sortdate desc".
+					 * Default ordering by current field is also "sortdate desc".
+					 * So...if you click the link for sortdate it will sort the results by "sortdate desc" again
+					 * To prevent this we change the default ordering here
+					 */
+					if($field == $dbOrdering[0] && $orderByDir == $dbOrdering[1]) {
+						$orderByDir = $this->changeOrdering($orderByDir);
+					}
+					
 					// generate link for static and after reload mode
 					$markerArray['###URL###'] = $this->cObj->typoLink(
-						$this->pi_getLL('orderlink_' . $value, $value),
+						$this->pi_getLL('orderlink_' . $field, $field),
 						array(
 							'parameter' => $GLOBALS['TSFE']->id,
 							'addQueryString' => 1,
 							'addQueryString.' => array('exclude' => 'id'),
-							'additionalParams' => '&' . $this->prefixId . '[orderByField]=' . $value . '&' . $this->prefixId . '[orderByDir]=' . $orderByDir,
+							'additionalParams' => '&' . $this->prefixId . '[orderByField]=' . $field . '&' . $this->prefixId . '[orderByDir]=' . $orderByDir,
 						)
 					);
-
+					
 					// add classname for sorting arrow
-					if($value == $dbOrdering[0]) {
-						if($orderByDir == 'asc') {
-							$markerArray['###CLASS###'] = 'down';
-						} else {
+					if($field == $dbOrdering[0]) {
+						if($dbOrdering[1] == 'asc') {
 							$markerArray['###CLASS###'] = 'up';
+						} else {
+							$markerArray['###CLASS###'] = 'down';
 						}
 					} else {
 						$markerArray['###CLASS###'] = '';
 					}
-
+					
 					$links .= $this->cObj->substituteMarkerArray($subpartArray['###SORT_LINK###'], $markerArray);
 				}
 			}
-
+			
 			$content = $this->cObj->substituteSubpart($subpartArray['###ORDERNAVIGATION###'], '###SORT_LINK###', $links);
 			$content = $this->cObj->substituteMarker($content, '###LABEL_SORT###', $this->pi_getLL('label_sort'));
-
+			
 			return $content;
 		} else {
 			return '';
 		}
 	}
-
-
-
+	
+	
+	/**
+	 * get default ordering direction
+	 * f.e. default ordering for sortdate should be DESC. The most current records at first
+	 * f.e. default ordering for relevance should be DESC. The best relevance at first
+	 * f.e. default ordering for title should be ASC. Alphabetic order begins with A.
+	 *
+	 * @param string The field name to order by
+	 * @return string The default ordering (asc/desc) for given field
+	 */
+	public function getDefaultOrderingDirection($field) {
+		if(!empty($field) && is_string($field)) {
+			switch($field) {
+				case 'sortdate':
+				case 'score':
+					$orderBy = 'desc';
+					break;
+				case 'title':
+				default:
+					$orderBy = 'asc';
+					break;
+			}
+			return $orderBy;
+		} else return 'asc';
+	}
+	
+	
+	/**
+	 * change ordering
+	 * f.e. asc to desc and desc to asc
+	 *
+	 * @param string $direction asc or desc
+	 * @return string desc or asc. If you call this function with a not allowed string, exactly this string will be returned. Short: The function do nothing
+	 */
+	public function changeOrdering($direction) {
+		$allowedDirections = array('asc', 'desc');
+		$direction = strtolower($direction);
+		if(!empty($direction) && t3lib_div::inArray($allowedDirections, $direction)) {
+			if($direction == 'asc') {
+				$direction = 'desc';
+			} else $direction = 'asc';
+		} return $direction;
+	}
+	
+	
 	/*
 	 * function renderSVGScale
 	 * @param $arg

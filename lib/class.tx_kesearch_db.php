@@ -250,7 +250,8 @@ class tx_kesearch_db {
 		}
 		return $orderBy;
 	}
-
+	
+	
 	/**
 	 * get limit for where query
 	 */
