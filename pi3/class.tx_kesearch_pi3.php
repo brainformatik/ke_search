@@ -76,7 +76,7 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 			'target_pid = ' . intval($GLOBALS['TSFE']->id),
 			'', '', ''
 		);
-
+		
 		// hook for modifying content
 		if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyMultiselectContent'])) {
 			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyMultiselectContent'] as $_classRef) {
