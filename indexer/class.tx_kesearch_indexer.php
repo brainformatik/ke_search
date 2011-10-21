@@ -105,11 +105,11 @@ class tx_kesearch_indexer {
 		
 		// set some prepare statements
 		$this->prepareStatements();
-
+		
 		foreach($configurations as $indexerConfig) {
 			$this->indexerConfig = $indexerConfig;
-
-			$path = t3lib_extMgm::extPath('ke_search').'indexer/types/class.tx_kesearch_indexer_types_' . $this->indexerConfig['type'] . '.php';
+			
+			$path = t3lib_extMgm::extPath('ke_search') . 'indexer/types/class.tx_kesearch_indexer_types_' . $this->indexerConfig['type'] . '.php';
 			if(is_file($path)) {
 				require_once($path);
 				$searchObj = t3lib_div::makeInstance('tx_kesearch_indexer_types_' . $this->indexerConfig['type'], $this);
@@ -117,13 +117,15 @@ class tx_kesearch_indexer {
 			}
 			
 			// hook for custom indexer
-			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['customIndexer'])) {
+			if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['customIndexer'])) {
 				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['customIndexer'] as $_classRef) {
 					$_procObj = & t3lib_div::getUserObj($_classRef);
 					$content .= $_procObj->customIndexer($indexerConfig, $this);
-					$this->storeTempRecordsToIndex('both');
 				}
 			}
+			
+			// In most cases there are some records waiting in ram to be written to db
+			$this->storeTempRecordsToIndex('both');
 		}
 		
 		// process index cleanup?
@@ -135,32 +137,29 @@ class tx_kesearch_indexer {
 		
 		// print indexing errors
 		if (sizeof($this->indexingErrors)) {
-			$content .= "\n\n".'<br /><br /><br /><b>INDEXING ERRORS ('.sizeof($this->indexingErrors).')<br /><br />'."\n";
+			$content .= "\n\n".'<br /><br /><br /><b>INDEXING ERRORS (' . sizeof($this->indexingErrors) . ')<br /><br />'.CHR(10);
 			foreach ($this->indexingErrors as $error) {
-				$content .= $error.'<br />'."\n";
+				$content .= $error . '<br />' . CHR(10);
 			}
 		}
 
 		// send notification in CLI mode
 		if ($mode == 'CLI') {
-
 			// send finishNotification
 			if ($extConf['finishNotification'] && t3lib_div::validEmail($extConf['notificationRecipient'])) {
-
 				// build message
 				$msg = 'Indexing process was finished:'."\n";
 				$msg .= "==============================\n\n";
 				$msg .= strip_tags($content);
 				$msg .= "\n\n".'Indexing process ran '.(time()-$this->startTime).' seconds.';
-
+				
 				// send the notification message
 				mail($extConf['notificationRecipient'], $extConf['notificationSubject'], $msg);
 			}
-
 		}
-
+		
 		// verbose or quiet output? as set in function call!
-		if ($verbose) return $content;
+		if($verbose) return $content;
 	}
 	
 	
@@ -322,7 +321,7 @@ class tx_kesearch_indexer {
 			if ($debugOnly) { // do not process - just debug query
 				t3lib_utility_Debug::debug($GLOBALS['TYPO3_DB']->UPDATEquery($table,$where,$fieldValues),1);
 			} else { // process storing of index record and return uid
-				$this->storeTempRecordsToIndex($fieldValues);
+				$this->prepareRecordForUpdate($fieldValues);
 				return true;
 			}
 		} else { // insert new record
