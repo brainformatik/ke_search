@@ -40,13 +40,13 @@ class tx_kesearch_indexer {
 	var $indexingErrors = array();
 	var $startTime;
 	var $currentRow = array(); // current row which have to be inserted/updated to database
-	
+
 	// We collect some records before saving
 	// this is faster than waiting till the next record was builded
 	var $tempArrayForUpdatingExistingRecords = array();
 	var $tempArrayForInsertNewRecords = array();
 	var $amountOfRecordsToSaveInMem = 100;
-	
+
 	/**
 	 * @var t3lib_Registry
 	 */
@@ -91,10 +91,10 @@ class tx_kesearch_indexer {
 
 		// get configurations
 		$configurations = $this->getConfigurations();
-		
+
 		$this->amountOfRecordsToSaveInMem = intval($this->extConf['periodicNotification']);
-		if(!$this->amountOfRecordsToSaveInMem) $this->amountOfRecordsToSaveInMem = 100;
-		
+		if(empty($this->amountOfRecordsToSaveInMem)) $this->amountOfRecordsToSaveInMem = 100;
+
 		// register additional fields which should be written to DB
 		if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['registerAdditionalFields'])) {
 			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['registerAdditionalFields'] as $_classRef) {
@@ -102,20 +102,20 @@ class tx_kesearch_indexer {
 				$_procObj->registerAdditionalFields($this->additionalFields);
 			}
 		}
-		
+
 		// set some prepare statements
 		$this->prepareStatements();
-		
+
 		foreach($configurations as $indexerConfig) {
 			$this->indexerConfig = $indexerConfig;
-			
+
 			$path = t3lib_extMgm::extPath('ke_search') . 'indexer/types/class.tx_kesearch_indexer_types_' . $this->indexerConfig['type'] . '.php';
 			if(is_file($path)) {
 				require_once($path);
 				$searchObj = t3lib_div::makeInstance('tx_kesearch_indexer_types_' . $this->indexerConfig['type'], $this);
 				$content .= $searchObj->startIndexing();
 			}
-			
+
 			// hook for custom indexer
 			if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['customIndexer'])) {
 				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['customIndexer'] as $_classRef) {
@@ -123,18 +123,18 @@ class tx_kesearch_indexer {
 					$content .= $_procObj->customIndexer($indexerConfig, $this);
 				}
 			}
-			
+
 			// In most cases there are some records waiting in ram to be written to db
 			$this->storeTempRecordsToIndex('both');
 		}
-		
+
 		// process index cleanup?
 		$content .= "\n".'<p><b>Index cleanup processed</b></p>'."\n";
 		$content .= $this->cleanUpIndex();
-		
+
 		// clean up process after indezing to free memory
 		$this->cleanUpProcessAfterIndexing();
-		
+
 		// print indexing errors
 		if (sizeof($this->indexingErrors)) {
 			$content .= "\n\n".'<br /><br /><br /><b>INDEXING ERRORS (' . sizeof($this->indexingErrors) . ')<br /><br />'.CHR(10);
@@ -152,17 +152,17 @@ class tx_kesearch_indexer {
 				$msg .= "==============================\n\n";
 				$msg .= strip_tags($content);
 				$msg .= "\n\n".'Indexing process ran '.(time()-$this->startTime).' seconds.';
-				
+
 				// send the notification message
 				mail($extConf['notificationRecipient'], $extConf['notificationSubject'], $msg);
 			}
 		}
-		
+
 		// verbose or quiet output? as set in function call!
 		if($verbose) return $content;
 	}
-	
-	
+
+
 	/**
 	 * prepare sql-statements for indexer
 	 *
@@ -175,7 +175,7 @@ class tx_kesearch_indexer {
 			$addInsertQueryFields .= ', ' . $value;
 			$addInsertQueryValues .= ', ?';
 		}
-		
+
 		// Statement to check if record already exists in db
 		$GLOBALS['TYPO3_DB']->sql_query('PREPARE searchStmt FROM "
 			SELECT *
@@ -185,7 +185,7 @@ class tx_kesearch_indexer {
 			AND type = ?
 			LIMIT 1
 		"');
-		
+
 		// Statement to update an existing record in indexer table
 		$GLOBALS['TYPO3_DB']->sql_query('PREPARE updateStmt FROM "
 			UPDATE tx_kesearch_index
@@ -204,14 +204,14 @@ class tx_kesearch_indexer {
 			tstamp=?' . $addUpdateQuery . '
 			WHERE uid=?
 		"');
-		
+
 		// Statement to insert a new records to index table
 		$GLOBALS['TYPO3_DB']->sql_query('PREPARE insertStmt FROM "
 			INSERT INTO tx_kesearch_index
 			(pid, title, type, targetpid, content, tags, params, abstract, language, starttime, endtime, fe_group, tstamp, crdate' . $addInsertQueryFields . ')
 			VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?' . $addInsertQueryValues . ', ?)
 		"');
-		
+
 		// disable keys only if indexer table was truncated (has 0 records)
 		// this speeds up the first indexing process
 		// don't use this for updating index table
@@ -219,8 +219,8 @@ class tx_kesearch_indexer {
 		$countIndex = $GLOBALS['TYPO3_DB']->exec_SELECTcountRows('*', 'tx_kesearch_index', '');
 		if($countIndex == 0) $GLOBALS['TYPO3_DB']->sql_query('ALTER TABLE tx_kesearch_index DISABLE KEYS');
 	}
-	
-	
+
+
 	/**
 	 * clean up statements
 	 *
@@ -229,16 +229,16 @@ class tx_kesearch_indexer {
 	public function cleanUpProcessAfterIndexing() {
 		// enable keys again if this was the first indexing process
 		if($countIndex == 0) $GLOBALS['TYPO3_DB']->sql_query('ALTER TABLE tx_kesearch_index ENABLE KEYS');
-		
+
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE searchStmt');
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE updateStmt');
 		$GLOBALS['TYPO3_DB']->sql_query('DEALLOCATE PREPARE insertStmt');
-		
+
 		// remove all entries from ke_search registry
 		$this->registry->removeAllByNamespace('tx_kesearch');
 	}
-	
-	
+
+
 	/**
 	 * Delete all index elements that are older than starting timestamp in temporary file
 	 *
@@ -306,13 +306,13 @@ class tx_kesearch_indexer {
 		if(!$this->checkIfRecordHasErrorsBeforeIndexing($storagePid, $title, $type, $targetPid)) return false;
 		$table = 'tx_kesearch_index';
 		$fieldValues = $this->createFieldValuesForIndexing($storagePid, $title, $type, $targetPid, $content, $tags, $params, $abstract, $language, $starttime, $endtime, $fe_group, $additionalFields);
-		
+
 		// prepare additional fields for queries
 		foreach($this->additionalFields as $value) {
 			$setQuery .= ', @' . $value[0] . ' = ' . $fieldValues[$value[0]];
 			$addQueryFields .= ', @' . $value[0];
 		}
-		
+
 		// check if record already exists. Average speed: 1-2ms
 		$recordExists = $this->indexRecordExists($fieldValues['orig_uid'], $fieldValues['pid'], $fieldValues['type']);
 		if($recordExists) { // update existing record
@@ -333,8 +333,8 @@ class tx_kesearch_indexer {
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * Return the query part for additional fields to get prepare statements dynamic
 	 *
@@ -344,15 +344,15 @@ class tx_kesearch_indexer {
 	public function getQueryPartForAdditionalFields(array $fieldValues) {
 		$queryForSet = '';
 		$queryForExecute = '';
-		
+
 		foreach($this->additionalFields as $value) {
 			$queryForSet .= ', @' . $value . ' = ' . $fieldValues[$value];
 			$queryForExecute .= ', @' . $value;
 		}
 		return array('set' => $queryForSet, 'execute' => $queryForExecute);
 	}
-	
-	
+
+
 	/**
 	 * concatnate each query one after the other before executing
 	 *
@@ -360,7 +360,7 @@ class tx_kesearch_indexer {
 	 */
 	public function prepareRecordForInsert($fieldValues) {
 		$addQueryPartFor = $this->getQueryPartForAdditionalFields($fieldValues);
-		
+
 		$queryArray = array();
 		$queryArray['set'] = 'SET
 			@pid = ' . $fieldValues['pid'] . ',
@@ -381,16 +381,16 @@ class tx_kesearch_indexer {
 		$queryArray['execute'] = '
 			EXECUTE insertStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp, @crdate' . $addQueryPartFor['execute'] . ';
 		';
-		
+
 		$this->tempArrayForInsertNewRecords[] = $queryArray;
-		
+
 		// if a defined maximum is reached...store temp records into database
 		if(count($this->tempArrayForInsertNewRecords) >= $this->amountOfRecordsToSaveInMem) {
 			$this->storeTempRecordsToIndex('insert');
 		}
 	}
-	
-	
+
+
 	/**
 	 * concatnate each query one after the other before executing
 	 *
@@ -398,7 +398,7 @@ class tx_kesearch_indexer {
 	 */
 	public function prepareRecordForUpdate($fieldValues) {
 		$addQueryPartFor = $this->getQueryPartForAdditionalFields($fieldValues);
-		
+
 		$queryArray = array();
 		$queryArray['set'] = 'SET
 			@pid = ' . $fieldValues['pid'] . ',
@@ -420,16 +420,16 @@ class tx_kesearch_indexer {
 		$queryArray['execute'] = '
 			EXECUTE updateStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp' . $addQueryPartFor['execute'] . ', @uid;
 		';
-		
+
 		$this->tempArrayForUpdatingExistingRecords[] = $queryArray;
-		
+
 		// if a defined maximum is reached...store temp records into database
 		if(count($this->tempArrayForUpdatingExistingRecords) >= $this->amountOfRecordsToSaveInMem) {
 			$this->storeTempRecordsToIndex('update');
 		}
 	}
-	
-	
+
+
 	/**
 	 * This method decides which temp array will be saved
 	 *
@@ -449,8 +449,8 @@ class tx_kesearch_indexer {
 				$this->updateRecordsInIndexer();
 		}
 	}
-	
-	
+
+
 	/**
 	 * Update temporary saved records to db
 	 */
@@ -460,12 +460,11 @@ class tx_kesearch_indexer {
 			$GLOBALS['TYPO3_DB']->sql_query($query['set']);
 			$GLOBALS['TYPO3_DB']->sql_query($query['execute']);
 		}
-		if($this->extConf['periodicNotification']) $this->periodicNotificationCount('update');
-		t3lib_div::devLog('Milliseconds to update ' . count($this->tempArrayForUpdatingExistingRecords) . ' records to db: ' . (t3lib_div::milliseconds() - $startTime), 'ke_search', -1);
+		if($this->amountOfRecordsToSaveInMem) $this->periodicNotificationCount('update');
 		$this->tempArrayForUpdatingExistingRecords = array();
 	}
-	
-	
+
+
 	/**
 	 * Insert temporary saved records to db
 	 */
@@ -475,12 +474,11 @@ class tx_kesearch_indexer {
 			$GLOBALS['TYPO3_DB']->sql_query($query['set']);
 			$GLOBALS['TYPO3_DB']->sql_query($query['execute']);
 		}
-		if($this->extConf['periodicNotification']) $this->periodicNotificationCount('insert');
-		t3lib_div::devLog('Milliseconds to insert ' . count($this->tempArrayForInsertNewRecords) . ' records to db: ' . (t3lib_div::milliseconds() - $startTime), 'ke_search', -1);
+		if($this->amountOfRecordsToSaveInMem) $this->periodicNotificationCount('insert');
 		$this->tempArrayForInsertNewRecords = array();
 	}
-	
-	
+
+
 	/**
 	 * try to find an allready indexed record
 	 * This function also sets $this->currentRow
@@ -505,8 +503,8 @@ class tx_kesearch_indexer {
 			return false;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Create fieldValues to save them in db later on
 	 * sets some default values, too
@@ -543,19 +541,19 @@ class tx_kesearch_indexer {
 			'tstamp' => $now,
 			'crdate' => $now,
 		);
-		
+
 		// merge additionalFields with ke_search fields
 		if(count($additionalFields)) {
 			$fieldsValues = array_merge($fieldsValues, $additionalFields);
 		}
-		
+
 		// full quoting record. Average speed: 0-1ms
 		$fieldsValues = $GLOBALS['TYPO3_DB']->fullQuoteArray($fieldsValues, 'tx_kesearch_index');
-		
+
 		return $fieldsValues;
 	}
-	
-	
+
+
 	/**
 	 * check if there are errors found in record before storing to db
 	 *
@@ -566,13 +564,13 @@ class tx_kesearch_indexer {
 	 */
 	public function checkIfRecordHasErrorsBeforeIndexing($storagePid, $title, $type, $targetPid) {
 		$errors = array();
-		
+
 		// check for empty values
 		if ($type != 'xtypocommerce' && empty($storagePid)) $errors[] = 'No storage PID set';
 		if (empty($title)) $errors[] = 'No title set';
 		if (empty($type)) $errors[] = 'No type set';
 		if (empty($targetPid)) $errors[] = 'No target PID set';
-		
+
 		// collect error messages if an error was found
 		if(count($errors)) {
 			$errormessage = '';
@@ -582,13 +580,13 @@ class tx_kesearch_indexer {
 			if(!empty($targetPid)) $errormessage .= 'TARGET PID: ' . $targetPid . '; ';
 			if(!empty($storagePid)) $errormessage .= 'STORAGE PID: ' . $storagePid . '; ';
 			$this->indexingErrors[] = ' (' . $errormessage . ')';
-			
+
 			// break indexing and wait for next record to store
 			return false;
 		} else return true;
 	}
-	
-	
+
+
 	/**
 	 * this function returns all indexer configurations found in DB
 	 * independant of PID
@@ -601,8 +599,8 @@ class tx_kesearch_indexer {
 		$where .= t3lib_befunc::deleteClause($table);
 		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where);
 	}
-	
-	
+
+
 	/**
 	 * send a periodic notification to the admin
 	 *
@@ -625,7 +623,7 @@ class tx_kesearch_indexer {
 		// send the notification message
 		if(t3lib_div::validEmail($this->extConf['notificationRecipient'])) {
 			$msg = $this->counter . ' records have been indexed.' . "\n";
-			$msg .= 'Indexer runs ' . (t3lib_div::milliseconds() - $this->registry->get('tx_kesearch', 'startTimeOfIndexer')) . ' seconds \'til now.';
+			$msg .= 'Indexer runs ' . (time() - $this->registry->get('tx_kesearch', 'startTimeOfIndexer')) . ' seconds \'til now.';
 			mail($this->extConf['notificationRecipient'], $this->extConf['notificationSubject'], $msg);
 		}
 	}
