@@ -45,35 +45,35 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 		$where .= ' AND (' . $this->whereClauseForCType. ')';
 		$where .= t3lib_BEfunc::BEenableFields($table);
 		$where .= t3lib_BEfunc::deleteClause($table);
-
+		
 		// if indexing of content elements with restrictions is not allowed
 		// get only content elements that have empty group restrictions
 		if($this->indexerConfig['index_content_with_restrictions'] != 'yes') {
 			$where .= ' AND (fe_group = "" OR fe_group = "0") ';
 		}
-
+		
 		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where);
 		if(count($rows)) {
 			foreach($rows as $row) {
 				// header
 				$row['header'] = strip_tags($row['header']);
-
+				
 				// bodytext
 				$bodytext = $row['bodytext'];
 				$bodytext = str_replace('<td', ' <td', $bodytext);
 				$bodytext = str_replace('<br', ' <br', $bodytext);
 				$bodytext = str_replace('<p', ' <p', $bodytext);
-
+				
 				if ($row['CType'] == 'table') {
 					// replace table dividers with whitespace
 					$bodytext = str_replace('|', ' ', $bodytext);
 				}
 				$bodytext = strip_tags($bodytext);
-
+				
 				$tags = $this->pageRecords[$uid]['tags'];
-
+				
 				$additionalFields = array();
-
+				
 				// hook for custom modifications of the indexed data, e. g. the tags
 				if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyContentIndexEntry'])) {
 					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyContentIndexEntry'] as $_classRef) {
@@ -87,11 +87,13 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 						);
 					}
 				}
-
+				
+				$title = $this->pageRecords[$uid]['title'] . ' - ' . $row['header'];
+				
 				// save record to index
 				$this->pObj->storeInIndex(
 					$this->indexerConfig['storagepid'],    // storage PID
-					$row['header'],                        // page title
+					$title,                                // page title inkl. tt_content-title
 					'content',                             // content type
 					$row['pid'] . '#c' . $row['uid'],      // target PID: where is the single view?
 					$bodytext,                             // indexed content, includes the title (linebreak after title)
@@ -109,7 +111,8 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 		} else {
 			return;
 		}
-
+		
 		return;
 	}
 }
+?>
