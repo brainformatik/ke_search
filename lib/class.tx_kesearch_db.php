@@ -237,8 +237,8 @@ class tx_kesearch_db {
 		
 		// if sorting in FE is allowed
 		if($this->conf['showSortInFrontend']) {
-			$piVarsField = $this->pObj->piVars['orderByField'];
-			$piVarsDir = $this->pObj->piVars['orderByDir'];
+			$piVarsField = $this->pObj->piVars['sortByField'];
+			$piVarsDir = $this->pObj->piVars['sortByDir'];
 			$piVarsDir = ($piVarsDir == '') ? 'asc' : $piVarsDir;
 			if(!empty($piVarsField)) { // if an ordering field is defined by GET/POST
 				if($this->conf['sortByVisitor'] != '' && t3lib_div::inList($this->conf['sortByVisitor'], $piVarsField)) {

@@ -86,16 +86,22 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 		}
 		if($filter != NULL) {
 			$contentOptions = '';
+			$tagChar = $this->extConf['prePostTagChar'];
+			$optionsAmountArray = $GLOBALS['TSFE']->fe_user->getKey('ses', 'ke_search.tagsInSearchResults');
 			$countLoops = 1;
 			$this->piVars['filter'][$filter['uid']] = array_unique($this->piVars['filter'][$filter['uid']]);
 			$options = $this->getFilterOptions($filter['options'], true);
 			foreach($options as $optionKey => $option) {
+				$tag = $tagChar . $option['tag'] . $tagChar;
+				if($optionsAmountArray[$tag]) {
+					$optionCounter = $optionsAmountArray[$tag];
+				} else $optionCounter = 0;
 				$selected = ($this->piVars['filter'][$filter['uid']][$optionKey]) ? 'checked="checked"' : '';
 				$markerArray['###ADDCLASS###'] = ($countLoops%3) ? '' : ' last';
 				$markerArray['###FILTERNAME###'] = 'tx_kesearch_pi1[filter][' . $filter['uid'] . ']';
 				$markerArray['###OPTIONID###'] = $option['uid'];
 				$markerArray['###OPTIONKEY###'] = $optionKey;
-				$markerArray['###OPTIONTITLE###'] = $option['title'];
+				$markerArray['###OPTIONTITLE###'] = $option['title'] . ' (' . $optionCounter . ')';
 				$markerArray['###OPTIONTAG###'] = $option['tag'];
 				$markerArray['###SELECTED###'] = $selected;
 				$countLoops++;

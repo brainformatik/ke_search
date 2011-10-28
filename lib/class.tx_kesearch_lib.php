@@ -63,7 +63,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	*/
 	var $xajax;
 
- 	/**
+	/**
 	* @var tx_kesearch_db
 	*/
 	var $db;
@@ -107,12 +107,12 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// prepare database object
 		$this->db = t3lib_div::makeInstance('tx_kesearch_db', $this);
-
+		
 		// add stdWrap properties to each config value
 		foreach($this->conf as $key => $value) {
 			$this->conf[$key] = $this->cObj->stdWrap($value, $this->conf[$key . '.']);
 		}
-
+		
 		// set some default values (this part have to be after stdWrap!!!)
 		if(!$this->conf['resultPage']) {
 			if($this->cObj->data['pid']) {
@@ -130,10 +130,10 @@ class tx_kesearch_lib extends tslib_pibase {
 				$_procObj->modifyFlexFormData($this->conf, $this->cObj, $this->piVars);
 			}
 		}
-
+		
 		// set startingPoints
 		$this->startingPoints = $this->div->getStartingPoint();
-
+		
 		// get extension configuration array
 		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->extKey]);
 		// sphinx has problems with # in query string.
@@ -153,7 +153,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		// get html template
 		$this->templateFile = $this->conf['templateFile'] ? $this->conf['templateFile'] : t3lib_extMgm::siteRelPath($this->extKey).'res/template_pi1.tpl';
 		$this->templateCode = $this->cObj->fileResource($this->templateFile);
-
+		
 		// get first startingpoint
 		$this->firstStartingPoint = $this->div->getFirstStartingPoint($this->startingPoints);
 
@@ -406,8 +406,8 @@ class tx_kesearch_lib extends tslib_pibase {
 						$options = $_procObj->modifyFilterOptionsArray($filterUid, $options, $this);
 					}
 				}
-
-					// render "wrap"
+				
+				// render "wrap"
 				if ($this->filters[$filterUid]['wrap']) {
 					$wrap = t3lib_div::trimExplode('|', $this->filters[$filterUid]['wrap']);
 				} else {
@@ -416,28 +416,28 @@ class tx_kesearch_lib extends tslib_pibase {
 						1 => ''
 					);
 				}
-
-					// get subparts corresponding to render type
+				
+				// get subparts corresponding to render type
 				switch ($this->filters[$filterUid]['rendertype']) {
-
+					
 					case 'select':
 					default:
 						$filterContent .= $wrap[0] . $this->renderSelect($filterUid, $options) . $wrap[1];
 						break;
-
+						
 					case 'list':
 						$filterContent .= $wrap[0] . $this->renderList($filterUid, $options) . $wrap[1];
 						break;
-
+						
 					case 'checkbox':
 						$filterContent .= $wrap[0] . $this->renderCheckbox($filterUid, $options) . $wrap[1];
 						break;
-
+						
 					case 'textlinks':
-						$filterContent .= $wrap[0] . $this->renderTextlinks($filterUid, $options) . $wrap[1];
+						$textLinkObj = t3lib_div::makeInstance('tx_kesearch_lib_filters_textlinks', $this);
+						$filterContent .= $wrap[0] . $textLinkObj->renderTextlinks($filterUid, $options) . $wrap[1];
 						break;
-
-						// use custom render code
+					// use custom render code
 					default:
 							// hook for custom filter renderer
 						$customFilterContent = '';
@@ -456,14 +456,14 @@ class tx_kesearch_lib extends tslib_pibase {
 		}
 		return $filterContent;
 	}
-
-
+	
+	
 	/*
 	 * function renderSelect
 	 * @param $arg
 	 */
 	public function renderSelect($filterUid, $options) {
-
+		
 		$filterSubpart = '###SUB_FILTER_SELECT###';
 		$optionSubpart = '###SUB_FILTER_SELECT_OPTION###';
 
@@ -748,8 +748,16 @@ class tx_kesearch_lib extends tslib_pibase {
 			$counter = 0;
 			$countActives = 0;
 			foreach($allOptionsOfCurrentFilter as $key => $data) {
+				// hook: modifyOptionForTextlinks
+				if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyOptionForTextlinks'])) {
+					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyOptionForTextlinks'] as $_classRef) {
+						$_procObj = &t3lib_div::getUserObj($_classRef);
+						$_procObj->modifyOptionForTextlinks($key, $data, $this->conf, $this);
+					}
+				}
+				
 				$isOptionInOptionArray = 0;
-
+				
 				// check if current option (of searchresults) is in array of all possible options
 				foreach((array)$options as $optionKey => $optionValue) {
 					if(is_array($options[$optionKey]) && t3lib_div::inArray($options[$optionKey], $data['tag'])) {
@@ -757,7 +765,7 @@ class tx_kesearch_lib extends tslib_pibase {
 						break;
 					}
 				}
-
+				
 				// if multi is set, then more than one entry can be selected
 				if($this->piVars['multi'] && $this->piVars['filter'][$filterUid][$key]) {
 					if($isOptionInOptionArray) {
@@ -784,10 +792,10 @@ class tx_kesearch_lib extends tslib_pibase {
 							$options[$optionKey]['title'] . '<span> (' . $options[$optionKey]['results'] . ')</span>',
 							array(
 								'parameter' => $this->conf['resultPage'],
-								'additionalParams' => '&tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']=' . $data['tag'] . '&tx_kesearch_pi1[page]=1',
+								'additionalParams' => '&tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']=' . $data['tag'] . '&tx_kesearch_pi1[page]=1' . $this->addParam,
 								'addQueryString' => 1,
 								'addQueryString.' => array(
-									'exclude' => 'uid'
+									'exclude' => 'uid,sortByField,sortByDir'
 								)
 							)
 						);
@@ -825,7 +833,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		$filterTitle = $this->filters[$filterUid]['title'];
 		$this->filters[$filterUid]['target_pid'] = ($this->filters[$filterUid]['target_pid']) ? $this->filters[$filterUid]['target_pid'] : $this->conf['resultPage'];
 
-			// fill markers
+		// fill markers
 		$markerArray['###FILTERTITLE###'] = $filterTitle;
 		$markerArray['###HIDDEN_FIELDS###'] = $hiddenFields;
 
@@ -860,9 +868,9 @@ class tx_kesearch_lib extends tslib_pibase {
 			);
 			$markerArray['###LINK_RESET_FILTER###'] = '';
 		}
-
+		
 		$contentFilters = $this->cObj->substituteMarkerArray($contentFilters, $markerArray);
-
+		
 		return $contentFilters;
 	}
 
@@ -990,6 +998,7 @@ class tx_kesearch_lib extends tslib_pibase {
 					$this->tagsInSearchResult[$value] += 1;
 				}
 			}
+			$GLOBALS['TSFE']->fe_user->setKey('ses', 'ke_search.tagsInSearchResults', $this->tagsInSearchResult);
 		}
 
 		return array_key_exists($tagChar . $tag . $tagChar, $this->tagsInSearchResult);
@@ -1957,114 +1966,8 @@ class tx_kesearch_lib extends tslib_pibase {
 	
 	
 	public function renderOrdering() {
-		// show ordering only if is set in FlexForm
-		if($this->conf['showSortInFrontend'] && !empty($this->conf['sortByVisitor']) && $this->numberOfResults) {
-			$subpartArray['###ORDERNAVIGATION###'] = $this->cObj->getSubpart($this->templateCode, '###ORDERNAVIGATION###');
-			$subpartArray['###SORT_LINK###'] = $this->cObj->getSubpart($subpartArray['###ORDERNAVIGATION###'], '###SORT_LINK###');
-			
-			$orderBy = t3lib_div::trimExplode(',', $this->conf['sortByVisitor'], true);
-			
-			// loop all allowed orderings
-			foreach($orderBy as $field) {
-				// we can't sort by score if there is no sword given
-				if($this->sword != '' || $field != 'score') {
-					$markerArray['###FIELDNAME###'] = $field;
-					
-					// get a default ordering direction for current field
-					$orderByDir = $this->getDefaultOrderingDirection($field);
-					
-					// get the ordering from current db request
-					$dbOrdering = t3lib_div::trimExplode(' ', $this->db->getOrdering());
-					
-					/* if ordering direction is the same change it
-					 *
-					 * Explaintation:
-					 * No ordering is active. Default Ordering by db is "sortdate desc".
-					 * Default ordering by current field is also "sortdate desc".
-					 * So...if you click the link for sortdate it will sort the results by "sortdate desc" again
-					 * To prevent this we change the default ordering here
-					 */
-					if($field == $dbOrdering[0] && $orderByDir == $dbOrdering[1]) {
-						$orderByDir = $this->changeOrdering($orderByDir);
-					}
-					
-					// generate link for static and after reload mode
-					$markerArray['###URL###'] = $this->cObj->typoLink(
-						$this->pi_getLL('orderlink_' . $field, $field),
-						array(
-							'parameter' => $GLOBALS['TSFE']->id,
-							'addQueryString' => 1,
-							'addQueryString.' => array('exclude' => 'id'),
-							'additionalParams' => '&' . $this->prefixId . '[orderByField]=' . $field . '&' . $this->prefixId . '[orderByDir]=' . $orderByDir,
-						)
-					);
-					
-					// add classname for sorting arrow
-					if($field == $dbOrdering[0]) {
-						if($dbOrdering[1] == 'asc') {
-							$markerArray['###CLASS###'] = 'up';
-						} else {
-							$markerArray['###CLASS###'] = 'down';
-						}
-					} else {
-						$markerArray['###CLASS###'] = '';
-					}
-					
-					$links .= $this->cObj->substituteMarkerArray($subpartArray['###SORT_LINK###'], $markerArray);
-				}
-			}
-			
-			$content = $this->cObj->substituteSubpart($subpartArray['###ORDERNAVIGATION###'], '###SORT_LINK###', $links);
-			$content = $this->cObj->substituteMarker($content, '###LABEL_SORT###', $this->pi_getLL('label_sort'));
-			
-			return $content;
-		} else {
-			return '';
-		}
-	}
-	
-	
-	/**
-	 * get default ordering direction
-	 * f.e. default ordering for sortdate should be DESC. The most current records at first
-	 * f.e. default ordering for relevance should be DESC. The best relevance at first
-	 * f.e. default ordering for title should be ASC. Alphabetic order begins with A.
-	 *
-	 * @param string The field name to order by
-	 * @return string The default ordering (asc/desc) for given field
-	 */
-	public function getDefaultOrderingDirection($field) {
-		if(!empty($field) && is_string($field)) {
-			switch($field) {
-				case 'sortdate':
-				case 'score':
-					$orderBy = 'desc';
-					break;
-				case 'title':
-				default:
-					$orderBy = 'asc';
-					break;
-			}
-			return $orderBy;
-		} else return 'asc';
-	}
-	
-	
-	/**
-	 * change ordering
-	 * f.e. asc to desc and desc to asc
-	 *
-	 * @param string $direction asc or desc
-	 * @return string desc or asc. If you call this function with a not allowed string, exactly this string will be returned. Short: The function do nothing
-	 */
-	public function changeOrdering($direction) {
-		$allowedDirections = array('asc', 'desc');
-		$direction = strtolower($direction);
-		if(!empty($direction) && t3lib_div::inArray($allowedDirections, $direction)) {
-			if($direction == 'asc') {
-				$direction = 'desc';
-			} else $direction = 'asc';
-		} return $direction;
+		$sortObj = t3lib_div::makeInstance('tx_kesearch_lib_sorting', $this);
+		return $sortObj->renderSorting();
 	}
 	
 	
