@@ -394,6 +394,19 @@ $TCA['tx_kesearch_index'] = array (
 				'type' => 'passthrough'
 			)
 		),
+		'directory' => array (
+			'exclude' => 0,
+			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_index.directory',
+			'config' => array (
+				'type' => 'input',
+				'size' => '30',
+			)
+		),
+		'hash' => array (
+			'config' => array (
+				'type' => 'passthrough'
+			)
+		),
 	),
 	'types' => array (
 		'0' => array('showitem' => 'starttime;;;;1-1-1, endtime, fe_group, targetpid, content, params, type, tags, abstract, title;;;;2-2-2, language;;;;3-3-3')
@@ -404,13 +417,11 @@ $TCA['tx_kesearch_index'] = array (
 );
 
 
-
-
 $TCA['tx_kesearch_indexerconfig']['ctrl']['requestUpdate'] = 'type';
 $TCA['tx_kesearch_indexerconfig'] = array (
 	'ctrl' => $TCA['tx_kesearch_indexerconfig']['ctrl'],
 	'interface' => array (
-		'showRecordFieldList' => 'hidden,title,storagepid,startingpoints_recursive,single_pages,sysfolder,type,index_content_with_restrictions, index_passed_events'
+		'showRecordFieldList' => 'hidden,title,storagepid,startingpoints_recursive,single_pages,sysfolder,type,index_content_with_restrictions,index_passed_events,directories,fileext'
 	),
 	'feInterface' => $TCA['tx_kesearch_indexerconfig']['feInterface'],
 	'columns' => array (
@@ -443,7 +454,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 			)
 		),
 		'targetpid' => array (
-			'displayCond' => 'FIELD:type:!IN:page,tt_content',
+			'displayCond' => 'FIELD:type:!IN:page,tt_content,file',
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.targetpid',
 			'config' => array (
@@ -468,6 +479,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.4', 'xtypocommerce', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_4.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.5', 'tt_address', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_5.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.6', 'tt_content', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_6.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.7', 'file', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_7.gif'),
 				),
 				'itemsProcFunc' => 'tx_kesearch_lib_items->fillIndexerConfig',
 				'size' => 1,
@@ -568,9 +580,29 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 				'default' => '0'
 			)
 		),
+		'directories' => array (
+			'exclude' => 0,
+			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.directories',
+			'displayCond' => 'FIELD:type:IN:file',
+			'config' => array (
+				'type' => 'group',
+				'internal_type' => 'folder',
+				'size' => 5,
+				'minitems' => 0,
+				'maxitems' => 10,
+			)
+		),
+		'fileext' => array (
+			'exclude' => 0,
+			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.fileext',
+			'config' => array (
+				'type' => 'input',
+				'size' => '30',
+			)
+		),
 	),
 	'types' => array (
-		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, storagepid,targetpid;;;;3-3-3, type, startingpoints_recursive, single_pages, sysfolder, index_content_with_restrictions, index_passed_events, index_dam_categories, index_dam_categories_recursive')
+		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, storagepid,targetpid;;;;3-3-3,type,startingpoints_recursive,single_pages,sysfolder,index_content_with_restrictions,index_passed_events,index_dam_categories,index_dam_categories_recursive,directories,fileext')
 	),
 	'palettes' => array (
 		'1' => array('showitem' => '')

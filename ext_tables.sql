@@ -83,6 +83,8 @@ CREATE TABLE tx_kesearch_index (
 	orig_pid int(11) DEFAULT '0' NOT NULL,
 	title tinytext,
 	language int(11) DEFAULT '0' NOT NULL,
+	directory tinytext,
+	hash varchar(25) DEFAULT '' NOT NULL,
 
 	FULLTEXT INDEX tags (tags),
 	FULLTEXT INDEX title (title),
@@ -116,6 +118,8 @@ CREATE TABLE tx_kesearch_indexerconfig (
 	type varchar(90) DEFAULT '' NOT NULL,
 	index_dam_categories text,
 	index_dam_categories_recursive tinyint(3) DEFAULT '0' NOT NULL,
+	directories text,
+	fileext tinytext,
 
 	PRIMARY KEY (uid),
 	KEY parent (pid)

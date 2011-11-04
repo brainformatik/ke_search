@@ -43,6 +43,7 @@
 			<label index="tx_kesearch_index.title">Title</label>
 			<label index="tx_kesearch_index.language">Language UID</label>
 			<label index="tx_kesearch_index.sortdate">Date</label>
+			<label index="tx_kesearch_index.directory">Directory</label>
 			<label index="tx_kesearch_indexerconfig">Indexer Configuration</label>
 			<label index="tx_kesearch_indexerconfig.title">Title</label>
 			<label index="tx_kesearch_indexerconfig.storagepid">Storage page</label>
@@ -57,6 +58,7 @@
 			<label index="tx_kesearch_indexerconfig.type.I.4">XTCommerce Products (tx_xtypocommerce)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.5">Address records (tt_address)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.6">Content records (tt_content)</label>
+			<label index="tx_kesearch_indexerconfig.type.I.7">Files</label>
 			<label index="tx_kesearch_indexerconfig.type">Type</label>
 			<label index="tx_kesearch_indexerconfig.index_content_with_restrictions">Index content elements with restrictions?</label>
 			<label index="tx_kesearch_indexerconfig.index_content_with_restrictions.I.0">Yes</label>
@@ -66,6 +68,8 @@
 			<label index="tx_kesearch_indexerconfig.index_dam_categories_recursive">Index DAM categories recursive?</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.0">Yes</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">No</label>
+			<label index="tx_kesearch_indexerconfig.directories">Directories</label>
+			<label index="tx_kesearch_indexerconfig.fileext">Commaseperated list of allowed file extensions (f.e. pdf,xls,txt)</label>
 		</languageKey>
 		<languageKey index="de" type="array">
 			<label index="pages.tx_kesearch_tags">Schlagworte für facettierte Suche</label>
@@ -105,6 +109,7 @@
 			<label index="tx_kesearch_index.title">Titel</label>
 			<label index="tx_kesearch_index.language">Sprach-UID</label>
 			<label index="tx_kesearch_index.sortdate">Datum</label>
+			<label index="tx_kesearch_index.directory">Verzeichnis</label>
 			<label index="tx_kesearch_indexerconfig">Indexer Konfiguration</label>
 			<label index="tx_kesearch_indexerconfig.title">Titel</label>
 			<label index="tx_kesearch_indexerconfig.storagepid">Storage Seite</label>
@@ -119,6 +124,7 @@
 			<label index="tx_kesearch_indexerconfig.type.I.4">XTCommerce Produkte (tx_xtypocommerce)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.5">Adressen (tt_address)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.6">Inhaltselemente (tt_content)</label>
+			<label index="tx_kesearch_indexerconfig.type.I.7">Dateien</label>
 			<label index="tx_kesearch_indexerconfig.type">Typ</label>
 			<label index="tx_kesearch_indexerconfig.index_content_with_restrictions">Indiziere Content-Elemente mit eingeschränkter Zugänglichkeit?</label>
 			<label index="tx_kesearch_indexerconfig.index_content_with_restrictions.I.0">Ja</label>
@@ -128,6 +134,8 @@
 			<label index="tx_kesearch_indexerconfig.index_dam_categories_recursive">Kategorien rekursiv indizieren?</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.0">Ja</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">Nein</label>
+			<label index="tx_kesearch_indexerconfig.directories">Verzeichnisse</label>
+			<label index="tx_kesearch_indexerconfig.fileext">Kommaseparierte Liste von zu indexierenden Dateiendungen (z.B. pdf,xls,txt)</label>
 		</languageKey>
 	</data>
 </T3locallang>

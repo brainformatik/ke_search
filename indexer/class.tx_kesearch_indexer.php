@@ -314,7 +314,11 @@ class tx_kesearch_indexer {
 		}
 
 		// check if record already exists. Average speed: 1-2ms
-		$recordExists = $this->indexRecordExists($fieldValues['orig_uid'], $fieldValues['pid'], $fieldValues['type']);
+		if($fieldValues['type'] == 'file') {
+			$recordExists = $this->checkIfFileWasIndexed($fieldValues['pid'], $fieldValues['hash']);
+		} else {
+			$recordExists = $this->checkIfRecordWasIndexed($fieldValues['orig_uid'], $fieldValues['pid'], $fieldValues['type']);
+		}
 		if($recordExists) { // update existing record
 			$where = 'uid=' . intval($this->currentRow['uid']);
 			unset($fieldValues['crdate']);
@@ -376,10 +380,12 @@ class tx_kesearch_indexer {
 			@endtime = ' . $fieldValues['endtime'] . ',
 			@fe_group = ' . $fieldValues['fe_group'] . ',
 			@tstamp = ' . $fieldValues['tstamp'] . ',
-			@crdate = ' . $fieldValues['crdate'] . $addQueryPartFor['set'] . '
+			@crdate = ' . $fieldValues['crdate'] . ',
+			@directory = ' . $fieldValues['directory'] . ',
+			@hash = ' . $fieldValues['hash'] . $addQueryPartFor['set'] . '
 		;';
 		$queryArray['execute'] = '
-			EXECUTE insertStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp, @crdate' . $addQueryPartFor['execute'] . ';
+			EXECUTE insertStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp, @crdate, @directory, @hash' . $addQueryPartFor['execute'] . ';
 		';
 
 		$this->tempArrayForInsertNewRecords[] = $queryArray;
@@ -413,12 +419,14 @@ class tx_kesearch_indexer {
 			@starttime = ' . $fieldValues['starttime'] . ',
 			@endtime = ' . $fieldValues['endtime'] . ',
 			@fe_group = ' . $fieldValues['fe_group'] . ',
-			@tstamp = ' . $fieldValues['tstamp'] . $addQueryPartFor['set'] . ',
+			@tstamp = ' . $fieldValues['tstamp'] . ',
+			@directory = ' . $fieldValues['directory'] . ',
+			@hash = ' . $fieldValues['hash'] . $addQueryPartFor['set'] . ',
 			@uid = ' . $this->currentRow['uid'] . '
 		';
 
 		$queryArray['execute'] = '
-			EXECUTE updateStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp' . $addQueryPartFor['execute'] . ', @uid;
+			EXECUTE updateStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp, @directory, @hash' . $addQueryPartFor['execute'] . ', @uid;
 		';
 
 		$this->tempArrayForUpdatingExistingRecords[] = $queryArray;
@@ -474,6 +482,7 @@ class tx_kesearch_indexer {
 			$GLOBALS['TYPO3_DB']->sql_query($query['set']);
 			$GLOBALS['TYPO3_DB']->sql_query($query['execute']);
 		}
+
 		if($this->amountOfRecordsToSaveInMem) $this->periodicNotificationCount('insert');
 		$this->tempArrayForInsertNewRecords = array();
 	}
@@ -484,16 +493,42 @@ class tx_kesearch_indexer {
 	 * This function also sets $this->currentRow
 	 * parameters should be already fullQuoted. see storeInIndex
 	 *
-	 * TODO: We should create an index to col type
+	 * TODO: We should create an index to column type
 	 *
 	 * @param integer $uid
 	 * @param integer $pid
 	 * @param string $type
 	 * @return boolean true if record was found, false if not
 	 */
-	function indexRecordExists($uid, $pid, $type) {
+	function checkIfRecordWasIndexed($uid, $pid, $type) {
 		$GLOBALS['TYPO3_DB']->sql_query('SET @orig_uid = ' . $uid . ', @pid = ' . $pid . ', @type = ' . $type);
 		$res = $GLOBALS['TYPO3_DB']->sql_query('EXECUTE searchStmt USING @orig_uid, @pid, @type;');
+		if(is_resource($res)) {
+			if($this->currentRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+				return true;
+			} return false;
+		} else {
+			$this->currentRow = array();
+			return false;
+		}
+	}
+
+
+	/**
+	 * try to find an allready indexed record
+	 * This function also sets $this->currentRow
+	 * parameters should be already fullQuoted. see storeInIndex
+	 *
+	 * TODO: We should create an index to column type
+	 *
+	 * @param integer $uid
+	 * @param integer $pid
+	 * @param string $type
+	 * @return boolean true if record was found, false if not
+	 */
+	function checkIfFileWasIndexed($pid, $hash) {
+		$GLOBALS['TYPO3_DB']->sql_query('SET @pid = ' . $pid . ', @hash = ' . $hash);
+		$res = $GLOBALS['TYPO3_DB']->sql_query('EXECUTE searchStmt USING @pid, @hash;');
 		if(is_resource($res)) {
 			if($this->currentRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 				return true;
