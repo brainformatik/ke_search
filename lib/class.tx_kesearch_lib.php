@@ -57,7 +57,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	var $preselectedFilter   = array(); // preselected filters by flexform
 	var $filtersFromFlexform = array(); // array with filter-uids as key and whole data as value
 	var $hasTooShortWords    = false; // contains a boolean value which represents if there are too short words in the searchstring
-	
+
  	/**
 	* @var tx_xajax
 	*/
@@ -78,7 +78,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	*/
 	var $user_kesearchpremium;
 
-	
+
 	/**
 	 * Initializes flexform, conf vars and some more
 	 *
@@ -92,7 +92,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		if(!$GLOBALS['TSFE']->register['ke_search_queryStartTime']) $GLOBALS['TSFE']->register['ke_search_queryStartTime'] = t3lib_div::milliseconds();
 
 		$this->moveFlexFormDataToConf();
-		
+
 		if(!empty($this->conf['loadFlexformsFromOtherCE'])) {
 			$data = $this->pi_getRecord('tt_content', intval($this->conf['loadFlexformsFromOtherCE']));
 			$this->cObj->data = $data;
@@ -105,14 +105,11 @@ class tx_kesearch_lib extends tslib_pibase {
 		// get preselected filter from rootline
 		$this->getFilterPreselect();
 
-		// prepare database object
-		$this->db = t3lib_div::makeInstance('tx_kesearch_db', $this);
-		
 		// add stdWrap properties to each config value
 		foreach($this->conf as $key => $value) {
 			$this->conf[$key] = $this->cObj->stdWrap($value, $this->conf[$key . '.']);
 		}
-		
+
 		// set some default values (this part have to be after stdWrap!!!)
 		if(!$this->conf['resultPage']) {
 			if($this->cObj->data['pid']) {
@@ -122,7 +119,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 		}
 		if(!isset($this->piVars['page'])) $this->piVars['page'] = 1;
-		
+
 		// hook: modifyFlexFormData
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFlexFormData'])) {
 			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFlexFormData'] as $_classRef) {
@@ -130,10 +127,13 @@ class tx_kesearch_lib extends tslib_pibase {
 				$_procObj->modifyFlexFormData($this->conf, $this->cObj, $this->piVars);
 			}
 		}
-		
+
+		// prepare database object
+		$this->db = t3lib_div::makeInstance('tx_kesearch_db', $this);
+
 		// set startingPoints
 		$this->startingPoints = $this->div->getStartingPoint();
-		
+
 		// get extension configuration array
 		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->extKey]);
 		// sphinx has problems with # in query string.
@@ -149,11 +149,11 @@ class tx_kesearch_lib extends tslib_pibase {
 		}
 		$this->extConf['multiplyValueToTitle'] = ($this->extConf['multiplyValueToTitle']) ? $this->extConf['multiplyValueToTitle'] : 1;
 		$this->extConf['searchWordLength'] = ($this->extConf['searchWordLength']) ? $this->extConf['searchWordLength'] : 4;
-		
+
 		// get html template
 		$this->templateFile = $this->conf['templateFile'] ? $this->conf['templateFile'] : t3lib_extMgm::siteRelPath($this->extKey).'res/template_pi1.tpl';
 		$this->templateCode = $this->cObj->fileResource($this->templateFile);
-		
+
 		// get first startingpoint
 		$this->firstStartingPoint = $this->div->getFirstStartingPoint($this->startingPoints);
 
@@ -359,7 +359,7 @@ class tx_kesearch_lib extends tslib_pibase {
 								$GLOBALS['TSFE']->sys_language_contentOL
 							);
 						}
-						
+
 						// check filter availability?
 						if($this->conf['checkFilterCondition'] != 'none') {
 							if($this->checkIfTagMatchesRecords($option['tag'], $this->conf['checkFilterCondition'], $filterUid)) {
@@ -398,7 +398,7 @@ class tx_kesearch_lib extends tslib_pibase {
 						}
 					}
 				}
-				
+
 				// hook for modifying filter options
 				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptionsArray'])) {
 					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptionsArray'] as $_classRef) {
@@ -406,7 +406,7 @@ class tx_kesearch_lib extends tslib_pibase {
 						$options = $_procObj->modifyFilterOptionsArray($filterUid, $options, $this);
 					}
 				}
-				
+
 				// render "wrap"
 				if ($this->filters[$filterUid]['wrap']) {
 					$wrap = t3lib_div::trimExplode('|', $this->filters[$filterUid]['wrap']);
@@ -416,23 +416,23 @@ class tx_kesearch_lib extends tslib_pibase {
 						1 => ''
 					);
 				}
-				
+
 				// get subparts corresponding to render type
 				switch ($this->filters[$filterUid]['rendertype']) {
-					
+
 					case 'select':
 					default:
 						$filterContent .= $wrap[0] . $this->renderSelect($filterUid, $options) . $wrap[1];
 						break;
-						
+
 					case 'list':
 						$filterContent .= $wrap[0] . $this->renderList($filterUid, $options) . $wrap[1];
 						break;
-						
+
 					case 'checkbox':
 						$filterContent .= $wrap[0] . $this->renderCheckbox($filterUid, $options) . $wrap[1];
 						break;
-						
+
 					case 'textlinks':
 						$textLinkObj = t3lib_div::makeInstance('tx_kesearch_lib_filters_textlinks', $this);
 						$filterContent .= $wrap[0] . $textLinkObj->renderTextlinks($filterUid, $options) . $wrap[1];
@@ -456,14 +456,14 @@ class tx_kesearch_lib extends tslib_pibase {
 		}
 		return $filterContent;
 	}
-	
-	
+
+
 	/*
 	 * function renderSelect
 	 * @param $arg
 	 */
 	public function renderSelect($filterUid, $options) {
-		
+
 		$filterSubpart = '###SUB_FILTER_SELECT###';
 		$optionSubpart = '###SUB_FILTER_SELECT_OPTION###';
 
@@ -755,9 +755,9 @@ class tx_kesearch_lib extends tslib_pibase {
 						$_procObj->modifyOptionForTextlinks($key, $data, $this->conf, $this);
 					}
 				}
-				
+
 				$isOptionInOptionArray = 0;
-				
+
 				// check if current option (of searchresults) is in array of all possible options
 				foreach((array)$options as $optionKey => $optionValue) {
 					if(is_array($options[$optionKey]) && t3lib_div::inArray($options[$optionKey], $data['tag'])) {
@@ -765,7 +765,7 @@ class tx_kesearch_lib extends tslib_pibase {
 						break;
 					}
 				}
-				
+
 				// if multi is set, then more than one entry can be selected
 				if($this->piVars['multi'] && $this->piVars['filter'][$filterUid][$key]) {
 					if($isOptionInOptionArray) {
@@ -868,9 +868,9 @@ class tx_kesearch_lib extends tslib_pibase {
 			);
 			$markerArray['###LINK_RESET_FILTER###'] = '';
 		}
-		
+
 		$contentFilters = $this->cObj->substituteMarkerArray($contentFilters, $markerArray);
-		
+
 		return $contentFilters;
 	}
 
@@ -958,7 +958,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$sphinx = t3lib_div::makeInstance('user_kesearchpremium');
 				$sphinx->setLimit(0, 10000, 10000);
 				$queryForSphinx = '';
-				
+
 				if($this->wordsAgainst) $queryForSphinx .= ' @(title,content) ' . $this->wordsAgainst;
 				if(count($this->tagsAgainst)) {
 					foreach($this->tagsAgainst as $value) {
@@ -968,7 +968,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				}
 				$queryForSphinx .= ' @(language) _language_' . $GLOBALS['TSFE']->sys_language_uid;
 				$queryForSphinx .= ' @(fe_group) _group_NULL | _group_0';
-				
+
 				// add fe_groups to query
 				if(!empty($GLOBALS['TSFE']->gr_list)) {
 					$feGroups = t3lib_div::trimExplode(',', $GLOBALS['TSFE']->gr_list, 1);
@@ -979,7 +979,7 @@ class tx_kesearch_lib extends tslib_pibase {
 					}
 					if(is_array($feGroups) && count($feGroups)) $queryForSphinx .= ' | ' . implode(' | ', $feGroups);
 				}
-				
+
 				// hook for appending additional where clause to sphinx query
 				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['appendWhereToSphinx'])) {
 					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['appendWhereToSphinx'] as $_classRef) {
@@ -1360,7 +1360,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 			$queryForSphinx .= ' @language _language_' . $GLOBALS['TSFE']->sys_language_uid;
 			$queryForSphinx .= ' @fe_group _group_NULL | _group_0';
-			
+
 			// add fe_groups to query
 			if(!empty($GLOBALS['TSFE']->gr_list)) {
 				$feGroups = t3lib_div::trimExplode(',', $GLOBALS['TSFE']->gr_list, 1);
@@ -1371,7 +1371,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				}
 				if(is_array($feGroups) && count($feGroups)) $queryForSphinx .= ' | ' . implode(' | ', $feGroups);
 			}
-			
+
 			// hook for appending additional where clause to sphinx query
 			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['appendWhereToSphinx'])) {
 				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['appendWhereToSphinx'] as $_classRef) {
@@ -1382,7 +1382,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			$res = $this->user_kesearchpremium->getResForSearchResults($queryForSphinx);
 			//t3lib_utility_Debug::debug($this->user_kesearchpremium->getLastWarning());
 			//t3lib_utility_Debug::debug($this->user_kesearchpremium->getLastError());
-			
+
 			// get number of records
 			$this->numberOfResults = $this->user_kesearchpremium->getTotalFound();
 		} else {
@@ -1393,7 +1393,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			// get number of records
 			$this->numberOfResults = $this->db->getAmountOfSearchResults();
 		}
-		
+
 		// count searchword with ke_stats
 		$this->countSearchWordWithKeStats($this->sword);
 
@@ -1402,10 +1402,10 @@ class tx_kesearch_lib extends tslib_pibase {
 			$this->countSearchPhrase($this->sword, $this->swords, $this->numberOfResults, $this->tagsAgainst);
 		}
 		if($this->numberOfResults == 0) {
-		
+
 			// get subpart for general message
 			$content = $this->cObj->getSubpart($this->templateCode, '###GENERAL_MESSAGE###');
-			
+
 			// no results found
 			if($this->conf['showNoResultsText']) {
 				// use individual text set in flexform
@@ -1420,7 +1420,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$imageConf['altText'] = $this->pi_getLL('no_results_found');
 				$attentionImage=$this->cObj->IMAGE($imageConf);
 			}
-			
+
 			// hook to implement your own idea of a no result message
 			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['noResultsHandler'])) {
 				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['noResultsHandler'] as $_classRef) {
@@ -1428,25 +1428,25 @@ class tx_kesearch_lib extends tslib_pibase {
 					$noResultsText = $_procObj->noResultsHandler($noResultsText, $this);
 				}
 			}
-			
+
 			// set text for "no results found"
 			$content = $this->cObj->substituteMarker($content,'###MESSAGE###', $noResultsText);
 			// set attention icon?
 			$content = $this->cObj->substituteMarker($content,'###IMAGE###', $attentionImage);
-			
+
 			// add query
 			if ($this->conf['showQuery']) {
 				$content .= '<br />'.$query.'<br />';
 			}
-			
+
 			// add onload image if in AJAX mode
 			if($this->conf['renderMethod'] != 'static') {
 				$content .= $this->onloadImage;
 			}
-			
+
 			return $content;
 		}
-		
+
 		if($this->hasTooShortWords) {
 			// get subpart for general message
 			$content = $this->cObj->getSubpart($this->templateCode, '###GENERAL_MESSAGE###');
@@ -1765,7 +1765,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$teaser = preg_replace('/('.$word.')/iu','<span class="hit">\0</span>',$teaser);
 			}
 		}
-		
+
 		return $teaser;
 	}
 
@@ -1960,17 +1960,17 @@ class tx_kesearch_lib extends tslib_pibase {
 			'of' => $this->pi_getLL('of'),
 		);
 		$content = $this->cObj->substituteMarkerArray($content,$markerArray,$wrap='###|###',$uppercase=1);
-		
+
 		return $content;
 	}
-	
-	
+
+
 	public function renderOrdering() {
 		$sortObj = t3lib_div::makeInstance('tx_kesearch_lib_sorting', $this);
 		return $sortObj->renderSorting();
 	}
-	
-	
+
+
 	/*
 	 * function renderSVGScale
 	 * @param $arg

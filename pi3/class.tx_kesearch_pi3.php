@@ -76,7 +76,7 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 			'target_pid = ' . intval($GLOBALS['TSFE']->id),
 			'', '', ''
 		);
-		
+
 		// hook for modifying content
 		if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyMultiselectContent'])) {
 			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyMultiselectContent'] as $_classRef) {
@@ -142,7 +142,7 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 					'parameter' => $this->conf['resultPage'],
 					'addQueryString' => 1,
 					'addQueryString.' => array(
-						'exclude' => 'id'
+						'exclude' => 'id,tx_kesearch_pi1[sword]'
 					)
 				)
 			)
@@ -157,7 +157,7 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 		$content = $this->cObj->substituteSubpart($content, '###SUB_FILTER_MULTISELECT_HIDDEN###', $hidden);
 		$content = $this->cObj->substituteMarker($content, '###PAGEID###', $this->conf['resultPage']);
 		$content = $this->cObj->substituteMarker($content, '###SWORD###', $this->piVars['sword']);
-		
+
 		return $this->pi_wrapInBaseClass($content);
 	}
 }

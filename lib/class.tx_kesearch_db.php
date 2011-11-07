@@ -74,7 +74,7 @@ class tx_kesearch_db {
 
 		// add ordering
 		$orderBy = $this->getOrdering();
-		
+
 		// add limitation
 		$limit = $this->getLimit();
 
@@ -234,7 +234,7 @@ class tx_kesearch_db {
 	public function getOrdering() {
 		// if the following code fails, fall back to this default ordering
 		$orderBy = $this->conf['sortWithoutSearchword'];
-		
+
 		// if sorting in FE is allowed
 		if($this->conf['showSortInFrontend']) {
 			$piVarsField = $this->pObj->piVars['sortByField'];
@@ -250,8 +250,8 @@ class tx_kesearch_db {
 		}
 		return $orderBy;
 	}
-	
-	
+
+
 	/**
 	 * get limit for where query
 	 */

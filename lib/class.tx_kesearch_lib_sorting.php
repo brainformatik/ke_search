@@ -31,35 +31,35 @@
  * @subpackage	tx_kesearch
  */
 class tx_kesearch_lib_sorting {
-	
+
 	var $conf = array();
 	var $subpartArray = array();
 	var $sortBy = '';
-	
+
 	/**
 	 * @var tx_kesearch_lib
 	 */
 	var $pObj;
-	
+
 	/**
 	* @var tx_kesearch_db
 	*/
 	var $db;
-	
+
 	/**
 	* @var tslib_cObj
 	*/
 	var $cObj;
-	
+
 	/**
 	* @var tx_kesearch_div
 	*/
 	var $div;
-	
-	
-	
-	
-	
+
+
+
+
+
 	/**
 	 * The constructor of this class
 	 *
@@ -69,8 +69,8 @@ class tx_kesearch_lib_sorting {
 		// initializes this object
 		$this->init($pObj);
 	}
-	
-	
+
+
 	/**
 	 * Initializes this object
 	 *
@@ -82,16 +82,16 @@ class tx_kesearch_lib_sorting {
 		$this->db = $this->pObj->db;
 		$this->cObj = $this->pObj->cObj;
 		$this->conf = $this->pObj->conf;
-		
+
 		// get subparts
 		$this->subpartArray['###ORDERNAVIGATION###'] = $this->cObj->getSubpart($this->pObj->templateCode, '###ORDERNAVIGATION###');
 		$this->subpartArray['###SORT_LINK###'] = $this->cObj->getSubpart($this->subpartArray['###ORDERNAVIGATION###'], '###SORT_LINK###');
-		
+
 		// get sorting values (sortdate, title, what ever...)
 		$this->sortBy = t3lib_div::trimExplode(',', $this->conf['sortByVisitor'], true);
 	}
-	
-	
+
+
 	/**
 	 * The main entry point of this class
 	 * It will return the complete sorting HTML
@@ -110,7 +110,7 @@ class tx_kesearch_lib_sorting {
 				if($this->pObj->sword != '' || $field != 'score') {
 					$sortByDir = $this->getDefaultSortingDirection($field);
 					$dbOrdering = t3lib_div::trimExplode(' ', $this->db->getOrdering());
-					
+
 					/* if ordering direction is the same change it
 					 *
 					 * Explaintation:
@@ -122,25 +122,25 @@ class tx_kesearch_lib_sorting {
 					if($field == $dbOrdering[0] && $sortByDir == $dbOrdering[1]) {
 						$sortByDir = $this->changeOrdering($sortByDir);
 					}
-					
+
 					$markerArray['###FIELDNAME###'] = $field;
 					$markerArray['###URL###'] = $this->generateSortingLink($field, $sortByDir);
 					$markerArray['###CLASS###'] = $this->getClassNameForUpDownArrow($field, $dbOrdering);
-					
+
 					$links .= $this->cObj->substituteMarkerArray($this->subpartArray['###SORT_LINK###'], $markerArray);
 				}
 			}
-			
+
 			$content = $this->cObj->substituteSubpart($this->subpartArray['###ORDERNAVIGATION###'], '###SORT_LINK###', $links);
 			$content = $this->cObj->substituteMarker($content, '###LABEL_SORT###', $this->pObj->pi_getLL('label_sort'));
-			
+
 			return $content;
 		} else {
 			return '';
 		}
 	}
-	
-	
+
+
 	/**
 	 * get default sorting direction
 	 * f.e. default sorting for sortdate should be DESC. The most current records at first
@@ -165,8 +165,8 @@ class tx_kesearch_lib_sorting {
 			return $orderBy;
 		} else return 'asc';
 	}
-	
-	
+
+
 	/**
 	 * change ordering
 	 * f.e. asc to desc and desc to asc
@@ -183,8 +183,8 @@ class tx_kesearch_lib_sorting {
 			} else $direction = 'asc';
 		} return $direction;
 	}
-	
-	
+
+
 	/**
 	 * get a class name for up and down arrows of sorting links
 	 *
@@ -203,8 +203,8 @@ class tx_kesearch_lib_sorting {
 		}
 		return $className;
 	}
-	
-	
+
+
 	/**
 	 * generate the link for the given sorting value
 	 *
@@ -216,17 +216,17 @@ class tx_kesearch_lib_sorting {
 		$params = array();
 		$params['sortByField'] = $field;
 		$params['sortByDir'] = $sortByDir;
-		
+
 		foreach($params as $key => $value) {
 			$params[$key] = $this->cObj->wrap($value, $this->pObj->prefixId . '[' . $key . ']=|');
 		}
-		
+
 		$conf = array();
 		$conf['parameter'] = $GLOBALS['TSFE']->id;
 		$conf['addQueryString'] = '1';
-		$conf['addQueryString.']['exclude'] = 'id';
+		$conf['addQueryString.']['exclude'] = 'id,tx_kesearch_pi1[multi]';
 		$conf['additionalParams'] = '&' . implode('&', $params);
-		
+
 		return $this->cObj->typoLink(
 			$this->pObj->pi_getLL('orderlink_' . $field, $field),
 			$conf

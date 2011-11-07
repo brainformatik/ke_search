@@ -30,7 +30,7 @@
  * @subpackage	tx_kesearch
  */
 class tx_kesearch_lib_filters_textlinks {
-	
+
 	var $conf = array();
 	var $templateArray = array();
 	var $countActiveOptions = 0;
@@ -38,21 +38,21 @@ class tx_kesearch_lib_filters_textlinks {
 	var $maxAllowedNormalOptions = 0;
 	var $contentOfActiveOptions = array();
 	var $contentOfNormalOptions = array();
-	
+
 	/**
 	 * @var tx_kesearch_lib
 	 */
 	var $pObj;
-	
+
 	/**
 	* @var tslib_cObj
 	*/
 	var $cObj;
-	
-	
-	
-	
-	
+
+
+
+
+
 	/**
 	 * The constructor of this class
 	 *
@@ -62,8 +62,8 @@ class tx_kesearch_lib_filters_textlinks {
 		// initializes this object
 		$this->init($pObj);
 	}
-	
-	
+
+
 	/**
 	 * Initializes this object
 	 *
@@ -74,19 +74,19 @@ class tx_kesearch_lib_filters_textlinks {
 		$this->pObj = $pObj;
 		$this->cObj = $this->pObj->cObj;
 		$this->conf = $this->pObj->conf;
-		
+
 		// reset global values
 		$this->countActiveOptions = 0;
 		$this->contentOfHiddenFields = array();
 		$this->contentOfActiveOptions = array();
 		$this->contentOfNormalOptions = array();
-		
+
 		// set template array
 		$this->templateArray['filter'] = $this->cObj->getSubpart($this->pObj->templateCode, '###SUB_FILTER_TEXTLINKS###');
 		$this->templateArray['options'] = $this->cObj->getSubpart($this->pObj->templateCode, '###SUB_FILTER_TEXTLINK_OPTION###');
 	}
-	
-	
+
+
 	/**
 	 * The main entry point of this class
 	 * It will return the complete HTML for textlinks
@@ -101,11 +101,11 @@ class tx_kesearch_lib_filters_textlinks {
 		$optionsOfFilter = $this->getOptionsOfFilter($filter, $optionsOfSearchresult);
 		if(!is_array($optionsOfFilter) && count($optionsOfFilter) == 0) return '';
 		$this->maxAllowedNormalOptions = $filter['amount'];
-		
+
 		foreach($optionsOfFilter as $key => $data) {
 			$this->saveRenderedTextlinkToGlobalArrays($filterUid, $data);
 		}
-		
+
 		if(is_array($this->contentOfActiveOptions) && count($this->contentOfActiveOptions)) {
 			foreach($this->contentOfActiveOptions as $option) {
 				$contentOptions .= $option;
@@ -115,7 +115,7 @@ class tx_kesearch_lib_filters_textlinks {
 				$contentOptions .= $option;
 			}
 		}
-		
+
 		// modify filter options by hook
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'])) {
 			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'] as $_classRef) {
@@ -128,9 +128,9 @@ class tx_kesearch_lib_filters_textlinks {
 				);
 			}
 		}
-		
+
 		unset($markerArray);
-		
+
 		// render filter
 		$contentFilters = $this->cObj->substituteSubpart(
 			$this->templateArray['filter'],
@@ -146,9 +146,7 @@ class tx_kesearch_lib_filters_textlinks {
 		$markerArray['###FILTERTITLE###'] = $filterTitle;
 		$markerArray['###HIDDEN_FIELDS###'] = implode(CHR(10), $this->contentOfHiddenFields);
 
-		if(count($this->pObj->piVars['filter']) <= 1) {
-			$exclude = 'tx_kesearch_pi1[page],tx_kesearch_pi1[multi],tx_kesearch_pi1[filter][' . $filterUid . ']';
-		} else $exclude = 'tx_kesearch_pi1[page],tx_kesearch_pi1[filter][' . $filterUid . ']';
+		$exclude = 'tx_kesearch_pi1[page],tx_kesearch_pi1[multi],tx_kesearch_pi1[filter][' . $filterUid . ']';
 
 		if($this->countActiveOptions) {
 			$markerArray['###LINK_MULTISELECT###'] = '';
@@ -171,19 +169,19 @@ class tx_kesearch_lib_filters_textlinks {
 					'parameter' => $filter['target_pid'],
 					'addQueryString' => 1,
 					'addQueryString.' => array(
-						'exclude' => 'id,tx_kesearch_pi1[page]'
+						'exclude' => 'id,tx_kesearch_pi1[page],tx_kesearch_pi1[multi]'
 					)
 				)
 			);
 			$markerArray['###LINK_RESET_FILTER###'] = '';
 		}
-		
+
 		$contentFilters = $this->cObj->substituteMarkerArray($contentFilters, $markerArray);
-		
+
 		return $contentFilters;
 	}
-	
-	
+
+
 	/**
 	 * get Filter record
 	 *
@@ -201,8 +199,8 @@ class tx_kesearch_lib_filters_textlinks {
 			} else return array();
 		} else return array();
 	}
-	
-	
+
+
 	/**
 	 * get all options of given filter
 	 *
@@ -222,8 +220,8 @@ class tx_kesearch_lib_filters_textlinks {
 			return $this->sortMultiDimArray($optionsOfCurrentFilter);
 		} else return array();
 	}
-	
-	
+
+
 	/**
 	 * Sort multidimensional array
 	 * Hint: This method keeps the original Array keys
@@ -234,21 +232,21 @@ class tx_kesearch_lib_filters_textlinks {
 	public function sortMultiDimArray($optionArray) {
 		// temporary saving all keys
 		$allOptionKeys = array_keys($optionArray);
-		
+
 		// prepare our array for sorting
 		foreach((array)$optionArray as $key => $array) {
 			$results[$key] = $array['results'];
 			$tags[$key] = $array['tag'];
 		}
-		
+
 		// sort multidim array
 		array_multisort($results, SORT_DESC, SORT_NUMERIC, $tags, SORT_ASC, SORT_STRING, $allOptionKeys, SORT_DESC, SORT_NUMERIC, $optionArray);
-		
+
 		// after multisort all keys are 0,1,2,3. So we have to restore our old keys
 		return array_combine($allOptionKeys, array_values($optionArray));
 	}
-	
-	
+
+
 	/**
 	 * a little factory to decide which kind of textlink has to be rendered
 	 * and save the result to global arrays
@@ -266,8 +264,8 @@ class tx_kesearch_lib_filters_textlinks {
 			}
 		} else return '';
 	}
-	
-	
+
+
 	/**
 	 * render textlink for active option
 	 *
@@ -285,8 +283,8 @@ class tx_kesearch_lib_filters_textlinks {
 		$this->contentOfHiddenFields[] = $this->renderHiddenField($filterUid, $option);
 		return $this->cObj->substituteMarkerArray($this->templateArray['options'], $markerArray);
 	}
-	
-	
+
+
 	/**
 	 * render textlink for normal option
 	 *
@@ -302,8 +300,8 @@ class tx_kesearch_lib_filters_textlinks {
 		$markerArray['###TEXTLINK###'] = $this->generateLink($filterUid, $option);
 		return $this->cObj->substituteMarkerArray($this->templateArray['options'], $markerArray);
 	}
-	
-	
+
+
 	/**
 	 * generate the link for normal textlinks
 	 *
@@ -315,10 +313,11 @@ class tx_kesearch_lib_filters_textlinks {
 		$params = array();
 		$params[] = '[page]=1';
 		$params[] = '[filter][' . $filterUid . '][' . $option['uid'] . ']=' . $option['tag'];
-		
+
 		$excludes = array();
 		$excludes[] = 'id';
-		
+		$excludes[] = 'tx_kesearch_pi1[multi]';
+
 		// hook: modifyParamsForTextlinks
 		// This is useful if you want to define special sortings for each textlink
 		if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyParamsForTextlinks'])) {
@@ -327,24 +326,24 @@ class tx_kesearch_lib_filters_textlinks {
 				$_procObj->modifyParamsForTextlinks($params, $excludes, $option, $this->conf, $this->pObj);
 			}
 		}
-		
+
 		foreach($params as $key => $value) {
 			$params[$key] = $this->cObj->wrap($value, $this->pObj->prefixId . '|');
 		}
-		
+
 		$conf = array();
 		$conf['parameter'] = $this->conf['resultPage'];
 		$conf['addQueryString'] = '1';
 		$conf['addQueryString.']['exclude'] = implode(',', $excludes);
 		$conf['additionalParams'] = '&' . implode('&', $params);
-		
+
 		return $this->cObj->typoLink(
 			$option['title'] . '<span> (' . $option['results'] . ')</span>',
 			$conf
 		);
 	}
-	
-	
+
+
 	/**
 	 * render a hidden field
 	 * They are needed to not forget setted options while search for another word
@@ -359,11 +358,11 @@ class tx_kesearch_lib_filters_textlinks {
 		$attributes['name'] = 'tx_kesearch_pi1[filter][' . $filterUid . '][' . $option['uid'] . ']';
 		$attributes['id'] = 'tx_kesearch_pi1[filter][' . $filterUid . '][' . $option['uid'] . ']';
 		$attributes['value'] = $option['tag'];
-		
+
 		foreach($attributes as $key => $attribut) {
 			$attributes[$key] = $key . $this->cObj->wrap($attribut, '="|"');
 		}
-		
+
 		return '<input ' . implode(' ', $attributes) . ' />';
 	}
 }
