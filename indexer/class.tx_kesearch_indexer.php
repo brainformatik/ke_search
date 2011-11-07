@@ -380,12 +380,10 @@ class tx_kesearch_indexer {
 			@endtime = ' . $fieldValues['endtime'] . ',
 			@fe_group = ' . $fieldValues['fe_group'] . ',
 			@tstamp = ' . $fieldValues['tstamp'] . ',
-			@crdate = ' . $fieldValues['crdate'] . ',
-			@directory = ' . $fieldValues['directory'] . ',
-			@hash = ' . $fieldValues['hash'] . $addQueryPartFor['set'] . '
+			@crdate = ' . $fieldValues['crdate'] . $addQueryPartFor['set'] . '
 		;';
 		$queryArray['execute'] = '
-			EXECUTE insertStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp, @crdate, @directory, @hash' . $addQueryPartFor['execute'] . ';
+			EXECUTE insertStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp, @crdate' . $addQueryPartFor['execute'] . ';
 		';
 
 		$this->tempArrayForInsertNewRecords[] = $queryArray;
@@ -419,14 +417,12 @@ class tx_kesearch_indexer {
 			@starttime = ' . $fieldValues['starttime'] . ',
 			@endtime = ' . $fieldValues['endtime'] . ',
 			@fe_group = ' . $fieldValues['fe_group'] . ',
-			@tstamp = ' . $fieldValues['tstamp'] . ',
-			@directory = ' . $fieldValues['directory'] . ',
-			@hash = ' . $fieldValues['hash'] . $addQueryPartFor['set'] . ',
+			@tstamp = ' . $fieldValues['tstamp'] . $addQueryPartFor['set'] . ',
 			@uid = ' . $this->currentRow['uid'] . '
 		';
 
 		$queryArray['execute'] = '
-			EXECUTE updateStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp, @directory, @hash' . $addQueryPartFor['execute'] . ', @uid;
+			EXECUTE updateStmt USING @pid, @title, @type, @targetpid, @content, @tags, @params, @abstract, @language, @starttime, @endtime, @fe_group, @tstamp' . $addQueryPartFor['execute'] . ', @uid;
 		';
 
 		$this->tempArrayForUpdatingExistingRecords[] = $queryArray;
@@ -481,6 +477,8 @@ class tx_kesearch_indexer {
 		foreach($this->tempArrayForInsertNewRecords as $query) {
 			$GLOBALS['TYPO3_DB']->sql_query($query['set']);
 			$GLOBALS['TYPO3_DB']->sql_query($query['execute']);
+			t3lib_utility_Debug::debug($query['execute']);
+			t3lib_utility_Debug::debug($GLOBALS['TYPO3_DB']->sql_error());
 		}
 
 		if($this->amountOfRecordsToSaveInMem) $this->periodicNotificationCount('insert');

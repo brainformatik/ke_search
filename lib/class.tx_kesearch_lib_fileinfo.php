@@ -117,7 +117,7 @@ class tx_kesearch_lib_fileinfo {
 	 * @return string lowercased Fileextension (f.e. pdf or xml)
 	 */
 	public function getExtension() {
-		return $this->fileInfo['ext'];
+		return $this->fileInfo['fileext'];
 	}
 
 

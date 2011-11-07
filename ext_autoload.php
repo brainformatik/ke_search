@@ -3,6 +3,7 @@ $extensionPath = t3lib_extMgm::extPath('ke_search');
 return array(
 	'tx_kesearch_indexer' => $extensionPath . 'indexer/class.tx_kesearch_indexer.php',
 	'tx_kesearch_indexer_types_file' => $extensionPath . 'indexer/types/class.tx_kesearch_indexer_types_file.php',
+	'tx_kesearch_indexer_filetypes' => $extensionPath . 'indexer/filetypes/interface.tx_kesearch_indexer_filetypes.php',
 	'tx_kesearch_indexer_filetypes_pdf' => $extensionPath . 'indexer/filetypes/class.tx_kesearch_indexer_filetypes_pdf.php',
 	'tx_kesearch_indexer_filetypes_ppt' => $extensionPath . 'indexer/filetypes/class.tx_kesearch_indexer_filetypes_ppt.php',
 	'tx_kesearch_pi1' => $extensionPath . 'pi1/class.tx_kesearch_pi1.php',

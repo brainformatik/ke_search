@@ -67,6 +67,8 @@ class tx_kesearch_indexer_filetypes_pdf extends tx_kesearch_indexer_types_file i
 	 * @return string The extracted content of the file
 	 */
 	public function getContent($file) {
+		$this->fileInfo = t3lib_div::makeInstance('tx_kesearch_lib_fileinfo');
+		$this->fileInfo->setFile($file);
 		// get PDF informations
 		if(!$pdfInfo = $this->getPdfInfo($file)) return false;
 

@@ -35,6 +35,8 @@ class user_kesearch_sortdate {
 		$additionalFields[] = 'sortdate';
 		$additionalFields[] = 'orig_uid';
 		$additionalFields[] = 'orig_pid';
+		$additionalFields[] = 'directory';
+		$additionalFields[] = 'hash';
 	}
 
 	public function modifyPagesIndexEntry(&$title, &$pageContent, &$tags, $pageRecord, &$additionalFields) {
