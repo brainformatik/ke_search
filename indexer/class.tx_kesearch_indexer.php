@@ -477,7 +477,11 @@ class tx_kesearch_indexer {
 		foreach($this->tempArrayForInsertNewRecords as $query) {
 			$GLOBALS['TYPO3_DB']->sql_query($query['set']);
 			$GLOBALS['TYPO3_DB']->sql_query($query['execute']);
-			if($GLOBALS['TYPO3_DB']->sql_error()) t3lib_div::devLog('indexer error', 'indexer', -1, array($GLOBALS['TYPO3_DB']->sql_error()));
+			if($GLOBALS['TYPO3_DB']->sql_error()) {
+				t3lib_div::devLog('indexer set', 'indexer', -1, array($query['set']));
+				t3lib_div::devLog('indexer execute', 'indexer', -1, array($query['execute']));
+				t3lib_div::devLog('indexer error', 'indexer', -1, array($GLOBALS['TYPO3_DB']->sql_error()));
+			}
 		}
 
 		if($this->amountOfRecordsToSaveInMem) $this->periodicNotificationCount('insert');
