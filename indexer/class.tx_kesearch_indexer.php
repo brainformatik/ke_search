@@ -307,12 +307,6 @@ class tx_kesearch_indexer {
 		$table = 'tx_kesearch_index';
 		$fieldValues = $this->createFieldValuesForIndexing($storagePid, $title, $type, $targetPid, $content, $tags, $params, $abstract, $language, $starttime, $endtime, $fe_group, $additionalFields);
 
-		// prepare additional fields for queries
-		foreach($this->additionalFields as $value) {
-			$setQuery .= ', @' . $value[0] . ' = ' . $fieldValues[$value[0]];
-			$addQueryFields .= ', @' . $value[0];
-		}
-
 		// check if record already exists. Average speed: 1-2ms
 		if($fieldValues['type'] == 'file') {
 			$recordExists = $this->checkIfFileWasIndexed($fieldValues['pid'], $fieldValues['hash']);
@@ -477,11 +471,6 @@ class tx_kesearch_indexer {
 		foreach($this->tempArrayForInsertNewRecords as $query) {
 			$GLOBALS['TYPO3_DB']->sql_query($query['set']);
 			$GLOBALS['TYPO3_DB']->sql_query($query['execute']);
-			if($GLOBALS['TYPO3_DB']->sql_error()) {
-				t3lib_div::devLog('indexer set', 'indexer', -1, array($query['set']));
-				t3lib_div::devLog('indexer execute', 'indexer', -1, array($query['execute']));
-				t3lib_div::devLog('indexer error', 'indexer', -1, array($GLOBALS['TYPO3_DB']->sql_error()));
-			}
 		}
 
 		if($this->amountOfRecordsToSaveInMem) $this->periodicNotificationCount('insert');
@@ -578,7 +567,13 @@ class tx_kesearch_indexer {
 			'crdate' => $now,
 		);
 
-		// merge additionalFields with ke_search fields
+		// add all registered additional fields to field value
+		// TODO: for no default is string. but in future it should select type automatically (string/int)
+		foreach($this->additionalFields as $fieldName) {
+			$fieldsValues[$fieldName] = '';
+		}
+
+		// merge filled additionalFields with ke_search fields
 		if(count($additionalFields)) {
 			$fieldsValues = array_merge($fieldsValues, $additionalFields);
 		}
