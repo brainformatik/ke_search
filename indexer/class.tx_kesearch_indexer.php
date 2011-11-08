@@ -549,6 +549,10 @@ class tx_kesearch_indexer {
 	 * @param array $additionalFields
 	 */
 	public function createFieldValuesForIndexing($storagepid, $title, $type, $targetpid, $content, $tags='', $params='', $abstract='', $language=0, $starttime=0, $endtime=0, $fe_group, $additionalFields=array()) {
+		// if no title is given, take the first 50 letters of bodytext
+		if (empty($title)) {
+			$title = t3lib_div::fixed_lgd_cs(strip_tags($content), 50);
+		}
 		$now = time();
 		$fieldsValues = array(
 			'pid' => intval($storagepid),
@@ -598,18 +602,16 @@ class tx_kesearch_indexer {
 
 		// check for empty values
 		if ($type != 'xtypocommerce' && empty($storagePid)) $errors[] = 'No storage PID set';
-		if (empty($title)) $errors[] = 'No title set';
 		if (empty($type)) $errors[] = 'No type set';
 		if (empty($targetPid)) $errors[] = 'No target PID set';
 
 		// collect error messages if an error was found
-		if(count($errors)) {
+		if (count($errors)) {
 			$errormessage = '';
 			$errormessage = implode(',', $errors);
-			if(!empty($type)) $errormessage .= 'TYPE: ' . $type . '; ';
-			if(!empty($title)) $errormessage .= 'TITLE: ' . $title . '; ';
-			if(!empty($targetPid)) $errormessage .= 'TARGET PID: ' . $targetPid . '; ';
-			if(!empty($storagePid)) $errormessage .= 'STORAGE PID: ' . $storagePid . '; ';
+			if (!empty($type)) $errormessage .= 'TYPE: ' . $type . '; ';
+			if (!empty($targetPid)) $errormessage .= 'TARGET PID: ' . $targetPid . '; ';
+			if (!empty($storagePid)) $errormessage .= 'STORAGE PID: ' . $storagePid . '; ';
 			$this->indexingErrors[] = ' (' . $errormessage . ')';
 
 			// break indexing and wait for next record to store
