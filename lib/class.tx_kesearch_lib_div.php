@@ -30,7 +30,7 @@
  * @package	TYPO3
  * @subpackage	tx_kesearch
  */
-class tx_kesearch_div {
+class tx_kesearch_lib_div {
 	var $showShortMessage = false;
 
 	/**
@@ -138,7 +138,7 @@ class tx_kesearch_div {
 				} else {
 					$this->pObj->hasTooShortWords = true;
 					unset ($swords[$key]);
-					
+
 					// if any of the search words is below 3 characters
 					$this->showShortMessage = true;
 				}
@@ -176,7 +176,7 @@ class tx_kesearch_div {
 				}
 			}
 		}
-		
+
 		$searchArray = array(
 			'sword' => implode(' ', $swords), // f.e. hello karl-heinz +mueller
 			'swords' => $swords, // f.e. Array: hello|karl|heinz|mueller
@@ -184,7 +184,7 @@ class tx_kesearch_div {
 			'tagsAgainst' => $tagsAgainst, // f.e. Array: +#category_213# +#color_123# +#city_42#
 			'scoreAgainst' => $scoreAgainst // f.e. hello karl heinz mueller
 		);
-		
+
 		return $searchArray;
 	}
 
@@ -274,7 +274,7 @@ class tx_kesearch_div {
 	}
 }
 
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/pi1/class.tx_kesearch_div.php'])	{
-	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/pi1/class.tx_kesearch_div.php']);
+if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/pi1/class.tx_kesearch_lib_div.php'])	{
+	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/pi1/class.tx_kesearch_lib_div.php']);
 }
 ?>

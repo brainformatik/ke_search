@@ -9,7 +9,7 @@ class DatabaseOrderingTest extends Tx_Extbase_BaseTestCase {
 	var $pObj;
 	
 	/**
-	 * @var tx_kesearch_div
+	 * @var tx_kesearch_lib_div
 	 */
 	var $div;
 	
@@ -22,7 +22,7 @@ class DatabaseOrderingTest extends Tx_Extbase_BaseTestCase {
 		$this->pObj = $this->getMock('tx_kesearch_pi1');
 		$this->pObj->expects($this->any())->method('pi_getLL')->will($this->returnValue('Suchbegriff'));
 		
-		$this->div = new tx_kesearch_div;
+		$this->div = new tx_kesearch_lib_div;
 	}
 	
 	public function tearDown() {

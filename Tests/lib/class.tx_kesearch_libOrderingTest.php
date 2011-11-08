@@ -8,7 +8,7 @@ class LibOrderingTest extends Tx_Extbase_BaseTestCase {
 	
 	
 	public function setUp() {
-		$this->div = new tx_kesearch_div;
+		$this->div = new tx_kesearch_lib_div;
 	}
 	
 	public function tearDown() {

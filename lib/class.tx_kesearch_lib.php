@@ -24,7 +24,6 @@
 
 require_once(PATH_tslib.'class.tslib_pibase.php');
 require_once(t3lib_extMgm::extPath('ke_search').'lib/class.tx_kesearch_db.php');
-require_once(t3lib_extMgm::extPath('ke_search').'pi1/class.tx_kesearch_div.php');
 
 /**
  * Plugin 'Faceted search - searchbox and filters' for the 'ke_search' extension.
@@ -59,24 +58,32 @@ class tx_kesearch_lib extends tslib_pibase {
 	var $hasTooShortWords    = false; // contains a boolean value which represents if there are too short words in the searchstring
 
  	/**
-	* @var tx_xajax
-	*/
+	 * @var tx_xajax
+	 */
 	var $xajax;
 
 	/**
-	* @var tx_kesearch_db
-	*/
+	 * @var tx_kesearch_db
+	 */
 	var $db;
 
 	/**
-	* @var tx_kesearch_div
-	*/
+	 * @var tx_kesearch_lib_div
+	 */
 	var $div;
 
 	/**
-	* @var user_kesearchpremium
-	*/
+	 * @var user_kesearchpremium
+	 */
 	var $user_kesearchpremium;
+
+	/**
+	 * @var tx_kesearch_lib_searchresult
+	 */
+	var $searchResult;
+
+
+
 
 
 	/**
@@ -86,7 +93,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 */
 	public function init() {
 		// get some helper functions
-		$this->div = t3lib_div::makeInstance('tx_kesearch_div', $this);
+		$this->div = t3lib_div::makeInstance('tx_kesearch_lib_div', $this);
 
 		// set start of query timer
 		if(!$GLOBALS['TSFE']->register['ke_search_queryStartTime']) $GLOBALS['TSFE']->register['ke_search_queryStartTime'] = t3lib_div::milliseconds();
@@ -1465,36 +1472,9 @@ class tx_kesearch_lib extends tslib_pibase {
 		// loop through results
 		// init results counter
 		$resultCount = 1;
+		$this->searchResult = t3lib_div::makeInstance('tx_kesearch_lib_searchresult', $this);
 		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-
-			// build link and url
-			unset($linkconf);
-			$linkconf['parameter'] = $row['targetpid'];
-			// add params to result link
-			if (!empty($row['params'])) $linkconf['additionalParams'] = $row['params'];
-			// add chash
-			$linkconf['useCacheHash'] = true;
-			$linkconf['target'] = $this->conf['resultLinkTarget'];
-
-			// set result title
-			$linktext = $row['title'];
-			$linktext = strip_tags($linktext);
-			$linktext = $this->div->removeXSS($linktext);
-			//$linktext = htmlentities($linktext);
-
-			// highlight hits in result title?
-			if($this->conf['highlightSword'] && count($this->swords)) {
-				foreach($this->swords as $word) {
-					$word = str_replace('/', '\/', $word);
-					$linktextReplaced = preg_replace('/(' . $word . ')/iu','<span class="hit">\0</span>', $linktext);
-					if(!empty($linktextReplaced)) $linktext = $linktextReplaced;
-				}
-			}
-
-			$resultLink = $this->cObj->typoLink($linktext, $linkconf);
-			$resultUrl = t3lib_div::getIndpEnv('TYPO3_SITE_URL') . $this->cObj->typoLink_URL($linkconf);
-			$this->resultUrl = $resultUrl;
-			$resultUrlLink = $this->cObj->typoLink($resultUrl, $linkconf);
+			$this->searchResult->setRow($row);
 
 			// generate row content
 			$tempContent = $this->cObj->getSubpart($this->templateCode, '###RESULT_ROW###');
@@ -1534,7 +1514,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 
 			$tempMarkerArray = array(
-				'title' => $resultLink,
+				'title' => $this->searchResult->getTitle(),
 				'teaser' => $teaserContent,
 			);
 
@@ -1554,42 +1534,42 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 
 
-			$tempContent = $this->cObj->substituteMarkerArray($tempContent,$tempMarkerArray,$wrap='###|###',$uppercase=1);
+			$tempContent = $this->cObj->substituteMarkerArray($tempContent, $tempMarkerArray, $wrap='###|###', $uppercase=1);
 
 			// show result url?
 			if ($this->conf['showResultUrl']) {
-				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_RESULTURL###');
-				$subContent = $this->cObj->substituteMarker($subContent,'###LABEL_RESULTURL###', $this->pi_getLL('label_resulturl'));
-				$subContent = $this->cObj->substituteMarker($subContent,'###RESULTURL###', $resultUrlLink);
+				$subContent = $this->cObj->getSubpart($this->templateCode, '###SUB_RESULTURL###');
+				$subContent = $this->cObj->substituteMarker($subContent, '###LABEL_RESULTURL###', $this->pi_getLL('label_resulturl'));
+				$subContent = $this->cObj->substituteMarker($subContent, '###RESULTURL###', $this->searchResult->getResultUrl(TRUE));
 			} else {
 				$subContent = '';
 			}
-			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_RESULTURL###', $subContent, $recursive=1);
+			$tempContent = $this->cObj->substituteSubpart($tempContent, '###SUB_RESULTURL###', $subContent, $recursive=1);
 
 			// show result numeration?
 			if ($this->conf['resultsNumeration']) {
-				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_NUMERATION###');
-				$subContent = $this->cObj->substituteMarker($subContent,'###NUMBER###', $resultCount + ($this->piVars['page'] * $this->conf['resultsPerPage']) - $this->conf['resultsPerPage']);
+				$subContent = $this->cObj->getSubpart($this->templateCode, '###SUB_NUMERATION###');
+				$subContent = $this->cObj->substituteMarker($subContent, '###NUMBER###', $resultCount + ($this->piVars['page'] * $this->conf['resultsPerPage']) - $this->conf['resultsPerPage']);
 			} else {
 				$subContent = '';
 			}
-			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_NUMERATION###', $subContent, $recursive=1);
+			$tempContent = $this->cObj->substituteSubpart($tempContent, '###SUB_NUMERATION###', $subContent, $recursive=1);
 
 			// show score?
 			if ($this->conf['showScore'] && $row['score']) {
-				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_SCORE###');
-				$subContent = $this->cObj->substituteMarker($subContent,'###LABEL_SCORE###', $this->pi_getLL('label_score'));
-				$subContent = $this->cObj->substituteMarker($subContent,'###SCORE###', number_format($row['score'],2,',',''));
+				$subContent = $this->cObj->getSubpart($this->templateCode, '###SUB_SCORE###');
+				$subContent = $this->cObj->substituteMarker($subContent, '###LABEL_SCORE###', $this->pi_getLL('label_score'));
+				$subContent = $this->cObj->substituteMarker($subContent, '###SCORE###', number_format($row['score'],2,',',''));
 			} else {
 				$subContent = '';
 			}
-			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_SCORE###', $subContent, $recursive=1);
+			$tempContent = $this->cObj->substituteSubpart($tempContent, '###SUB_SCORE###', $subContent, $recursive=1);
 
 			// show date?
 			if ($this->conf['showDate'] && $row['sortdate']) {
-				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_DATE###');
-				$subContent = $this->cObj->substituteMarker($subContent,'###LABEL_DATE###', $this->pi_getLL('label_date'));
-				$subContent = $this->cObj->substituteMarker($subContent,'###DATE###', date($GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'], $row['sortdate']));
+				$subContent = $this->cObj->getSubpart($this->templateCode, '###SUB_DATE###');
+				$subContent = $this->cObj->substituteMarker($subContent, '###LABEL_DATE###', $this->pi_getLL('label_date'));
+				$subContent = $this->cObj->substituteMarker($subContent, '###DATE###', date($GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'], $row['sortdate']));
 			} else {
 				$subContent = '';
 			}

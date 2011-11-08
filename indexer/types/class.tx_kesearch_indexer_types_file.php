@@ -209,7 +209,7 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 		// store record in index table
 		$this->pObj->storeInIndex(
 			$this->indexerConfig['storagepid'],    // storage PID
-			$this->fileInfo->getBody(),            // page title
+			$this->fileInfo->getName(),            // page title
 			'file',                                // content type
 			1,                                     // target PID: where is the single view?
 			$content,                              // indexed content, includes the title (linebreak after title)

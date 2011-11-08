@@ -52,7 +52,7 @@ class tx_kesearch_lib_sorting {
 	var $cObj;
 
 	/**
-	* @var tx_kesearch_div
+	* @var tx_kesearch_lib_div
 	*/
 	var $div;
 
