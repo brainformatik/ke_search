@@ -107,11 +107,7 @@ class tx_kesearch_lib_searchresult {
 
 		// highlight hits in result title?
 		if($this->conf['highlightSword'] && count($this->pObj->swords)) {
-			foreach($this->pObj->swords as $word) {
-				$word = str_replace('/', '\/', $word);
-				$linktextReplaced = preg_replace('/(' . $word . ')/iu','<span class="hit">\0</span>', $linktext);
-				if(!empty($linktextReplaced)) $linktext = $linktextReplaced;
-			}
+			$linktext = $this->highlightArrayOfWordsInContent($this->pObj->swords, $linktext);
 		}
 		return $this->cObj->typoLink($this->row['title'], $linkconf);
 	}
@@ -162,6 +158,109 @@ class tx_kesearch_lib_searchresult {
 		}
 
 		return $linkconf;
+	}
+
+
+	/**
+	 * get teaser for result list
+	 *
+	 * @return string The teaser
+	 */
+	public function getTeaser() {
+		$content = $this->getContentForTeaser();
+		return $this->buildTeaserContent($content);
+	}
+
+
+	/**
+	 * get content for teaser
+	 * This can be the abstract or content col
+	 *
+	 * @return string The content
+	 */
+	public function getContentForTeaser() {
+		$content = $this->row['content'];
+		if (!empty($row['abstract'])) {
+			$content = nl2br($row['abstract']);
+			if ($this->conf['previewMode'] != 'abstract') {
+				if (!$this->isArrayOfWordsInString($this->pObj->swords, $row['abstract'])) {
+					$content = $this->row['content'];
+				}
+			}
+		}
+		return $content;
+	}
+
+
+	/**
+	 * check if an array with words was found in given content
+	 *
+	 * @param array $wordArray A single dimmed Array containing words to search for. F.E. array('hello', 'georg', 'company')
+	 * @param string $content The string to search in
+	 * @param boolean $checkAll If this is checked, then all words have to be found in string. If false: The method returns true directly, if one of the words was found
+	 * @return boolean Returns true if the word(s) are found
+	 */
+	public function isArrayOfWordsInString(array $wordArray, $content, $checkAll = FALSE) {
+		$found = FALSE;
+		foreach($wordArray as $word) {
+			if(stripos($content, $word) === FALSE) {
+				$found = FALSE;
+				if($checkAll === TRUE) return FALSE;
+			} else {
+				$found = TRUE;
+				if($checkAll === FALSE) return TRUE;
+			}
+		}
+		return $found;
+	}
+
+
+	public function highlightArrayOfWordsInContent($wordArray, $content) {
+		if(is_array($wordArray) && count($wordArray)) {
+			foreach($wordArray as $word) {
+				$word = str_replace('/', '\/', $word);
+				$content = preg_replace('/(' . $word . ')/iu','<span class="hit">\0</span>', $content);
+			}
+		}
+		return $content;
+	}
+
+
+	public function buildTeaserContent($content) {
+		if(is_array($this->pObj->swords) && count($this->pObj->swords)) {
+			$amountOfSearchWords = count($this->pObj->swords);
+			$charsForEachSearchWord = ceil($this->conf['resultChars'] / $amountOfSearchWords);
+			$charsBeforeAfterSearchWord = ceil($charsForEachSearchWord / 2);
+
+			foreach($this->pObj->swords as $word) {
+				$word = ' ' . $word; // our searchengine searches for wordbeginnings
+				$pos = stripos($content, $word);
+				if($pos === FALSE) {
+					continue;
+				} else { // if the search was found
+					// find search starting point
+					$startPos = $pos - $charsBeforeAfterSearchWord;
+					if($startPos < 0) $startPos = 0;
+
+					// crop some words behind searchword
+					$partWithSearchWord = substr($content, $startPos);
+					$temp = $this->cObj->crop($partWithSearchWord, $charsForEachSearchWord . '|...|1');
+
+					// crop some words before searchword
+					// after last cropping our text is too short now. So we have to find a new cutting position
+					($startPos > 10)? $length = strlen($temp) - 10: $length = strlen($temp);
+					$teaserArray[] = $this->cObj->crop($temp, '-' . $length . '||1');
+				}
+			}
+
+			$teaser = '...' . implode(' ', $teaserArray);
+
+			// highlight hits?
+			if ($this->conf['highlightSword']) {
+				$teaser = $this->highlightArrayOfWordsInContent($this->pObj->swords, $teaser);
+			}
+			return $teaser;
+		} else return $this->cObj->crop($content, $this->conf['resultChars'] . '|...|1');
 	}
 }
 

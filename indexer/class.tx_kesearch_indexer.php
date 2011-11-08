@@ -549,10 +549,6 @@ class tx_kesearch_indexer {
 	 * @param array $additionalFields
 	 */
 	public function createFieldValuesForIndexing($storagepid, $title, $type, $targetpid, $content, $tags='', $params='', $abstract='', $language=0, $starttime=0, $endtime=0, $fe_group, $additionalFields=array()) {
-		// if no title is given, take the first 50 letters of bodytext
-		if (empty($title)) {
-			$title = t3lib_div::fixed_lgd_cs(strip_tags($content), 50);
-		}
 		$now = time();
 		$fieldsValues = array(
 			'pid' => intval($storagepid),

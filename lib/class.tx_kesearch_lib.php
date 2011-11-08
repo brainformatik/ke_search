@@ -1473,49 +1473,15 @@ class tx_kesearch_lib extends tslib_pibase {
 		// init results counter
 		$resultCount = 1;
 		$this->searchResult = t3lib_div::makeInstance('tx_kesearch_lib_searchresult', $this);
+		//t3lib_utility_Debug::debug($this->conf);
 		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-			$this->searchResult->setRow($row);
-
 			// generate row content
 			$tempContent = $this->cObj->getSubpart($this->templateCode, '###RESULT_ROW###');
-
-			// result preview - as set in pi config
-			if ($this->conf['previewMode'] == 'abstract') {
-
-				// always show abstract
-				if (!empty($row['abstract'])) {
-					$teaserContent = nl2br($row['abstract']);
-					$teaserContent = $this->buildTeaserContent($teaserContent);
-				} else  {
-					// build teaser from content
-					$teaserContent = $this->buildTeaserContent($row['content']);
-				}
-
-			} else if ($this->conf['previewMode'] == 'hit' || $this->conf['previewMode'] == '') {
-				if (!empty($row['abstract'])) {
-					// show abstract if it contains sword, otherwise show content
-					$abstractHit = false;
-					foreach($this->swords as $word) {
-						if (preg_match('/('.$word.')/iu', $row['abstract'])) {
-							$abstractHit = true;
-						}
-					}
-					if ($abstractHit) {
-						$teaserContent = nl2br($row['abstract']);
-						$teaserContent = $this->buildTeaserContent($teaserContent);
-					} else {
-						// sword was not found in abstract
-						$teaserContent = $this->buildTeaserContent($row['content']);
-					}
-				} else {
-					// sword was not found in abstract
-					$teaserContent = $this->buildTeaserContent($row['content']);
-				}
-			}
+			$this->searchResult->setRow($row);
 
 			$tempMarkerArray = array(
 				'title' => $this->searchResult->getTitle(),
-				'teaser' => $teaserContent,
+				'teaser' => $this->searchResult->getTeaser(),
 			);
 
 			// hook for additional markers in result
@@ -1698,55 +1664,6 @@ class tx_kesearch_lib extends tslib_pibase {
 			unset($singleword);
 			unset($keStatsObj);
 		}
-	}
-
-
-	/*
-	 * function buildTeaserContent
-	 */
-	public function buildTeaserContent($resultText) {
-
-		// calculate substring params
-		// switch through all swords and use first word found for calculating
-		$resultPos = 0;
-		if(count($this->swords)) {
-			for($i = 0; $i < count($this->swords); $i++) {
-				$newResultPos = intval(stripos($resultText, (string)$this->swords[$i]));
-				if($resultPos == 0) {
-					$resultPos = $newResultPos;
-				}
-			}
-		}
-
-		$startPos = $resultPos - (ceil($this->conf['resultChars'] / 2));
-		if($startPos < 0) $startPos = 0;
-		$teaser = substr($resultText, $startPos);
-
-		// crop til whitespace reached
-		$cropped = false;
-		if ($startPos != 0 && $teaser[0] != " " ) {
-			$pos = strpos($teaser, ' ');
-			if ($pos === false) {
-				$teaser = ' ' . $teaser;
-			} else {
-				$teaser = substr($teaser, $pos);
-				$cropped = true;
-			}
-		}
-
-		// append dots when cropped
-		if ($startPos > 0) $teaser = '...' . $teaser;
-		$teaser = $this->betterSubstr($teaser, $this->conf['resultChars']);
-
-		// highlight hits?
-		if ($this->conf['highlightSword'] && count($this->swords)) {
-			foreach ($this->swords as $word) {
-				$word = str_replace('/', '\/', $word);
-				$teaser = preg_replace('/('.$word.')/iu','<span class="hit">\0</span>',$teaser);
-			}
-		}
-
-		return $teaser;
 	}
 
 
