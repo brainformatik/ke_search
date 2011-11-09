@@ -101,6 +101,10 @@ class tx_kesearch_lib_filters_textlinks {
 		$optionsOfFilter = $this->getOptionsOfFilter($filter, $optionsOfSearchresult);
 		if(!is_array($optionsOfFilter) && count($optionsOfFilter) == 0) return '';
 		$this->maxAllowedNormalOptions = $filter['amount'];
+		if(is_array($this->pObj->piVars['filter'][$filterUid]) && count($this->pObj->piVars['filter'][$filterUid])) {
+			$piVarsOptionList = implode(',', array_keys($this->pObj->piVars['filter'][$filterUid]));
+			$optionsOfFilter = $this->pObj->getFilterOptions($piVarsOptionList);
+		}
 
 		foreach($optionsOfFilter as $key => $data) {
 			$this->saveRenderedTextlinkToGlobalArrays($filterUid, $data);
@@ -202,14 +206,15 @@ class tx_kesearch_lib_filters_textlinks {
 
 
 	/**
-	 * get all options of given filter
+	 * get options of given filter and regarding current search result
+	 * Only options which are also found in result will be returned
 	 *
 	 * @param array $filter The current looped filter
 	 * @param array $additionalOptionValues This is an array with some additional informations for each filteroption (title, tag, amount of records, selected)
 	 * @return array A merged, sorted and complete Array with all option values we need
 	 */
 	public function getOptionsOfFilter($filter, $additionalOptionValues) {
-		if(is_array($filter) && count($filter) && is_array($additionalOptionValues) && count($additionalOptionValues)) {
+		if(is_array($filter) && count($filter) && is_array($additionalOptionValues)) {
 			// get all options
 			$allOptionsOfCurrentFilter = $this->pObj->getFilterOptions($filter['options']);
 			// build intersection of both arrays
