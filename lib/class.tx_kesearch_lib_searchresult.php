@@ -215,6 +215,13 @@ class tx_kesearch_lib_searchresult {
 	}
 
 
+	/**
+	 * Find and highlight the searchwords
+	 *
+	 * @param array $wordArray
+	 * @param string $content
+	 * @return string The content with highlighted searchwords
+	 */
 	public function highlightArrayOfWordsInContent($wordArray, $content) {
 		if(is_array($wordArray) && count($wordArray)) {
 			foreach($wordArray as $word) {
@@ -226,6 +233,12 @@ class tx_kesearch_lib_searchresult {
 	}
 
 
+	/**
+	 * Build Teasercontent
+	 *
+	 * @param string $content The whole resultcontent
+	 * @return string The cutted recultcontent
+	 */
 	public function buildTeaserContent($content) {
 		if(is_array($this->pObj->swords) && count($this->pObj->swords)) {
 			$amountOfSearchWords = count($this->pObj->swords);
@@ -234,10 +247,13 @@ class tx_kesearch_lib_searchresult {
 
 			foreach($this->pObj->swords as $word) {
 				$word = ' ' . $word; // our searchengine searches for wordbeginnings
+				$aSearchWordWasFound = FALSE;
 				$pos = stripos($content, $word);
 				if($pos === FALSE) {
 					continue;
 				} else { // if the search was found
+					$aSearchWordWasFound = TRUE;
+
 					// find search starting point
 					$startPos = $pos - $charsBeforeAfterSearchWord;
 					if($startPos < 0) $startPos = 0;
@@ -251,6 +267,12 @@ class tx_kesearch_lib_searchresult {
 					($startPos > 10)? $length = strlen($temp) - 10: $length = strlen($temp);
 					$teaserArray[] = $this->cObj->crop($temp, '-' . $length . '||1');
 				}
+			}
+
+			// When the searchword was found in title but not in content the teaser is empty
+			// in that case we have to get the first x letters without containing any searchword
+			if($aSearchWordWasFound === FALSE) {
+				$teaserArray[] = $this->cObj->crop($content, $this->conf['resultChars'] . '||1');
 			}
 
 			$teaser = '...' . implode(' ', $teaserArray);
