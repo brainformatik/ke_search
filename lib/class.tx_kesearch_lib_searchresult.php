@@ -246,11 +246,10 @@ class tx_kesearch_lib_searchresult {
 			// I decided to add 20 additional letters for each searchword. It looks much better and is more readable
 			$charsForEachSearchWord = ceil($this->conf['resultChars'] / $amountOfSearchWords) + 20;
 			$charsBeforeAfterSearchWord = ceil($charsForEachSearchWord / 2);
-
+			$aSearchWordWasFound = FALSE;
+			$isSearchWordAtTheBeginning = FALSE;
 			foreach($this->pObj->swords as $word) {
 				$word = ' ' . $word; // our searchengine searches for wordbeginnings
-				$aSearchWordWasFound = FALSE;
-				$isSearchWordAtTheBeginning = FALSE;
 				$pos = stripos($content, $word);
 				if($pos === FALSE) {
 					continue;
