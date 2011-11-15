@@ -242,17 +242,25 @@ class tx_kesearch_lib_searchresult {
 	public function buildTeaserContent($content) {
 		if(is_array($this->pObj->swords) && count($this->pObj->swords)) {
 			$amountOfSearchWords = count($this->pObj->swords);
-			$charsForEachSearchWord = ceil($this->conf['resultChars'] / $amountOfSearchWords);
+			// with each new searchword and all the croppings here the teaser for each word will become too small/short
+			// I decided to add 20 additional letters for each searchword. It looks much better and is more readable
+			$charsForEachSearchWord = ceil($this->conf['resultChars'] / $amountOfSearchWords) + 20;
 			$charsBeforeAfterSearchWord = ceil($charsForEachSearchWord / 2);
 
 			foreach($this->pObj->swords as $word) {
 				$word = ' ' . $word; // our searchengine searches for wordbeginnings
 				$aSearchWordWasFound = FALSE;
+				$isSearchWordAtTheBeginning = FALSE;
 				$pos = stripos($content, $word);
 				if($pos === FALSE) {
 					continue;
-				} else { // if the search was found
+				} else { // if the searchword was found
 					$aSearchWordWasFound = TRUE;
+
+					// if searchword is the first word
+					if($pos === 0) {
+						$isSearchWordAtTheBeginning = TRUE;
+					}
 
 					// find search starting point
 					$startPos = $pos - $charsBeforeAfterSearchWord;
@@ -273,6 +281,8 @@ class tx_kesearch_lib_searchresult {
 			// in that case we have to get the first x letters without containing any searchword
 			if($aSearchWordWasFound === FALSE) {
 				$teaser = $this->cObj->crop($content, $this->conf['resultChars'] . '||1');
+			} elseif($isSearchWordAtTheBeginning === TRUE) {
+				$teaser = implode(' ', $teaserArray);
 			} else {
 				$teaser = '...' . implode(' ', $teaserArray);
 			}
