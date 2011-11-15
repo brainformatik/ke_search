@@ -272,10 +272,10 @@ class tx_kesearch_lib_searchresult {
 			// When the searchword was found in title but not in content the teaser is empty
 			// in that case we have to get the first x letters without containing any searchword
 			if($aSearchWordWasFound === FALSE) {
-				$teaserArray[] = $this->cObj->crop($content, $this->conf['resultChars'] . '||1');
+				$teaser = $this->cObj->crop($content, $this->conf['resultChars'] . '||1');
+			} else {
+				$teaser = '...' . implode(' ', $teaserArray);
 			}
-
-			$teaser = '...' . implode(' ', $teaserArray);
 
 			// highlight hits?
 			if ($this->conf['highlightSword']) {
