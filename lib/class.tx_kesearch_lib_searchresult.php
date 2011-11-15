@@ -147,8 +147,8 @@ class tx_kesearch_lib_searchresult {
 				break;
 			default: // render a link for page targets
 				// if params are filled, add them to the link generation process
-				if (!empty($row['params'])) {
-					$additionalParams = $row['params'];
+				if (!empty($this->row['params'])) {
+					$additionalParams = $this->row['params'];
 				}
 				$linkconf['additionalParams'] = $additionalParams;
 				$linkconf['parameter'] = $this->row['targetpid'];
