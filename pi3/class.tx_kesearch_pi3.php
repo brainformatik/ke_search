@@ -142,7 +142,7 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 					'parameter' => $this->conf['resultPage'],
 					'addQueryString' => 1,
 					'addQueryString.' => array(
-						'exclude' => 'id,tx_kesearch_pi1[sword]'
+						'exclude' => 'id'
 					)
 				)
 			)
