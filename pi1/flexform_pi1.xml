@@ -391,6 +391,16 @@
 						</TCEforms>
 					</showResultUrl>
 
+					<renderResultUrlAsLink>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.renderResultUrlAsLink</label>
+							<config>
+								<type>check</type>
+								<default>0</default>
+							</config>
+						</TCEforms>
+					</renderResultUrlAsLink>
+
 					<showScore>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showScore</label>

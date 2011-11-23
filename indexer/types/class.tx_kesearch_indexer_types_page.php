@@ -74,8 +74,17 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 * @return string content which will be displayed in backend
 	 */
 	public function startIndexing() {
+		// get all pages. Regardeless if they are shortcur, sysfolder or external link
 		$indexPids = $this->getPagelist();
+
+		// add complete page record to list of pids in $indexPids
+		// and remove all page of type shortcut, sysfolder and external link
 		$this->pageRecords = $this->getPageRecords($indexPids);
+
+		// create a new list of allowed pids
+		$indexPids = array_keys($this->pageRecords);
+
+		// add the tags of each page to the global page array
 		$this->addTagsToPageRecords($indexPids);
 
 		// loop through pids and collect page content and tags
@@ -126,14 +135,14 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$fields = '*';
 		$table = 'pages';
 		$where = 'uid IN (' . implode(',', $uids) . ')';
-		
+
 		// index only pages of doktype standard, advanced and "not in menu"
 		$where .= ' AND (doktype = 1 OR doktype = 2 OR doktype = 5) ';
-		
+
 		// index only pages which are searchable
 		// index only page which are not hidden
 		$where .= ' AND no_search <> 1 AND hidden=0';
-		
+
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where);
 
 		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
@@ -209,7 +218,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$where .= ' AND (' . $this->whereClauseForCType. ')';
 		$where .= t3lib_BEfunc::BEenableFields($table);
 		$where .= t3lib_BEfunc::deleteClause($table);
-		
+
 		// if indexing of content elements with restrictions is not allowed
 		// get only content elements that have empty group restrictions
 		if($this->indexerConfig['index_content_with_restrictions'] != 'yes') {
@@ -281,3 +290,4 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		return;
 	}
 }
+?>

@@ -46,6 +46,7 @@
 			<label index="ff.showQueryTime">Show time (query process duration)?</label>
 			<label index="ff.showTypeIcon">Show result type icon?</label>
 			<label index="ff.showResultUrl">Show result URL?</label>
+			<label index="ff.renderResultUrlAsLink">Render result URL as link (a-Tag)?</label>
 			<label index="ff.showScore">Show score?</label>
 			<label index="ff.showDate">Show date?</label>
 			<label index="ff.showResultsPerFilter">Show amount of results for each filteroption?</label>
@@ -143,6 +144,7 @@
 			<label index="ff.showQueryTime">Benötigte Zeit für Suchabfrage anzeigen?</label>
 			<label index="ff.showTypeIcon">Zeige Ergebnistyp-Icon?</label>
 			<label index="ff.showResultUrl">Ergebnis-URL anzeigen?</label>
+			<label index="ff.renderResultUrlAsLink">Generiere aus der Ergebnis-URL einen Link (a-Tag)?</label>
 			<label index="ff.showScore">Zeige Relevanz?</label>
 			<label index="ff.showDate">Zeige Datum?</label>
 			<label index="ff.showResultsPerFilter">Zeige Anzahl der Suchergebnisse pro Filteroption?</label>

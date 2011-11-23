@@ -118,13 +118,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		}
 
 		// set some default values (this part have to be after stdWrap!!!)
-		if(!$this->conf['resultPage']) {
-			if($this->cObj->data['pid']) {
-				$this->conf['resultPage'] = $this->cObj->data['pid'];
-			} else {
-				$this->conf['resultPage'] = $GLOBALS['TSFE']->id;
-			}
-		}
+		if(!$this->conf['resultPage']) $this->conf['resultPage'] = $GLOBALS['TSFE']->id;
 		if(!isset($this->piVars['page'])) $this->piVars['page'] = 1;
 
 		// hook: modifyFlexFormData
@@ -1506,7 +1500,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			if ($this->conf['showResultUrl']) {
 				$subContent = $this->cObj->getSubpart($this->templateCode, '###SUB_RESULTURL###');
 				$subContent = $this->cObj->substituteMarker($subContent, '###LABEL_RESULTURL###', $this->pi_getLL('label_resulturl'));
-				$subContent = $this->cObj->substituteMarker($subContent, '###RESULTURL###', $this->searchResult->getResultUrl(TRUE));
+				$subContent = $this->cObj->substituteMarker($subContent, '###RESULTURL###', $this->searchResult->getResultUrl($this->conf['renderResultUrlAsLink']));
 			} else {
 				$subContent = '';
 			}
