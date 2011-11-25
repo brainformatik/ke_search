@@ -1770,7 +1770,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				}
 
 				if ($this->piVars['page'] == $i) $linkconf['ATagParams'] = 'class="current" ';
-				$tempContent .= $this->cObj->typoLink($i, $linkconf);
+				$tempContent .= $this->cObj->typoLink($i . ' ', $linkconf);
 			}
 		}
 
