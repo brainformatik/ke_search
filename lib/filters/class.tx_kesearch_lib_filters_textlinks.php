@@ -97,9 +97,9 @@ class tx_kesearch_lib_filters_textlinks {
 	 */
 	public function renderTextlinks($filterUid, $optionsOfSearchresult) {
 		$filter = $this->getFilter($filterUid);
-		if(!is_array($filter) && count($filter) == 0) return '';
+		if(!is_array($filter) || count($filter) == 0) return '';
 		$optionsOfFilter = $this->getOptionsOfFilter($filter, $optionsOfSearchresult);
-		if(!is_array($optionsOfFilter) && count($optionsOfFilter) == 0) return '';
+		if(!is_array($optionsOfFilter) || count($optionsOfFilter) == 0) return '';
 		$this->maxAllowedNormalOptions = $filter['amount'];
 		if(is_array($this->pObj->piVars['filter'][$filterUid]) && count($this->pObj->piVars['filter'][$filterUid])) {
 			$piVarsOptionList = implode(',', array_keys($this->pObj->piVars['filter'][$filterUid]));
