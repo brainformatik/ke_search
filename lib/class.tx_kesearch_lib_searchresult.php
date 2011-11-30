@@ -242,6 +242,7 @@ class tx_kesearch_lib_searchresult {
 	public function buildTeaserContent($content) {
 		if(is_array($this->pObj->swords) && count($this->pObj->swords)) {
 			$amountOfSearchWords = count($this->pObj->swords);
+			$content = strip_tags($content);
 			// with each new searchword and all the croppings here the teaser for each word will become too small/short
 			// I decided to add 20 additional letters for each searchword. It looks much better and is more readable
 			$charsForEachSearchWord = ceil($this->conf['resultChars'] / $amountOfSearchWords) + 20;
