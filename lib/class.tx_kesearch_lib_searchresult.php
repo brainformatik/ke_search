@@ -253,28 +253,32 @@ class tx_kesearch_lib_searchresult {
 				$word = ' ' . $word; // our searchengine searches for wordbeginnings
 				$pos = stripos($content, $word);
 				if($pos === FALSE) {
-					continue;
-				} else { // if the searchword was found
-					$aSearchWordWasFound = TRUE;
-
-					// if searchword is the first word
-					if($pos === 0) {
-						$isSearchWordAtTheBeginning = TRUE;
+					// if the word was not found it could be within brakets => (searchWord)
+					// so give it a second try
+					$pos = stripos($content, trim($word));
+					if($pos === FALSE) {
+						continue;
 					}
-
-					// find search starting point
-					$startPos = $pos - $charsBeforeAfterSearchWord;
-					if($startPos < 0) $startPos = 0;
-
-					// crop some words behind searchword
-					$partWithSearchWord = substr($content, $startPos);
-					$temp = $this->cObj->crop($partWithSearchWord, $charsForEachSearchWord . '|...|1');
-
-					// crop some words before searchword
-					// after last cropping our text is too short now. So we have to find a new cutting position
-					($startPos > 10)? $length = strlen($temp) - 10: $length = strlen($temp);
-					$teaserArray[] = $this->cObj->crop($temp, '-' . $length . '||1');
 				}
+				$aSearchWordWasFound = TRUE;
+
+				// if searchword is the first word
+				if($pos === 0) {
+					$isSearchWordAtTheBeginning = TRUE;
+				}
+
+				// find search starting point
+				$startPos = $pos - $charsBeforeAfterSearchWord;
+				if($startPos < 0) $startPos = 0;
+
+				// crop some words behind searchword
+				$partWithSearchWord = substr($content, $startPos);
+				$temp = $this->cObj->crop($partWithSearchWord, $charsForEachSearchWord . '|...|1');
+
+				// crop some words before searchword
+				// after last cropping our text is too short now. So we have to find a new cutting position
+				($startPos > 10)? $length = strlen($temp) - 10: $length = strlen($temp);
+				$teaserArray[] = $this->cObj->crop($temp, '-' . $length . '||1');
 			}
 
 			// When the searchword was found in title but not in content the teaser is empty
