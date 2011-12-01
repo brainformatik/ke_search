@@ -1755,8 +1755,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$linkconf['parameter'] = $GLOBALS['TSFE']->id;
 				$linkconf['addQueryString'] = 1;
 				$linkconf['addQueryString.']['exclude'] = 'id';
-				$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
-				$linkconf['additionalParams'] .= '&tx_kesearch_pi1[page]='.intval($i);
+				$linkconf['additionalParams'] = '&tx_kesearch_pi1[page]=' . intval($i);
 				$filterArray = $this->getFiltersFromFlexform();
 
 				if (is_array($this->piVars['filter'])) {
