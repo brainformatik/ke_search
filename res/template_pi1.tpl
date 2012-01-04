@@ -167,7 +167,7 @@ function hideSpinner() {
 		<div class="search_input">
 			<b><input type="text" name="tx_kesearch_pi1[sword]" id="ke_search_sword" value="###SWORD_VALUE###" onfocus="###SWORD_ONFOCUS###" /></b>
 		</div>
-		<div class=clearer"">&nbsp;</div>
+		<div class="clearer">&nbsp;</div>
 		<input type="image" src="typo3conf/ext/ke_search/res/img/go.gif" id="kesearch_submit" class="submit" value="###SUBMIT_VALUE###" onclick="document.getElementById('pagenumber').value=1; document.getElementById('xajax_form_kesearch_pi1').submit();" />
 		<input id="pagenumber" type="hidden" name="tx_kesearch_pi1[page]" value="###HIDDEN_PAGE_VALUE###" />
 		<input id="resetFilters" type="hidden" name="tx_kesearch_pi1[resetFilters]" value="0" />
@@ -339,11 +339,11 @@ function hideSpinner() {
 		<input type="hidden" name="tx_kesearch_pi1[multi]" value="1" />
 		<input type="hidden" name="tx_kesearch_pi1[sword]" value="###SWORD###" />
 		<input type="hidden" name="tx_kesearch_pi1[page]" value="1" />
-		
+
 		<!-- ###SUB_FILTER_MULTISELECT_HIDDEN### begin -->
 			<input type="hidden" name="###NAME###" value="###VALUE###" />
 		<!-- ###SUB_FILTER_MULTISELECT_HIDDEN### end -->
-		
+
 		<!-- ###SUB_FILTER_MULTISELECT_FILTER### begin -->
 			<h3>###TITLE###</h3>
 			<!-- ###SUB_FILTER_MULTISELECT_OPTION### begin -->
