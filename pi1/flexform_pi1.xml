@@ -271,7 +271,7 @@
 								<maxitems>1</maxitems>
 								<size>5</size>
 								<relevanceNotAllowed>1</relevanceNotAllowed>
-								<default>sortdate DESC</default>
+								<default>sortdate desc</default>
 								<itemsProcFunc>EXT:ke_search/classes/class.tx_kesearch_classes_flexform.php:tx_kesearch_classes_flexform->listAvailableOrderingsForAdmin</itemsProcFunc>
 							</config>
 						</TCEforms>
