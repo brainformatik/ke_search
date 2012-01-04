@@ -66,7 +66,7 @@
 			<label index="ff.checkFilterCondition.I.1">no check</label>
 
 			<label index="results">Search results</label>
-			<label index="num_results">Results: </label>
+			<label index="num_results">%s results:</label>
 			<label index="until">until</label>
 			<label index="of">of</label>
 			<label index="no_results_found">No results found</label>
@@ -164,7 +164,7 @@
 			<label index="ff.checkFilterCondition.I.1">keine Verfügbarkeitsprüfung</label>
 
 			<label index="results">Suchergebnisse</label>
-			<label index="num_results">Treffer: </label>
+			<label index="num_results">%s Treffer: </label>
 			<label index="until">bis</label>
 			<label index="of">von</label>
 			<label index="no_results_found">Keine Ergebnisse gefunden</label>
