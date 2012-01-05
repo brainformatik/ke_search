@@ -595,6 +595,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'fileext' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.fileext',
+			'displayCond' => 'FIELD:type:=:file',
 			'config' => array (
 				'type' => 'input',
 				'size' => '30',
