@@ -109,7 +109,7 @@ class tx_kesearch_lib_searchresult {
 		if($this->conf['highlightSword'] && count($this->pObj->swords)) {
 			$linktext = $this->highlightArrayOfWordsInContent($this->pObj->swords, $linktext);
 		}
-		return $this->cObj->typoLink($this->row['title'], $linkconf);
+		return $this->cObj->typoLink($linktext, $linkconf);
 	}
 
 
