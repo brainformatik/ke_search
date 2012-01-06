@@ -1181,7 +1181,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			// process if on result page
 			if ($GLOBALS['TSFE']->id == $this->conf['resultPage']) {
 				$objResponse->addAssign('kesearch_results', 'innerHTML', $this->getSearchResults() . $this->onloadImage);
-				$objResponse->addAssign('kesearch_num_results', 'innerHTML', $this->pi_getLL('num_results') . $this->numberOfResults);
+				$objResponse->addAssign('kesearch_num_results', 'innerHTML', sprintf($this->pi_getLL('num_results'), $this->numberOfResults));
 				$objResponse->addAssign('kesearch_ordering', 'innerHTML', $this->renderOrdering());
 			}
 
