@@ -266,6 +266,8 @@ class tx_kesearch_lib extends tslib_pibase {
 		}
 		$content = $this->cObj->substituteMarker($content,'###SWORD_VALUE###', $this->swordValue);
 		$content = $this->cObj->substituteMarker($content,'###SWORD_ONFOCUS###', $searchboxFocusJS);
+		$content = $this->cObj->substituteMarker($content,'###SORTBYFIELD###', $this->piVars['sortByField']);
+		$content = $this->cObj->substituteMarker($content,'###SORTBYDIR###', $this->piVars['sortByDir']);
 
 		// set onsubmit action
 		if ($this->conf['renderMethod'] != 'static') {

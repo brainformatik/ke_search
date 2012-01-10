@@ -171,6 +171,8 @@ function hideSpinner() {
 		<input type="image" src="typo3conf/ext/ke_search/res/img/go.gif" id="kesearch_submit" class="submit" value="###SUBMIT_VALUE###" onclick="document.getElementById('pagenumber').value=1; document.getElementById('xajax_form_kesearch_pi1').submit();" />
 		<input id="pagenumber" type="hidden" name="tx_kesearch_pi1[page]" value="###HIDDEN_PAGE_VALUE###" />
 		<input id="resetFilters" type="hidden" name="tx_kesearch_pi1[resetFilters]" value="0" />
+		<input id="sortByField" type="hidden" name="tx_kesearch_pi1[sortByField]" value="###SORTBYFIELD###" />
+		<input id="sortByDir" type="hidden" name="tx_kesearch_pi1[sortByDir]" value="###SORTBYDIR###" />
 	</div>
 	<div id="kesearch_filters">###FILTER###</div>
 	<!-- ###SHOW_SPINNER### begin -->
