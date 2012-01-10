@@ -63,6 +63,7 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 				$bodytext = str_replace('<td', ' <td', $bodytext);
 				$bodytext = str_replace('<br', ' <br', $bodytext);
 				$bodytext = str_replace('<p', ' <p', $bodytext);
+				$bodytext = str_replace('<li', ' <li', $bodytext);
 
 				if ($row['CType'] == 'table') {
 					// replace table dividers with whitespace

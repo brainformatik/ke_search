@@ -233,9 +233,12 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
 				// bodytext
 				$bodytext = $row['bodytext'];
+
+				// following lines prevents having words one after the other like: HelloAllTogether
 				$bodytext = str_replace('<td', ' <td', $bodytext);
 				$bodytext = str_replace('<br', ' <br', $bodytext);
 				$bodytext = str_replace('<p', ' <p', $bodytext);
+				$bodytext = str_replace('<li', ' <li', $bodytext);
 
 				if ($row['CType'] == 'table') {
 					// replace table dividers with whitespace
