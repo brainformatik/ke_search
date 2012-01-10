@@ -30,6 +30,7 @@
 
 $LANG->includeLLFile('EXT:ke_search/mod1/locallang.xml');
 require_once(PATH_t3lib . 'class.t3lib_scbase.php');
+require_once(t3lib_extMgm::extPath('ke_search') . 'indexer/class.tx_kesearch_indexer.php');
 $BE_USER->modAccess($MCONF,1);	// This checks permissions and exits if the users has no permission for entry.
 	// DEFAULT initialization of a module [END]
 
@@ -328,8 +329,6 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 			case 1:
 				if (t3lib_div::_GET('do') == 'startindexer') {
 					// make indexer instance and init
-
-					require_once(t3lib_extMgm::extPath('ke_search').'indexer/class.tx_kesearch_indexer.php');
 					$indexer = t3lib_div::makeInstance('tx_kesearch_indexer');
 
 					$verbose = true;
@@ -352,7 +351,6 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 				if ($this->id) {
 
 					if (t3lib_div::_GET('do') == 'reindex') {
-						require_once(t3lib_extMgm::extPath('ke_search').'indexer/class.tx_kesearch_indexer.php');
 						$indexer = t3lib_div::makeInstance('tx_kesearch_indexer');
 						$verbose = true;
 						$cleanup = $this->extConf['cleanupInterval'];
