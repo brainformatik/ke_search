@@ -120,6 +120,10 @@ class tx_kesearch_lib extends tslib_pibase {
 		// set some default values (this part have to be after stdWrap!!!)
 		if(!$this->conf['resultPage']) $this->conf['resultPage'] = $GLOBALS['TSFE']->id;
 		if(!isset($this->piVars['page'])) $this->piVars['page'] = 1;
+		if(!empty($this->conf['additionalPathForTypeIcons'])) {
+			$this->conf['additionalPathForTypeIcons'] = rtrim($this->conf['additionalPathForTypeIcons'], '/') . '/';
+		}
+
 
 		// hook: modifyFlexFormData
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFlexFormData'])) {
@@ -1873,16 +1877,19 @@ class tx_kesearch_lib extends tslib_pibase {
 	}
 
 
-	/*
-	 * function renderTypeIcon
-	 * @param $type string
+	/**
+	 * renders an image tag which will prepend the teaser if activated by user.
+	 *
+	 * @param $type string A value like page, dam, tt_address
 	 */
 	public function renderTypeIcon($type) {
 		$type = $this->div->removeXSS($type);
-		unset($imageConf);
-		$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/types/'.$type.'.gif';
-		$image=$this->cObj->IMAGE($imageConf);
-		return $image;
+		if(is_file($this->conf['additionalPathForTypeIcons'] . $type . '.gif')) {
+			$imageConf['file'] = $this->conf['additionalPathForTypeIcons'] . $type . '.gif';
+		} else {
+			$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/types/' . $type . '.gif';
+		}
+		return $this->cObj->IMAGE($imageConf);
 	}
 
 	/*
