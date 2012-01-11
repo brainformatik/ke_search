@@ -231,7 +231,11 @@ function hideSpinner() {
 	<li>
 	<!-- ###SUB_NUMERATION### start -->###NUMBER###.<!-- ###SUB_NUMERATION### end -->
 	<b>###TITLE###</b>
-	<!-- ###SUB_SCORE_SCALE### start --><span style="float:right;">###SCORE_SCALE###</span><!-- ###SUB_SCORE_SCALE### end -->
+	<!-- ###SUB_SCORE_SCALE### start -->
+		<span class="scoreBar">
+			<span class="score" style="width: ###SCORE###%;"></span>
+		</span>
+	<!-- ###SUB_SCORE_SCALE### end -->
 	<span class="clearer">&nbsp;</span>
 	<!-- ###SUB_TYPE_ICON### start --><span class="teaser_icon">###TYPE_ICON###</span><!-- ###SUB_TYPE_ICON### end -->
 	###TEASER###<br />

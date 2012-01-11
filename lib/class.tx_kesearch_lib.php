@@ -1555,10 +1555,8 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			// show score scale?
 			if ($this->conf['showScoreScale'] && $row['percent']) {
-				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_SCORE_SCALE###');
-				$subContent = $this->cObj->substituteMarker($subContent,'###LABEL_SCORE_SCALE###', $this->pi_getLL('label_score_scale'));
-				$scoreScale = $this->renderSVGScale($row['percent']);
-				$subContent = $this->cObj->substituteMarker($subContent,'###SCORE_SCALE###', $scoreScale);
+				$subContent = $this->cObj->getSubpart($this->templateCode, '###SUB_SCORE_SCALE###');
+				$subContent = $this->cObj->substituteMarker($subContent, '###SCORE###', $row['percent']);
 			} else {
 				$subContent = '';
 			}
@@ -1866,16 +1864,6 @@ class tx_kesearch_lib extends tslib_pibase {
 	public function renderOrdering() {
 		$sortObj = t3lib_div::makeInstance('tx_kesearch_lib_sorting', $this);
 		return $sortObj->renderSorting();
-	}
-
-
-	/*
-	 * function renderSVGScale
-	 * @param $arg
-	 */
-	public function renderSVGScale($percent) {
-		$svgScriptPath = t3lib_extMgm::siteRelPath($this->extKey).'res/scripts/SVG.php?p='.$percent;
-		return '<embed src="'.$svgScriptPath.'" style="margin-top: 5px;" width="50" height="12" type="image/svg+xml"	pluginspage="http://www.adobe.com/svg/viewer/install/" />';
 	}
 
 

@@ -35,6 +35,20 @@
     font-size: 80%;
     background: #EEE;
 }
+.tx-kesearch-pi1 #kesearch_results li .scoreBar {
+	border: 1px solid #D3D3D3;
+	display: inline-block;
+	float: right;
+	height: 10px;
+	width: 48px;
+}
+.tx-kesearch-pi1 #kesearch_results li .scoreBar .score {
+	background-color: #D3D3D3;
+	border: 1px solid #898989;
+	display: inline-block;
+	height: 10px;
+	margin: -1px 0 0 -1px;
+}
 
 
 /* Query time */
