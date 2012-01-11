@@ -212,7 +212,7 @@ class tx_kesearch_db {
 
 		// add language
 		$lang = intval($GLOBALS['TSFE']->sys_language_uid);
-		$where .= ' AND language = ' . $lang . ' ';
+		$where .= ' AND language IN(' . $lang . ', -1) ';
 
 		// add "tagged content only" searchphrase
 		if($this->conf['showTaggedContentOnly']) {

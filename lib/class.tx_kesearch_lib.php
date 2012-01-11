@@ -944,7 +944,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			// add language
 			$lang = intval($GLOBALS['TSFE']->sys_language_uid);
-			$where .= ' AND language = ' . $lang . ' ';
+			$where .= ' AND language IN(' . $lang . ', -1) ';
 
 			$where .= $this->cObj->enableFields($table);
 
@@ -975,7 +975,7 @@ class tx_kesearch_lib extends tslib_pibase {
 						$queryForSphinx .= ' @tags ' . str_replace('" "', '" | "', trim($value));
 					}
 				}
-				$queryForSphinx .= ' @(language) _language_' . $GLOBALS['TSFE']->sys_language_uid;
+				$queryForSphinx .= ' @(language) _language_-1 | _language_' . $GLOBALS['TSFE']->sys_language_uid;
 				$queryForSphinx .= ' @(fe_group) _group_NULL | _group_0';
 
 				// add fe_groups to query
@@ -1367,7 +1367,7 @@ class tx_kesearch_lib extends tslib_pibase {
 					$queryForSphinx .= ' @tags ' . str_replace('" "', '" | "', trim($value));
 				}
 			}
-			$queryForSphinx .= ' @language _language_' . $GLOBALS['TSFE']->sys_language_uid;
+			$queryForSphinx .= ' @language _language_-1 | _language_' . $GLOBALS['TSFE']->sys_language_uid;
 			$queryForSphinx .= ' @fe_group _group_NULL | _group_0';
 
 			// add fe_groups to query
