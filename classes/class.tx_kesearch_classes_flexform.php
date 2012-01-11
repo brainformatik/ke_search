@@ -12,7 +12,7 @@ class tx_kesearch_classes_flexform {
 
 		// get orderings
 		$fieldLabel = $this->lang->sL('LLL:EXT:ke_search/locallang_db.php:tx_kesearch_index.relevance');
-		$notAllowedFields = 'uid,pid,tstamp,crdate,cruser_id,starttime,endtime,fe_group,targetpid,content,params,type,tags,abstract,language';
+		$notAllowedFields = 'uid,pid,tstamp,crdate,cruser_id,starttime,endtime,fe_group,targetpid,content,params,type,tags,abstract,language,orig_uid,orig_pid,hash';
 		$config['items'][] = array($fieldLabel, 'score');
 		$res = $GLOBALS['TYPO3_DB']->sql_query('SHOW COLUMNS FROM tx_kesearch_index');
 		while($col = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
@@ -31,7 +31,7 @@ class tx_kesearch_classes_flexform {
 
 		// get orderings
 		$fieldLabel = $this->lang->sL('LLL:EXT:ke_search/locallang_db.php:tx_kesearch_index.relevance');
-		$notAllowedFields = 'uid,pid,tstamp,crdate,cruser_id,starttime,endtime,fe_group,targetpid,content,params,type,tags,abstract,language';
+		$notAllowedFields = 'uid,pid,tstamp,crdate,cruser_id,starttime,endtime,fe_group,targetpid,content,params,type,tags,abstract,language,orig_uid,orig_pid,hash';
 		if(!$config['config']['relevanceNotAllowed']) {
 			$config['items'][] = array($fieldLabel . ' UP', 'score asc');
 			$config['items'][] = array($fieldLabel . ' DOWN', 'score desc');
