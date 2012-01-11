@@ -89,7 +89,9 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 			$tagChar = $this->extConf['prePostTagChar'];
 			$optionsAmountArray = $GLOBALS['TSFE']->fe_user->getKey('ses', 'ke_search.tagsInSearchResults');
 			$countLoops = 1;
-			$this->piVars['filter'][$filter['uid']] = array_unique($this->piVars['filter'][$filter['uid']]);
+			if(is_array($this->piVars['filter'][$filter['uid']]) && count($this->piVars['filter'][$filter['uid']])) {
+				$this->piVars['filter'][$filter['uid']] = array_unique($this->piVars['filter'][$filter['uid']]);
+			}
 			$options = $this->getFilterOptions($filter['options'], true);
 			foreach($options as $optionKey => $option) {
 				$tag = $tagChar . $option['tag'] . $tagChar;
@@ -147,11 +149,13 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 				)
 			)
 		);
-		foreach($this->piVars['filter'] as $filterKey => $filterValue) {
-			if($filterKey == $filter['uid']) continue;
-			foreach($this->piVars['filter'][$filterKey] as $optionKey => $option) {
-				$hidden .= $this->cObj->substituteMarker($template['multihidden'], '###NAME###', 'tx_kesearch_pi1[filter][' . $filterKey . '][' . $optionKey . ']');
-				$hidden = $this->cObj->substituteMarker($hidden, '###VALUE###', $option);
+		if(is_array($this->piVars['filter']) && count($this->piVars['filter'])) {
+			foreach($this->piVars['filter'] as $filterKey => $filterValue) {
+				if($filterKey == $filter['uid']) continue;
+				foreach($this->piVars['filter'][$filterKey] as $optionKey => $option) {
+					$hidden .= $this->cObj->substituteMarker($template['multihidden'], '###NAME###', 'tx_kesearch_pi1[filter][' . $filterKey . '][' . $optionKey . ']');
+					$hidden = $this->cObj->substituteMarker($hidden, '###VALUE###', $option);
+				}
 			}
 		}
 		$content = $this->cObj->substituteSubpart($content, '###SUB_FILTER_MULTISELECT_HIDDEN###', $hidden);

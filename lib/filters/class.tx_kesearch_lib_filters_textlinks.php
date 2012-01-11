@@ -235,20 +235,28 @@ class tx_kesearch_lib_filters_textlinks {
 	 * @return array Array with original Keys
 	 */
 	public function sortMultiDimArray($optionArray) {
-		// temporary saving all keys
-		$allOptionKeys = array_keys($optionArray);
+		if(is_array($optionArray) && count($optionArray)) {
+			// temporary saving all keys
+			$allOptionKeys = array_keys($optionArray);
 
-		// prepare our array for sorting
-		foreach((array)$optionArray as $key => $array) {
-			$results[$key] = $array['results'];
-			$tags[$key] = $array['tag'];
+			// prepare our array for sorting
+			foreach((array)$optionArray as $key => $array) {
+				$results[$key] = $array['results'];
+				$tags[$key] = $array['tag'];
+			}
+
+			// sort multidim array
+			array_multisort($results, SORT_DESC, SORT_NUMERIC, $tags, SORT_ASC, SORT_STRING, $allOptionKeys, SORT_DESC, SORT_NUMERIC, $optionArray);
+
+			// after multisort all keys are 0,1,2,3. So we have to restore our old keys
+			if(count($allOptionKeys) && count(array_values($optionArray))) {
+				return array_combine($allOptionKeys, array_values($optionArray));
+			} else {
+				return array();
+			}
+		} else {
+			return array();
 		}
-
-		// sort multidim array
-		array_multisort($results, SORT_DESC, SORT_NUMERIC, $tags, SORT_ASC, SORT_STRING, $allOptionKeys, SORT_DESC, SORT_NUMERIC, $optionArray);
-
-		// after multisort all keys are 0,1,2,3. So we have to restore our old keys
-		return array_combine($allOptionKeys, array_values($optionArray));
 	}
 
 
