@@ -124,7 +124,6 @@ class tx_kesearch_lib extends tslib_pibase {
 			$this->conf['additionalPathForTypeIcons'] = rtrim($this->conf['additionalPathForTypeIcons'], '/') . '/';
 		}
 
-
 		// hook: modifyFlexFormData
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFlexFormData'])) {
 			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFlexFormData'] as $_classRef) {
@@ -178,9 +177,12 @@ class tx_kesearch_lib extends tslib_pibase {
 			$this->db->chooseBestIndex($this->wordsAgainst, $this->tagsAgainst);
 		}
 
-		// get css file
-		$cssFile = $this->conf['cssFile'] ? $this->conf['cssFile'] : t3lib_extMgm::siteRelPath($this->extKey) . 'res/ke_search_pi1.css';
-		$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId . '_css'] = '<link rel="stylesheet" type="text/css" href="' . $cssFile . '" />';
+		// add cssTag to header if set
+		$cssFile = $GLOBALS['TSFE']->tmpl->getFileName($this->conf['cssFile']);
+		if(!empty($cssFile)) {
+			$cssTag = $this->cObj->wrap($cssFile, '<link rel="stylesheet" type="text/css" href="|" />');
+			$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId . '_css'] = $cssTag;
+		}
 	}
 
 

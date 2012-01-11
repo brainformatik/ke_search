@@ -32,6 +32,8 @@
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.templateFile</label>
 							<config>
 								<type>input</type>
+								<default>EXT:ke_search/res/template_pi1.tpl</default>
+								<eval>trim</eval>
 							</config>
 						</TCEforms>
 					</templateFile>
@@ -42,6 +44,8 @@
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.cssFile</label>
 							<config>
 								<type>input</type>
+								<default>EXT:ke_search/res/ke_search_pi1.css</default>
+								<eval>trim</eval>
 							</config>
 						</TCEforms>
 					</cssFile>
