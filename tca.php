@@ -571,6 +571,15 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 				'maxitems' => 100,
 			)
 		),
+		'index_dam_without_categories' => array (
+			'exclude' => 0,
+			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.index_dam_without_categories',
+			'displayCond' => 'FIELD:type:=:dam',
+			'config' => array (
+				'type' => 'check',
+				'default' => '0'
+			)
+		),
 		'index_dam_categories_recursive' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.index_dam_categories_recursive',
@@ -603,7 +612,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		),
 	),
 	'types' => array (
-		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, storagepid,targetpid;;;;3-3-3,type,startingpoints_recursive,single_pages,sysfolder,index_content_with_restrictions,index_passed_events,index_dam_categories,index_dam_categories_recursive,directories,fileext')
+		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, storagepid,targetpid;;;;3-3-3,type,startingpoints_recursive,single_pages,sysfolder,index_content_with_restrictions,index_passed_events,index_dam_categories,index_dam_without_categories,index_dam_categories_recursive,directories,fileext')
 	),
 	'palettes' => array (
 		'1' => array('showitem' => '')

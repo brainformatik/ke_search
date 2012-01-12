@@ -118,6 +118,7 @@ CREATE TABLE tx_kesearch_indexerconfig (
 	index_passed_events text,
 	type varchar(90) DEFAULT '' NOT NULL,
 	index_dam_categories text,
+	index_dam_without_categories tinyint(4) DEFAULT '0' NOT NULL,
 	index_dam_categories_recursive tinyint(3) DEFAULT '0' NOT NULL,
 	directories text,
 	fileext tinytext,

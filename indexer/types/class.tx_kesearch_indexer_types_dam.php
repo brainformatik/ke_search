@@ -22,7 +22,7 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-require_once(t3lib_extMgm::extPath('ke_search').'indexer/class.tx_kesearch_indexer_types.php');
+require_once(t3lib_extMgm::extPath('ke_search') . 'indexer/class.tx_kesearch_indexer_types.php');
 
 /**
  * Plugin 'Faceted search' for the 'ke_search' extension.
@@ -33,6 +33,12 @@ require_once(t3lib_extMgm::extPath('ke_search').'indexer/class.tx_kesearch_index
  * @subpackage	tx_kesearch
  */
 class tx_kesearch_indexer_types_dam extends tx_kesearch_indexer_types {
+
+	var $catList = ''; // holder for recursive/non-recursive dam categories
+
+
+
+
 
 	/**
 	 * Initializes indexer for dam
@@ -52,27 +58,25 @@ class tx_kesearch_indexer_types_dam extends tx_kesearch_indexer_types {
 		$tagChar = $this->pObj->extConf['prePostTagChar'];
 
 		// get categories
-		$this->catList = $this->indexerConfig['index_dam_categories'].',';
-
-		// add recursive categories if set in indexer config
-		if ($this->indexerConfig['index_dam_categories_recursive']) {
-			$categoriesArray = t3lib_div::trimExplode(',', $this->indexerConfig['index_dam_categories'], true);
-			foreach ($categoriesArray as $key => $catUid) {
-				$this->getRecursiveDAMCategories($catUid);
-			}
-		}
-		// make unique list values
-		$this->catList = t3lib_div::uniqueList($this->catList);
+		$categories = $this->getCategories();
 
 		// get dam records from categories
 		$fields = 'DISTINCT tx_dam.*';
 		$table = 'tx_dam_mm_cat, tx_dam';
-		$where = 'uid_foreign IN ('.$this->catList.')';
-		$where .= ' AND tx_dam_mm_cat.uid_local = tx_dam.uid ';
-		$where .= t3lib_befunc::BEenableFields('tx_dam',$inv=0);
-		$where .= t3lib_befunc::deleteClause('tx_dam',$inv=0);
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
-
+		$where = '1=1';
+		if(is_array($categories) && count($categories)) {
+			if($this->indexerConfig['index_dam_without_categories']) {
+				$table = 'tx_dam_mm_cat RIGHT JOIN tx_dam ON (tx_dam_mm_cat.uid_local = tx_dam.uid)';
+				$where .= ' AND uid_foreign IN (' . implode(',', $categories) . ')';
+				$where .= ' OR tx_dam.category = 0';
+			} else {
+				$where .= ' AND tx_dam_mm_cat.uid_local = tx_dam.uid';
+				$where .= ' AND uid_foreign IN (' . implode(',', $categories) . ')';
+			}
+		}
+		$where .= t3lib_befunc::BEenableFields('tx_dam');
+		$where .= t3lib_befunc::deleteClause('tx_dam');
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where);
 		$resCount = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
 		if ($resCount) {
 			while ($damRecord=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
@@ -160,21 +164,72 @@ class tx_kesearch_indexer_types_dam extends tx_kesearch_indexer_types {
 	}
 
 
-	/*
-	 * function getDAMSubcategories
-	 * @param $arg
+	/**
+	 * get categories
+	 *
+	 * @return array A simple array containing the category uids
 	 */
-	function getRecursiveDAMCategories($catUid) {
-		$fields = 'uid, parent_id';
-		$table = 'tx_dam_cat';
-		$where = 'parent_id="'.intval($catUid).'" ';
-		$where .= t3lib_befunc::BEenableFields($table,$inv=0);
-		$where .= t3lib_befunc::deleteClause($table,$inv=0);
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='',$orderBy='',$limit='');
-		$anz = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-		while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-			$this->catList .= $row['uid'].',';
-			$this->getRecursiveDAMCategories($row['uid']);
+	public function getCategories() {
+		// remove empty values from category list
+		$indexerCategories = t3lib_div::trimExplode(',', $this->indexerConfig['index_dam_categories'], true);
+
+		// if valid array then make array unique
+		if(is_array($indexerCategories) && count($indexerCategories)) {
+			$indexerCategories = array_unique($indexerCategories);
+		}
+
+		// add recursive categories if set in indexer config
+		if($this->indexerConfig['index_dam_categories_recursive'] && is_array($indexerCategories) && count($indexerCategories)) {
+			foreach($indexerCategories as $value) {
+				$categories[] = $this->getRecursiveDAMCategories($value);
+			}
+			// remove empty values from list and make array unique
+			$categories = t3lib_div::trimExplode(',', implode(',', $categories), true);
+			$indexerCategories = array_unique($categories);
+		}
+
+		if(is_array($indexerCategories) && count($indexerCategories)) {
+			return $indexerCategories;
+		} else { // if array is empty
+			return array();
+		}
+	}
+
+
+	/**
+	 * get recursive DAM categories
+	 *
+	 * @param integer $catUid The category uid to search in recursive records
+	 * @param integer $depth Recursive depth. Normally you don't have to set it.
+	 * @return string A commaseperated list of category uids
+	 */
+	public function getRecursiveDAMCategories($catUid, $depth = 0) {
+		if($catUid) {
+			$row = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow(
+				'GROUP_CONCAT(uid) AS categoryUids',
+				'tx_dam_cat',
+				'parent_id = ' . intval($catUid) .
+				t3lib_befunc::BEenableFields('tx_dam_cat') .
+				t3lib_befunc::deleteClause('tx_dam_cat'),
+				'', '', ''
+			);
+
+			// add categories to list
+			$listOfCategories = $row['categoryUids'];
+
+			$categories = t3lib_div::trimExplode(',', $row['categoryUids']);
+			if(is_array($categories) && count($categories)) {
+				foreach($categories as $category) {
+					// only if further categories are found, add them to list
+					$tempCatList = $this->getRecursiveDAMCategories($category, $depth + 1);
+					if(count(t3lib_div::trimExplode(',', $tempCatList, true))) {
+						$listOfCategories .= ',' . $tempCatList;
+					}
+				}
+			}
+			return ($depth===0 ? $catUid . ',' : '') . $listOfCategories;
+		} else {
+			return '';
 		}
 	}
 }
