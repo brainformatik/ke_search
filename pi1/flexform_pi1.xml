@@ -531,7 +531,7 @@
 									</numIndex>
 									<numIndex index="1">
 										<numIndex index="0">LLL:EXT:ke_search/pi1/locallang.xml:ff.checkFilterCondition.I.1</numIndex>
-										<numIndex index="1">single</numIndex>
+										<numIndex index="1">none</numIndex>
 									</numIndex>
 								</items>
 								<size>1</size>
