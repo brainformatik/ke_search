@@ -33,9 +33,11 @@ require_once(t3lib_extMgm::extPath('ke_search').'indexer/class.tx_kesearch_index
  * @subpackage	tx_kesearch
  */
 class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
-	var $pids        = 0;
-	var $pageRecords = array(); // this array contains all data of all pages
-	var $indexCTypes = array(
+	var $pids              = 0;
+	var $pageRecords       = array(); // this array contains all data of all pages
+	var $cachedPageRecords = array(); // this array contains all data of all pages, but additionally with all available languages
+	var $sysLanguages      = array();
+	var $indexCTypes       = array(
 		'text',
 		'textpic',
 		'bullets',
@@ -62,6 +64,10 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 			$cTypes[] = 'CType="' . $value . '"';
 		}
 		$this->whereClauseForCType = implode(' OR ', $cTypes);
+
+		// get all available sys_language_uid records
+		$this->sysLanguages = t3lib_BEfunc::getSystemLanguages();
+
 
 		// we need this object to get all contained pids
 		$this->queryGen = t3lib_div::makeInstance('t3lib_queryGenerator');
@@ -128,6 +134,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	/**
 	 * get array with all pages
 	 * but remove all pages we don't want to have
+	 * additionally generates a cachedPageArray
 	 *
 	 * @param array Array with all page cols
 	 */
@@ -146,9 +153,36 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where);
 
 		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+			$this->addLocalizedPagesToCache($row);
 			$pages[$row['uid']] = $row;
 		}
 		return $pages;
+	}
+
+
+	/**
+	 * add localized page records to a cache/globalArray
+	 * This is much faster than requesting the DB for each tt_content-record
+	 *
+	 * @param array $row
+	 * @return void
+	 */
+	public function addLocalizedPagesToCache($row) {
+		$this->cachedPageRecords[0][$row['uid']] = $row;
+		foreach($this->sysLanguages as $sysLang) {
+			list($pageOverlay) = t3lib_BEfunc::getRecordsByField(
+				'pages_language_overlay',
+				'pid',
+				$row['uid'],
+				'AND sys_language_uid=' . intval($sysLang[1])
+			);
+			if($pageOverlay) {
+				$this->cachedPageRecords[$sysLang[1]][$row['uid']] = t3lib_div::array_merge(
+					$row,
+					$pageOverlay
+				);
+			}
+		}
 	}
 
 
@@ -261,10 +295,10 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyPagesIndexEntry'] as $_classRef) {
 				$_procObj = & t3lib_div::getUserObj($_classRef);
 				$_procObj->modifyPagesIndexEntry(
-					$this->pageRecords[$uid]['title'],
+					$uid,
 					$pageContent,
 					$tags,
-					$this->pageRecords[$uid],
+					$this->cachedPageRecords,
 					$additionalFields
 				);
 			}
@@ -273,20 +307,20 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		// store record in index table
 		foreach($pageContent as $langKey => $content) {
 			$this->pObj->storeInIndex(
-				$this->indexerConfig['storagepid'],    // storage PID
-				$this->pageRecords[$uid]['title'],     // page title
-				'page',                                // content type
-				$uid,                                  // target PID: where is the single view?
-				$content,                              // indexed content, includes the title (linebreak after title)
-				$tags,                                 // tags
-				'',                                    // typolink params for singleview
-				'',                                    // abstract
-				$langKey,                              // language uid
-				$this->pageRecords[$uid]['starttime'], // starttime
-				$this->pageRecords[$uid]['endtime'],   // endtime
-				$this->pageRecords[$uid]['fe_group'],  // fe_group
-				false,                                 // debug only?
-				$additionalFields                      // additional fields added by hooks
+				$this->indexerConfig['storagepid'],                    // storage PID
+				$this->cachedPageRecords[$langKey][$uid]['title'],     // page title
+				'page',                                                // content type
+				$uid,                                                  // target PID: where is the single view?
+				$content,                                              // indexed content, includes the title (linebreak after title)
+				$tags,                                                 // tags
+				'',                                                    // typolink params for singleview
+				'',                                                    // abstract
+				$langKey,                                              // language uid
+				$this->cachedPageRecords[$langKey][$uid]['starttime'], // starttime
+				$this->cachedPageRecords[$langKey][$uid]['endtime'],   // endtime
+				$this->cachedPageRecords[$langKey][$uid]['fe_group'],  // fe_group
+				false,                                                 // debug only?
+				$additionalFields                                      // additional fields added by hooks
 			);
 		}
 

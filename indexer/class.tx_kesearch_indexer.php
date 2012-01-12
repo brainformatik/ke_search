@@ -183,6 +183,7 @@ class tx_kesearch_indexer {
 			WHERE orig_uid = ?
 			AND pid = ?
 			AND type = ?
+			AND language = ?
 			LIMIT 1
 		"');
 
@@ -311,7 +312,7 @@ class tx_kesearch_indexer {
 		if($fieldValues['type'] == 'file') {
 			$recordExists = $this->checkIfFileWasIndexed($fieldValues['pid'], $fieldValues['hash']);
 		} else {
-			$recordExists = $this->checkIfRecordWasIndexed($fieldValues['orig_uid'], $fieldValues['pid'], $fieldValues['type']);
+			$recordExists = $this->checkIfRecordWasIndexed($fieldValues['orig_uid'], $fieldValues['pid'], $fieldValues['type'], $fieldValues['language']);
 		}
 		if($recordExists) { // update existing record
 			$where = 'uid=' . intval($this->currentRow['uid']);
@@ -488,11 +489,12 @@ class tx_kesearch_indexer {
 	 * @param integer $uid
 	 * @param integer $pid
 	 * @param string $type
+	 * @param integer $language
 	 * @return boolean true if record was found, false if not
 	 */
-	function checkIfRecordWasIndexed($uid, $pid, $type) {
-		$GLOBALS['TYPO3_DB']->sql_query('SET @orig_uid = ' . $uid . ', @pid = ' . $pid . ', @type = ' . $type);
-		$res = $GLOBALS['TYPO3_DB']->sql_query('EXECUTE searchStmt USING @orig_uid, @pid, @type;');
+	function checkIfRecordWasIndexed($uid, $pid, $type, $language) {
+		$GLOBALS['TYPO3_DB']->sql_query('SET @orig_uid = ' . $uid . ', @pid = ' . $pid . ', @type = ' . $type . ', @language = ' . $language);
+		$res = $GLOBALS['TYPO3_DB']->sql_query('EXECUTE searchStmt USING @orig_uid, @pid, @type, @language;');
 		if(is_resource($res)) {
 			if($this->currentRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 				return true;

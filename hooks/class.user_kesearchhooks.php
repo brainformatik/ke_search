@@ -39,27 +39,27 @@ class user_kesearch_sortdate {
 		$additionalFields[] = 'hash';
 	}
 
-	public function modifyPagesIndexEntry(&$title, &$pageContent, &$tags, $pageRecord, &$additionalFields) {
+	public function modifyPagesIndexEntry($uid, &$pageContent, &$tags, $cachedPageRecords, &$additionalFields) {
 		// crdate is always given, but can be overwritten
-		if(isset($pageRecord['crdate']) && $pageRecord['crdate'] > 0) {
-			$additionalFields['sortdate'] = $pageRecord['crdate'];
+		if(isset($cachedPageRecords[0][$uid]['crdate']) && $cachedPageRecords[0][$uid]['crdate'] > 0) {
+			$additionalFields['sortdate'] = $cachedPageRecords[0][$uid]['crdate'];
 		}
 		// if TYPO3 sets last changed
-		if(isset($pageRecord['SYS_LASTCHANGED']) && $pageRecord['SYS_LASTCHANGED'] > 0) {
-			$additionalFields['sortdate'] = $pageRecord['SYS_LASTCHANGED'];
+		if(isset($cachedPageRecords[0][$uid]['SYS_LASTCHANGED']) && $cachedPageRecords[0][$uid]['SYS_LASTCHANGED'] > 0) {
+			$additionalFields['sortdate'] = $cachedPageRecords[0][$uid]['SYS_LASTCHANGED'];
 		}
 		// if the user has manually set a date
-		if(isset($pageRecord['lastUpdated']) && $pageRecord['lastUpdated'] > 0) {
-			$additionalFields['sortdate'] = $pageRecord['lastUpdated'];
+		if(isset($cachedPageRecords[0][$uid]['lastUpdated']) && $cachedPageRecords[0][$uid]['lastUpdated'] > 0) {
+			$additionalFields['sortdate'] = $cachedPageRecords[0][$uid]['lastUpdated'];
 		}
 
 		// fill orig_uid
-		if(isset($pageRecord['uid']) && $pageRecord['uid'] > 0) {
-			$additionalFields['orig_uid'] = $pageRecord['uid'];
+		if(isset($cachedPageRecords[0][$uid]['uid']) && $cachedPageRecords[0][$uid]['uid'] > 0) {
+			$additionalFields['orig_uid'] = $cachedPageRecords[0][$uid]['uid'];
 		}
 		// fill orig_pid
-		if(isset($pageRecord['pid']) && $pageRecord['pid'] > 0) {
-			$additionalFields['orig_pid'] = $pageRecord['pid'];
+		if(isset($cachedPageRecords[0][$uid]['pid']) && $cachedPageRecords[0][$uid]['pid'] > 0) {
+			$additionalFields['orig_pid'] = $cachedPageRecords[0][$uid]['pid'];
 		}
 	}
 
