@@ -6,7 +6,10 @@
     clear: both;
 }
 
-.tx-kesearch-pi1 form{ border:0 none; }
+.tx-kesearch-pi1 form{
+	border:0 none;
+	margin: 0 0 20px 0;
+}
 .tx-kesearch-pi1 input,
 .tx-kesearch-pi1 select,
 .tx-kesearch-pi1 textarea{
@@ -342,6 +345,7 @@ div.kesearchbox{
 .tx-kesearch-pi1 #kesearch_pagebrowser_top table,
 .tx-kesearch-pi1 #kesearch_pagebrowser_bottom table {
     margin: 0 auto 5px;
+	width:1%;
 }
 
 .tx-kesearch-pi1 .next, .tx-kesearch-pi1 .prev {
@@ -449,7 +453,6 @@ div.kesearchbox{
 #kesearch_filters ul li a{
     display:block;
     padding:0 0 0 18px;
-    
     font-size:12px;
     line-height:16px
 }
