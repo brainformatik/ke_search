@@ -161,19 +161,20 @@ function hideSpinner() {
 
 <!-- ###SEARCHBOX_STATIC### start -->
 <form method="get" id="xajax_form_kesearch_pi1" name="xajax_form_kesearch_pi1"  action="###FORM_ACTION###" class="static" ###ONSUBMIT###>
-	<div class="searchbox">
-		<input type="hidden" name="id" value="###FORM_TARGET_PID###" />
-		###HIDDENFIELDS###
-		<div class="search_input">
-			<b><input type="text" name="tx_kesearch_pi1[sword]" id="ke_search_sword" value="###SWORD_VALUE###" onfocus="###SWORD_ONFOCUS###" /></b>
-		</div>
+	<input type="hidden" name="id" value="###FORM_TARGET_PID###" />
+	###HIDDENFIELDS###
+
+	<div class="kesearchbox">
+		<input type="text" id="ke_search_sword" name="tx_kesearch_pi1[sword]"  value="###SWORD_VALUE###" onfocus="###SWORD_ONFOCUS###" /></b>
+		<input type="image" id="kesearch_submit" src="typo3conf/ext/ke_search/res/img/kesearch_submit.png" class="submit" value="###SUBMIT_VALUE###" onclick="document.getElementById('pagenumber').value=1; document.getElementById('xajax_form_kesearch_pi1').submit();" />
 		<div class="clearer">&nbsp;</div>
-		<input type="image" src="typo3conf/ext/ke_search/res/img/go.gif" id="kesearch_submit" class="submit" value="###SUBMIT_VALUE###" onclick="document.getElementById('pagenumber').value=1; document.getElementById('xajax_form_kesearch_pi1').submit();" />
-		<input id="pagenumber" type="hidden" name="tx_kesearch_pi1[page]" value="###HIDDEN_PAGE_VALUE###" />
-		<input id="resetFilters" type="hidden" name="tx_kesearch_pi1[resetFilters]" value="0" />
-		<input id="sortByField" type="hidden" name="tx_kesearch_pi1[sortByField]" value="###SORTBYFIELD###" />
-		<input id="sortByDir" type="hidden" name="tx_kesearch_pi1[sortByDir]" value="###SORTBYDIR###" />
 	</div>
+
+	<input id="pagenumber" type="hidden" name="tx_kesearch_pi1[page]" value="###HIDDEN_PAGE_VALUE###" />
+	<input id="resetFilters" type="hidden" name="tx_kesearch_pi1[resetFilters]" value="0" />
+	<input id="sortByField" type="hidden" name="tx_kesearch_pi1[sortByField]" value="###SORTBYFIELD###" />
+	<input id="sortByDir" type="hidden" name="tx_kesearch_pi1[sortByDir]" value="###SORTBYDIR###" />
+
 	<div id="kesearch_filters">###FILTER###</div>
 	<!-- ###SHOW_SPINNER### begin -->
 	<div id="kesearch_updating_filters"><center>###SPINNER###<br /></center></div>
@@ -185,12 +186,12 @@ function hideSpinner() {
 
 <!-- ###RESULT_LIST### start -->
 	<span id="kesearch_error"></span>
-
 	<div id="kesearch_num_results">###NUMBER_OF_RESULTS###</div>
 
 	<div id="kesearch_pagebrowser_top">###PAGEBROWSER_TOP###</div>
 	<div id="kesearch_ordering">###ORDERING###</div>
-	<ul id="kesearch_results"><li>###MESSAGE###</li></ul>
+	
+	<div id="kesearch_results">###MESSAGE###</div>
 
 	<div id="kesearch_updating_results"><center>###SPINNER###<br /></center></div>
 	<div id="kesearch_pagebrowser_bottom">###PAGEBROWSER_BOTTOM###</div>
@@ -228,7 +229,7 @@ function hideSpinner() {
 
 
 <!-- ###RESULT_ROW### start -->
-	<li>
+<div class="result-list-item">
 	<!-- ###SUB_NUMERATION### start -->###NUMBER###.<!-- ###SUB_NUMERATION### end -->
 	<b>###TITLE###</b>
 	<!-- ###SUB_SCORE_SCALE### start -->
@@ -238,7 +239,8 @@ function hideSpinner() {
 	<!-- ###SUB_SCORE_SCALE### end -->
 	<span class="clearer">&nbsp;</span>
 	<!-- ###SUB_TYPE_ICON### start --><span class="teaser_icon">###TYPE_ICON###</span><!-- ###SUB_TYPE_ICON### end -->
-	###TEASER###<br />
+	###TEASER###
+	<span class="clearer">&nbsp;</span>
 	<div class="add-info">
 	    <!-- ###SUB_RESULTURL### start -->
 		<i>###LABEL_RESULTURL###:</i> ###RESULTURL###<br />
@@ -259,7 +261,7 @@ function hideSpinner() {
 		<i>###LABEL_QUERY###:</i> ###QUERY###
 	    <!-- ###SUB_QUERY### end -->
 	</div>
-    </li>
+</div>
 <!-- ###RESULT_ROW### end -->
 
 
@@ -279,7 +281,6 @@ function hideSpinner() {
 		<option value="###VALUE###" ###SELECTED###>###TITLE###</option>
 	    <!-- ###SUB_FILTER_SELECT_OPTION### end -->
 	</select>
-	<br /><br />
     </div>
 <!-- ###SUB_FILTER_SELECT### end -->
 
