@@ -93,6 +93,10 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 				if ($row['header'] && $row['header_layout'] != 100) {
 					$title = $title . ' - ' . $row['header'];
 				}
+				
+				// add page rights to tt_content record and make list unique
+				$feGroups = $row['fe_group'] . ',' . $this->pageRecords[$uid]['fe_group'];
+				$feGroups = t3lib_div::uniqueList($feGroups);
 
 				// save record to index
 				$this->pObj->storeInIndex(
@@ -107,7 +111,7 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 					$row['sys_language_uid'],              // language uid
 					$row['starttime'],                     // starttime
 					$row['endtime'],                       // endtime
-					$row['fe_group'],                      // fe_group
+					$feGroups,                             // fe_group
 					false,                                 // debug only?
 					$additionalFields                      // additional fields added by hooks
 				);
