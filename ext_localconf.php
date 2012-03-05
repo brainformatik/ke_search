@@ -26,7 +26,6 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyNewsIndexEntry'][] = 
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyYACIndexEntry'][] = 'EXT:ke_search/hooks/class.user_kesearchhooks.php:user_kesearch_sortdate';
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyDAMIndexEntry'][] = 'EXT:ke_search/hooks/class.user_kesearchhooks.php:user_kesearch_sortdate';
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyAddressIndexEntry'][] = 'EXT:ke_search/hooks/class.user_kesearchhooks.php:user_kesearch_sortdate';
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyXTYPOCommerceIndexEntry'][] = 'EXT:ke_search/hooks/class.user_kesearchhooks.php:user_kesearch_sortdate';
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyContentIndexEntry'][] = 'EXT:ke_search/hooks/class.user_kesearchhooks.php:user_kesearch_sortdate';
 
 

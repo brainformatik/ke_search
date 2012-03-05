@@ -476,7 +476,6 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.1', 'ke_yac', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_1.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.2', 'ttnews', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_2.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.3', 'dam', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_3.gif'),
-					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.4', 'xtypocommerce', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_4.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.5', 'tt_address', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_5.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.6', 'tt_content', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_6.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.7', 'file', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_7.gif'),

@@ -55,7 +55,6 @@
 			<label index="tx_kesearch_indexerconfig.type.I.1">Calendar (ke_yac)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.2">News (tt_news)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.3">DAM (tx_dam)</label>
-			<label index="tx_kesearch_indexerconfig.type.I.4">XTCommerce Products (tx_xtypocommerce)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.5">Address records (tt_address)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.6">Content records (tt_content)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.7">Files</label>
@@ -123,7 +122,6 @@
 			<label index="tx_kesearch_indexerconfig.type.I.1">Kalendar (ke_yac)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.2">Nachrichten (tt_news)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.3">DAM (tx_dam)</label>
-			<label index="tx_kesearch_indexerconfig.type.I.4">XTCommerce Produkte (tx_xtypocommerce)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.5">Adressen (tt_address)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.6">Inhaltselemente (tt_content)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.7">Dateien</label>

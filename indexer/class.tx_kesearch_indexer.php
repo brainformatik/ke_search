@@ -599,7 +599,7 @@ class tx_kesearch_indexer {
 		$errors = array();
 
 		// check for empty values
-		if ($type != 'xtypocommerce' && empty($storagePid)) $errors[] = 'No storage PID set';
+		if (empty($storagePid)) $errors[] = 'No storage PID set';
 		if (empty($type)) $errors[] = 'No type set';
 		if (empty($targetPid)) $errors[] = 'No target PID set';
 

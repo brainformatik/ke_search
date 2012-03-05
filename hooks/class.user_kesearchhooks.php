@@ -138,10 +138,6 @@ class user_kesearch_sortdate {
 		}
 	}
 
-	public function modifyXTYPOCommerceIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tagContent, $prodRecord, &$additionalFields) {
-
-	}
-
 	public function modifyContentIndexEntry(&$title, &$contentRecord, &$tags, $contentUid, &$additionalFields) {
 		// crdate is always given, but can be overwritten
 		if(isset($contentRecord['crdate']) && $contentRecord['crdate'] > 0) {
