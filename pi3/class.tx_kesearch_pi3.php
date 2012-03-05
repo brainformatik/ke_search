@@ -53,7 +53,13 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 		// initializes plugin configuration
 		$this->init();
 
-		if ($this->conf['renderMethod'] != 'static') $this->initXajax();
+		// init XAJAX?
+		if ($this->conf['renderMethod'] != 'static') {
+			if (!t3lib_extMgm::isLoaded('xajax')) {
+				return ('<span style="color: red;"><b>ke_search error:</b>"XAJAX" must be installed for this mode.</span>');
+			}
+			else $this->initXajax();
+		}
 
 		// hook for initials
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['initials'])) {

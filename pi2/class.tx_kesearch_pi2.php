@@ -58,7 +58,11 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 			return $this->pi_wrapInBaseClass($content);
 		}
 
-		if ($this->conf['renderMethod'] != 'static') $this->initXajax();
+		// init XAJAX?
+		if ($this->conf['renderMethod'] != 'static') {
+			if (!t3lib_extMgm::isLoaded('xajax')) return;
+			else $this->initXajax();
+		}
 
 		// Spinner Image
 		if ($this->conf['spinnerImageFile']) {

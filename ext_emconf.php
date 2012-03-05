@@ -17,7 +17,7 @@ $EM_CONF[$_EXTKEY] = array(
 	'author' => 'A. Kiefer, C. Buelter, S. Froemken (kennziffer.com)',
 	'author_email' => 'kiefer@kennziffer.com',
 	'shy' => '',
-	'dependencies' => 'xajax',
+	'dependencies' => '',
 	'conflicts' => '',
 	'priority' => '',
 	'module' => '',
@@ -32,7 +32,6 @@ $EM_CONF[$_EXTKEY] = array(
 	'version' => '0.4.0',
 	'constraints' => array(
 		'depends' => array(
-			'xajax' => '0.2.5-0.2.99',
 		),
 		'conflicts' => array(
 		),
