@@ -248,6 +248,10 @@ class tx_kesearch_db {
 		} else { // if sorting is predefined by admin
 			$orderBy = $this->conf['sortByAdmin'];
 		}
+
+		// set special ordering if no searchword set
+		if (empty($this->pObj->wordsAgainst)) $orderBy = $this->conf['sortWithoutSearchword'];
+
 		return $orderBy;
 	}
 
