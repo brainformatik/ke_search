@@ -89,6 +89,9 @@ class tx_kesearch_indexer {
 			return 'You can\'t start the indexer twice. Please wait while first indexer process is currently running';
 		}
 
+		// set indexing start time
+		$this->startTime = time();
+
 		// get configurations
 		$configurations = $this->getConfigurations();
 
@@ -147,11 +150,28 @@ class tx_kesearch_indexer {
 		if ($mode == 'CLI') {
 			// send finishNotification
 			if ($extConf['finishNotification'] && t3lib_div::validEmail($extConf['notificationRecipient'])) {
+
+				// calculate and format indexing time
+				$indexingTime = time() - $this->startTime;
+				if ($indexingTime > 3600) {
+					// format hours
+					$indexingTime = $indexingTime / 3600;
+					$indexingTime = number_format($indexingTime, 2, ',', '.');
+					$indexingTime .= ' hours';
+				} else if ($indexingTime > 60) {
+					// format minutes
+					$indexingTime = $indexingTime / 60;
+					$indexingTime = number_format($indexingTime, 2, ',', '.');
+					$indexingTime .= ' minutes';
+				} else {
+					$indexingTime .= ' seconds';
+				}
+
 				// build message
 				$msg = 'Indexing process was finished:'."\n";
 				$msg .= "==============================\n\n";
 				$msg .= strip_tags($content);
-				$msg .= "\n\n".'Indexing process ran '.(time()-$this->startTime).' seconds.';
+				$msg .= "\n\n".'Indexing process ran '.$indexingTime;
 
 				// send the notification message
 				mail($extConf['notificationRecipient'], $extConf['notificationSubject'], $msg);
