@@ -245,12 +245,11 @@ class tx_kesearch_db {
 					$orderBy = $piVarsField . ' ' . $piVarsDir;
 				} // if sortByVisitor is not set OR not in the list of allowed fields then use fallback ordering in "sortWithoutSearchword"
 			} // if sortByVisitor is not set OR not in the list of allowed fields then use fallback ordering in "sortWithoutSearchword"
-		} else { // if sorting is predefined by admin
+		} else if (!empty($this->pObj->wordsAgainst)) { // if sorting is predefined by admin
 			$orderBy = $this->conf['sortByAdmin'];
+		} else {
+			$orderBy = $this->conf['sortWithoutSearchword'];
 		}
-
-		// set special ordering if no searchword set
-		if (empty($this->pObj->wordsAgainst)) $orderBy = $this->conf['sortWithoutSearchword'];
 
 		return $orderBy;
 	}
