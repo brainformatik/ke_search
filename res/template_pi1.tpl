@@ -176,9 +176,11 @@ function hideSpinner() {
 	<input id="sortByDir" type="hidden" name="tx_kesearch_pi1[sortByDir]" value="###SORTBYDIR###" />
 
 	<div id="kesearch_filters">###FILTER###</div>
+
 	<!-- ###SHOW_SPINNER### begin -->
 	<div id="kesearch_updating_filters"><center>###SPINNER###<br /></center></div>
 	<!-- ###SHOW_SPINNER### end -->
+	###SUBMIT###
 	###RESET###
 </form>
 <!-- ###SEARCHBOX_STATIC### end -->

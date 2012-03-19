@@ -268,8 +268,8 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			// set javascript for resetting searchbox value
 			$searchboxFocusJS = ' searchboxFocus(this);  ';
-
 		}
+
 		$content = $this->cObj->substituteMarker($content,'###SWORD_VALUE###', $this->swordValue);
 		$content = $this->cObj->substituteMarker($content,'###SWORD_ONFOCUS###', $searchboxFocusJS);
 		$content = $this->cObj->substituteMarker($content,'###SORTBYFIELD###', $this->piVars['sortByField']);
@@ -288,17 +288,20 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// set form action pid
 		$content = $this->cObj->substituteMarker($content,'###FORM_TARGET_PID###', $this->conf['resultPage']);
+
 		// set form action
 		$content = $this->cObj->substituteMarker($content,'###FORM_ACTION###', t3lib_div::getIndpEnv('TYPO3_SITE_URL').'index.php');
 
 		// set other hidden fields
 		$hiddenFieldsContent = '';
+
 		// language parameter
 		$lParam = t3lib_div::_GET('L');
 		if (isset($lParam)) {
 			$hiddenFieldValue = intval($lParam);
 			$hiddenFieldsContent .= '<input type="hidden" name="L" value="'.$hiddenFieldValue.'" />';
 		}
+
 		// mountpoint parameter
 		$mpParam = t3lib_div::_GET('MP');
 		if (isset($mpParam)) {
@@ -306,17 +309,6 @@ class tx_kesearch_lib extends tslib_pibase {
 			$hiddenFieldsContent .= '<input type="hidden" name="MP" value="'.$hiddenFieldValue.'" />';
 		}
 		$content = $this->cObj->substituteMarker($content,'###HIDDENFIELDS###', $hiddenFieldsContent);
-
-		// set reset link
-		unset($linkconf);
-		$linkconf['parameter'] = $this->conf['resultPage'];
-		$resetUrl = $this->cObj->typoLink_URL($linkconf);
-		$resetLink = '<a href="'.$resetUrl.'" class="resetButton"><span>'.$this->pi_getLL('reset_button').'</span></a>';
-
-		// init onDomReadyAction
-		$this->initDomReadyAction();
-
-		$content = $this->cObj->substituteMarker($content,'###RESET###',$resetLink);
 
 		// type param
 		$typeParam = t3lib_div::_GP('type');
@@ -326,6 +318,25 @@ class tx_kesearch_lib extends tslib_pibase {
 			$typeContent = $this->cObj->substituteMarker($typeContent,'###PAGETYPE###',$typeParam);
 		} else $typeContent = '';
 		$content = $this->cObj->substituteSubpart ($content, '###SUB_PAGETYPE###', $typeContent, $recursive=1);
+
+		// add submit button in static mode
+		if ($this->conf['renderMethod'] == 'static') {
+			$submitButton = '<input type="submit" value="' . $this->pi_getLL('submit') . '" />';
+		} else {
+			$submitButton = '';
+		}
+		$content = $this->cObj->substituteMarker($content,'###SUBMIT###',$submitButton);
+
+		// set reset link
+		unset($linkconf);
+		$linkconf['parameter'] = $this->conf['resultPage'];
+		$resetUrl = $this->cObj->typoLink_URL($linkconf);
+		$resetLink = '<a href="'.$resetUrl.'" class="resetButton"><span>'.$this->pi_getLL('reset_button').'</span></a>';
+		$content = $this->cObj->substituteMarker($content,'###RESET###',$resetLink);
+
+		// init onDomReadyAction
+		$this->initDomReadyAction();
+
 
 		return $content;
 	}

@@ -91,7 +91,7 @@
 			<label index="query_time">The search query was processed in %s ms.</label>
 			<label index="reset_button">Reset</label>
 			<label index="reset_filter">Reset filter</label>
-			<label index="submit">Submit</label>
+			<label index="submit">Find</label>
 			<label index="back">Back</label>
 
 			<label index="orderlink_title">Title</label>
@@ -187,9 +187,9 @@
 			<label index="no_options">-----</label>
 			<label index="message_before_search">Bitte geben Sie Ihre Suchkriterien an.</label>
 			<label index="query_time">Die Suchabfrage hat %s ms in Anspruch genommen.</label>
-			<label index="reset_button">Alle Eingaben löschen</label>
+			<label index="reset_button">Eingaben löschen</label>
 			<label index="reset_filter">Filter zurücksetzen</label>
-			<label index="submit">Schnellsuche starten</label>
+			<label index="submit">Finden</label>
 			<label index="back">Zurück</label>
 
 			<label index="orderlink_title">Titel</label>
