@@ -70,7 +70,7 @@
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.0">Yes</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">No</label>
 			<label index="tx_kesearch_indexerconfig.directories">Directories</label>
-			<label index="tx_kesearch_indexerconfig.fileext">Commaseperated list of allowed file extensions (f.e. pdf,xls,txt)</label>
+			<label index="tx_kesearch_indexerconfig.fileext">Comma-separated list of allowed file extensions (eg. pdf,ppt)</label>
 		</languageKey>
 		<languageKey index="de" type="array">
 			<label index="pages.tx_kesearch_tags">Schlagworte für facettierte Suche</label>
@@ -137,7 +137,7 @@
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.0">Ja</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">Nein</label>
 			<label index="tx_kesearch_indexerconfig.directories">Verzeichnisse</label>
-			<label index="tx_kesearch_indexerconfig.fileext">Kommaseparierte Liste von zu indexierenden Dateiendungen (z.B. pdf,xls,txt)</label>
+			<label index="tx_kesearch_indexerconfig.fileext">Komma-separierte Liste von zu indexierenden Dateiendungen (z.B. pdf,ppt)</label>
 		</languageKey>
 	</data>
 </T3locallang>

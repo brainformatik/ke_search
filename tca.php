@@ -608,6 +608,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 			'config' => array (
 				'type' => 'input',
 				'size' => '30',
+				'default' => 'pdf,ppt'
 			)
 		),
 	),

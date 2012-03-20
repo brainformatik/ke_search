@@ -88,8 +88,9 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 		$this->extractContentAndSaveToIndex($files);
 
 		// show indexer content?
-		$content .= '<p><b>Indexer "' . $this->indexerConfig['title'] . '": ' . count($this->pageRecords) . ' pages have been found for indexing.</b></p>' . "\n";
-		$content .= '<p><b>Indexer "' . $this->indexerConfig['title'] . '": ' . $this->counter . ' pages have been indexed.</b></p>' . "\n";
+		$content .= '<p><b>Indexer "' . $this->indexerConfig['title'] . '": </b><br />'
+			. count($files) . ' files have been indexed.</b></p>' . "\n";
+
 		$content .= $this->showTime();
 
 		return $content;
@@ -106,7 +107,7 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 		$directoryArray = $this->getAbsoluteDirectoryPath($directoryArray);
 		if(is_array($directoryArray) && count($directoryArray)) {
 			foreach($directoryArray as $directory) {
-				$foundFiles = t3lib_div::getAllFilesAndFoldersInPath(array(), $directory, 'pdf,ppt');
+				$foundFiles = t3lib_div::getAllFilesAndFoldersInPath(array(), $directory, $this->indexerConfig['fileext']);
 				if(is_array($foundFiles) && count($foundFiles)) {
 					foreach($foundFiles as $file) {
 						$files[] = $file;
