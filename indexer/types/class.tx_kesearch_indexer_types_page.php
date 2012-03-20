@@ -47,10 +47,14 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	var $counter = 0;
 	var $whereClauseForCType = '';
 
+	// Name of indexed elements. Will be overwritten in content element indexer.
+	var $indexedElementsName = 'pages';
+
 	/**
 	 * @var t3lib_queryGenerator
 	 */
 	var $queryGen;
+
 
 
 	/**
@@ -99,8 +103,11 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		}
 
 		// show indexer content?
-		$content .= '<p><b>Indexer "' . $this->indexerConfig['title'] . '": ' . count($this->pageRecords) . ' pages have been found for indexing.</b></p>' . "\n";
-		$content .= '<p><b>Indexer "' . $this->indexerConfig['title'] . '": ' . $this->counter . ' pages have been indexed.</b></p>' . "\n";
+		$content .= '<p><b>Indexer "' . $this->indexerConfig['title'] . '": </b><br />'
+			. count($this->pageRecords) . ' pages have been found for indexing.<br />' . "\n"
+			. $this->counter . ' ' . $this->indexedElementsName . ' have been indexed.<br />' . "\n"
+			. '</p>' . "\n";
+
 		$content .= $this->showTime();
 
 		return $content;

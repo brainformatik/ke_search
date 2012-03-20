@@ -33,6 +33,8 @@ require_once(t3lib_extMgm::extPath('ke_search').'indexer/types/class.tx_kesearch
  * @subpackage	tx_kesearch
  */
 class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_page {
+	var $indexedElementsName = 'content elements';
+
 	/**
 	 * get content of current page and save data to db
 	 * @param $uid page-UID that has to be indexed
@@ -93,7 +95,7 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 				if ($row['header'] && $row['header_layout'] != 100) {
 					$title = $title . ' - ' . $row['header'];
 				}
-				
+
 				// add page rights to tt_content record and make list unique
 				$feGroups = $row['fe_group'] . ',' . $this->pageRecords[$uid]['fe_group'];
 				$feGroups = t3lib_div::uniqueList($feGroups);
@@ -115,6 +117,9 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 					false,                                 // debug only?
 					$additionalFields                      // additional fields added by hooks
 				);
+
+				// count elements written to the index
+				$this->counter++;
 			}
 		} else {
 			return;
