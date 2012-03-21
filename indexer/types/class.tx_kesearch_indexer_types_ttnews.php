@@ -71,7 +71,7 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 				$abstract = strip_tags($newsRecord['short']);
 				$content = strip_tags($newsRecord['bodytext']);
 
-				// add keywords to content if not empty
+					// add keywords to content if not empty
 				if (!empty($newsRecord['keywords'])) {
 					$content .= "\n".$newsRecord['keywords'];
 				}
@@ -81,7 +81,10 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 				$tags = '';
 				$additionalFields = array();
 
-				// hook for custom modifications of the indexed data, e. g. the tags
+					// make it possible to modify the indexerConfig via hook
+				$indexerConfig = $this->indexerConfig;
+
+					// hook for custom modifications of the indexed data, e. g. the tags
 				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyNewsIndexEntry'])) {
 					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyNewsIndexEntry'] as $_classRef) {
 						$_procObj = & t3lib_div::getUserObj($_classRef);
@@ -92,17 +95,18 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 							$params,
 							$tags,
 							$newsRecord,
-							$additionalFields
+							$additionalFields,
+							$indexerConfig
 						);
 					}
 				}
 
 				// ... and store them
 				$this->pObj->storeInIndex(
-					$this->indexerConfig['storagepid'],    // storage PID
+					$indexerConfig['storagepid'],    // storage PID
 					$title,                          // page title
 					'tt_news',                       // content type
-					$this->indexerConfig['targetpid'],     // target PID: where is the single view?
+					$indexerConfig['targetpid'],     // target PID: where is the single view?
 					$fullContent,                    // indexed content, includes the title (linebreak after title)
 					$tags,                           // tags
 					$params,                         // typolink params for singleview
