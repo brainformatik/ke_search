@@ -11,6 +11,8 @@
 			<label index="function2">Indexed content</label>
 			<label index="function3">Index table information</label>
 			<label index="function4">Searchword statistics</label>
+			<label index="function5">Clear search index</label>
+			<label index="select_a_page">Please select a page.</label>
 		</languageKey>
 		<languageKey index="de" type="array">
 			<label index="title">Facettierte Suche</label>
@@ -18,6 +20,8 @@
 			<label index="function2">Indizierte Inhalte</label>
 			<label index="function3">Informationen über Index-Tabelle</label>
 			<label index="function4">Suchwort-Statistik</label>
+			<label index="function5">Suchindex leeren</label>
+			<label index="select_a_page">Bitte wählen Sie eine Seite aus.</label>
 		</languageKey>
 	</data>
 </T3locallang>

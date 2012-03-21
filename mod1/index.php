@@ -68,6 +68,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 				'2' => $LANG->getLL('function2'),
 				'3' => $LANG->getLL('function3'),
 				'4' => $LANG->getLL('function4'),
+				'5' => $LANG->getLL('function5'),
 			)
 		);
 		parent::menuConfig();
@@ -87,7 +88,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 		$this->pageinfo = t3lib_BEfunc::readPageAccess($this->id,$this->perms_clause);
 		$access = is_array($this->pageinfo) ? 1 : 0;
 
-		if (($this->id && $access) || ($BE_USER->user['admin'] && !$this->id))	{
+		if (($this->id && $access) || ($GLOBALS['BE_USER']->user['admin'] && !$this->id))	{
 
 				// Draw the header.
 			$this->doc = t3lib_div::makeInstance('mediumDoc');
@@ -200,20 +201,24 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 
 
 				.reindex-button,
+				a.index-button:hover,
 				.index-button {
 					-moz-border-radius: 7px;
 					border-radius: 7px;
-					border: 1px solid white;
 					box-shadow: 5px 5px 5px #AFAFAF;
 					-moz-box-shadow: 5px 5px 5px #AFAFAF;
 					-webkit-box-shadow: 5px 5px 5px #AFAFAF;
 					background: green;
 					padding: 5px;
-					width: 100px;
+					width: 250px;
 					display: block;
 					text-align: center;
 					font-weight: bold;
 					color: white
+				}
+
+				a.index-button:hover {
+					background: darkgreen;
 				}
 
 				.reindex-button {
@@ -298,6 +303,9 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 			$this->content.=$this->doc->startPage($LANG->getLL('title'));
 			$this->content.=$this->doc->header($LANG->getLL('title'));
 			$this->content.=$this->doc->spacer(5);
+
+			$this->content.= $LANG->getLL('select_a_page');
+
 			$this->content.=$this->doc->spacer(10);
 		}
 
@@ -327,24 +335,23 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 
 			// start indexing process
 			case 1:
+				$content = '';
+
 				if (t3lib_div::_GET('do') == 'startindexer') {
 					// make indexer instance and init
 					$indexer = t3lib_div::makeInstance('tx_kesearch_indexer');
 
 					$verbose = true;
 					$cleanup = $this->extConf['cleanupInterval'];
-					$content = $indexer->startIndexing(true, $this->extConf); // start indexing in verbose mode with cleanup process
-
-
-					// Reload - for Debugging only
-					$content .= '<br /><br /><input type="button" value="Reload Page" onClick="window.location.reload()">';
-
-				} else {
-					// show "start indexer" link
-					$content='<br /><br /><a class="index-button" href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=startindexer">Start Indexer</a>';
+					$content .= $indexer->startIndexing(true, $this->extConf); // start indexing in verbose mode with cleanup process
 				}
+
+				// show "start indexer" link
+				$content .= '<br /><a class="index-button" href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=startindexer">Start Indexer</a>';
+
 				$this->content.=$this->doc->section('INDEXER FOR KE_SEARCH',$content,0,1);
 			break;
+
 
 			// show indexed content
 			case 2:
@@ -390,6 +397,35 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 
 				break;
 
+			// clear index
+			case 5:
+				$content = '';
+
+					// admin only access
+				if ($GLOBALS['BE_USER']->user['admin'])	{
+					$table = 'tx_kesearch_index';
+
+					if (t3lib_div::_GET('do') == 'clear') {
+						$query = 'TRUNCATE TABLE ' . $table;
+						$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+					}
+
+					$query = 'SELECT COUNT(*) AS number_of_records FROM ' . $table;
+					$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+					$row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+					$content .= '<p>Search index table contains ' . $row['number_of_records'] . ' records.</p>';
+
+					// show "start indexer" link
+					$content .= '<br /><a class="index-button" href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=clear">Clear whole search index!</a>';
+				} else {
+					$content .= '<p>Clear search index: This function is available to admins only.</p>';
+				}
+
+
+				$this->content.=$this->doc->section('FACETED SEARCH',$content,0,1);
+
+				break;
+
 
 		}
 	}
@@ -413,22 +449,22 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 				$completeLength = $this->formatFilesize($row['Data_length'] + $row['Index_length']);
 
 				$content .= '
-					<h2>Index table information</h2>
+					<h2>Search index table information</h2>
 					<table>
 						<tr>
-							<td class="label">Rows: </td>
+							<td class="label">Records: </td>
 							<td>'.$row['Rows'].'</td>
 						</tr>
 						<tr>
-							<td class="label">Data length: </td>
+							<td class="label">Data size: </td>
 							<td>'.$dataLength.'</td>
 						</tr>
 						<tr>
-							<td class="label">Index length: </td>
+							<td class="label">Index size: </td>
 							<td>'.$indexLength.'</td>
 						</tr>
 						<tr>
-							<td class="label">Complete table length: </td>
+							<td class="label">Complete table size: </td>
 							<td>'.$completeLength.'</td>
 						</tr>
 					</table>';
