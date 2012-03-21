@@ -101,10 +101,13 @@ class tx_kesearch_indexer_types_ke_yac extends tx_kesearch_indexer_types {
 					}
 				}
 
-				// add clearText Tags to content
+					// add clearText Tags to content
 				if (!empty($clearTextTags)) $fullContent .= chr(13).$clearTextTags;
 
-				// hook for custom modifications of the indexed data, e. g. the tags
+					// make it possible to modify the indexerConfig via hook
+				$indexerConfig = $this->indexerConfig;
+
+					// hook for custom modifications of the indexed data, e. g. the tags
 				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyYACIndexEntry'])) {
 					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyYACIndexEntry'] as $_classRef) {
 						$_procObj = & t3lib_div::getUserObj($_classRef);
@@ -116,14 +119,15 @@ class tx_kesearch_indexer_types_ke_yac extends tx_kesearch_indexer_types {
 							$tags,
 							$yacRecord,
 							$targetPID,
-							$additionalFields
+							$additionalFields,
+							$indexerConfig
 						);
 					}
 				}
 
 				// store data in index table
 				$this->pObj->storeInIndex(
-					$this->indexerConfig['storagepid'],				// storage PID
+					$indexerConfig['storagepid'],				// storage PID
 					$title,										// page/record title
 					'ke_yac', 									// content type
 					$targetPID,									// target PID: where is the single view?

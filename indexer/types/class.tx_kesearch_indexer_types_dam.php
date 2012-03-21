@@ -116,7 +116,11 @@ class tx_kesearch_indexer_types_dam extends tx_kesearch_indexer_types {
 					$tags = '';
 				}
 
-				// hook for custom modifications of the indexed data, e. g. the tags
+
+					// make it possible to modify the indexerConfig via hook
+				$indexerConfig = $this->indexerConfig;
+
+					// hook for custom modifications of the indexed data, e. g. the tags
 				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyDAMIndexEntry'])) {
 					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyDAMIndexEntry'] as $_classRef) {
 						$_procObj = & t3lib_div::getUserObj($_classRef);
@@ -129,7 +133,8 @@ class tx_kesearch_indexer_types_dam extends tx_kesearch_indexer_types {
 							$damRecord,
 							$targetPID,
 							$clearTextTags,
-							$additionalFields
+							$additionalFields,
+							$indexerConfig
 						);
 					}
 				}
@@ -140,10 +145,10 @@ class tx_kesearch_indexer_types_dam extends tx_kesearch_indexer_types {
 
 				// store data in index table
 				$this->pObj->storeInIndex(
-					$this->indexerConfig['storagepid'],   // storage PID
+					$indexerConfig['storagepid'],   // storage PID
 					$title,                         // page/record title
 					'dam',                          // content type
-					$this->indexerConfig['targetpid'],    // target PID: where is the single view?
+					$indexerConfig['targetpid'],    // target PID: where is the single view?
 					$fullContent,                   // indexed content, includes the title (linebreak after title)
 					$tags,                          // tags
 					$params,                        // typolink params for singleview

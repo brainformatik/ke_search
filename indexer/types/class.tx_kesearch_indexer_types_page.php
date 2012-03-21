@@ -294,10 +294,13 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 			return;
 		}
 
-		// get Tags for current page
+			// get Tags for current page
 		$tags = $this->pageRecords[intval($uid)]['tags'];
 
-		// hook for custom modifications of the indexed data, e. g. the tags
+			// make it possible to modify the indexerConfig via hook
+		$indexerConfig = $this->indexerConfig;
+
+			// hook for custom modifications of the indexed data, e. g. the tags
 		if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyPagesIndexEntry'])) {
 			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyPagesIndexEntry'] as $_classRef) {
 				$_procObj = & t3lib_div::getUserObj($_classRef);
@@ -306,7 +309,8 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 					$pageContent,
 					$tags,
 					$this->cachedPageRecords,
-					$additionalFields
+					$additionalFields,
+					$indexerConfig
 				);
 			}
 		}
@@ -314,20 +318,20 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		// store record in index table
 		foreach($pageContent as $langKey => $content) {
 			$this->pObj->storeInIndex(
-				$this->indexerConfig['storagepid'],                    // storage PID
-				$this->cachedPageRecords[$langKey][$uid]['title'],     // page title
-				'page',                                                // content type
-				$uid,                                                  // target PID: where is the single view?
-				$content,                                              // indexed content, includes the title (linebreak after title)
-				$tags,                                                 // tags
-				'',                                                    // typolink params for singleview
-				'',                                                    // abstract
-				$langKey,                                              // language uid
-				$this->cachedPageRecords[$langKey][$uid]['starttime'], // starttime
-				$this->cachedPageRecords[$langKey][$uid]['endtime'],   // endtime
-				$this->cachedPageRecords[$langKey][$uid]['fe_group'],  // fe_group
-				false,                                                 // debug only?
-				$additionalFields                                      // additional fields added by hooks
+				$indexerConfig['storagepid'],                    		// storage PID
+				$this->cachedPageRecords[$langKey][$uid]['title'],     	// page title
+				'page',                                                	// content type
+				$uid,                                                  	// target PID: where is the single view?
+				$content,                                             	// indexed content, includes the title (linebreak after title)
+				$tags,                                                 	// tags
+				'',                                                    	// typolink params for singleview
+				'',                                                    	// abstract
+				$langKey,                                              	// language uid
+				$this->cachedPageRecords[$langKey][$uid]['starttime'], 	// starttime
+				$this->cachedPageRecords[$langKey][$uid]['endtime'],   	// endtime
+				$this->cachedPageRecords[$langKey][$uid]['fe_group'],  	// fe_group
+				false,                                                 	// debug only?
+				$additionalFields                                      	// additional fields added by hooks
 			);
 		}
 

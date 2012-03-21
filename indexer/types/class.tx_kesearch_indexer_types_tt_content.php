@@ -77,6 +77,9 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 
 				$additionalFields = array();
 
+					// make it possible to modify the indexerConfig via hook
+				$indexerConfig = $this->indexerConfig;
+
 				// hook for custom modifications of the indexed data, e. g. the tags
 				if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyContentIndexEntry'])) {
 					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyContentIndexEntry'] as $_classRef) {
@@ -86,7 +89,8 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 							$row,
 							$tags,
 							$row['uid'],
-							$additionalFields
+							$additionalFields,
+							$indexerConfig
 						);
 					}
 				}
@@ -102,20 +106,20 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 
 				// save record to index
 				$this->pObj->storeInIndex(
-					$this->indexerConfig['storagepid'],    // storage PID
-					$title,                                // page title inkl. tt_content-title
-					'content',                             // content type
-					$row['pid'] . '#c' . $row['uid'],      // target PID: where is the single view?
-					$bodytext,                             // indexed content, includes the title (linebreak after title)
-					$tags,                                 // tags
-					'',                                    // typolink params for singleview
-					'',                                    // abstract
-					$row['sys_language_uid'],              // language uid
-					$row['starttime'],                     // starttime
-					$row['endtime'],                       // endtime
-					$feGroups,                             // fe_group
-					false,                                 // debug only?
-					$additionalFields                      // additional fields added by hooks
+					$indexerConfig['storagepid'],    		// storage PID
+					$title,                             	// page title inkl. tt_content-title
+					'content',                        		// content type
+					$row['pid'] . '#c' . $row['uid'],      	// target PID: where is the single view?
+					$bodytext,                             	// indexed content, includes the title (linebreak after title)
+					$tags,                                	// tags
+					'',                                    	// typolink params for singleview
+					'',                                   	// abstract
+					$row['sys_language_uid'],              	// language uid
+					$row['starttime'],                     	// starttime
+					$row['endtime'],                       	// endtime
+					$feGroups,                             	// fe_group
+					false,                                 	// debug only?
+					$additionalFields                      	// additional fields added by hooks
 				);
 
 				// count elements written to the index

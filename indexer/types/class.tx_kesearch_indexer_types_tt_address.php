@@ -103,7 +103,10 @@ class tx_kesearch_indexer_types_tt_address extends tx_kesearch_indexer_types {
 				'sortdate' => $addressRow['tstamp'],
 			);
 
-			// hook for custom modifications of the indexed data, e. g. the tags
+				// make it possible to modify the indexerConfig via hook
+			$indexerConfig = $this->indexerConfig;
+
+				// hook for custom modifications of the indexed data, e. g. the tags
 			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyAddressIndexEntry'])) {
 				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyAddressIndexEntry'] as $_classRef) {
 					$_procObj = & t3lib_div::getUserObj($_classRef);
@@ -114,14 +117,15 @@ class tx_kesearch_indexer_types_tt_address extends tx_kesearch_indexer_types {
 						$params,
 						$tagContent,
 						$addressRow,
-						$additionalFields
+						$additionalFields,
+						$indexerConfig
 					);
 				}
 			}
 
 			// store in index
 			$this->pObj->storeInIndex(
-				$this->indexerConfig['storagepid'],     // storage PID
+				$indexerConfig['storagepid'],     		// storage PID
 				$title,                                 // page/record title
 				'tt_address',              				// content type
 				$targetPID,                   			// target PID: where is the single view?
