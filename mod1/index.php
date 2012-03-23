@@ -45,6 +45,7 @@ $BE_USER->modAccess($MCONF,1);	// This checks permissions and exits if the users
  */
 class  tx_kesearch_module1 extends t3lib_SCbase {
 	var $pageinfo;
+	var $registry;
 
 	/**
 	 * Initializes the Module
@@ -225,6 +226,26 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					margin-top: 20px;
 				}
 
+				a.lock-button:hover,
+				.lock-button {
+					-moz-border-radius: 7px;
+					border-radius: 7px;
+					box-shadow: 5px 5px 5px #AFAFAF;
+					-moz-box-shadow: 5px 5px 5px #AFAFAF;
+					-webkit-box-shadow: 5px 5px 5px #AFAFAF;
+					background: red;
+					padding: 5px;
+					width: 250px;
+					display: block;
+					text-align: center;
+					font-weight: bold;
+					color: white
+				}
+
+				a.lock-button:hover {
+					background: #d60008;
+				}
+
 				table.statistics {
 					-moz-border-radius: 10px;
 					border-radius: 10px;
@@ -336,18 +357,51 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 			// start indexing process
 			case 1:
 				$content = '';
+				$this->registry = t3lib_div::makeInstance('t3lib_Registry');
 
 				if (t3lib_div::_GET('do') == 'startindexer') {
 					// make indexer instance and init
 					$indexer = t3lib_div::makeInstance('tx_kesearch_indexer');
-
 					$verbose = true;
 					$cleanup = $this->extConf['cleanupInterval'];
 					$content .= $indexer->startIndexing(true, $this->extConf); // start indexing in verbose mode with cleanup process
+				} else if (t3lib_div::_GET('do') == 'rmLock') {
+					// remove lock from registry - admin only!
+					if ($GLOBALS['BE_USER']->user['admin']) {
+						$this->registry->removeAllByNamespace('tx_kesearch');
+					} else {
+						$content .= '<p>You are not allowed to remove the indexer lock! This is for admins only!</p>';
+					}
 				}
 
-				// show "start indexer" link
-				$content .= '<br /><a class="index-button" href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=startindexer">Start Indexer</a>';
+				// check for index process lock in registry
+				$lockTime = $this->registry->get('tx_kesearch', 'startTimeOfIndexer');
+				if ($lockTime !== null) {
+					// lock is set
+					$compareTime = time() - (60*60*12);
+					if ($lockTime < $compareTime) {
+						// lock is older than 12 hours
+						// remove lock and show "start index" button
+						$this->registry->removeAllByNamespace('tx_kesearch');
+						$content .= '<br /><a class="index-button" href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=startindexer">Start Indexer</a>';
+					} else {
+						// lock is not older than 12 hours
+						if (!$GLOBALS['BE_USER']->user['admin']) {
+							// print warning message for non-admins
+							$content .= '<br /><p style="color: red; font-weight: bold;">WARNING!</p>';
+							$content .= '<p>The indexer is already running and can not be started twice.</p>';
+						} else {
+							// show 'remove lock' button for admins
+							$content .= '<br /><p>The indexer is already running and can not be started twice.</p>';
+							$content .= '<p>The indexing process was started at '.strftime('%c', $lockTime).'.</p>';
+							$content .= '<p>You can remove the lock by clicking the following button.</p>';
+							$content .= '<br /><a class="lock-button" href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=rmLock">RemoveLock</a>';
+						}
+					}
+				} else {
+					// no lock set - show "start indexer" link
+					$content .= '<br /><a class="index-button" href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=startindexer">Start Indexer</a>';
+				}
 
 				$this->content.=$this->doc->section('INDEXER FOR KE_SEARCH',$content,0,1);
 			break;
@@ -415,7 +469,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					$row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 					$content .= '<p>Search index table contains ' . $row['number_of_records'] . ' records.</p>';
 
-					// show "start indexer" link
+					// show "clear index" link
 					$content .= '<br /><a class="index-button" href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=clear">Clear whole search index!</a>';
 				} else {
 					$content .= '<p>Clear search index: This function is available to admins only.</p>';
