@@ -19,7 +19,7 @@
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	border-radius: 4px;
-	
+
 	font-family: Verdana,Arial,Helvetica,sans-serif;
 	color: #2b2b2b;
     font-size: 12px;
@@ -53,7 +53,7 @@ div.kesearchbox{
 #kesearch_submit{
 	position: absolute;
 	top: 3px;
-	left: 237px;    
+	left: 237px;
 	height: 28px;
 	width: 28px;
     border: 0 none;
@@ -112,7 +112,7 @@ div.kesearchbox{
 }
 .tx-kesearch-pi1 #kesearch_results .result-list-item .scoreBar {
 	border: 1px solid #D3D3D3;
-	display: inline-block;
+	display: block;
 	float: right;
 	height: 10px;
 	width: 48px;
@@ -120,7 +120,7 @@ div.kesearchbox{
 .tx-kesearch-pi1 #kesearch_results .result-list-item .scoreBar .score {
 	background-color: #D3D3D3;
 	border: 1px solid #898989;
-	display: inline-block;
+	display: block;
 	height: 10px;
 	margin: -1px 0 0 -1px;
 }
@@ -445,7 +445,7 @@ div.kesearchbox{
     display:block;
     list-style-type:none;
     margin:0 0 5px 0;
-    
+
     font-size:12px;
     line-height:16px
 }
@@ -487,4 +487,3 @@ div.kesearchbox{
 #kesearch_filters div.multiselect a{
     background-position: 0 -78px;
 }
-
