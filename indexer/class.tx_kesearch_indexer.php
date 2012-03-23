@@ -173,8 +173,22 @@ class tx_kesearch_indexer {
 				$msg .= strip_tags($content);
 				$msg .= "\n\n".'Indexing process ran '.$indexingTime;
 
+				// build subject
+				$subject = $extConf['notificationSubject'];
+
 				// send the notification message
-				mail($extConf['notificationRecipient'], $extConf['notificationSubject'], $msg);
+				// use swiftmailer in 4.5 and above
+				if (t3lib_div::int_from_ver(TYPO3_version) >= 4005000) {
+					$mail = t3lib_div::makeInstance('t3lib_mail_Message');
+					$mail->setFrom(array($extConf['notificationSender']));
+					$mail->setTo(array($extConf['notificationRecipient']));
+					$mail->setSubject($subject);
+					$mail->setBody($msg);
+					$mail->send();
+				} else {
+					mail($extConf['notificationRecipient'], $subject, $msg);
+				}
+
 			}
 		}
 
