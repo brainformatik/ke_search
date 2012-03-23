@@ -1888,9 +1888,8 @@ class tx_kesearch_lib extends tslib_pibase {
 	 */
 	public function renderTypeIcon($type) {
 		$type = $this->div->removeXSS($type);
-		if(is_file($this->conf['additionalPathForTypeIcons'] . $type . '.gif')) {
-			$imageConf['file'] = $this->conf['additionalPathForTypeIcons'] . $type . '.gif';
-		} else {
+		$imageConf['file'] = str_replace(PATH_site, '', t3lib_div::getFileAbsFileName($this->conf['additionalPathForTypeIcons'] . $type . '.gif'));
+		if(!is_file(PATH_site . $imageConf['file'])) {
 			$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/types/' . $type . '.gif';
 		}
 		return $this->cObj->IMAGE($imageConf);
