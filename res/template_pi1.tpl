@@ -231,7 +231,7 @@ function hideSpinner() {
 
 
 <!-- ###RESULT_ROW### start -->
-<div class="result-list-item">
+<div class="result-list-item result-list-item-type-###TYPE###">
 	<!-- ###SUB_NUMERATION### start -->###NUMBER###.<!-- ###SUB_NUMERATION### end -->
 	<b>###TITLE###</b>
 	<!-- ###SUB_SCORE_SCALE### start -->

@@ -1512,7 +1512,10 @@ class tx_kesearch_lib extends tslib_pibase {
 				unset($this->currentRowNumber);
 			}
 
+			// add type marker
+			$tempMarkerArray['type'] = str_replace(' ', '_', $row['type']);
 
+			// replace markers
 			$tempContent = $this->cObj->substituteMarkerArray($tempContent, $tempMarkerArray, $wrap='###|###', $uppercase=1);
 
 			// show result url?

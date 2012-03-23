@@ -91,7 +91,13 @@ div.kesearchbox{
 }
 .tx-kesearch-pi1 #kesearch_results .result-list-item{
 	margin: 0 0 20px 0;
-	padding: 0 15px;
+	padding: 0 0px;
+}
+
+.tx-kesearch-pi1 #kesearch_results .result-list-item-type-page {
+}
+
+.tx-kesearch-pi1 #kesearch_results .result-list-item-type-tt_news {
 }
 
 .tx-kesearch-pi1 #kesearch_results .teaser_icon img {
