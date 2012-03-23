@@ -58,7 +58,10 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 		if(count($rows)) {
 			foreach($rows as $row) {
 				// header
-				$row['header'] = strip_tags($row['header']);
+				// add header only if not set to "hidden"
+				if ($row['header_layout'] != 100) {
+					$row['header'] = strip_tags($row['header']);
+				}
 
 				// bodytext
 				$bodytext = $row['bodytext'];

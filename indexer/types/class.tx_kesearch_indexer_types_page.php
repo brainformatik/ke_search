@@ -42,7 +42,8 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		'textpic',
 		'bullets',
 		'table',
-		'html'
+		'html',
+		'header'
 	);
 	var $counter = 0;
 	var $whereClauseForCType = '';
@@ -253,7 +254,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		// language id = pages_language_overlay.sys_language_uid
 
 		// get content elements for this page
-		$fields = 'header, bodytext, CType, sys_language_uid';
+		$fields = 'header, bodytext, CType, sys_language_uid, header_layout';
 		$table = 'tt_content';
 		$where = 'pid = ' . intval($uid);
 		$where .= ' AND (' . $this->whereClauseForCType. ')';
@@ -270,7 +271,10 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		if(count($rows)) {
 			foreach($rows as $row) {
 				// header
-				$pageContent[$row['sys_language_uid']] .= strip_tags($row['header']) . "\n";
+				// add header only if not set to "hidden"
+				if ($row['header_layout'] != 100) {
+					$pageContent[$row['sys_language_uid']] .= strip_tags($row['header']) . "\n";
+				}
 
 				// bodytext
 				$bodytext = $row['bodytext'];
