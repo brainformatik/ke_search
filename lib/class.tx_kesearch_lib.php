@@ -543,67 +543,143 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * @param $arg
 	 */
 	public function renderList($filterUid, $options) {
-		// onClick don't works in static mode
-		if($this->conf['renderMethod'] == 'static') {
-			return $this->renderSelect($filterUid, $options);
-		}
 
 		$filterSubpart = '###SUB_FILTER_LIST###';
 		$optionSubpart = '###SUB_FILTER_LIST_OPTION###';
 
 		$optionsCount = 0;
 
-		// loop through options
-		if (is_array($options)) {
-			foreach ($options as $key => $data) {
 
-				$onclick = '';
-				$tempField = strtolower(t3lib_div::removeXSS($this->piVars['orderByField']));
-				$tempDir = strtolower(t3lib_div::removeXSS($this->piVars['orderByDir']));
-				if($tempField != '' && $tempDir != '') {
-					$onclick = 'setOrderBy(' . $tempField . ', ' . $tempDir . ');';
+		if($this->conf['renderMethod'] == 'static') {
+			// STATIC MODE
+			// in static mode, the list filter can not submit other filter values
+			// it submits only the current filter value that is clicked, other
+			// filters are ignored
+			if (is_array($options)) {
+				foreach ($options as $key => $data) {
+
+					$onclick = '';
+
+					// build filter link
+					$optionLink = '';
+					unset($linkconf);
+					$linkconf['parameter'] = $GLOBALS['TSFE']->id;
+					$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'].'&tx_kesearch_pi1[filter]['.$filterUid.']='.$data['value'];
+					$linkconf['useCacheHash'] = false;
+					$optionLink = $this->cObj->typoLink($data['title'],$linkconf);
+
+					$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
+					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###ONCLICK###', '');
+					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $optionLink);
+					$cssClass = 'option ';
+					$cssClass .= $data['selected'] ? 'selected' : '';
+					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONCSSCLASS###', $cssClass);
+
+					$optionsCount++;
 				}
-				$onclick = $onclick . ' document.getElementById(\'filter['.$filterUid.']\').value=\''.$data['value'].'\'; ';
-				$onclick .= ' document.getElementById(\'pagenumber\').value=\'1\'; ';
-				$onclick .= $this->onclickFilter;
 
-				$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###ONCLICK###', $onclick);
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $data['title']);
-				$cssClass = 'option ';
-				$cssClass .= $data['selected'] ? 'selected' : '';
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONCSSCLASS###', $cssClass);
+				// modify filter options by hook
+				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'])) {
+					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'] as $_classRef) {
+						$_procObj = & t3lib_div::getUserObj($_classRef);
+						$optionsContent .= $_procObj->modifyFilterOptions(
+							$filterUid,
+							$optionsContent,
+							$optionsCount,
+							$this
+						);
+					}
+				}
 
-				$optionsCount++;
+				// build link to reset filter
+				unset($linkconf);
+				$linkconf['parameter'] = $GLOBALS['TSFE']->id;
+				$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
+				$linkconf['additionalParams'] = '&tx_kesearch_pi1[filter]['.$filterUid.']=';
+				foreach ($this->piVars['filter'] as $key => $value) {
+					if ($key != $filterUid) {
+						$linkconf['additionalParams'] = '&tx_kesearch_pi1[filter]['.$key.']='.$value.'';
+					}
+				}
+				$resetFilterLink = $this->cObj->typoLink($this->pi_getLL('reset_filter'),$linkconf);
 
+				// fill markers
+				$filterContent = $this->cObj->getSubpart($this->templateCode, $filterSubpart);
+				$filterContent = $this->cObj->substituteSubpart ($filterContent, $optionSubpart, $optionsContent);
+				$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $this->filters[$filterUid]['title']);
+				$filterContent = $this->cObj->substituteMarker($filterContent,'###SWITCH_AREA_START###', '');
+				$filterContent = $this->cObj->substituteMarker($filterContent,'###SWITCH_AREA_END###', '');
+				$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERNAME###', 'tx_kesearch_pi1[filter]['.$filterUid.']');
+				$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERID###', 'filter['.$filterUid.']');
+				$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCHANGE###', '');
+				$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCLICK_RESET###', '');
+				$filterContent = $this->cObj->substituteMarker($filterContent,'###RESET_FILTER###', $resetFilterLink);
+				$filterContent = $this->cObj->substituteMarker($filterContent,'###DISABLED###', $optionsCount > 0 ? '' : ' disabled="disabled" ');
+				$filterContent = $this->cObj->substituteMarker($filterContent,'###VALUE###', $this->piVars['filter'][$filterUid]);
 			}
-		}
+			// return $this->renderSelect($filterUid, $options);
+		} else {
+			// AJAX -MODE
+			// use javascript onclick action for submitting the whole form
+			// if in ajax-mode
+			// loop through options
 
-		// modify filter options by hook
-		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'])) {
-			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'] as $_classRef) {
-				$_procObj = & t3lib_div::getUserObj($_classRef);
-				$optionsContent .= $_procObj->modifyFilterOptions(
-					$filterUid,
-					$optionsContent,
-					$optionsCount,
-					$this
-				);
+			if (is_array($options)) {
+				foreach ($options as $key => $data) {
+
+					$onclick = '';
+					$tempField = strtolower(t3lib_div::removeXSS($this->piVars['orderByField']));
+					$tempDir = strtolower(t3lib_div::removeXSS($this->piVars['orderByDir']));
+					if($tempField != '' && $tempDir != '') {
+						$onclick = 'setOrderBy(' . $tempField . ', ' . $tempDir . ');';
+					}
+					$onclick = $onclick . ' document.getElementById(\'filter['.$filterUid.']\').value=\''.$data['value'].'\'; ';
+					$onclick .= ' document.getElementById(\'pagenumber\').value=\'1\'; ';
+					$onclick .= $this->onclickFilter;
+					$onclick = 'onclick="'.$onclick.'"';
+
+					$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
+					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###ONCLICK###', $onclick);
+					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $data['title']);
+					$cssClass = 'option ';
+					$cssClass .= $data['selected'] ? 'selected' : '';
+					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONCSSCLASS###', $cssClass);
+
+					$optionsCount++;
+
+				}
 			}
+
+			// modify filter options by hook
+			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'])) {
+				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'] as $_classRef) {
+					$_procObj = & t3lib_div::getUserObj($_classRef);
+					$optionsContent .= $_procObj->modifyFilterOptions(
+						$filterUid,
+						$optionsContent,
+						$optionsCount,
+						$this
+					);
+				}
+			}
+
+			// build onclick reset
+			$onclickReset = 'onclick="document.getElementById(\'filter['.$filterUid.']\').value=\'\'; '.$this->onclickFilter.' "';
+
+			// fill markers
+			$filterContent = $this->cObj->getSubpart($this->templateCode, $filterSubpart);
+			$filterContent = $this->cObj->substituteSubpart ($filterContent, $optionSubpart, $optionsContent);
+			$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $this->filters[$filterUid]['title']);
+			$filterContent = $this->cObj->substituteMarker($filterContent,'###SWITCH_AREA_START###', '<a href="javascript:switchArea(\'filter['.$filterUid.']\')">');
+			$filterContent = $this->cObj->substituteMarker($filterContent,'###SWITCH_AREA_END###', '</a>');
+			$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERNAME###', 'tx_kesearch_pi1[filter]['.$filterUid.']');
+			$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERID###', 'filter['.$filterUid.']');
+			$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCHANGE###', $this->onclickFilter);
+			$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCLICK_RESET###', $onclickReset );
+			$filterContent = $this->cObj->substituteMarker($filterContent,'###RESET_FILTER###', $this->pi_getLL('reset_filter'));
+			$filterContent = $this->cObj->substituteMarker($filterContent,'###DISABLED###', $optionsCount > 0 ? '' : ' disabled="disabled" ');
+			$filterContent = $this->cObj->substituteMarker($filterContent,'###VALUE###', $this->piVars['filter'][$filterUid]);
 		}
-
-		// fill markers
-		$filterContent = $this->cObj->getSubpart($this->templateCode, $filterSubpart);
-		$filterContent = $this->cObj->substituteSubpart ($filterContent, $optionSubpart, $optionsContent);
-
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $this->filters[$filterUid]['title']);
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $this->filters[$filterUid]['title']);
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERNAME###', 'tx_kesearch_pi1[filter]['.$filterUid.']');
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERID###', 'filter['.$filterUid.']');
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCHANGE###', $this->onclickFilter);
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCLICK_RESET###', $this->onclickFilter);
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###DISABLED###', $optionsCount > 0 ? '' : ' disabled="disabled" ');
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###VALUE###', $this->piVars['filter'][$filterUid]);
 
 		// bullet
 		unset($imageConf);

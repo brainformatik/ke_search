@@ -1,4 +1,3 @@
-
 <!-- ###JS_SEARCH_ALL### begin -->
 <script type="text/javascript">
 //<![CDATA[
@@ -287,23 +286,28 @@ function hideSpinner() {
 <!-- ###SUB_FILTER_SELECT### end -->
 
 
+
+
 <!-- ###SUB_FILTER_LIST### start -->
     <div class="list" id="list_###FILTERID###">
-	<span class="head">
-	    ###BULLET###
-	    <a href="javascript:switchArea('###FILTERID###');">###FILTERTITLE###</a>
-	</span>
-	<ul id="options_###FILTERID###" class="###LISTCSSCLASS###">
-	    <span class="###SPECIAL_CSS_CLASS###">
-		<!-- ###SUB_FILTER_LIST_OPTION### start -->
-		<li class="###OPTIONCSSCLASS###" onclick="###ONCLICK###">###TITLE###</li>
-		<!-- ###SUB_FILTER_LIST_OPTION### end -->
-	    </span>
-	    <span class="resetlink" onclick="document.getElementById('###FILTERID###').value=''; ###ONCLICK_RESET###">Filter zur&uuml;cksetzen</span>
-	</ul>
-	<input type="hidden" name="###FILTERNAME###" id="###FILTERID###" value="###VALUE###" />
+		<span class="head">
+			###BULLET###
+			###SWITCH_AREA_START### ###FILTERTITLE### ###SWITCH_AREA_END###
+		</span>
+		<input type="hidden" name="###FILTERNAME###" id="###FILTERID###" value="###VALUE###" />
+		<ul id="options_###FILTERID###" class="###LISTCSSCLASS###">
+			<span class="###SPECIAL_CSS_CLASS###">
+			<!-- ###SUB_FILTER_LIST_OPTION### start -->
+				<li class="###OPTIONCSSCLASS###" ###ONCLICK###>###TITLE###</li>
+			<!-- ###SUB_FILTER_LIST_OPTION### end -->
+			</span>
+			<span class="resetlink" ###ONCLICK_RESET###>###RESET_FILTER###</span>
+		</ul>
+
 	</div>
 <!-- ###SUB_FILTER_LIST### end -->
+
+
 
 <!-- ###SUB_FILTER_CHECKBOX### start -->
     <div class="list" id="list_###FILTERID###">
