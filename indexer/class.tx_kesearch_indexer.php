@@ -95,8 +95,8 @@ class tx_kesearch_indexer {
 		// get configurations
 		$configurations = $this->getConfigurations();
 
-		$this->amountOfRecordsToSaveInMem = intval($this->extConf['periodicNotification']);
-		if(empty($this->amountOfRecordsToSaveInMem)) $this->amountOfRecordsToSaveInMem = 100;
+		// number of records that should be written to the database in one action
+		$this->amountOfRecordsToSaveInMem = 500;
 
 		// register additional fields which should be written to DB
 		if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['registerAdditionalFields'])) {
@@ -488,12 +488,10 @@ class tx_kesearch_indexer {
 	 * Update temporary saved records to db
 	 */
 	public function updateRecordsInIndexer() {
-		$startTime = t3lib_div::milliseconds();
 		foreach($this->tempArrayForUpdatingExistingRecords as $query) {
 			$GLOBALS['TYPO3_DB']->sql_query($query['set']);
 			$GLOBALS['TYPO3_DB']->sql_query($query['execute']);
 		}
-		if($this->amountOfRecordsToSaveInMem) $this->periodicNotificationCount('update');
 		$this->tempArrayForUpdatingExistingRecords = array();
 	}
 
@@ -502,13 +500,10 @@ class tx_kesearch_indexer {
 	 * Insert temporary saved records to db
 	 */
 	public function insertRecordsToIndexer() {
-		$startTime = t3lib_div::milliseconds();
 		foreach($this->tempArrayForInsertNewRecords as $query) {
 			$GLOBALS['TYPO3_DB']->sql_query($query['set']);
 			$GLOBALS['TYPO3_DB']->sql_query($query['execute']);
 		}
-
-		if($this->amountOfRecordsToSaveInMem) $this->periodicNotificationCount('insert');
 		$this->tempArrayForInsertNewRecords = array();
 	}
 
@@ -663,34 +658,6 @@ class tx_kesearch_indexer {
 		$where .= t3lib_befunc::BEenableFields($table);
 		$where .= t3lib_befunc::deleteClause($table);
 		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where);
-	}
-
-
-	/**
-	 * send a periodic notification to the admin
-	 *
-	 * @param string $which
-	 * @return void
-	 */
-	public function periodicNotificationCount($which = 'both') {
-		switch($which) {
-			case 'insert':
-				$this->counter += count($this->tempArrayForInsertNewRecords);
-				break;
-			case 'update':
-				$this->counter += count($this->tempArrayForUpdatingExistingRecords);
-				break;
-			case 'both':
-			default:
-				$this->counter += (count($this->tempArrayForInsertNewRecords) + count($this->tempArrayForUpdatingExistingRecords));
-				break;
-		}
-		// send the notification message
-		if(t3lib_div::validEmail($this->extConf['notificationRecipient'])) {
-			$msg = $this->counter . ' records have been indexed.' . "\n";
-			$msg .= 'Indexer runs ' . (time() - $this->registry->get('tx_kesearch', 'startTimeOfIndexer')) . ' seconds \'til now.';
-			mail($this->extConf['notificationRecipient'], $this->extConf['notificationSubject'], $msg);
-		}
 	}
 }
 
