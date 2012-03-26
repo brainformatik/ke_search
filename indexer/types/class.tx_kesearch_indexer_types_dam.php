@@ -37,9 +37,6 @@ class tx_kesearch_indexer_types_dam extends tx_kesearch_indexer_types {
 	var $catList = ''; // holder for recursive/non-recursive dam categories
 
 
-
-
-
 	/**
 	 * Initializes indexer for dam
 	 */
@@ -85,16 +82,13 @@ class tx_kesearch_indexer_types_dam extends tx_kesearch_indexer_types {
 
 				// prepare content for storing in index table
 				$title = strip_tags($damRecord['title']);
-				$params = '&tx_kedownloadshop_pi1[showUid]='.intval($damRecord['uid']);
-				$abstract = str_replace('<br />', chr(13), $damRecord['tx_kedownloadshop_teaser']);
-				$abstract = str_replace('<br>', chr(13), $abstract);
-				$abstract = str_replace('</p>', chr(13), $abstract);
-				$abstract = strip_tags($abstract);
-				$content = strip_tags($damRecord['tx_kedownloadshop_description']);
-				$pagetitle = strip_tags($damRecord['tx_kedownloadshop_pagetitle']);
+				$params = '&tx_dam[uid]='.intval($damRecord['uid']);
+				$abstract = '';
+				$content = strip_tags($damRecord['description']);
+				$title = strip_tags($damRecord['title']);
 				$keywords = strip_tags($damRecord['keywords']);
 				$filename = strip_tags($damRecord['file_name']);
-				$fullContent = $pagetitle . "\n" . $abstract . "\n" . $content . "\n" . $keywords . "\n" . $filename;
+				$fullContent = $content . "\n" . $keywords . "\n" . $filename;
 				$targetPID = $this->indexerConfig['targetpid'];
 
 				// get tags for this record
@@ -111,7 +105,6 @@ class tx_kesearch_indexer_types_dam extends tx_kesearch_indexer_types {
 							$clearTextTags .= chr(13).$this->getTag($tagUid, true);
 						}
 					}
-
 				} else {
 					$tags = '';
 				}
