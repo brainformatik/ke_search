@@ -365,6 +365,9 @@ $TCA['tx_kesearch_index'] = array (
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_index.language',
 			'config' => array (
 				'type' => 'select',
+				'items' => array (
+						array('Default', 0),
+				),
 				'foreign_table' => 'sys_language',
 				'foreign_table_where' => 'ORDER BY sys_language.uid',
 				'size' => 1,
