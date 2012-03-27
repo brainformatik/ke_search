@@ -595,10 +595,10 @@ class tx_kesearch_lib extends tslib_pibase {
 				unset($linkconf);
 				$linkconf['parameter'] = $GLOBALS['TSFE']->id;
 				$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
-				$linkconf['additionalParams'] = '&tx_kesearch_pi1[filter]['.$filterUid.']=';
+				$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterUid.']=';
 				foreach ($this->piVars['filter'] as $key => $value) {
 					if ($key != $filterUid) {
-						$linkconf['additionalParams'] = '&tx_kesearch_pi1[filter]['.$key.']='.$value.'';
+						$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$key.']='.$value.'';
 					}
 				}
 				$resetFilterLink = $this->cObj->typoLink($this->pi_getLL('reset_filter'),$linkconf);
