@@ -256,6 +256,7 @@ class tx_kesearch_lib_div {
 				// string
 				case 'sword':
 				case 'orderByField':
+					$value = trim($value);
 					$value = str_replace(array('"', "'"), array(' ', ' '), $value);
 					$piVars[$key] = htmlspecialchars($value, ENT_QUOTES);
 					break;
