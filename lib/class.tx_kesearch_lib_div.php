@@ -133,8 +133,8 @@ class tx_kesearch_lib_div {
 			foreach($swords as $key => $word) {
 				// ignore words under length of 4 chars
 				if(t3lib_cs::utf8_strlen($word) >= $this->pObj->extConf['searchWordLength']) {
-					$scoreAgainst .= $word.' ';
-					$wordsAgainst .= '+' . $word . '* ';
+					$scoreAgainst .= $GLOBALS['TYPO3_DB']->quoteStr($word, 'tx_kesearch_index' ) .' ';
+					$wordsAgainst .= '+' . $GLOBALS['TYPO3_DB']->quoteStr($word, 'tx_kesearch_index') . '* ';
 				} else {
 					$this->pObj->hasTooShortWords = true;
 					unset ($swords[$key]);
@@ -152,10 +152,10 @@ class tx_kesearch_lib_div {
 		foreach($this->pObj->preselectedFilter as $key => $value) {
 			// if we are in checkbox mode
 			if(count($this->pObj->preselectedFilter[$key]) >= 2) {
-				$tagsAgainst[$key] .= ' "' . $tagChar . implode($tagChar . '" "' . $tagChar, $value) . $tagChar . '"';
+				$tagsAgainst[$key] .= ' "' . $tagChar . implode($tagChar . '" "' . $tagChar, $GLOBALS['TYPO3_DB']->quoteStr($value, 'tx_kesearch_index')) . $tagChar . '"';
 			// if we are in select or list mode
 			} elseif(count($this->pObj->preselectedFilter[$key]) == 1) {
-				$tagsAgainst[$key] .= ' +"' . $tagChar. current($value) . $tagChar . '"';
+				$tagsAgainst[$key] .= ' +"' . $tagChar. current($GLOBALS['TYPO3_DB']->quoteStr($value, 'tx_kesearch_index')) . $tagChar . '"';
 			}
 		}
 		if(is_array($this->pObj->piVars['filter'])) {
@@ -165,13 +165,13 @@ class tx_kesearch_lib_div {
 						// Don't add the tag if it is already inserted by preselected filters
 						if(!empty($subtag) && strstr($tagsAgainst[$key], $subtag) === false) {
 							// Don't add a "+", because we are here in checkbox mode. It's a OR.
-							$tagsAgainst[$key] .= ' "' . $tagChar . $subtag . $tagChar . '"';
+							$tagsAgainst[$key] .= ' "' . $tagChar . $GLOBALS['TYPO3_DB']->quoteStr($subtag, 'tx_kesearch_index') . $tagChar . '"';
 						}
 					}
 				} else {
 					// Don't add the tag if it is already inserted by preselected filters
 					if(!empty($tag) && strstr($tagsAgainst[$key], $subtag) === false) {
-						$tagsAgainst[$key] .= ' +"' . $tagChar . $tag . $tagChar . '"';
+						$tagsAgainst[$key] .= ' +"' . $tagChar . $GLOBALS['TYPO3_DB']->quoteStr($tag, 'tx_kesearch_index') . $tagChar . '"';
 					}
 				}
 			}
@@ -244,10 +244,10 @@ class tx_kesearch_lib_div {
 						foreach($piVars[$key] as $filterId => $filterValue)  {
 							if(is_array($piVars[$key][$filterId])) {
 								foreach($piVars[$key][$filterId] as $key => $value) {
-									$piVars[$key][$filterId][$key] = htmlspecialchars($value);
+									$piVars[$key][$filterId][$key] = htmlspecialchars($value, ENT_QUOTES);
 								}
 							} else {
-								$piVars[$key][$filterId] = htmlspecialchars($filterValue);
+								$piVars[$key][$filterId] = htmlspecialchars($filterValue, ENT_QUOTES);
 							}
 						}
 					}
@@ -256,12 +256,13 @@ class tx_kesearch_lib_div {
 				// string
 				case 'sword':
 				case 'orderByField':
-					$piVars[$key] = htmlspecialchars($value);
+					$value = str_replace(array('"', "'"), array(' ', ' '), $value);
+					$piVars[$key] = htmlspecialchars($value, ENT_QUOTES);
 					break;
 
 				// "asc" or "desc"
 				case 'orderByDir':
-					$piVars[$key] = strtolower(htmlspecialchars($value));
+					$piVars[$key] = strtolower(htmlspecialchars($value, ENT_QUOTES));
 					if ($piVars[$key] != 'asc' && $piVars[$key] != 'desc') {
 						$piVars[$key] = 'asc';
 					}
