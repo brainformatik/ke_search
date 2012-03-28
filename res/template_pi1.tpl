@@ -8,6 +8,17 @@ function searchboxFocus(searchbox) {
 	}
 }
 
+function resetCheckboxes(filter) {
+	allLi = document.getElementsByName("optionCheckBox" + filter);
+	allCb = new Array();
+	for(i = 0; i < allLi.length; i++) {
+		allCb[i] = allLi[i].getElementsByTagName("input");
+	}
+	for(i = 0; i < allCb.length; i++) {
+		allCb[i][0].checked = false;
+	}
+}
+
 function enableCheckboxes(filter) {
 	allLi = document.getElementsByName("optionCheckBox" + filter);
 	allCb = new Array();
@@ -313,19 +324,30 @@ function hideSpinner() {
     <div class="list" id="list_###FILTERID###">
 	<span class="head">
 	    ###BULLET###
-	    <a href="javascript:switchArea('###FILTERID###');">###FILTERTITLE###</a>
+		###SWITCH_AREA_START### ###FILTERTITLE### ###SWITCH_AREA_END###
 	</span>
 	<ul id="options_###FILTERID###" class="###LISTCSSCLASS###">
 	    <span class="###SPECIAL_CSS_CLASS###">
-	    <li class="checkboxLabel"><label onclick="enableCheckboxes(###FILTER_UID###)">###LABEL_ALL###</label></li>
-		<!-- ###SUB_FILTER_CHECKBOX_OPTION### start -->
-		<li name="###OPTIONNAME###" class="###OPTIONCSSCLASS###"><input type="checkbox" name="###FILTERNAME###[###OPTIONKEY###]" id="###OPTIONID###" value="###VALUE###" ###OPTIONSELECT### ###OPTIONDISABLED### /><label for="###OPTIONID###">###TITLE###</label></li>
-		<!-- ###SUB_FILTER_CHECKBOX_OPTION### end -->
+
+			<!-- ###SUB_CHECKBOX_SWITCH### start -->
+			<li class="checkboxLabel">
+				<label onclick="enableCheckboxes(###FILTER_UID###)">###LABEL_ALL###</label>
+			</li>
+			<!-- ###SUB_CHECKBOX_SWITCH### end -->
+
+			<!-- ###SUB_FILTER_CHECKBOX_OPTION### start -->
+			<li name="###OPTIONNAME###" class="###OPTIONCSSCLASS###">
+				<input type="checkbox" name="###FILTERNAME###[###OPTIONKEY###]" id="###OPTIONID###" value="###VALUE###" ###OPTIONSELECT### ###OPTIONDISABLED### />
+				<label for="###OPTIONID###">###TITLE###</label>
+			</li>
+			<!-- ###SUB_FILTER_CHECKBOX_OPTION### end -->
+
 	    </span>
 		<li class="clearer"></li>
-	    <span class="resetlink" onclick="countInput=document.getElementById('list_###FILTERID###').getElementsByTagName('input').length;for(i=0;i<countInput;i++){document.getElementById('###FILTERID###['+i+']').value='';} ###ONCLICK_RESET###">Filter zur&uuml;cksetzen</span>
+		<!-- ###SUB_CHECKBOX_RESET### start -->
+			<span class="resetlink" onclick="resetCheckboxes(###FILTER_UID###); ###ONCLICK_RESET###">###RESET_FILTER###</span>
+		<!-- ###SUB_CHECKBOX_RESET### end -->
 	</ul>
-	<!-- <input type="hidden" name="###FILTERNAME###" id="###FILTERID###" value="###VALUE###" /> -->
     </div>
 <!-- ###SUB_FILTER_CHECKBOX### end -->
 

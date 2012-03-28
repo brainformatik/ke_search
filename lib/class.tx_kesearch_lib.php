@@ -759,6 +759,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$markerArray['###OPTIONNAME###'] = 'optionCheckBox' . $filterUid;
 				$markerArray['###OPTIONSELECT###'] = $checkBoxParams['selected'];
 				$markerArray['###OPTIONDISABLED###'] = $checkBoxParams['disabled'];
+
 				$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
 			}
 			$optionsCount = count($allOptionsOfCurrentFilter);
@@ -812,7 +813,33 @@ class tx_kesearch_lib extends tslib_pibase {
 		$markerArray['###BULLET###'] = $bulletImage;
 		$markerArray['###LISTCSSCLASS###'] = $class;
 		$markerArray['###SPECIAL_CSS_CLASS###'] = $this->filters[$filterUid]['cssclass'] ? $this->filters[$filterUid]['cssclass'] : '';
+		$markerArray['###SWITCH_AREA_START###'] = $this->conf['renderMethod'] != 'static' ? '<a href="javascript:switchArea(\'filter['.$filterUid.']\')">' : '';
+		$markerArray['###SWITCH_AREA_END###'] = $this->conf['renderMethod'] != 'static' ? '</a>' : '';
 		$contentFilters = $this->cObj->substituteMarkerArray($contentFilters, $markerArray);
+
+		// show checkbox switch only in ajax mode (needs javascript)
+		if ($this->conf['renderMethod'] != 'static') {
+			$checkboxSwitch  = $this->cObj->getSubpart($this->templateCode,'###SUB_CHECKBOX_SWITCH###');
+			$markerArray = array(
+				'###FILTER_UID###' => $filterUid,
+				'###LABEL_ALL###' => $this->pi_getLL('label_all'),
+			);
+			$checkboxSwitch = $this->cObj->substituteMarkerArray($checkboxSwitch,$markerArray);
+		} else $checkboxSwitch = '';
+		$contentFilters = $this->cObj->substituteSubpart($contentFilters, '###SUB_CHECKBOX_SWITCH', $checkboxSwitch);
+
+		// show checkbox reset link only in ajax mode (needs javascript)
+		if ($this->conf['renderMethod'] != 'static') {
+			$checkboxReset  = $this->cObj->getSubpart($this->templateCode,'###SUB_CHECKBOX_RESET###');
+			$markerArray = array(
+				'###FILTER_UID###' => $filterUid,
+				'###ONCLICK_RESET###' => $this->onclickFilter,
+				'###RESET_FILTER###' => $this->pi_getLL('reset_filter'),
+			);
+			$checkboxReset = $this->cObj->substituteMarkerArray($checkboxReset,$markerArray);
+		} else $checkboxReset = '';
+		$contentFilters = $this->cObj->substituteSubpart($contentFilters, '###SUB_CHECKBOX_RESET', $checkboxReset);
+
 
 		return $contentFilters;
 	}
