@@ -347,6 +347,11 @@ function hideSpinner() {
 		<!-- ###SUB_CHECKBOX_RESET### start -->
 			<span class="resetlink" onclick="resetCheckboxes(###FILTER_UID###); ###ONCLICK_RESET###">###RESET_FILTER###</span>
 		<!-- ###SUB_CHECKBOX_RESET### end -->
+
+		<!-- ###SUB_CHECKBOX_SUBMIT### start -->
+			<span class="resetLink" onclick="###ONCLICK_RESET###">###CHECKBOX_SUBMIT###</span>
+		<!-- ###SUB_CHECKBOX_SUBMIT### end -->
+
 	</ul>
     </div>
 <!-- ###SUB_FILTER_CHECKBOX### end -->

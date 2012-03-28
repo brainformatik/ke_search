@@ -840,6 +840,19 @@ class tx_kesearch_lib extends tslib_pibase {
 		} else $checkboxReset = '';
 		$contentFilters = $this->cObj->substituteSubpart($contentFilters, '###SUB_CHECKBOX_RESET', $checkboxReset);
 
+		// submit checkbox filter link only in ajax mode (needs javascript)
+		if ($this->conf['renderMethod'] != 'static') {
+			$checkboxSubmit  = $this->cObj->getSubpart($this->templateCode,'###SUB_CHECKBOX_SUBMIT###');
+			$markerArray = array(
+				'###ONCLICK_RESET###' => $this->onclickFilter,
+				'###CHECKBOX_SUBMIT###' => $this->pi_getLL('checkbox_submit'),
+			);
+			$checkboxSubmit = $this->cObj->substituteMarkerArray($checkboxSubmit,$markerArray);
+		} else $checkboxSubmit = '';
+		$contentFilters = $this->cObj->substituteSubpart($contentFilters, '###SUB_CHECKBOX_SUBMIT', $checkboxSubmit);
+
+
+
 
 		return $contentFilters;
 	}

@@ -93,6 +93,7 @@
 			<label index="reset_filter">Reset filter</label>
 			<label index="submit">Find</label>
 			<label index="back">Back</label>
+			<label index="checkbox_submit">Apply filter</label>
 
 			<label index="orderlink_title">Title</label>
 			<label index="orderlink_score">Relevance</label>
@@ -191,6 +192,7 @@
 			<label index="reset_filter">Filter zurücksetzen</label>
 			<label index="submit">Finden</label>
 			<label index="back">Zurück</label>
+			<label index="checkbox_submit">Filter anwenden</label>
 
 			<label index="orderlink_title">Titel</label>
 			<label index="orderlink_score">Relevanz</label>
