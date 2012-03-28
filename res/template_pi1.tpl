@@ -190,8 +190,9 @@ function hideSpinner() {
 	<!-- ###SHOW_SPINNER### begin -->
 	<div id="kesearch_updating_filters"><center>###SPINNER###<br /></center></div>
 	<!-- ###SHOW_SPINNER### end -->
-	###SUBMIT###
-	###RESET###
+	<span class="resetbutt">###RESET###</span>
+	<span class="submitbutt">###SUBMIT###</span>
+	
 </form>
 <!-- ###SEARCHBOX_STATIC### end -->
 
@@ -214,18 +215,13 @@ function hideSpinner() {
 
 
 <!-- ###PAGEBROWSER### start -->
-<div class="pages_total">
-	###RESULTS### ###START### ###UNTIL### ###END### ###OF### ###TOTAL###<br />
-	<table cellpadding="2" align="center">
-		<tr>
-			<td nowrap="nowrap">###PREVIOUS###</td>
-			<td nowrap="nowrap">###PAGES_LIST###</td>
-			<td nowrap="nowrap">###NEXT###</td>
-		</tr>
-	</table>
-</div>
-<!-- ###PAGEBROWSER### end -->
 
+<div class="pages_total">
+	<div class="result_txt">###RESULTS### ###START### ###UNTIL### ###END### ###OF### ###TOTAL###</div>
+	<div class="kesearch_pagebrowser">###PREVIOUS### ###PAGES_LIST### ###NEXT###</div>
+</div>
+
+<!-- ###PAGEBROWSER### end -->
 
 <!-- ###ORDERNAVIGATION### start -->
 <div class="ordering">
@@ -238,7 +234,6 @@ function hideSpinner() {
 	<div class="clearer"></div>
 </div>
 <!-- ###ORDERNAVIGATION### end -->
-
 
 <!-- ###RESULT_ROW### start -->
 <div class="result-list-item result-list-item-type-###TYPE###">
@@ -297,8 +292,6 @@ function hideSpinner() {
 <!-- ###SUB_FILTER_SELECT### end -->
 
 
-
-
 <!-- ###SUB_FILTER_LIST### start -->
     <div class="list" id="list_###FILTERID###">
 		<span class="head">
@@ -309,10 +302,10 @@ function hideSpinner() {
 		<ul id="options_###FILTERID###" class="###LISTCSSCLASS###">
 			<span class="###SPECIAL_CSS_CLASS###">
 			<!-- ###SUB_FILTER_LIST_OPTION### start -->
-				<li class="###OPTIONCSSCLASS###" ###ONCLICK###>###TITLE###</li>
+			<li class="###OPTIONCSSCLASS###" ###ONCLICK###>###TITLE###</li>
 			<!-- ###SUB_FILTER_LIST_OPTION### end -->
 			</span>
-			<span class="resetlink" ###ONCLICK_RESET###>###RESET_FILTER###</span>
+			<span class="kesGreyButt" ###ONCLICK_RESET###>###RESET_FILTER###</span>
 		</ul>
 
 	</div>
@@ -326,12 +319,11 @@ function hideSpinner() {
 	    ###BULLET###
 		###SWITCH_AREA_START### ###FILTERTITLE### ###SWITCH_AREA_END###
 	</span>
-	<ul id="options_###FILTERID###" class="###LISTCSSCLASS###">
+	<ul id="options_###FILTERID###" class="###LISTCSSCLASS### checkboxList">
 	    <span class="###SPECIAL_CSS_CLASS###">
-
 			<!-- ###SUB_CHECKBOX_SWITCH### start -->
-			<li class="checkboxLabel">
-				<label onclick="enableCheckboxes(###FILTER_UID###)">###LABEL_ALL###</label>
+			<li class="checkboxButton">
+				<span class="kesGreyButt" onclick="enableCheckboxes(###FILTER_UID###)">###LABEL_ALL###</span>
 			</li>
 			<!-- ###SUB_CHECKBOX_SWITCH### end -->
 
@@ -339,19 +331,23 @@ function hideSpinner() {
 			<li name="###OPTIONNAME###" class="###OPTIONCSSCLASS###">
 				<input type="checkbox" name="###FILTERNAME###[###OPTIONKEY###]" id="###OPTIONID###" value="###VALUE###" ###OPTIONSELECT### ###OPTIONDISABLED### />
 				<label for="###OPTIONID###">###TITLE###</label>
+				<div class="clearer"></div>
 			</li>
 			<!-- ###SUB_FILTER_CHECKBOX_OPTION### end -->
-
 	    </span>
 		<li class="clearer"></li>
+		
 		<!-- ###SUB_CHECKBOX_RESET### start -->
-			<span class="resetlink" onclick="resetCheckboxes(###FILTER_UID###); ###ONCLICK_RESET###">###RESET_FILTER###</span>
+		<li class="checkboxButton">
+			<span class="kesGreyButt" onclick="resetCheckboxes(###FILTER_UID###); ###ONCLICK_RESET###">###RESET_FILTER###</span>
+		</li>
 		<!-- ###SUB_CHECKBOX_RESET### end -->
 
 		<!-- ###SUB_CHECKBOX_SUBMIT### start -->
-			<span class="resetLink" onclick="###ONCLICK_RESET###">###CHECKBOX_SUBMIT###</span>
+		<li class="checkboxButtonSubmit">
+			<span class="kesGreyButt" onclick="###ONCLICK_RESET###">###CHECKBOX_SUBMIT###</span>
+		</li>
 		<!-- ###SUB_CHECKBOX_SUBMIT### end -->
-
 	</ul>
     </div>
 <!-- ###SUB_FILTER_CHECKBOX### end -->
@@ -388,13 +384,17 @@ function hideSpinner() {
 			<h3>###TITLE###</h3>
 			<!-- ###SUB_FILTER_MULTISELECT_OPTION### begin -->
 				<div class="multi-option###ADDCLASS###">
-					<input type="checkbox" name="###FILTERNAME###[###OPTIONKEY###]" id="###FILTERNAME###[###OPTIONKEY###]" value="###OPTIONTAG###" ###SELECTED### /><label for="###FILTERNAME###[###OPTIONKEY###]">###OPTIONTITLE###</label>
+					<input type="checkbox" name="###FILTERNAME###[###OPTIONKEY###]" id="###FILTERNAME###[###OPTIONKEY###]" value="###OPTIONTAG###" ###SELECTED### />
+					<label for="###FILTERNAME###[###OPTIONKEY###]">###OPTIONTITLE###</label>
+					<div class="clearer"></div>
 				</div>
 			<!-- ###SUB_FILTER_MULTISELECT_OPTION### end -->
 			<div class="clearer"></div>
 		<!-- ###SUB_FILTER_MULTISELECT_FILTER### end -->
-		<div class="submit"><input type="submit" value="###SHOW_RESULTS###" /></div>
-		<div class="back">###LINK_BACK###</div>
+		<div class="multiselectButtons">
+			<span class="kesGreyButt">###LINK_BACK###</span>
+			<input class="kesGreyButt" type="submit" value="###SHOW_RESULTS###" />
+		</div>
 	</form>
 </div>
 <!-- ###SUB_FILTER_MULTISELECT### end -->
