@@ -1,36 +1,39 @@
 ChangeLog
 
+Current Trunk
+* ...
+
 Version 1.0.0, March 2012
-* added „apply filter“ link to checkbox filters in ajax mode
-* bugfix: checkbox filter functions „reset“ and „select / deselect all“ removed for static mode, this needs javascript
+* added "apply filter" link to checkbox filters in ajax mode
+* bugfix: checkbox filter functions "reset" and "select / deselect all" removed for static mode, this needs javascript
 * bugfix: javascript for resetting of checkbox filters fixed
-* Indexer „DAM“ was edited for common usage
-* Filter type „list“ implemented for static mode
+* Indexer "DAM" was edited for common usage
+* Filter type "list" implemented for static mode
 * notifications: switched to swiftmailer for notification for version 4.5 and above
 * notifications: added sender email configuration option in extension manager (needed for swiftmailer)
 * notifications: renamed extension manager configuration option for notification mail
 * notifications: removed periodic notifications since they weren't working properly.
 * notifications: Detached periodicNotification configuration from amountOfRecordsToSaveInMem, two different things have been mixed up here.
 * Set default value for amountOfRecordsToSaveInMem to 500.
-* New feature: BE function „start indexing“ now checks if there is a LOCK for the indexing process. If so it will print a warning message for non-admins and the „start indexer“ button is not shown. Admin users can remove the LOCK by clicking a button. This means no more manual editing of database table „sys_registry“ if an index process fails. In addition, a LOCK that is older than 12 hours will be removed automatically.
+* New feature: BE function "start indexing" now checks if there is a LOCK for the indexing process. If so it will print a warning message for non-admins and the "start indexer" button is not shown. Admin users can remove the LOCK by clicking a button. This means no more manual editing of database table "sys_registry" if an index process fails. In addition, a LOCK that is older than 12 hours will be removed automatically.
 * Added patch for additionalPathForTypeIcons, http://forge.typo3.org/issues/28496, thanks to Morton Jonuschat
 * New feature: added CSS class per type to result list item, eg. class="result-list-item result-list-item-type-tt_news", thanks to Dominik Hahn
 * Bugfix: calculation of percental score (thanks to Morton Jonuschat)
 * Bugfix: CSS for score scale 
-* page and content element indexer index now the Ctype  „header“
-* bugfix: headers set to „hidden“ are not indexed anymore (page indexer and content element indexer)
+* page and content element indexer index now the Ctype  "header"
+* bugfix: headers set to "hidden" are not indexed anymore (page indexer and content element indexer)
 * new feature in backend module: clear search index button, only for admins
 * bugfix: filext was not taken into account in file indexer
 * Bugfix and improvement regarding indexing time information in indexing process finish notification mail
-* Bugfix: config value „sortWithoutSearchword“ was not processed, this leaded to empty result lists in some cases because sorting by relevance was used instead
+* Bugfix: config value "sortWithoutSearchword" was not processed, this leaded to empty result lists in some cases because sorting by relevance was used instead
 * Changed default values for options "showPercentalScore" and "showScoreScale" to 0
-* Removed dependency on „xajax“. If render method „ajax after load“ is used and xajax is not installed, you will receive an error message in frontend
-* Bugfix: removal of indexer „xtypocommerce“ - this is a very special extension that should not be interesting for most users
+* Removed dependency on "xajax". If render method "ajax after load" is used and xajax is not installed, you will receive an error message in frontend
+* Bugfix: removal of indexer "xtypocommerce" - this is a very special extension that should not be interesting for most users
 * Bugfix: highlighting of searchword in result title
-* Bugfix: show indexer configuration field „filetypes“ only for type „files“
+* Bugfix: show indexer configuration field "filetypes" only for type "files"
 * More flexible rendering of results count by using sprintf
 * New config: set template and css file by flexform; overwrites the setup and default value
-* Bugfix: default flexforms value for „sortWithoutSearchword“ changed
+* Bugfix: default flexforms value for "sortWithoutSearchword" changed
 * Indexing process time information added to notifications
 * Bugfix: reset pagenumber when submitting new search params
 * Bugfix: show correct error message when a searchword is too short
@@ -43,8 +46,8 @@ Version 1.0.0, March 2012
 * Better output for error messages while indexing process
 * New feature: TYPO3 scheduler task for indexing process added
 * New feature in ext-conf. Now you can give title a higher relevance.
-* Bugfix: check if hook entry is available before calling “modifyFlexFormData” 
-* New marker “NUMBER_OF_RESULTS” added to result list subpart, independent of pagebrowser subpart
+* Bugfix: check if hook entry is available before calling "modifyFlexFormData" 
+* New marker "NUMBER_OF_RESULTS" added to result list subpart, independent of pagebrowser subpart
 * amount of results for each filter will be displayed now
 * each flexform value is configurable by TS
 * each TS property has stdWrap properties
@@ -55,12 +58,12 @@ Version 1.0.0, March 2012
 * bug: wrong checkboxes are selected after search in "no validation to other filter"-mode
 * hide sorting links in FE if there are no search results
 * new option to mark all checkboxes as default
-* ajax render method has been removed. Remaining render methods are “static” and “ajax after reload”. It has been removed since it hasn't been used very much and raised maintenance. In this case we also deleted following two options of FlexForm-Configuration:
+* ajax render method has been removed. Remaining render methods are "static" and "ajax after reload". It has been removed since it hasn't been used very much and raised maintenance. In this case we also deleted following two options of FlexForm-Configuration:
 * redirectOnFilterChange
 * resetFiltersOnSubmit
 * better index choosing, increases performance
 * sorting in frontend not activated by default
-* Deleted the “plugin mode”. We have two seperate plugins instead. Each plugin has its own flexform and locallang file. So you have to insert all resultlists again as pi2.
+* Deleted the "plugin mode". We have two seperate plugins instead. Each plugin has its own flexform and locallang file. So you have to insert all resultlists again as pi2.
 * Both plugins extend the same parent object
 * Created a new DB Object for generating the search results
 * Many calles to getSearchResults have been deleted
@@ -83,8 +86,8 @@ Version 0.3.0
 * modified cleanup process. All records before starting timestamp of indexing will be deleted
 * speed up indexing with help of PREPARED-Statements
 * New feature: Show text instead of searchresults when no filter or searchword was given. 
-* New feature: Multi-select filters. The user can now select two or more options of a filter, they will be “OR” connected. In the frontend this filter type will be rendered as checkboxes.
-* New feature: set individual text in RTE for “no results found”
+* New feature: Multi-select filters. The user can now select two or more options of a filter, they will be "OR" connected. In the frontend this filter type will be rendered as checkboxes.
+* New feature: set individual text in RTE for "no results found"
 * New feature: a default text is shown in searchbox; it will be hidden on focus
 * Notification functions for a better monitoring of the indexing process (in CLI mode) added
 * Example configuration for use of danp_tagcloud with ke_search statistics data added to documentation
@@ -122,7 +125,7 @@ Version 0.1.1
 * XSS removal improvements
 * New: render mode selectable: ajax, static, ajax after page reload
 * Several bugfixes and optimizations
-* New filter render type added: “list”
+* New filter render type added: "list"
 * New indexer type included: ke_yac records 
 * Icon artwork for database tables added
 * New feature: tags can be set automated for all childs of defined page
@@ -130,7 +133,7 @@ Version 0.1.1
 * Added CLI-script for indexing process
 * New indexer type included: tt_news records 
 * New feature: supporting multiple words as searchphrase (treated as conjunction)
-* Filter select boxes that have no options but “all” get HTML-Tag “disabled”
+* Filter select boxes that have no options but "all" get HTML-Tag "disabled"
 * New indexer configuration option for indexing of pages: index content elements that have got restricted usergroup permissions?
 * Javascript is minified (if TYPO3 version >= 4.2 )
 * Flexform options regarding debugging are available for admins only
