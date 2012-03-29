@@ -4,6 +4,7 @@ Current Trunk
 * ...
 
 Version 1.0.0, March 2012
+* removed plugin flexform option "showResultsPerFilter" since it had no effect
 * added "apply filter" link to checkbox filters in ajax mode
 * bugfix: checkbox filter functions "reset" and "select / deselect all" removed for static mode, this needs javascript
 * bugfix: javascript for resetting of checkbox filters fixed
@@ -19,7 +20,7 @@ Version 1.0.0, March 2012
 * Added patch for additionalPathForTypeIcons, http://forge.typo3.org/issues/28496, thanks to Morton Jonuschat
 * New feature: added CSS class per type to result list item, eg. class="result-list-item result-list-item-type-tt_news", thanks to Dominik Hahn
 * Bugfix: calculation of percental score (thanks to Morton Jonuschat)
-* Bugfix: CSS for score scale 
+* Bugfix: CSS for score scale
 * page and content element indexer index now the Ctype  "header"
 * bugfix: headers set to "hidden" are not indexed anymore (page indexer and content element indexer)
 * new feature in backend module: clear search index button, only for admins
@@ -46,7 +47,7 @@ Version 1.0.0, March 2012
 * Better output for error messages while indexing process
 * New feature: TYPO3 scheduler task for indexing process added
 * New feature in ext-conf. Now you can give title a higher relevance.
-* Bugfix: check if hook entry is available before calling "modifyFlexFormData" 
+* Bugfix: check if hook entry is available before calling "modifyFlexFormData"
 * New marker "NUMBER_OF_RESULTS" added to result list subpart, independent of pagebrowser subpart
 * amount of results for each filter will be displayed now
 * each flexform value is configurable by TS
@@ -85,7 +86,7 @@ Version 0.3.0
 * repaired customIndexer hook and added a new code sample to documentationdelete interval setting from ext conf
 * modified cleanup process. All records before starting timestamp of indexing will be deleted
 * speed up indexing with help of PREPARED-Statements
-* New feature: Show text instead of searchresults when no filter or searchword was given. 
+* New feature: Show text instead of searchresults when no filter or searchword was given.
 * New feature: Multi-select filters. The user can now select two or more options of a filter, they will be "OR" connected. In the frontend this filter type will be rendered as checkboxes.
 * New feature: set individual text in RTE for "no results found"
 * New feature: a default text is shown in searchbox; it will be hidden on focus
@@ -116,7 +117,7 @@ Version 0.2.0
 * Bugfix: correct highlighting of search word in result titles
 * Cleanup: removed methods that are not needed any longer
 * Bugfix: correct limit for pagebrowser
-* Bugfix: checking of matching tags 
+* Bugfix: checking of matching tags
 * Bugfix: correct whitespace cropping; old procedure generated endless loops in some cases
 * Bugfix: AND relation for several search words
 * Cleanup for search word creation, use one central function
@@ -126,12 +127,12 @@ Version 0.1.1
 * New: render mode selectable: ajax, static, ajax after page reload
 * Several bugfixes and optimizations
 * New filter render type added: "list"
-* New indexer type included: ke_yac records 
+* New indexer type included: ke_yac records
 * Icon artwork for database tables added
 * New feature: tags can be set automated for all childs of defined page
 * Bugfix: Indexer took all pages if no recursive page was set for indexing
 * Added CLI-script for indexing process
-* New indexer type included: tt_news records 
+* New indexer type included: tt_news records
 * New feature: supporting multiple words as searchphrase (treated as conjunction)
 * Filter select boxes that have no options but "all" get HTML-Tag "disabled"
 * New indexer configuration option for indexing of pages: index content elements that have got restricted usergroup permissions?
