@@ -35,11 +35,11 @@
 
 			<label index="ff.page.sorting">Sorting</label>
 			<label index="ff.sortWithoutSearchword">How should the sort results be sorted if no searchword/filter is given?</label>
-			<label index="ff.showSortInFrontend">Should the website visitor see a possibility to order the searchresults?</label>
+			<label index="ff.showSortInFrontend">Should the website visitor be able to order the searchresults?</label>
 			<label index="ff.sortByVisitor">Which fields should the visitor be able to order by?</label>
 			<label index="ff.sortByAdmin">All searchresults will be sorted by this value</label>
 
-			<label index="ff.page.view">View</label>
+			<label index="ff.page.view">Layout</label>
 			<label index="ff.pagebrowserOnTop">Show pagebrowser on top of result list</label>
 			<label index="ff.pagebrowserAtBottom">Show pagebrowser at the bottom of the result list</label>
 			<label index="ff.maxPagesInPagebrowser">Number of pages shown in pagebrowser</label>
@@ -136,9 +136,9 @@
 			<label index="ff.sortWithoutSearchword">Wie sollen die Ergebnisse sortiert werden, wenn kein Suchwort angegeben wurde?</label>
 			<label index="ff.showSortInFrontend">Soll dem Webseitenbesucher die Möglichkeit gegeben werden, die Suchergebnisse selbst zu sortieren?</label>
 			<label index="ff.sortByVisitor">Welche Sortiermöglichkeiten sollen dem Besucher zur Verfügung gestellt werden?</label>
-			<label index="ff.sortByAdmin">Suchergebnisse werden nach dieser Vorgabe sortieren.</label>
+			<label index="ff.sortByAdmin">Suchergebnisse werden nach dieser Vorgabe sortiert.</label>
 
-			<label index="ff.page.view">Ansicht</label>
+			<label index="ff.page.view">Darstellung</label>
 			<label index="ff.pagebrowserOnTop">Pagebrowser am Anfang der Ergebnisliste anzeigen?</label>
 			<label index="ff.pagebrowserAtBottom">Pagebrowser am Ende der Ergebnisliste anzeigen?</label>
 			<label index="ff.maxPagesInPagebrowser">max. Anzahl Seiten in Pagebrowser</label>
