@@ -49,7 +49,6 @@
 			<label index="ff.renderResultUrlAsLink">Render result URL as link (a-Tag)?</label>
 			<label index="ff.showScore">Show score?</label>
 			<label index="ff.showDate">Show date?</label>
-			<label index="ff.showResultsPerFilter">Show amount of results for each filteroption?</label>
 			<label index="ff.showPercentalScore">Show percental score?</label>
 			<label index="ff.showScoreScale">Show score scale?</label>
 
@@ -148,7 +147,6 @@
 			<label index="ff.renderResultUrlAsLink">Generiere aus der Ergebnis-URL einen Link (a-Tag)?</label>
 			<label index="ff.showScore">Zeige Relevanz?</label>
 			<label index="ff.showDate">Zeige Datum?</label>
-			<label index="ff.showResultsPerFilter">Zeige Anzahl der Suchergebnisse pro Filteroption?</label>
 			<label index="ff.showPercentalScore">Zeige Prozentuale Relevanz?</label>
 			<label index="ff.showScoreScale">Zeige Relevanz-Skala?</label>
 
