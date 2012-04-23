@@ -1,7 +1,7 @@
 ChangeLog
 
 Current Trunk
-* ...
+* bugfix: don't skip "shortcut" pages, thanks to Jan Bartels
 
 Version 1.0.0, March 2012
 * changed default values in searchbox plugin: don't allow sorting by visitor, sorting with searchword is now relevance descending (score desc), click on result link does not open an new window

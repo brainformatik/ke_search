@@ -226,8 +226,8 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
 		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where);
 
-		// index only pages of doktype standard, advanced and "not in menu"
-		$where = ' (doktype = 1 OR doktype = 2 OR doktype = 5) ';
+		// index only pages of doktype standard, advanced, shortcut and "not in menu"
+		$where = ' (doktype = 1 OR doktype = 2 OR doktype = 4 OR doktype = 5) ';
 		// index only pages which are searchable
 		$where .= ' AND no_search <> 1 ';
 
