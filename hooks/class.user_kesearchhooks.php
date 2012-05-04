@@ -31,6 +31,12 @@
  */
 
 class user_kesearch_sortdate {
+	
+	/**
+	 * @var tx_ttnews_helpers
+	 */
+	protected $ttNewsHelper;
+	
 	public function registerAdditionalFields(&$additionalFields) {
 		$additionalFields[] = 'sortdate';
 		$additionalFields[] = 'orig_uid';
@@ -63,7 +69,7 @@ class user_kesearch_sortdate {
 		}
 	}
 
-	public function modifyNewsIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tags, $newsRecord, &$additionalFields) {
+	public function modifyNewsIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tags, $newsRecord, &$additionalFields, $indexerConfig) {
 		// crdate is always given, but can be overwritten
 		if(isset($newsRecord['crdate']) && $newsRecord['crdate'] > 0) {
 			$additionalFields['sortdate'] = $newsRecord['crdate'];
@@ -81,6 +87,10 @@ class user_kesearch_sortdate {
 		if(isset($newsRecord['pid']) && $newsRecord['pid'] > 0) {
 			$additionalFields['orig_pid'] = $newsRecord['pid'];
 		}
+		
+		// http://forge.typo3.org/issues/33701
+		//$this->ttNewsHelper = t3lib_div::makeInstance('tx_ttnews_helpers');
+		//$indexerConfig['targetpid'] = $this->ttNewsHelper->getRecursiveCategorySinglePid($newsRecord['']);
 	}
 
 	public function modifyYACIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tags, $yacRecord, $targetPID, &$additionalFields) {
