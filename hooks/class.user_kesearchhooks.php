@@ -95,7 +95,7 @@ class user_kesearch_sortdate {
 		$this->ttNews = t3lib_div::makeInstance('tx_ttnews');
 		$categories = $this->ttNews->getCategories($newsRecord['uid']);
 		$firstCategory = reset($categories);
-		$indexerConfig['targetpid'] = $firstCategory['single_pid'];
+		if($firstCategory['single_pid']) $indexerConfig['targetpid'] = $firstCategory['single_pid'];
 		//t3lib_utility_Debug::debug($indexerConfig, 'indexerConfig POST');
 	}
 
