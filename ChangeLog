@@ -2,7 +2,8 @@ ChangeLog
 
 Current Trunk
 * bugfix: don't skip "shortcut" pages, thanks to Jan Bartels
-* bugfix: http://forge.typo3.org/issues/33701: TT-News indexer: targetpage provided by category
+* bugfix: remove unused code in tt_address indexer, http://forge.typo3.org/issues/36493, thanks to Jan Bartels
+* bugfix: http://forge.typo3.org/issues/33701: tt_news indexer: targetpage provided by category
 
 Version 1.0.0, March 2012
 * changed default values in searchbox plugin: don't allow sorting by visitor, sorting with searchword is now relevance descending (score desc), click on result link does not open an new window
