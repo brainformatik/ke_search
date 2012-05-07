@@ -22,6 +22,8 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
+require_once (t3lib_extMgm::extPath('tt_news') . 'pi/class.tx_ttnews.php');
+
 /**
  * Hooks for ke_search
  *
@@ -33,9 +35,9 @@
 class user_kesearch_sortdate {
 	
 	/**
-	 * @var tx_ttnews_helpers
+	 * @var tx_ttnews
 	 */
-	protected $ttNewsHelper;
+	protected $ttNews;
 	
 	public function registerAdditionalFields(&$additionalFields) {
 		$additionalFields[] = 'sortdate';
@@ -69,7 +71,7 @@ class user_kesearch_sortdate {
 		}
 	}
 
-	public function modifyNewsIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tags, $newsRecord, &$additionalFields, $indexerConfig) {
+	public function modifyNewsIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tags, $newsRecord, &$additionalFields, &$indexerConfig) {
 		// crdate is always given, but can be overwritten
 		if(isset($newsRecord['crdate']) && $newsRecord['crdate'] > 0) {
 			$additionalFields['sortdate'] = $newsRecord['crdate'];
@@ -89,8 +91,12 @@ class user_kesearch_sortdate {
 		}
 		
 		// http://forge.typo3.org/issues/33701
-		//$this->ttNewsHelper = t3lib_div::makeInstance('tx_ttnews_helpers');
-		//$indexerConfig['targetpid'] = $this->ttNewsHelper->getRecursiveCategorySinglePid($newsRecord['']);
+		//t3lib_utility_Debug::debug($indexerConfig, 'indexerConfig PRE');
+		$this->ttNews = t3lib_div::makeInstance('tx_ttnews');
+		$categories = $this->ttNews->getCategories($newsRecord['uid']);
+		$firstCategory = reset($categories);
+		$indexerConfig['targetpid'] = $firstCategory['single_pid'];
+		//t3lib_utility_Debug::debug($indexerConfig, 'indexerConfig POST');
 	}
 
 	public function modifyYACIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tags, $yacRecord, $targetPID, &$additionalFields) {
