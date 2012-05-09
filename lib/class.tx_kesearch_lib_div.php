@@ -149,13 +149,17 @@ class tx_kesearch_lib_div {
 		$tagsAgainst = array();
 		$tagChar = $this->pObj->extConf['prePostTagChar'];
 
-		foreach($this->pObj->preselectedFilter as $key => $value) {
+		foreach($this->pObj->preselectedFilter as $key => $filterTags) {
+			// Quote the tags for use in database query
+			foreach ($filterTags as $k => $v) {
+				$filterTags[$k] = $GLOBALS['TYPO3_DB']->quoteStr($v, 'tx_kesearch_index');
+			}
 			// if we are in checkbox mode
 			if(count($this->pObj->preselectedFilter[$key]) >= 2) {
-				$tagsAgainst[$key] .= ' "' . $tagChar . implode($tagChar . '" "' . $tagChar, $GLOBALS['TYPO3_DB']->quoteStr($value, 'tx_kesearch_index')) . $tagChar . '"';
+				$tagsAgainst[$key] .= ' "' . $tagChar . implode($tagChar . '" "' . $tagChar, $filterTags) . $tagChar . '"';
 			// if we are in select or list mode
 			} elseif(count($this->pObj->preselectedFilter[$key]) == 1) {
-				$tagsAgainst[$key] .= ' +"' . $tagChar. current($GLOBALS['TYPO3_DB']->quoteStr($value, 'tx_kesearch_index')) . $tagChar . '"';
+				$tagsAgainst[$key] .= ' +"' . $tagChar . array_shift($filterTags) . $tagChar . '"';
 			}
 		}
 		if(is_array($this->pObj->piVars['filter'])) {
