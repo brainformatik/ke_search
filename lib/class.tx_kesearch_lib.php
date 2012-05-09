@@ -1844,6 +1844,19 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		$this->initOnclickActions();
 
+		// hook for third party pagebrowsers or for modification of build in browser
+		// if the hook return content then return that content
+		$content = '';
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['renderPagebrowserInit'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['renderPagebrowserInit'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$content = $_procObj->renderPagebrowserInit($this);
+			}
+		}
+		if($content) {
+			return $content;
+		}
+		
 		$numberOfResults = $this->numberOfResults;
 		$resultsPerPage = $this->conf['resultsPerPage'];
 		$maxPages = $this->conf['maxPagesInPagebrowser'];
@@ -1985,6 +1998,18 @@ class tx_kesearch_lib extends tslib_pibase {
 			'until' => $this->pi_getLL('until'),
 			'of' => $this->pi_getLL('of'),
 		);
+		
+		// hook for additional markers in pagebrowse
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['pagebrowseAdditionalMarker'])) {
+			foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['pagebrowseAdditionalMarker'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$_procObj->pagebrowseAdditionalMarker(
+					$markerArray,
+					$this
+				);
+			}
+		}
+		
 		$content = $this->cObj->substituteMarkerArray($content,$markerArray,$wrap='###|###',$uppercase=1);
 
 		return $content;
