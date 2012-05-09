@@ -5,6 +5,7 @@ Current Trunk
 * bugfix: remove unused code in tt_address indexer, http://forge.typo3.org/issues/36493, thanks to Jan Bartels
 * New feature: tt_news indexer targetpage is provided by tt_news category, thanks for sponsoring to Otto van Bruggen, http://forge.typo3.org/issues/33701
 * new hooks: renderPagebrowserInit, pagebrowseAdditionalMarker, thanks to Krystian Szymukowicz, http://forge.typo3.org/issues/35646
+* new hook: getLimit, thanks to Krystian Szymukowicz, http://forge.typo3.org/issues/35652
 
 Version 1.0.0, March 2012
 * changed default values in searchbox plugin: don't allow sorting by visitor, sorting with searchword is now relevance descending (score desc), click on result link does not open an new window

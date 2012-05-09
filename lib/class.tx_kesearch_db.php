@@ -266,7 +266,17 @@ class tx_kesearch_db {
 			if($start < 0) $start = 0;
 		}
 
-		return array($start, $limit);
+		$startLimit = array($start, $limit);
+
+		// hook for third party pagebrowsers or for modification $this->pObj->piVars['page'] parameter
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['getLimit'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['getLimit'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$_procObj->getLimit($startLimit, $this);
+			}
+		}
+
+		return $startLimit;
 	}
 }
 ?>
