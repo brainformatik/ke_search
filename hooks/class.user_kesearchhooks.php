@@ -22,8 +22,6 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-require_once (t3lib_extMgm::extPath('tt_news') . 'pi/class.tx_ttnews.php');
-
 /**
  * Hooks for ke_search
  *
@@ -91,12 +89,13 @@ class user_kesearch_sortdate {
 		}
 		
 		// http://forge.typo3.org/issues/33701
-		//t3lib_utility_Debug::debug($indexerConfig, 'indexerConfig PRE');
-		$this->ttNews = t3lib_div::makeInstance('tx_ttnews');
-		$categories = $this->ttNews->getCategories($newsRecord['uid']);
-		$firstCategory = reset($categories);
-		if($firstCategory['single_pid']) $indexerConfig['targetpid'] = $firstCategory['single_pid'];
-		//t3lib_utility_Debug::debug($indexerConfig, 'indexerConfig POST');
+		if(t3lib_extMgm::isLoaded('tt_news')) {
+			require_once (t3lib_extMgm::extPath('tt_news') . 'pi/class.tx_ttnews.php');
+			$this->ttNews = t3lib_div::makeInstance('tx_ttnews');
+			$categories = $this->ttNews->getCategories($newsRecord['uid']);
+			$firstCategory = reset($categories);
+			if($firstCategory['single_pid']) $indexerConfig['targetpid'] = $firstCategory['single_pid'];
+		}
 	}
 
 	public function modifyYACIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tags, $yacRecord, $targetPID, &$additionalFields) {
