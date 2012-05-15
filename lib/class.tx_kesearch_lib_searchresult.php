@@ -180,10 +180,10 @@ class tx_kesearch_lib_searchresult {
 	 */
 	public function getContentForTeaser() {
 		$content = $this->row['content'];
-		if (!empty($row['abstract'])) {
-			$content = nl2br($row['abstract']);
+		if (!empty($this->row['abstract'])) {
+			$content = nl2br($this->row['abstract']);
 			if ($this->conf['previewMode'] != 'abstract') {
-				if (!$this->isArrayOfWordsInString($this->pObj->swords, $row['abstract'])) {
+				if (!$this->isArrayOfWordsInString($this->pObj->swords, $this->row['abstract'])) {
 					$content = $this->row['content'];
 				}
 			}
