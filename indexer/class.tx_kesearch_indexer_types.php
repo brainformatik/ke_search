@@ -134,7 +134,7 @@ class tx_kesearch_indexer_types {
 		$where = ' AND ' . $table . '.pid = pages.uid ';
 		$where .= t3lib_befunc::BEenableFields($table);
 		$where .= t3lib_befunc::deleteClause($table);
-		$this->pageRecords = $this->getPageRecords($indexPids, $where, 'pages,' . $table, 'DISTINCT pages.*' );
+		$this->pageRecords = $this->getPageRecords($indexPids, $where, 'pages,' . $table, 'pages.*' );
 		if(count($this->pageRecords)) {
 			// create a new list of allowed pids
 			return array_keys($this->pageRecords);
