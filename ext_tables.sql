@@ -54,6 +54,7 @@ CREATE TABLE tx_kesearch_filteroptions (
 	title tinytext,
 	tag tinytext,
 	automated_tagging text,
+	automated_tagging_exclude text,
 	sorting int(11) DEFAULT '0' NOT NULL,
 	PRIMARY KEY (uid),
 	KEY parent (pid)

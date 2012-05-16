@@ -32,6 +32,7 @@
 			<label index="tx_kesearch_filteroptions.title">Title</label>
 			<label index="tx_kesearch_filteroptions.tag">Tag</label>
 			<label index="tx_kesearch_filteroptions.automated_tagging">Set tag for all children of this page</label>
+			<label index="tx_kesearch_filteroptions.automated_tagging_exclude">Exclude tag for all children of this page</label>
 			<label index="tx_kesearch_index">Index</label>
 			<label index="tx_kesearch_index.relevance">Relevance</label>
 			<label index="tx_kesearch_index.targetpid">Target PID</label>
@@ -99,6 +100,7 @@
 			<label index="tx_kesearch_filteroptions.title">Titel</label>
 			<label index="tx_kesearch_filteroptions.tag">Tag</label>
 			<label index="tx_kesearch_filteroptions.automated_tagging">Tag automatisch für Unterseiten dieser Seite setzen</label>
+			<label index="tx_kesearch_filteroptions.automated_tagging_exclude">Tag nicht automatisch für Unterseiten dieser Seite setzen</label>
 			<label index="tx_kesearch_index">Index</label>
 			<label index="tx_kesearch_index.relevance">Relevanz</label>
 			<label index="tx_kesearch_index.targetpid">Zielseite</label>

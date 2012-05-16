@@ -169,7 +169,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 * @param array Simple array with uids of pages
 	 * @return array extended array with uids and tags for pages
 	 */
-	public function addTagsToPageRecords($uids) {
+	public function addTagsToPageRecords(array $uids) {
 		$tagChar = $this->pObj->extConf['prePostTagChar'];
 		// add tags which are defined by page properties
 		$fields = 'pages.*, GROUP_CONCAT(CONCAT("' . $tagChar . '", tx_kesearch_filteroptions.tag, "' . $tagChar . '")) as tags';
@@ -186,8 +186,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		}
 
 		// add tags which are defined by filteroption records
-
-		$fields = 'automated_tagging, tag';
+		$fields = 'automated_tagging, automated_tagging_exclude, tag';
 		$table = 'tx_kesearch_filteroptions';
 		$where = 'automated_tagging <> "" ';
 		$where .= t3lib_befunc::BEenableFields('tx_kesearch_filteroptions');
@@ -202,6 +201,9 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
 		foreach($rows as $row) {
 			$tempTags = array();
+			if( $row['automated_tagging_exclude'] > '' ) {
+				$where .= 'AND FIND_IN_SET(pages.pid, "' . $row['automated_tagging_exclude'] .'") = 0';
+			}
 			$pageList = t3lib_div::trimExplode(',', $this->queryGen->getTreeList($row['automated_tagging'], 99, 0, $where));
 			foreach($pageList as $uid) {
 				if($this->pageRecords[$uid]['tags']) {

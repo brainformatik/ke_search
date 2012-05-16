@@ -233,10 +233,21 @@ $TCA['tx_kesearch_filteroptions'] = array (
 				'maxitems' => 1,
 			)
 		),
-
+		'automated_tagging_exclude' => array (
+			'exclude' => 1,
+			'label'   => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filteroptions.automated_tagging_exclude',
+			'config' => array (
+				'type' => 'group',
+				'internal_type' => 'db',
+				'allowed' => 'pages',
+				'size' => 5,
+				'minitems' => 0,
+				'maxitems' => 99,
+			)
+		),
 	),
 	'types' => array (
-		'0' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2, tag;;;;3-3-3, automated_tagging;;;;4-4-4')
+		'0' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2, tag;;;;3-3-3, automated_tagging;;;;4-4-4,automated_tagging_exclude;;;;5-5-5')
 	),
 	'palettes' => array (
 		'1' => array('showitem' => '')

@@ -3,6 +3,8 @@ ChangeLog
 Current Trunk
 * bugfix: wrong rendering of the abstract
 * bugfix: Installation of tt_news was required for ke_search, http://forge.typo3.org/issues/37133
+* feature: Enable recursive search for tt_news and tt_address, too.
+* feature: #20885: Add a possibility to exclude pages from tagging
 
 Version 1.0.1, May 2012
 * bugfix: don't skip "shortcut" pages, thanks to Jan Bartels
@@ -11,7 +13,6 @@ Version 1.0.1, May 2012
 * new hooks: renderPagebrowserInit, pagebrowseAdditionalMarker, thanks to Krystian Szymukowicz, http://forge.typo3.org/issues/35646
 * new hook: getLimit, thanks to Krystian Szymukowicz, http://forge.typo3.org/issues/35652
 * bugfix: Tags from preselected filters result in invalid query, thanks to Morton Jonuschat, http://forge.typo3.org/issues/36556
-* feature: Enable recursive search for tt_news and tt_address, too.
 
 Version 1.0.0, March 2012
 * changed default values in searchbox plugin: don't allow sorting by visitor, sorting with searchword is now relevance descending (score desc), click on result link does not open an new window
