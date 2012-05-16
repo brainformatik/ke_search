@@ -57,7 +57,10 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 			// Copy those restrictions to the index.
 		$fields = '*';
 		$table = 'tt_news';
-		$where = 'pid IN (' . $this->indexerConfig['sysfolder'] . ') AND hidden = 0 AND deleted = 0';
+		$indexPids = $this->getPidList($this->indexerConfig['startingpoints_recursive'], $this->indexerConfig['sysfolder'], $table);
+		$where = 'pid IN (' . implode(',', $indexPids) . ') ';
+		$where .= t3lib_befunc::BEenableFields($table,$inv=0);
+		$where .= t3lib_befunc::deleteClause($table,$inv=0);
 		$groupBy = '';
 		$orderBy = '';
 		$limit = '';

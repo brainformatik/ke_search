@@ -51,15 +51,12 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	// Name of indexed elements. Will be overwritten in content element indexer.
 	var $indexedElementsName = 'pages';
 
-	/**
-	 * @var t3lib_queryGenerator
-	 */
-	var $queryGen;
+
 
 
 
 	/**
-	 * Initializes indexer for pages
+	 * Construcor of this object
 	 */
 	public function __construct($pObj) {
 		parent::__construct($pObj);
@@ -72,10 +69,6 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
 		// get all available sys_language_uid records
 		$this->sysLanguages = t3lib_BEfunc::getSystemLanguages();
-
-
-		// we need this object to get all contained pids
-		$this->queryGen = t3lib_div::makeInstance('t3lib_queryGenerator');
 	}
 
 
@@ -85,8 +78,8 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 * @return string content which will be displayed in backend
 	 */
 	public function startIndexing() {
-		// get all pages. Regardeless if they are shortcur, sysfolder or external link
-		$indexPids = $this->getPagelist();
+		// get all pages. Regardeless if they are shortcut, sysfolder or external link
+		$indexPids = $this->getPagelist($this->indexerConfig['startingpoints_recursive'], $this->indexerConfig['single_pages']);
 
 		// add complete page record to list of pids in $indexPids
 		// and remove all page of type shortcut, sysfolder and external link
@@ -112,30 +105,6 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$content .= $this->showTime();
 
 		return $content;
-	}
-
-
-	/**
-	 * get all recursive contained pids of given Page-UID
-	 *
-	 * @return array List of page UIDs
-	 */
-	public function getPagelist() {
-		// make array from list
-		$pidsRecursive = t3lib_div::trimExplode(',', $this->indexerConfig['startingpoints_recursive'], true);
-		$pidsNonRecursive = t3lib_div::trimExplode(',', $this->indexerConfig['single_pages'], true);
-
-		// add recursive pids
-		foreach($pidsRecursive as $pid) {
-			$pageList .= $this->queryGen->getTreeList($pid, 99, 0, '1=1');
-		}
-
-		// add non-recursive pids
-		foreach($pidsNonRecursive as $pid) {
-			$pageList .= $pid . ',';
-		}
-
-		return t3lib_div::trimExplode(',', $pageList, true);
 	}
 
 
@@ -248,11 +217,6 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 * @param $uid page-UID that has to be indexed
 	 */
 	public function getPageContent($uid) {
-
-		// TODO: index all language versions of this page
-		// pages.uid <=> pages_language_overlay.pid
-		// language id = pages_language_overlay.sys_language_uid
-
 		// get content elements for this page
 		$fields = 'header, bodytext, CType, sys_language_uid, header_layout';
 		$table = 'tt_content';

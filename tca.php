@@ -493,7 +493,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'startingpoints_recursive' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.startingpoints_recursive',
-			'displayCond' => 'FIELD:type:=:page,tt_content',
+			'displayCond' => 'FIELD:type:=:page,tt_content,ttnews,tt_address',
 			'config' => array (
 				'type' => 'group',
 				'internal_type' => 'db',

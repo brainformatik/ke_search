@@ -52,7 +52,8 @@ class tx_kesearch_indexer_types_tt_address extends tx_kesearch_indexer_types {
 		// get all address records from pid set in indexerConfig
 		$fields = '*';
 		$table = 'tt_address';
-		$where = 'pid IN ('.$this->indexerConfig['sysfolder'].') ';
+		$indexPids = $this->getPidList($this->indexerConfig['startingpoints_recursive'], $this->indexerConfig['sysfolder'], $table);
+		$where = 'pid IN (' . implode(',', $indexPids) . ') ';
 		$where .= t3lib_befunc::BEenableFields($table,$inv=0);
 		$where .= t3lib_befunc::deleteClause($table,$inv=0);
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where);
