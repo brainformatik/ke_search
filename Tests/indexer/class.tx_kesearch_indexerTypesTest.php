@@ -116,6 +116,13 @@ class IndexerTypesTest extends Tx_Extbase_BaseTestCase {
 		foreach($pidArray as $pid) {
 			$this->assertInternalType('integer', $pid);
 		}
+
+		$pidArray = $this->indexerTypes->getPidList('', $rootPage, 'tt_news');
+		// check if it is of type array
+		$this->assertInternalType('array', $pidArray);
+		// there should be 1 record
+		$this->assertEquals(1, count($pidArray));
+		$this->assertInternalType('integer', $pidArray[0]);
 	}
 }
 ?>

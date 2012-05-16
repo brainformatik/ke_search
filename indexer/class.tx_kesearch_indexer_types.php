@@ -78,7 +78,7 @@ class tx_kesearch_indexer_types {
 
 		// add recursive pids
 		foreach($pidsRecursive as $pid) {
-			$pageList .= $this->queryGen->getTreeList($pid, 99, 0, '1=1');
+			$pageList .= $this->queryGen->getTreeList($pid, 99, 0, '1=1') . ',';
 		}
 
 		// add non-recursive pids
@@ -125,17 +125,20 @@ class tx_kesearch_indexer_types {
 	 * @param string $startingPointsRecursive
 	 * @param string $singlePages
 	 * @param string $table
+	 * @return array Array containing uids of pageRecords
 	 */
 	public function getPidList($startingPointsRecursive = '', $singlePages = '', $table = 'pages') {
 		// get all pages. Regardless if they are shortcut, sysfolder or external link
 		$indexPids = $this->getPagelist($startingPointsRecursive, $singlePages);
 		// add complete page record to list of pids in $indexPids
-		$where = ' AND ' . $table .'.pid = pages.uid ';
+		$where = ' AND ' . $table . '.pid = pages.uid ';
 		$where .= t3lib_befunc::BEenableFields($table);
 		$where .= t3lib_befunc::deleteClause($table);
-		$this->pageRecords = $this->getPageRecords($indexPids, $where, 'pages,' . $table, 'DISTINCT pages.uid' );
-		// create a new list of allowed pids
-		return array_keys($this->pageRecords);
+		$this->pageRecords = $this->getPageRecords($indexPids, $where, 'pages,' . $table, 'DISTINCT pages.*' );
+		if(count($this->pageRecords)) {
+			// create a new list of allowed pids
+			return array_keys($this->pageRecords);
+		} else return array('0' => 0);
 	}
 
 
