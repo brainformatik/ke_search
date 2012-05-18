@@ -86,6 +86,14 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 
 		$content = $this->cObj->getSubpart($this->templateCode, '###RESULT_LIST###');
 
+		// hook: modifyResultList
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyResultList'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyResultList'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$_procObj->modifyResultList($content, $this);
+			}
+		}
+
 		// show text instead of results if no searchparams set and activated in ff
 		if($this->isEmptySearch && $this->conf['showTextInsteadOfResults']) {
 			// Don't replace the following with substituteMarker

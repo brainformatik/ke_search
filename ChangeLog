@@ -6,6 +6,7 @@ Current Trunk
 * feature: Enable recursive search for tt_news and tt_address, too. Thanks to Jan Bartels, http://forge.typo3.org/issues/34077
 * feature: #20885: Add a possibility to exclude pages from tagging. Thanks to Jan Bartels, http://forge.typo3.org/issues/34495
 * new language: Dutch (nl), Thanks to Otto van Bruggen
+* new hook: modifyResultList
 
 Version 1.0.1, May 2012
 * bugfix: don't skip "shortcut" pages, thanks to Jan Bartels
