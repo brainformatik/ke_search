@@ -1,6 +1,6 @@
 ChangeLog
 
-Current Trunk
+Version 1.0.2, May 2012
 * bugfix: wrong rendering of the abstract
 * bugfix: Installation of tt_news was required for ke_search, http://forge.typo3.org/issues/37133
 * feature: Enable recursive search for tt_news and tt_address, too. Thanks to Jan Bartels, http://forge.typo3.org/issues/34077
