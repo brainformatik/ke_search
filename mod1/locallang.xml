@@ -23,5 +23,14 @@
 			<label index="function5">Suchindex leeren</label>
 			<label index="select_a_page">Bitte wählen Sie eine Seite aus.</label>
 		</languageKey>
+		<languageKey index="nl" type="array">
+			<label index="title">Facet Zoeken</label>
+			<label index="function1">Start indexeren</label>
+			<label index="function2">Geindexeerde inhoud</label>
+			<label index="function3">Index tabel informatie</label>
+			<label index="function4">Zoekwoorden statistieken</label>
+			<label index="function5">Wis zoek index</label>
+			<label index="select_a_page">Selecteer een pagina</label>
+		</languageKey>
 	</data>
 </T3locallang>

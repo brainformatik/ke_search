@@ -15,5 +15,10 @@
 			<label index="mlang_labels_tabdescr">Manuelles Starten der Indizierung</label>
 			<label index="mlang_labels_tablabel">Indizierung verwalten</label>
 		</languageKey>
+		<languageKey index="nl" type="array">
+			<label index="mlang_tabs_tab">Facet Zoeken</label>
+			<label index="mlang_labels_tabdescr">Start het indexeer proces handmatig</label>
+			<label index="mlang_labels_tablabel">Indexeer management</label>
+		</languageKey>
 	</data>
 </T3locallang>
