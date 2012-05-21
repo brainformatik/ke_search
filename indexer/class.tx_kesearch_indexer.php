@@ -583,13 +583,13 @@ class tx_kesearch_indexer {
 		$now = time();
 		$fieldsValues = array(
 			'pid' => intval($storagepid),
-			'title' => $title,
+			'title' => $this->stripControlCharacters($title),
 			'type' => $type,
 			'targetpid' => $targetpid,
-			'content' => $content,
+			'content' => $this->stripControlCharacters($content),
 			'tags' => $tags,
 			'params' => $params,
-			'abstract' => $abstract,
+			'abstract' => $this->stripControlCharacters($abstract),
 			'language' => intval($language),
 			'starttime' => intval($starttime),
 			'endtime' => intval($endtime),
@@ -644,6 +644,19 @@ class tx_kesearch_indexer {
 			// break indexing and wait for next record to store
 			return false;
 		} else return true;
+	}
+
+
+/**
+	 * Strips control characters
+	 *
+	 * @param string the content to sanitize
+	 * @return string the sanitized content
+	 * @see http://forge.typo3.org/issues/34808
+	 */
+	public function stripControlCharacters($content) {
+			// Printable utf-8 does not include any of these chars below x7F
+		return preg_replace('@[\x00-\x08\x0B\x0C\x0E-\x1F]@', ' ', $content);
 	}
 
 
