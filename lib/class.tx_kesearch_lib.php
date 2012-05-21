@@ -163,6 +163,18 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// build words searchphrase
 		$searchWordInformation = $this->div->buildSearchphrase();
+
+		// Hook: modifySearchWords
+		if(isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifySearchWords'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifySearchWords'] as $classRef) {
+				$hookObj = t3lib_div::getUserObj($classRef);
+				if(method_exists($hookObj, 'modifySearchWords')) {
+					$hookObj->modifySearchWords($searchWordInformation, $this);
+				}
+			}
+		}
+
+		// set searchword and tag information
 		$this->sword = $searchWordInformation['sword'];
 		$this->swords = $searchWordInformation['swords'];
 		$this->wordsAgainst = $searchWordInformation['wordsAgainst'];

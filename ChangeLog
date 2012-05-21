@@ -1,5 +1,12 @@
 ChangeLog
 
+Current Trunk
+* bugfix: Error-handling for Ajax-FE missing / Remove invalid characters. Thanks to Jan Bartels, http://forge.typo3.org/issues/34808
+* feature: tt-news-indexer: Add tags of SysFolder. Thanks to Jan Bartels, http://forge.typo3.org/issues/34080
+* feature: Assign tags to indexer. Thanks to Jan Bartels, http://forge.typo3.org/issues/34081
+* bugfix: not valid html code. http://forge.typo3.org/issues/35229
+* new hook: modifySearchWords
+
 Version 1.0.2, May 2012
 * bugfix: wrong rendering of the abstract
 * bugfix: Installation of tt_news was required for ke_search, http://forge.typo3.org/issues/37133
@@ -7,10 +14,6 @@ Version 1.0.2, May 2012
 * feature: #20885: Add a possibility to exclude pages from tagging. Thanks to Jan Bartels, http://forge.typo3.org/issues/34495
 * new language: Dutch (nl), Thanks to Otto van Bruggen
 * new hook: modifyResultList
-* bugfix: Error-handling for Ajax-FE missing / Remove invalid characters. Thanks to Jan Bartels, http://forge.typo3.org/issues/34808
-* feature: tt-news-indexer: Add tags of SysFolder. Thanks to Jan Bartels, http://forge.typo3.org/issues/34080
-* feature: Assign tags to indexer. Thanks to Jan Bartels, http://forge.typo3.org/issues/34081
-* bugfix: not valid html code. http://forge.typo3.org/issues/35229
 
 Version 1.0.1, May 2012
 * bugfix: don't skip "shortcut" pages, thanks to Jan Bartels
