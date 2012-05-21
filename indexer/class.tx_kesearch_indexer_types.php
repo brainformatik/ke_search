@@ -130,6 +130,7 @@ class tx_kesearch_indexer_types {
 	public function getPidList($startingPointsRecursive = '', $singlePages = '', $table = 'pages') {
 		// get all pages. Regardless if they are shortcut, sysfolder or external link
 		$indexPids = $this->getPagelist($startingPointsRecursive, $singlePages);
+
 		// add complete page record to list of pids in $indexPids
 		$where = ' AND ' . $table . '.pid = pages.uid ';
 		$where .= t3lib_befunc::BEenableFields($table);
@@ -139,6 +140,52 @@ class tx_kesearch_indexer_types {
 			// create a new list of allowed pids
 			return array_keys($this->pageRecords);
 		} else return array('0' => 0);
+	}
+
+
+	/**
+	 * Add Tags to pages array
+	 *
+	 * @param array Simple array with uids of pages
+	 * @return array extended array with uids and tags for pages
+	 */
+	public function addTagsToPageRecords($uids, $pageWhere = '1=1') {
+		$tagChar = $this->pObj->extConf['prePostTagChar'];
+		// add tags which are defined by page properties
+		$fields = 'pages.*, GROUP_CONCAT(CONCAT("' . $tagChar . '", tx_kesearch_filteroptions.tag, "' . $tagChar . '")) as tags';
+		$table = 'pages, tx_kesearch_filteroptions';
+		$where = 'pages.uid IN (' . implode(',', $uids) . ')';
+		$where .= ' AND pages.tx_kesearch_tags <> "" ';
+		$where .= ' AND FIND_IN_SET(tx_kesearch_filteroptions.uid, pages.tx_kesearch_tags)';
+		$where .= t3lib_befunc::BEenableFields('tx_kesearch_filteroptions');
+		$where .= t3lib_befunc::deleteClause('tx_kesearch_filteroptions');
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where, 'pages.uid', '', '');
+		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+			$this->pageRecords[$row['uid']]['tags'] = $row['tags'];
+		}
+
+		// add tags which are defined by filteroption records
+		$fields = 'automated_tagging, tag';
+		$table = 'tx_kesearch_filteroptions';
+		$where = 'automated_tagging <> "" ';
+		$where .= t3lib_befunc::BEenableFields('tx_kesearch_filteroptions');
+		$where .= t3lib_befunc::deleteClause('tx_kesearch_filteroptions');
+
+		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where);
+
+		// index only pages which are searchable
+		$where = $pageWhere . ' AND no_search <> 1 ';
+
+		foreach($rows as $row) {
+			$tempTags = array();
+			$pageList = t3lib_div::trimExplode(',', $this->queryGen->getTreeList($row['automated_tagging'], 99, 0, $where));
+			foreach($pageList as $uid) {
+				if($this->pageRecords[$uid]['tags']) {
+					$this->pageRecords[$uid]['tags'] .= ',' . $tagChar . $row['tag'] . $tagChar;
+				} else $this->pageRecords[$uid]['tags'] = $tagChar . $row['tag'] . $tagChar;
+			}
+		}
 	}
 
 

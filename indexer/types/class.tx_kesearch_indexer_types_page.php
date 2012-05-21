@@ -82,14 +82,16 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$indexPids = $this->getPagelist($this->indexerConfig['startingpoints_recursive'], $this->indexerConfig['single_pages']);
 
 		// add complete page record to list of pids in $indexPids
-		// and remove all page of type shortcut, sysfolder and external link
 		$this->pageRecords = $this->getPageRecords($indexPids);
 
 		// create a new list of allowed pids
 		$indexPids = array_keys($this->pageRecords);
 
+		// index only pages of doktype standard, advanced, shortcut and "not in menu"
+		$where = ' (doktype = 1 OR doktype = 2 OR doktype = 4 OR doktype = 5) ';
+
 		// add the tags of each page to the global page array
-		$this->addTagsToPageRecords($indexPids);
+		$this->addTagsToPageRecords($indexPids, $where);
 
 		// loop through pids and collect page content and tags
 		foreach($indexPids as $uid) {
@@ -158,57 +160,6 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 					$row,
 					$pageOverlay
 				);
-			}
-		}
-	}
-
-
-	/**
-	 * Add Tags to pages array
-	 *
-	 * @param array Simple array with uids of pages
-	 * @return array extended array with uids and tags for pages
-	 */
-	public function addTagsToPageRecords(array $uids) {
-		$tagChar = $this->pObj->extConf['prePostTagChar'];
-		// add tags which are defined by page properties
-		$fields = 'pages.*, GROUP_CONCAT(CONCAT("' . $tagChar . '", tx_kesearch_filteroptions.tag, "' . $tagChar . '")) as tags';
-		$table = 'pages, tx_kesearch_filteroptions';
-		$where = 'pages.uid IN (' . implode(',', $uids) . ')';
-		$where .= ' AND pages.tx_kesearch_tags <> "" ';
-		$where .= ' AND FIND_IN_SET(tx_kesearch_filteroptions.uid, pages.tx_kesearch_tags)';
-		$where .= t3lib_befunc::BEenableFields('tx_kesearch_filteroptions');
-		$where .= t3lib_befunc::deleteClause('tx_kesearch_filteroptions');
-
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where, 'pages.uid', '', '');
-		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-			$this->pageRecords[$row['uid']]['tags'] = $row['tags'];
-		}
-
-		// add tags which are defined by filteroption records
-		$fields = 'automated_tagging, automated_tagging_exclude, tag';
-		$table = 'tx_kesearch_filteroptions';
-		$where = 'automated_tagging <> "" ';
-		$where .= t3lib_befunc::BEenableFields('tx_kesearch_filteroptions');
-		$where .= t3lib_befunc::deleteClause('tx_kesearch_filteroptions');
-
-		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where);
-
-		// index only pages of doktype standard, advanced, shortcut and "not in menu"
-		$where = ' (doktype = 1 OR doktype = 2 OR doktype = 4 OR doktype = 5) ';
-		// index only pages which are searchable
-		$where .= ' AND no_search <> 1 ';
-
-		foreach($rows as $row) {
-			$tempTags = array();
-			if( $row['automated_tagging_exclude'] > '' ) {
-				$where .= 'AND FIND_IN_SET(pages.pid, "' . $row['automated_tagging_exclude'] .'") = 0';
-			}
-			$pageList = t3lib_div::trimExplode(',', $this->queryGen->getTreeList($row['automated_tagging'], 99, 0, $where));
-			foreach($pageList as $uid) {
-				if($this->pageRecords[$uid]['tags']) {
-					$this->pageRecords[$uid]['tags'] .= ',' . $tagChar . $row['tag'] . $tagChar;
-				} else $this->pageRecords[$uid]['tags'] = $tagChar . $row['tag'] . $tagChar;
 			}
 		}
 	}

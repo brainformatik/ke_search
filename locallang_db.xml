@@ -68,6 +68,7 @@
 			<label index="tx_kesearch_indexerconfig.index_dam_categories">Select DAM categories</label>
 			<label index="tx_kesearch_indexerconfig.index_dam_without_categories">Index dam records without defined categories</label>
 			<label index="tx_kesearch_indexerconfig.index_dam_categories_recursive">Index DAM categories recursive?</label>
+			<label index="tx_kesearch_indexerconfig.index_use_page_tags">Use page tags?</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.0">Yes</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">No</label>
 			<label index="tx_kesearch_indexerconfig.directories">Directories</label>
@@ -136,6 +137,7 @@
 			<label index="tx_kesearch_indexerconfig.index_dam_categories">Welche Kategorien sollen indiziert werden?</label>
 			<label index="tx_kesearch_indexerconfig.index_dam_without_categories">Indexiere DAM Datensätze, die keiner Kategorie zugeordnet sind?</label>
 			<label index="tx_kesearch_indexerconfig.index_dam_categories_recursive">Kategorien rekursiv indizieren?</label>
+			<label index="tx_kesearch_indexerconfig.index_use_page_tags">Seitentags übernehmen?</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.0">Ja</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">Nein</label>
 			<label index="tx_kesearch_indexerconfig.directories">Verzeichnisse</label>

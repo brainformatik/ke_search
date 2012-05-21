@@ -58,6 +58,12 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 		$fields = '*';
 		$table = 'tt_news';
 		$indexPids = $this->getPidList($this->indexerConfig['startingpoints_recursive'], $this->indexerConfig['sysfolder'], $table);
+		if($this->indexerConfig['index_use_page_tags']) {
+			// add the tags of each page to the global page array
+			$this->pageRecords = $this->getPageRecords($indexPids);
+			$this->addTagsToPageRecords($indexPids);
+		}
+
 		$where = 'pid IN (' . implode(',', $indexPids) . ') ';
 		$where .= t3lib_befunc::BEenableFields($table,$inv=0);
 		$where .= t3lib_befunc::deleteClause($table,$inv=0);
@@ -81,7 +87,10 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 
 				$fullContent = $abstract . "\n" . $content;
 				$params = '&tx_ttnews[tt_news]=' . $newsRecord['uid'];
-				$tags = '';
+				if($this->indexerConfig['index_use_page_tags']) {
+					$tags = $this->pageRecords[intval($newsRecord['pid'])]['tags'];
+				} else $tags = '';
+
 				$additionalFields = array();
 
 					// make it possible to modify the indexerConfig via hook

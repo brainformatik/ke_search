@@ -53,6 +53,11 @@ class tx_kesearch_indexer_types_tt_address extends tx_kesearch_indexer_types {
 		$fields = '*';
 		$table = 'tt_address';
 		$indexPids = $this->getPidList($this->indexerConfig['startingpoints_recursive'], $this->indexerConfig['sysfolder'], $table);
+		if ( $this->indexerConfig[ 'index_use_page_tags' ] ) {
+			// add the tags of each page to the global page array
+			$this->pageRecords = $this->getPageRecords($indexPids);
+			$this->addTagsToPageRecords($indexPids);
+		}
 		$where = 'pid IN (' . implode(',', $indexPids) . ') ';
 		$where .= t3lib_befunc::BEenableFields($table,$inv=0);
 		$where .= t3lib_befunc::deleteClause($table,$inv=0);
@@ -101,7 +106,9 @@ class tx_kesearch_indexer_types_tt_address extends tx_kesearch_indexer_types {
 			$params = '&tt_address[showUid]='.$addressRow['uid'];
 
 				// no tags yet
-			$tagContent = '';
+			if($this->indexerConfig['index_use_page_tags']) {
+				$tagContent = $this->pageRecords[intval($addressRow['pid'])]['tags'];
+			} else $tagContent = '';
 
 				// set additional fields for sorting
 			$additionalFields = array(
