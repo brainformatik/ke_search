@@ -192,7 +192,7 @@ function hideSpinner() {
 	<!-- ###SHOW_SPINNER### end -->
 	<span class="resetbutt">###RESET###</span>
 	<span class="submitbutt">###SUBMIT###</span>
-	
+
 </form>
 <!-- ###SEARCHBOX_STATIC### end -->
 
@@ -336,7 +336,7 @@ function hideSpinner() {
 			<!-- ###SUB_FILTER_CHECKBOX_OPTION### end -->
 	    </span>
 		<li class="clearer"></li>
-		
+
 		<!-- ###SUB_CHECKBOX_RESET### start -->
 		<li class="checkboxButton">
 			<span class="kesGreyButt" onclick="resetCheckboxes(###FILTER_UID###); ###ONCLICK_RESET###">###RESET_FILTER###</span>

@@ -150,7 +150,7 @@ class tx_kesearch_db {
 			$count = $GLOBALS['TYPO3_DB']->exec_SELECTcountRows(
 				'tags',
 				'tx_kesearch_index',
-				$this->createQueryForTags($tags)
+				'1=1 ' . $this->createQueryForTags($tags)
 			);
 			$this->countResultsOfTags = $count;
 			$countQueries++;
@@ -180,7 +180,7 @@ class tx_kesearch_db {
 	 * @param array $tags
 	 * @return string Query
 	 */
-	protected function createQueryForTags($tags) {
+	protected function createQueryForTags(array $tags) {
 		if(count($tags) && is_array($tags)) {
 			foreach($tags as $value) {
 				$value = $GLOBALS['TYPO3_DB']->quoteStr($value, 'tx_kesearch_index');
