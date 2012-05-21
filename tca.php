@@ -435,7 +435,7 @@ $TCA['tx_kesearch_indexerconfig']['ctrl']['requestUpdate'] = 'type';
 $TCA['tx_kesearch_indexerconfig'] = array (
 	'ctrl' => $TCA['tx_kesearch_indexerconfig']['ctrl'],
 	'interface' => array (
-		'showRecordFieldList' => 'hidden,title,storagepid,startingpoints_recursive,single_pages,sysfolder,type,index_content_with_restrictions,index_passed_events,directories,fileext'
+		'showRecordFieldList' => 'hidden,title,storagepid,startingpoints_recursive,single_pages,sysfolder,type,index_content_with_restrictions,index_passed_events,directories,fileext,filteroption'
 	),
 	'feInterface' => $TCA['tx_kesearch_indexerconfig']['feInterface'],
 	'columns' => array (
@@ -634,9 +634,23 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 				'default' => 'pdf,ppt'
 			)
 		),
+		'filteroption' => array (
+			'exclude' => 0,
+			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.filteroption',
+			'config' => array (
+				'type'   => 'select',
+				'items' => array (
+					array('', 0),
+				),
+				'itemsProcFunc' => 'user_filterlist->getListOfAvailableFiltersForTCA',
+				'size' => 1,
+				'minitems' => 0,
+				'maxitems' => 1,
+			)
+		),
 	),
 	'types' => array (
-		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, storagepid,targetpid;;;;3-3-3,type,startingpoints_recursive,single_pages,sysfolder,index_content_with_restrictions,index_passed_events,index_dam_categories,index_dam_without_categories,index_dam_categories_recursive,index_use_page_tags,directories,fileext')
+		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, storagepid,targetpid;;;;3-3-3,type,startingpoints_recursive,single_pages,sysfolder,index_content_with_restrictions,index_passed_events,index_dam_categories,index_dam_without_categories,index_dam_categories_recursive,index_use_page_tags,directories,fileext,filteroption')
 	),
 	'palettes' => array (
 		'1' => array('showitem' => '')

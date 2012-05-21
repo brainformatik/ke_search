@@ -73,6 +73,7 @@
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">No</label>
 			<label index="tx_kesearch_indexerconfig.directories">Directories</label>
 			<label index="tx_kesearch_indexerconfig.fileext">Comma-separated list of allowed file extensions (eg. pdf,ppt)</label>
+			<label index="tx_kesearch_indexerconfig.filteroption">tag with filter option</label>
 		</languageKey>
 		<languageKey index="de" type="array">
 			<label index="pages.tx_kesearch_tags">Schlagworte für facettierte Suche</label>
@@ -142,6 +143,7 @@
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">Nein</label>
 			<label index="tx_kesearch_indexerconfig.directories">Verzeichnisse</label>
 			<label index="tx_kesearch_indexerconfig.fileext">Komma-separierte Liste von zu indexierenden Dateiendungen (z.B. pdf,ppt)</label>
+			<label index="tx_kesearch_indexerconfig.filteroption">Einträge mit dieser Filteroption als Tag setzen</label>
 		</languageKey>
 		<languageKey index="nl" type="array">
 			<label index="pages.tx_kesearch_tags">Labels voor Facet Zoeken</label>

@@ -50,5 +50,31 @@ class IndexerTest extends Tx_Extbase_BaseTestCase {
 
 		$this->assertEquals($shouldArray, $isArray);
 	}
+
+
+	/**
+	 * Test additional query parts for additional fields
+	 *
+	 * @test
+	 */
+	public function getTagTest() {
+		$fields = 'uid, title, tag';
+		$table = 'tx_kesearch_filteroptions';
+		$where = '1=1 ';
+		$where .= t3lib_befunc::BEenableFields($table, 0);
+		$where .= t3lib_befunc::deleteClause($table, 0);
+
+		$row = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow(
+			$fields,
+			$table,
+			$where
+		);
+		if(is_array($row) && count($row)) {
+			$return = $this->indexer->getTag($row['uid'], false);
+			$this->assertEquals($row['tag'], $return);
+			$return = $this->indexer->getTag($row['uid'], true);
+			$this->assertEquals($row['title'], $return);
+		}
+	}
 }
 ?>

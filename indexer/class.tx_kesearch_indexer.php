@@ -339,6 +339,16 @@ class tx_kesearch_indexer {
 	function storeInIndex($storagePid, $title, $type, $targetPid, $content, $tags='', $params='', $abstract='', $language=0, $starttime=0, $endtime=0, $fe_group, $debugOnly=false, $additionalFields=array()) {
 		// if there are errors found in current record return false and break processing
 		if(!$this->checkIfRecordHasErrorsBeforeIndexing($storagePid, $title, $type, $targetPid)) return false;
+		// optionally add indexer-tag
+		if (!empty($this->indexerConfig['filteroption'])) {
+			$indexerTag = $this->getTag( $this->indexerConfig['filteroption'] );
+			$tagChar = $this->extConf['prePostTagChar'];
+			if($tags) {
+				$tags .= ',' . $tagChar . $indexerTag . $tagChar;
+			} else $tags = $tagChar . $indexerTag . $tagChar;
+			$tags = t3lib_div::uniqueList($tags);
+		}
+
 		$table = 'tx_kesearch_index';
 		$fieldValues = $this->createFieldValuesForIndexing($storagePid, $title, $type, $targetPid, $content, $tags, $params, $abstract, $language, $starttime, $endtime, $fe_group, $additionalFields);
 
@@ -647,7 +657,32 @@ class tx_kesearch_indexer {
 	}
 
 
-/**
+	/**
+	 * function getTag
+	 *
+	 * @param int $tagUid
+	 * @param bool $clearText. If true returns the title of the tag. false return the tag itself
+	 */
+	public function getTag($tagUid, $clearText=false) {
+		$fields = 'title, tag';
+		$table = 'tx_kesearch_filteroptions';
+		$where = 'uid = "' . intval($tagUid) . '" ';
+		$where .= t3lib_befunc::BEenableFields($table, 0);
+		$where .= t3lib_befunc::deleteClause($table, 0);
+
+		$row = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow(
+			$fields,
+			$table,
+			$where
+		);
+
+		if($clearText) {
+			return $row['title'];
+		} else return $row['tag'];
+	}
+
+
+	/**
 	 * Strips control characters
 	 *
 	 * @param string the content to sanitize
