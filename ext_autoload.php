@@ -5,6 +5,7 @@ return array(
 	'tx_kesearch_indexer_types' => $extensionPath . 'indexer/class.tx_kesearch_indexer_types.php',
 	'tx_kesearch_indexer_types_file' => $extensionPath . 'indexer/types/class.tx_kesearch_indexer_types_file.php',
 	'tx_kesearch_indexer_types_page' => $extensionPath . 'indexer/types/class.tx_kesearch_indexer_types_page.php',
+	'tx_kesearch_indexer_types_templavoila' => $extensionPath . 'indexer/types/class.tx_kesearch_indexer_types_templavoila.php',
 	'tx_kesearch_indexer_filetypes' => $extensionPath . 'indexer/filetypes/interface.tx_kesearch_indexer_filetypes.php',
 	'tx_kesearch_indexer_filetypes_pdf' => $extensionPath . 'indexer/filetypes/class.tx_kesearch_indexer_filetypes_pdf.php',
 	'tx_kesearch_indexer_filetypes_ppt' => $extensionPath . 'indexer/filetypes/class.tx_kesearch_indexer_filetypes_ppt.php',

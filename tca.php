@@ -468,7 +468,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 			)
 		),
 		'targetpid' => array (
-			'displayCond' => 'FIELD:type:!IN:page,tt_content,file',
+			'displayCond' => 'FIELD:type:!IN:page,tt_content,file,templavoila',
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.targetpid',
 			'config' => array (
@@ -494,7 +494,8 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.6', 'tt_content', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_6.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.7', 'file', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_7.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.8', 't3s_content', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_8.gif'),
-					),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.9', 'templavoila', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_9.gif'),
+				),
 				'itemsProcFunc' => 'tx_kesearch_lib_items->fillIndexerConfig',
 				'size' => 1,
 				'maxitems' => 1,
@@ -504,7 +505,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'startingpoints_recursive' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.startingpoints_recursive',
-			'displayCond' => 'FIELD:type:=:page,tt_content,ttnews,tt_address',
+			'displayCond' => 'FIELD:type:=:page,tt_content,ttnews,tt_address,templavoila',
 			'config' => array (
 				'type' => 'group',
 				'internal_type' => 'db',
@@ -517,7 +518,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'single_pages' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.single_pages',
-			'displayCond' => 'FIELD:type:=:page,tt_content',
+			'displayCond' => 'FIELD:type:=:page,tt_content,templavoila',
 			'config' => array (
 				'type' => 'group',
 				'internal_type' => 'db',

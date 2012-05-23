@@ -60,6 +60,7 @@
 			<label index="tx_kesearch_indexerconfig.type.I.6">Content records (tt_content)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.7">Files</label>
 			<label index="tx_kesearch_indexerconfig.type.I.8">t3s_content</label>
+			<label index="tx_kesearch_indexerconfig.type.I.9">TemplaVoila</label>
 			<label index="tx_kesearch_indexerconfig.type">Type</label>
 			<label index="tx_kesearch_indexerconfig.index_content_with_restrictions">Index content elements with restrictions?</label>
 			<label index="tx_kesearch_indexerconfig.index_content_with_restrictions.I.0">Yes</label>
@@ -198,6 +199,7 @@
 			<label index="tx_kesearch_indexerconfig.type.I.6">Inhouds elementen (tt_content)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.7">Bestanden</label>
 			<label index="tx_kesearch_indexerconfig.type.I.8">t3s_inhoud</label>
+			<label index="tx_kesearch_indexerconfig.type.I.9">TemplaVoila</label>
 			<label index="tx_kesearch_indexerconfig.type">Type</label>
 			<label index="tx_kesearch_indexerconfig.index_content_with_restrictions">Indexeer inhouds elementen met restricties?</label>
 			<label index="tx_kesearch_indexerconfig.index_content_with_restrictions.I.0">Ja</label>
