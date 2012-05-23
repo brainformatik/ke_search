@@ -49,9 +49,9 @@
 			<label index="tx_kesearch_indexerconfig.title">Title</label>
 			<label index="tx_kesearch_indexerconfig.storagepid">Record storage page of search data</label>
 			<label index="tx_kesearch_indexerconfig.targetpid">Target page for extension content</label>
-			<label index="tx_kesearch_indexerconfig.startingpoints_recursive">Startingpoints (recursive)</label>
+			<label index="tx_kesearch_indexerconfig.startingpoints_recursive">Record storage page(s) of data to be indexed, recursive</label>
 			<label index="tx_kesearch_indexerconfig.single_pages">Single Pages</label>
-			<label index="tx_kesearch_indexerconfig.sysfolder">Record storage page(s) of data to be indexed</label>
+			<label index="tx_kesearch_indexerconfig.sysfolder">Record storage page(s) of data to be indexed, single</label>
 			<label index="tx_kesearch_indexerconfig.type.I.0">Pages</label>
 			<label index="tx_kesearch_indexerconfig.type.I.1">Calendar (ke_yac)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.2">News (tt_news)</label>
@@ -69,12 +69,12 @@
 			<label index="tx_kesearch_indexerconfig.index_dam_categories">Select DAM categories</label>
 			<label index="tx_kesearch_indexerconfig.index_dam_without_categories">Index dam records without defined categories</label>
 			<label index="tx_kesearch_indexerconfig.index_dam_categories_recursive">Index DAM categories recursive?</label>
-			<label index="tx_kesearch_indexerconfig.index_use_page_tags">Use page tags?</label>
+			<label index="tx_kesearch_indexerconfig.index_use_page_tags">Add tags of parent pages/sys-folders?</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.0">Yes</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">No</label>
 			<label index="tx_kesearch_indexerconfig.directories">Directories</label>
-			<label index="tx_kesearch_indexerconfig.fileext">Comma-separated list of allowed file extensions (eg. pdf,ppt)</label>
-			<label index="tx_kesearch_indexerconfig.filteroption">tag with filter option</label>
+			<label index="tx_kesearch_indexerconfig.fileext">Comma-separated list of allowed file extensions (eg. pdf,ppt):</label>
+			<label index="tx_kesearch_indexerconfig.filteroption">Add tag to all indexed elements:</label>
 		</languageKey>
 		<languageKey index="de" type="array">
 			<label index="pages.tx_kesearch_tags">Schlagworte für facettierte Suche</label>
@@ -120,9 +120,9 @@
 			<label index="tx_kesearch_indexerconfig.title">Titel</label>
 			<label index="tx_kesearch_indexerconfig.storagepid">Datensatzsammlung: Ordner für Suchindex</label>
 			<label index="tx_kesearch_indexerconfig.targetpid">Zielseite für Erweiterungen</label>
-			<label index="tx_kesearch_indexerconfig.startingpoints_recursive">Startpunkte (rekursiv)</label>
+			<label index="tx_kesearch_indexerconfig.startingpoints_recursive">Ordner mit zu indexierenden Daten, rekursiv</label>
 			<label index="tx_kesearch_indexerconfig.single_pages">Einzelseiten</label>
-			<label index="tx_kesearch_indexerconfig.sysfolder">Datensatzsammlung: Ordner mit zu indexierenden Daten</label>
+			<label index="tx_kesearch_indexerconfig.sysfolder">Ordner mit zu indexierenden Daten, einfach</label>
 			<label index="tx_kesearch_indexerconfig.type.I.0">Seiten</label>
 			<label index="tx_kesearch_indexerconfig.type.I.1">Kalendar (ke_yac)</label>
 			<label index="tx_kesearch_indexerconfig.type.I.2">Nachrichten (tt_news)</label>
@@ -139,12 +139,12 @@
 			<label index="tx_kesearch_indexerconfig.index_dam_categories">Welche Kategorien sollen indiziert werden?</label>
 			<label index="tx_kesearch_indexerconfig.index_dam_without_categories">Indexiere DAM Datensätze, die keiner Kategorie zugeordnet sind?</label>
 			<label index="tx_kesearch_indexerconfig.index_dam_categories_recursive">Kategorien rekursiv indizieren?</label>
-			<label index="tx_kesearch_indexerconfig.index_use_page_tags">Seitentags übernehmen?</label>
+			<label index="tx_kesearch_indexerconfig.index_use_page_tags">Schlagworte der übergeordneten Seite/des Sys-Ordners übernehmen?</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.0">Ja</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">Nein</label>
 			<label index="tx_kesearch_indexerconfig.directories">Verzeichnisse</label>
-			<label index="tx_kesearch_indexerconfig.fileext">Komma-separierte Liste von zu indexierenden Dateiendungen (z.B. pdf,ppt)</label>
-			<label index="tx_kesearch_indexerconfig.filteroption">Einträge mit dieser Filteroption als Tag setzen</label>
+			<label index="tx_kesearch_indexerconfig.fileext">Komma-separierte Liste von zu indexierenden Dateiendungen (z.B. pdf,ppt):</label>
+			<label index="tx_kesearch_indexerconfig.filteroption">Allen indexierten Elementen dieses Schlagwort hinzufügen:</label>
 		</languageKey>
 		<languageKey index="nl" type="array">
 			<label index="pages.tx_kesearch_tags">Labels voor Facet Zoeken</label>
