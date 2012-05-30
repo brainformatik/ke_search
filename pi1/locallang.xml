@@ -151,9 +151,9 @@
 			<label index="ff.showScoreScale">Zeige Relevanz-Skala?</label>
 
 			<label index="ff.page.debug">Debug (Admin)</label>
-			<label index="ff.showTags">Zeige Tags?</label>
+			<label index="ff.showTags">Zeige Schlagworte?</label>
 			<label index="ff.showQuery">Zeige Such-Query?</label>
-			<label index="ff.showTaggedContentOnly">Nur getaggte Inhalte zeigen?</label>
+			<label index="ff.showTaggedContentOnly">Nur Inhalte mit Schlagworten zeigen?</label>
 
 			<label index="ff.page.filter">Filtereinstellungen</label>
 			<label index="ff.filters">Filter</label>
@@ -177,7 +177,7 @@
 			<label index="label_date">Datum</label>
 			<label index="label_score_percent">Prozentuale Relevanz</label>
 			<label index="label_score_scale">Relevanz-Skala</label>
-			<label index="label_tags">Tags</label>
+			<label index="label_tags">Schlagworte</label>
 			<label index="label_query">DB-Query</label>
 			<label index="label_all">alle auswählen / alle abwählen</label>
 
