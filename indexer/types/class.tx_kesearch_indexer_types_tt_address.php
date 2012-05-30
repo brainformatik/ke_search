@@ -56,7 +56,7 @@ class tx_kesearch_indexer_types_tt_address extends tx_kesearch_indexer_types {
 		if ( $this->indexerConfig[ 'index_use_page_tags' ] ) {
 			// add the tags of each page to the global page array
 			$this->pageRecords = $this->getPageRecords($indexPids);
-			$this->addTagsToPageRecords($indexPids);
+			$this->addTagsToRecords($indexPids);
 		}
 		$where = 'pid IN (' . implode(',', $indexPids) . ') ';
 		$where .= t3lib_befunc::BEenableFields($table,$inv=0);

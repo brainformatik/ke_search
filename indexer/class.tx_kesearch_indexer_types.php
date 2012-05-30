@@ -149,7 +149,7 @@ class tx_kesearch_indexer_types {
 	 * @param array Simple array with uids of pages
 	 * @return array extended array with uids and tags for pages
 	 */
-	public function addTagsToPageRecords($uids, $pageWhere = '1=1') {
+	public function addTagsToRecords($uids, $pageWhere = '1=1') {
 		$tagChar = $this->pObj->extConf['prePostTagChar'];
 		// add tags which are defined by page properties
 		$fields = 'pages.*, GROUP_CONCAT(CONCAT("' . $tagChar . '", tx_kesearch_filteroptions.tag, "' . $tagChar . '")) as tags';

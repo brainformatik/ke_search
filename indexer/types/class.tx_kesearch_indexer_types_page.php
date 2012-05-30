@@ -91,7 +91,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$where = ' (doktype = 1 OR doktype = 2 OR doktype = 4 OR doktype = 5) ';
 
 		// add the tags of each page to the global page array
-		$this->addTagsToPageRecords($indexPids, $where);
+		$this->addTagsToRecords($indexPids, $where);
 
 		// loop through pids and collect page content and tags
 		foreach($indexPids as $uid) {
