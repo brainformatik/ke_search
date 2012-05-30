@@ -144,10 +144,11 @@ class tx_kesearch_indexer_types {
 
 
 	/**
-	 * Add Tags to pages array
+	 * Add Tags to records array
 	 *
 	 * @param array Simple array with uids of pages
-	 * @return array extended array with uids and tags for pages
+	 * @param string additional where-clause
+	 * @return array extended array with uids and tags for records
 	 */
 	public function addTagsToRecords($uids, $pageWhere = '1=1') {
 		$tagChar = $this->pObj->extConf['prePostTagChar'];
