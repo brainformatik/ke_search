@@ -7,6 +7,7 @@ Current Trunk
 * bugfix: not valid html code. http://forge.typo3.org/issues/35229
 * new hook: modifySearchWords
 * bugfix: corrected locallang values, thanks to Jan Bartes, http://forge.typo3.org/issues/37582
+* feature: added new indexer for TemplaVoila, http://forge.typo3.org/issues/31208
 
 Version 1.0.2, May 2012
 * bugfix: wrong rendering of the abstract
