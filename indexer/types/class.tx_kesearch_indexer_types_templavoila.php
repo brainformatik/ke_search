@@ -118,8 +118,8 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 
 		// show indexer content?
 		$content .= '<p><b>Indexer "' . $this->indexerConfig['title'] . '": </b><br />'
-			. count($this->pageRecords) . ' pages have been found for indexing.<br />' . "\n"
-			. $this->counter . ' ' . $this->indexedElementsName . ' have been indexed.<br />' . "\n"
+			. count($this->pageRecords) . ' pages for TemplaVoila have been found for indexing.<br />' . "\n"
+			. $this->counter . ' ' . $this->indexedElementsName . ' TemplaVoila records have been indexed.<br />' . "\n"
 			. '</p>' . "\n";
 
 		$content .= $this->showTime();
@@ -215,6 +215,7 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 
 		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where);
 		if(count($rows)) {
+			$this->counter++;
 			foreach($rows as $row) {
 				// header
 				// add header only if not set to "hidden"
