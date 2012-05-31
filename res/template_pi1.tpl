@@ -20,12 +20,16 @@ function resetCheckboxes(filter) {
 }
 
 function enableCheckboxes(filter) {
-	allLi = document.getElementsByName("optionCheckBox" + filter);
-	allCb = new Array();
-	for(i = 0; i < allLi.length; i++) {
-		allCb[i] = allLi[i].getElementsByTagName("input");
+	var lis = document.getElementsByTagName("LI");
+	var allCb = new Array();
+	var allCbChecked = true;
+	var count = 0;
+	for(var i = 0; i < lis.length; i++) {
+		if(lis[i].className == "optionCheckBox optionCheckBox" + filter) {
+			allCb[count] = lis[i].getElementsByTagName("input");
+			count++;
+		}
 	}
-	allCbChecked = true;
 	for(i = 0; i < allCb.length; i++) {
 		if(!allCb[i][0].checked) {
 			allCbChecked = false;

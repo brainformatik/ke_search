@@ -8,6 +8,7 @@ Current Trunk
 * new hook: modifySearchWords
 * bugfix: corrected locallang values, thanks to Jan Bartes, http://forge.typo3.org/issues/37582
 * feature: added new indexer for TemplaVoila, http://forge.typo3.org/issues/31208
+* bug: mark all checkboxes doen not work in IE8/9, http://www.keworks.de/kunden/kesearch/ticket/14283.html
 
 Version 1.0.2, May 2012
 * bugfix: wrong rendering of the abstract
