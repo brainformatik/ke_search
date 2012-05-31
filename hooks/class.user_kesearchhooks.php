@@ -31,12 +31,12 @@
  */
 
 class user_kesearch_sortdate {
-	
+
 	/**
 	 * @var tx_ttnews
 	 */
 	protected $ttNews;
-	
+
 	public function registerAdditionalFields(&$additionalFields) {
 		$additionalFields[] = 'sortdate';
 		$additionalFields[] = 'orig_uid';
@@ -87,7 +87,7 @@ class user_kesearch_sortdate {
 		if(isset($newsRecord['pid']) && $newsRecord['pid'] > 0) {
 			$additionalFields['orig_pid'] = $newsRecord['pid'];
 		}
-		
+
 		// http://forge.typo3.org/issues/33701
 		if(t3lib_extMgm::isLoaded('tt_news')) {
 			require_once (t3lib_extMgm::extPath('tt_news') . 'pi/class.tx_ttnews.php');
@@ -170,6 +170,30 @@ class user_kesearch_sortdate {
 		// fill orig_pid
 		if(isset($contentRecord['pid']) && $contentRecord['pid'] > 0) {
 			$additionalFields['orig_pid'] = $contentRecord['pid'];
+		}
+	}
+
+	public function modifyTemplaVoilaIndexEntry($uid, &$pageContent, &$tags, $cachedPageRecords, &$additionalFields) {
+		// crdate is always given, but can be overwritten
+		if(isset($cachedPageRecords[0][$uid]['crdate']) && $cachedPageRecords[0][$uid]['crdate'] > 0) {
+			$additionalFields['sortdate'] = $cachedPageRecords[0][$uid]['crdate'];
+		}
+		// if TYPO3 sets last changed
+		if(isset($cachedPageRecords[0][$uid]['SYS_LASTCHANGED']) && $cachedPageRecords[0][$uid]['SYS_LASTCHANGED'] > 0) {
+			$additionalFields['sortdate'] = $cachedPageRecords[0][$uid]['SYS_LASTCHANGED'];
+		}
+		// if the user has manually set a date
+		if(isset($cachedPageRecords[0][$uid]['lastUpdated']) && $cachedPageRecords[0][$uid]['lastUpdated'] > 0) {
+			$additionalFields['sortdate'] = $cachedPageRecords[0][$uid]['lastUpdated'];
+		}
+
+		// fill orig_uid
+		if(isset($cachedPageRecords[0][$uid]['uid']) && $cachedPageRecords[0][$uid]['uid'] > 0) {
+			$additionalFields['orig_uid'] = $cachedPageRecords[0][$uid]['uid'];
+		}
+		// fill orig_pid
+		if(isset($cachedPageRecords[0][$uid]['pid']) && $cachedPageRecords[0][$uid]['pid'] > 0) {
+			$additionalFields['orig_pid'] = $cachedPageRecords[0][$uid]['pid'];
 		}
 	}
 }

@@ -52,7 +52,7 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 	var $indexedElementsName = 'pages';
 
 	/**
-	 * @var tx_templavoila_api
+	 * @var tx_templavoila_pi1
 	 */
 	var $tv;
 
@@ -67,7 +67,12 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 		parent::__construct($pObj);
 
 		if(t3lib_extMgm::isLoaded('templavoila')) {
-			$this->tv = t3lib_div::makeInstance('tx_templavoila_api');
+			$GLOBALS['TT'] = new t3lib_timeTrackNull;
+			$GLOBALS['TSFE'] = t3lib_div::makeInstance('tslib_fe', $GLOBALS['TYPO3_CONF_VARS'], 1, 0);
+			$GLOBALS['TSFE']->sys_page = t3lib_div::makeInstance('t3lib_pageSelect');
+			$GLOBALS['TSFE']->sys_page->init(TRUE);
+			$GLOBALS['TSFE']->initTemplate();
+			$this->tv = t3lib_div::makeInstance('tx_templavoila_pi1');
 		}
 
 		$this->counter = 0;
@@ -195,7 +200,7 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 		// TODO: Maybe it's good to check comma seperated list for int values
 
 		// get content elements for this page
-		$fields = 'header, bodytext, CType, sys_language_uid, header_layout, tx_templavoila_flex, tx_templavoila_ds, tx_templavoila_to';
+		$fields = '*';
 		$table = 'tt_content';
 		$where = 'uid IN (' . $contentElementUids . ')';
 		$where .= ' AND (' . $this->whereClauseForCType. ')';
@@ -216,12 +221,17 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 				if($row['header_layout'] != 100) {
 					$pageContent[$row['sys_language_uid']] .= strip_tags($row['header']) . "\n";
 				}
+
+				// bodytext
+				$bodytext = $row['bodytext'];
+
 				if($row['CType'] == 'table') {
 					// replace table dividers with whitespace
 					$bodytext = str_replace('|', ' ', $bodytext);
 				}
 				if($row['CType'] == 'templavoila_pi1') {
-					$bodytext = $this->getContentForTV($row);
+					//$bodytext = $this->getContentForTV($row);
+					$bodytext = $this->tv->renderElement($row, 'tt_content');
 				}
 				// following lines prevents having words one after the other like: HelloAllTogether
 				$bodytext = str_replace('<td', ' <td', $bodytext);
@@ -259,110 +269,22 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 		// store record in index table
 		foreach($pageContent as $langKey => $content) {
 			$this->pObj->storeInIndex(
-				$indexerConfig['storagepid'],                    		// storage PID
-				$this->cachedPageRecords[$langKey][$uid]['title'],     	// page title
-				'templavoila',                                                	// content type
-				$uid,                                                  	// target PID: where is the single view?
-				$content,                                             	// indexed content, includes the title (linebreak after title)
-				$tags,                                                 	// tags
-				'',                                                    	// typolink params for singleview
-				'',                                                    	// abstract
-				$langKey,                                              	// language uid
-				$this->cachedPageRecords[$langKey][$uid]['starttime'], 	// starttime
-				$this->cachedPageRecords[$langKey][$uid]['endtime'],   	// endtime
-				$this->cachedPageRecords[$langKey][$uid]['fe_group'],  	// fe_group
-				false,                                                 	// debug only?
-				$additionalFields                                      	// additional fields added by hooks
+				$indexerConfig['storagepid'],                          // storage PID
+				$this->cachedPageRecords[$langKey][$uid]['title'],     // page title
+				'templavoila',                                         // content type
+				$uid,                                                  // target PID: where is the single view?
+				$content,                                              // indexed content, includes the title (linebreak after title)
+				$tags,                                                 // tags
+				'',                                                    // typolink params for singleview
+				'',                                                    // abstract
+				$langKey,                                              // language uid
+				$this->cachedPageRecords[$langKey][$uid]['starttime'], // starttime
+				$this->cachedPageRecords[$langKey][$uid]['endtime'],   // endtime
+				$this->cachedPageRecords[$langKey][$uid]['fe_group'],  // fe_group
+				false,                                                 // debug only?
+				$additionalFields                                      // additional fields added by hooks
 			);
 		}
-	}
-
-
-	/**
-	 * get content for records of CType templavoila_pi1
-	 *
-	 * @param array $row Array containing the elements of a tt_content record
-	 */
-	public function getContentForTV(array $row) {
-		$flex = t3lib_div::xml2array($row['tx_templavoila_flex']);
-		$fields = $flex['data']['sDEF']['lDEF'];
-
-		// remove non allowed field arrays and merge field arrays
-		$fieldsOfDS = $this->getAllowedFieldsOfDS($row['tx_templavoila_ds']);
-		$fields = array_intersect_key($fields, $fieldsOfDS);
-		$fields = t3lib_div::array_merge_recursive_overrule($fields, $fieldsOfDS);
-
-		foreach($fields as $fieldName => $field) {
-			switch($field['tx_templavoila']['eType']) {
-				case 'input':
-				case 'input_h':
-				case 'input_g':
-				case 'text':
-				case 'rte':
-					$value = $field['vDEF'];
-					break;
-				case 'ce':
-					$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
-						'bodytext',
-						'tt_content',
-						'uid IN (' . $field['vDEF'] . ')' .
-						' AND (' . $this->whereClauseForCType. ')' .
-						t3lib_BEfunc::BEenableFields($table) .
-						t3lib_BEfunc::deleteClause($table)
-					);
-					t3lib_utility_Debug::debug($rows, 'rows');
-					if(count($rows)) {
-						$value = array();
-						foreach($rows as $ce) {
-							$value[] = $ce['bodytext'];
-						}
-					}
-					$value = implode(chr(10), $value);
-					break;
-				case 'TypoScriptObject':
-					$value = '';
-					break;
-				case 'none':
-					$value = '';
-					break;
-				default:
-					$value = $field['vDEF'];
-					break;
-			}
-			if(!empty($value) && is_string($value)) {
-				$content[] = $value;
-			}
-		}
-
-		return implode(chr(10), $content);
-	}
-
-
-	/**
-	 * retuns the allowed fields defined in DS
-	 * This is useful, because removed fields in ds are not automatically removed in flex
-	 *
-	 * @param integer $ds The records ID for Datastructure
-	 * @return array Array containing the allowed fields
-	 */
-	public function getAllowedFieldsOfDS($ds) {
-		$allowedTypes = t3lib_div::trimExplode(',', 'input, input_h, input_g, text, rte, ce, TypoScriptObject, none');
-
-		// get DS from Database
-		$row = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow(
-			'*',
-			'tx_templavoila_datastructure',
-			'uid = ' . intval($ds)
-		);
-		$flex = t3lib_div::xml2array($row['dataprot']);
-		$fields = $flex['ROOT']['el'];
-		foreach($fields as $fieldName => $field) {
-			// remove all fields which have no content like links, images and selectboxes
-			if(!t3lib_div::inArray($allowedTypes, $field['tx_templavoila']['eType'])) {
-				unset($fields[$fieldName]);
-			}
-		}
-		return $fields;
 	}
 }
 ?>
