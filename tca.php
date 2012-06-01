@@ -435,7 +435,7 @@ $TCA['tx_kesearch_indexerconfig']['ctrl']['requestUpdate'] = 'type';
 $TCA['tx_kesearch_indexerconfig'] = array (
 	'ctrl' => $TCA['tx_kesearch_indexerconfig']['ctrl'],
 	'interface' => array (
-		'showRecordFieldList' => 'hidden,title,storagepid,startingpoints_recursive,single_pages,sysfolder,type,index_content_with_restrictions,index_passed_events,directories,fileext,filteroption'
+		'showRecordFieldList' => 'hidden,title,storagepid,startingpoints_recursive,single_pages,sysfolder,type,index_content_with_restrictions,index_passed_events,,index_news_category_mode,index_news_category_selection,directories,fileext,filteroption'
 	),
 	'feInterface' => $TCA['tx_kesearch_indexerconfig']['feInterface'],
 	'columns' => array (
@@ -569,6 +569,35 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 				'maxitems' => 1,
 			)
 		),
+		'index_news_category_mode' => array (
+			'exclude' => 0,
+			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.index_news_category_mode',
+			'displayCond' => 'FIELD:type:=:ttnews',
+			'config' => array (
+				'type' => 'select',
+				'items' => array (
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.index_news_category_mode.I.1', '1'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.index_news_category_mode.I.2', '2'),
+				),
+				'size' => 1,
+				'maxitems' => 1,
+			)
+		),
+		'index_news_category_selection' => Array (
+			'exclude' => 1,
+			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.index_news_category_selection',
+			'displayCond' => 'FIELD:type:=:ttnews',
+			'config' => Array (
+				'type' => 'select',
+				'form_type' => 'user',
+				'userFunc' => 'tx_ttnews_TCAform_selectTree->renderCategoryFields',
+				'treeView' => 1,
+				'foreign_table' => 'tt_news_cat',
+				'autoSizeMax' => 50,
+				'minitems' => 0,
+				'maxitems' => 500,
+			)
+		),
 		'index_dam_categories' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.index_dam_categories',
@@ -651,7 +680,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		),
 	),
 	'types' => array (
-		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, storagepid,targetpid;;;;3-3-3,type,startingpoints_recursive,single_pages,sysfolder,index_content_with_restrictions,index_passed_events,index_dam_categories,index_dam_without_categories,index_dam_categories_recursive,index_use_page_tags,directories,fileext,filteroption')
+		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, storagepid,targetpid;;;;3-3-3,type,startingpoints_recursive,single_pages,sysfolder,index_content_with_restrictions,index_passed_events,index_news_category_mode,index_news_category_selection,index_dam_categories,index_dam_without_categories,index_dam_categories_recursive,index_use_page_tags,directories,fileext,filteroption')
 	),
 	'palettes' => array (
 		'1' => array('showitem' => '')

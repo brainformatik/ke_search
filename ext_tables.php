@@ -128,6 +128,11 @@ $TCA['tx_kesearch_index'] = array (
 	),
 );
 
+// class for displaying the category tree for tt_news in BE forms.
+if(t3lib_extMgm::isLoaded('tt_news')) {
+	include_once(t3lib_extMgm::extPath('tt_news') . 'lib/class.tx_ttnews_TCAform_selectTree.php');
+}
+
 $TCA['tx_kesearch_indexerconfig'] = array (
 	'ctrl' => array (
 		'title'     => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig',

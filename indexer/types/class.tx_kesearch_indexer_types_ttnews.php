@@ -75,7 +75,35 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 		if ($resCount) {
 			while ( ($newsRecord = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) ) {
 
-					// compile the information which should go into the index
+				// if mode equals 'choose categories for indexing' (2). 1 = All
+				if($this->indexerConfig['index_news_category_mode'] == '2') {
+					$resCat = $GLOBALS['TYPO3_DB']->exec_SELECT_mm_query(
+						'tt_news_cat.uid',
+						'tt_news',
+						'tt_news_cat_mm',
+						'tt_news_cat',
+						' AND tt_news.uid = ' . $newsRecord['uid'] .
+						t3lib_befunc::BEenableFields('tt_news_cat') .
+						t3lib_befunc::deleteClause('tt_news_cat'),
+						'', '', ''
+					);
+					if(is_resource($resCat)) {
+						$isInList = false;
+						while($newsCat = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($resCat)) {
+							// if category was found in list, set isInList to true and break further processing.
+							if(t3lib_div::inList($this->indexerConfig['index_news_category_selection'], $newsCat['uid'])) {
+								$isInList = true;
+								break;
+							}
+						}
+						// if category was not fount stop further processing and loop with next news record
+						if(!$isInList) {
+							continue ;
+						}
+					}
+				}
+
+				// compile the information which should go into the index
 				$title = strip_tags($newsRecord['title']);
 				$abstract = strip_tags($newsRecord['short']);
 				$content = strip_tags($newsRecord['bodytext']);
