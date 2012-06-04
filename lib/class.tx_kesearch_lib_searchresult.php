@@ -182,7 +182,7 @@ class tx_kesearch_lib_searchresult {
 		$content = $this->row['content'];
 		if (!empty($this->row['abstract'])) {
 			$content = nl2br($this->row['abstract']);
-			if ($this->conf['previewMode'] != 'abstract') {
+			if ($this->conf['previewMode'] == 'hit') {
 				if (!$this->isArrayOfWordsInString($this->pObj->swords, $this->row['abstract'])) {
 					$content = $this->row['content'];
 				}

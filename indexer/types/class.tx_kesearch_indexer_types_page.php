@@ -239,20 +239,20 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		// store record in index table
 		foreach($pageContent as $langKey => $content) {
 			$this->pObj->storeInIndex(
-				$indexerConfig['storagepid'],                    		// storage PID
-				$this->cachedPageRecords[$langKey][$uid]['title'],     	// page title
-				'page',                                                	// content type
-				$uid,                                                  	// target PID: where is the single view?
-				$content,                                             	// indexed content, includes the title (linebreak after title)
-				$tags,                                                 	// tags
-				'',                                                    	// typolink params for singleview
-				'',                                                    	// abstract
-				$langKey,                                              	// language uid
-				$this->cachedPageRecords[$langKey][$uid]['starttime'], 	// starttime
-				$this->cachedPageRecords[$langKey][$uid]['endtime'],   	// endtime
-				$this->cachedPageRecords[$langKey][$uid]['fe_group'],  	// fe_group
-				false,                                                 	// debug only?
-				$additionalFields                                      	// additional fields added by hooks
+				$indexerConfig['storagepid'],                           // storage PID
+				$this->cachedPageRecords[$langKey][$uid]['title'],      // page title
+				'page',                                                 // content type
+				$uid,                                                   // target PID: where is the single view?
+				$content,                                               // indexed content, includes the title (linebreak after title)
+				$tags,                                                  // tags
+				'',                                                     // typolink params for singleview
+				$this->cachedPageRecords[$langKey][$uid]['abstract'],   // abstract
+				$langKey,                                               // language uid
+				$this->cachedPageRecords[$langKey][$uid]['starttime'],  // starttime
+				$this->cachedPageRecords[$langKey][$uid]['endtime'],    // endtime
+				$this->cachedPageRecords[$langKey][$uid]['fe_group'],   // fe_group
+				false,                                                  // debug only?
+				$additionalFields                                       // additional fields added by hooks
 			);
 		}
 
