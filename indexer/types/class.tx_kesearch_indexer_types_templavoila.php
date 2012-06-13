@@ -67,8 +67,15 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 		parent::__construct($pObj);
 
 		if(t3lib_extMgm::isLoaded('templavoila')) {
+			$row = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow(
+				'uid',
+				'pages',
+				'pid = 0' .
+				t3lib_BEfunc::BEenableFields('pages') .
+				t3lib_BEfunc::deleteClause('pages') 
+			);
 			$GLOBALS['TT'] = new t3lib_timeTrackNull;
-			$GLOBALS['TSFE'] = t3lib_div::makeInstance('tslib_fe', $GLOBALS['TYPO3_CONF_VARS'], 1, 0);
+			$GLOBALS['TSFE'] = t3lib_div::makeInstance('tslib_fe', $GLOBALS['TYPO3_CONF_VARS'], $row['uid'], 0);
 			$GLOBALS['TSFE']->sys_page = t3lib_div::makeInstance('t3lib_pageSelect');
 			$GLOBALS['TSFE']->sys_page->init(TRUE);
 			$GLOBALS['TSFE']->initTemplate();

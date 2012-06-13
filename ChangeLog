@@ -11,6 +11,7 @@ Version 1.1.0, June 2012
 * bug: mark all checkboxes doen not work in IE8/9, http://www.keworks.de/kunden/kesearch/ticket/14283.html
 * feature: Index only news of the following categories, http://www.keworks.de/kunden/kesearch/ticket/14264.html
 * feature: get abstract of pageproperties, http://www.keworks.de/kunden/kesearch/ticket/14328.html
+* bugfix: content error in templavoila indexer, thanks to Bernhard Eckl, http://forge.typo3.org/issues/38017
 
 Version 1.0.2, May 2012
 * bugfix: wrong rendering of the abstract
