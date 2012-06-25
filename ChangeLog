@@ -1,5 +1,8 @@
 ChangeLog
 
+Current SVN trunk
+* bugfix: ke_yac indexer: store additional fields in db
+
 Version 1.1.0, June 2012
 * bugfix: Error-handling for Ajax-FE missing / Remove invalid characters. Thanks to Jan Bartels, http://forge.typo3.org/issues/34808
 * feature: tt-news-indexer: Add tags of SysFolder. Thanks to Jan Bartels, http://forge.typo3.org/issues/34080

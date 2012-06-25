@@ -139,9 +139,9 @@ class tx_kesearch_indexer_types_ke_yac extends tx_kesearch_indexer_types {
 					$yacRecord['starttime'], 					// starttime
 					$yacRecord['endtime'], 						// endtime
 					$yacRecord['fe_group'], 					// fe_group
-					false 										// debug only?
+					false, 										// debug only?
+					$additionalFields							// additional fields added by hooks
 				);
-
 			}
 		}
 
