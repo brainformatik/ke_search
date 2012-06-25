@@ -25,23 +25,23 @@ function enableCheckboxes(filter) {
 	var allCbChecked = true;
 	var count = 0;
 	for(var i = 0; i < lis.length; i++) {
-		if(lis[i].className == "optionCheckBox optionCheckBox" + filter) {
-			allCb[count] = lis[i].getElementsByTagName("input");
+		if(lis[i].getAttribute("name", 1) == "optionCheckBox" + filter) {
+			allCb[count] = lis[i].getElementsByTagName("input")[0];
 			count++;
 		}
 	}
 	for(i = 0; i < allCb.length; i++) {
-		if(!allCb[i][0].checked) {
+		if(!allCb[i].checked) {
 			allCbChecked = false;
 		}
 	}
 	if(allCbChecked) {
 		for(i = 0; i < allCb.length; i++) {
-			allCb[i][0].checked = false;
+			allCb[i].checked = false;
 		}
 	} else {
 		for(i = 0; i < allCb.length; i++) {
-			allCb[i][0].checked = true;
+			allCb[i].checked = true;
 		}
 	}
 }
