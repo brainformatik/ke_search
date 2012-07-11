@@ -397,7 +397,8 @@ class tx_kesearch_lib extends tslib_pibase {
 							if($this->checkIfTagMatchesRecords($option['tag'], $this->conf['checkFilterCondition'], $filterUid)) {
 								// process check in condition to other filters or without condition
 
-								// selected / preselected?
+								// Is the filter option selected in the frontend via piVars
+								// or in the backend via flexform configuration?
 								$selected = 0;
 
 								if($this->piVars['filter'][$filterUid] == $option['tag']) {
@@ -406,10 +407,12 @@ class tx_kesearch_lib extends tslib_pibase {
 									if(t3lib_div::inArray($this->piVars['filter'][$filterUid], $option['tag'])) {
 										$selected = 1;
 									}
+									// check preselected filter options
 								} elseif(!isset($this->piVars['filter'][$filterUid]) && !is_array($this->piVars['filter'][$filterUid])) {
 									if (is_array($this->preselectedFilter) && $this->in_multiarray($option['tag'], $this->preselectedFilter)) {
 										$selected = 1;
-										$this->piVars['filter'][$filterUid] = $option['tag'];
+										// add preselected filter to piVars
+										$this->piVars['filter'][$filterUid] = array($option['uid'] => $option['tag']);
 									}
 								}
 
@@ -421,7 +424,7 @@ class tx_kesearch_lib extends tslib_pibase {
 								);
 							}
 						} else {
-							// do not process check; show all filters
+							// do not process check; show all filter options
 							$options[$option['uid']] = array(
 								'title' => $option['title'],
 								'value' => $option['tag'],
@@ -746,19 +749,17 @@ class tx_kesearch_lib extends tslib_pibase {
 				// if option is in optionArray, we have to mark the checkboxes
 				if($isOptionInOptionArray) {
 					// if user has selected a checkbox it must be selected on the resultpage, too.
+					// options which have been preselected in the backend are already in $this->piVars['filter'][$filterUid]
 					if($this->piVars['filter'][$filterUid][$key]) {
 						$checkBoxParams['selected'] = 'checked="checked"';
 					}
 
-					// mark all checkboxes if set and no search string was given
-					if($this->isEmptySearch && $this->filters[$filterUid]['markAllCheckboxes']) {
+					// mark all checkboxes if that config options is set and no search string was given and there
+					// are no preselected filters given for that filter
+					if($this->isEmptySearch && $this->filters[$filterUid]['markAllCheckboxes'] && empty($this->preselectedFilter[$filterUid])) {
 						$checkBoxParams['selected'] = 'checked="checked"';
 					}
 
-					// always mark checkboxes which are preselected
-					if($this->preselectedFilter[$filterUid][$data['uid']]) {
-						$checkBoxParams['selected'] = 'checked="checked"';
-					}
 				} else { // if an option was not found in the search results
 					$checkBoxParams['disabled'] = 'disabled="disabled"';
 				}
