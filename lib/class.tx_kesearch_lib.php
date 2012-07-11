@@ -407,7 +407,7 @@ class tx_kesearch_lib extends tslib_pibase {
 										$selected = 1;
 									}
 								} elseif(!isset($this->piVars['filter'][$filterUid]) && !is_array($this->piVars['filter'][$filterUid])) {
-									if (is_array($this->preselectedFilter) && in_array($option['tag'], $this->preselectedFilter)) {
+									if (is_array($this->preselectedFilter) && $this->in_multiarray($option['tag'], $this->preselectedFilter)) {
 										$selected = 1;
 										$this->piVars['filter'][$filterUid] = $option['tag'];
 									}
@@ -1528,8 +1528,6 @@ class tx_kesearch_lib extends tslib_pibase {
 				}
 			}
 			$res = $this->user_kesearchpremium->getResForSearchResults($queryForSphinx);
-			//t3lib_utility_Debug::debug($this->user_kesearchpremium->getLastWarning());
-			//t3lib_utility_Debug::debug($this->user_kesearchpremium->getLastError());
 
 			// get number of records
 			$this->numberOfResults = $this->user_kesearchpremium->getTotalFound();
@@ -1614,7 +1612,6 @@ class tx_kesearch_lib extends tslib_pibase {
 		// init results counter
 		$resultCount = 1;
 		$this->searchResult = t3lib_div::makeInstance('tx_kesearch_lib_searchresult', $this);
-		//t3lib_utility_Debug::debug($this->conf);
 		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 			// generate row content
 			$tempContent = $this->cObj->getSubpart($this->templateCode, '###RESULT_ROW###');
@@ -2226,7 +2223,6 @@ class tx_kesearch_lib extends tslib_pibase {
 
 
 	public function sortArrayRecursive($array, $field) {
-		#debug ($array);
 
 		$sortArray = Array();
 		$mynewArray = Array();
@@ -2262,5 +2258,28 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		return ($a < $b) ? -1 : +1;
 	}
+
+	/**
+	 * implements a recursive in_array function
+	 *
+	 * @param mixed $needle
+	 * @param array $array
+	 * @return boolean
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 11.07.12 
+	 */
+    public function in_multiarray($needle, $haystack) {
+		foreach ($haystack as $value) {
+			if (is_array($value)) {
+				if ($this->in_multiarray($needle, $value)) {
+					return true;
+				}
+			} else if ($value == $needle) {
+				return true;
+			}
+		}
+        return false;
+    }
+
 }
 ?>

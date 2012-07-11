@@ -149,19 +149,27 @@ class tx_kesearch_lib_div {
 		$tagsAgainst = array();
 		$tagChar = $this->pObj->extConf['prePostTagChar'];
 
+		// add preselected filter options (preselected in the backend flexform)
 		foreach($this->pObj->preselectedFilter as $key => $filterTags) {
-			// Quote the tags for use in database query
-			foreach ($filterTags as $k => $v) {
-				$filterTags[$k] = $GLOBALS['TYPO3_DB']->quoteStr($v, 'tx_kesearch_index');
-			}
-			// if we are in checkbox mode
-			if(count($this->pObj->preselectedFilter[$key]) >= 2) {
-				$tagsAgainst[$key] .= ' "' . $tagChar . implode($tagChar . '" "' . $tagChar, $filterTags) . $tagChar . '"';
-			// if we are in select or list mode
-			} elseif(count($this->pObj->preselectedFilter[$key]) == 1) {
-				$tagsAgainst[$key] .= ' +"' . $tagChar . array_shift($filterTags) . $tagChar . '"';
+
+			// add it only, if no other filter options of this filter has been
+			// selected in the frontend
+			if (!isset($this->pObj->piVars['filter'][$key]) && !is_array($this->pObj->piVars['filter'][$key])) {
+				// Quote the tags for use in database query
+				foreach ($filterTags as $k => $v) {
+					$filterTags[$k] = $GLOBALS['TYPO3_DB']->quoteStr($v, 'tx_kesearch_index');
+				}
+				// if we are in checkbox mode
+				if(count($this->pObj->preselectedFilter[$key]) >= 2) {
+					$tagsAgainst[$key] .= ' "' . $tagChar . implode($tagChar . '" "' . $tagChar, $filterTags) . $tagChar . '"';
+				// if we are in select or list mode
+				} elseif(count($this->pObj->preselectedFilter[$key]) == 1) {
+					$tagsAgainst[$key] .= ' +"' . $tagChar . array_shift($filterTags) . $tagChar . '"';
+				}
 			}
 		}
+
+		// add filter options selected in the frontend
 		if(is_array($this->pObj->piVars['filter'])) {
 			foreach($this->pObj->piVars['filter'] as $key => $tag)  {
 				if(is_array($this->pObj->piVars['filter'][$key])) {

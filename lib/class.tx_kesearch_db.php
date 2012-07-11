@@ -23,7 +23,7 @@
 ***************************************************************/
 
 /**
- * Plugin 'Faceted search - searchbox and filters' for the 'ke_search' extension.
+ * DB Class for ke_search, generates search queries.
  *
  * @author	Stefan Froemken (kennziffer.com) <froemken@kennziffer.com>
  * @package	TYPO3
