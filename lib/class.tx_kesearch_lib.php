@@ -1572,7 +1572,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['noResultsHandler'])) {
 				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['noResultsHandler'] as $_classRef) {
 					$_procObj = & t3lib_div::getUserObj($_classRef);
-					$noResultsText = $_procObj->noResultsHandler($noResultsText, $this);
+					$_procObj->noResultsHandler($noResultsText, $this);
 				}
 			}
 
