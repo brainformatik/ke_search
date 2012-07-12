@@ -2267,7 +2267,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * @param array $array
 	 * @return boolean
 	 * @author Christian Bülter <buelter@kennziffer.com>
-	 * @since 11.07.12 
+	 * @since 11.07.12
 	 */
     public function in_multiarray($needle, $haystack) {
 		foreach ($haystack as $value) {
