@@ -50,6 +50,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	var $firstStartingPoint  = 0; // comma seperated list of startingPoints
 	var $conf                = array(); // FlexForm-Configuration
 	var $extConf             = array(); // Extension-Configuration
+	var $extConfPremium      = array(); // Extension-Configuration of ke_search_premium if installed
 	var $numberOfResults     = 0; // count search results
 	var $indexToUse          = ''; // it's for 'USE INDEX ($indexToUse)' to speed up queries
 	var $tagsInSearchResult  = false; // contains all tags of current search result
@@ -141,11 +142,11 @@ class tx_kesearch_lib extends tslib_pibase {
 		// get extension configuration array
 		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->extKey]);
 		// sphinx has problems with # in query string.
-		// so you have the possibility to change # against some other char
+		// so you have the possibility to change # against another char
 		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
-			$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search_premium']);
-			if(!$extConf['prePostTagChar']) $extConf['prePostTagChar'] = '_';
-			$this->extConf['prePostTagChar'] = $extConf['prePostTagChar'];
+			$this->extConfPremium = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search_premium']);
+			if(!$this->extConfPremium['prePostTagChar']) $this->extConfPremium['prePostTagChar'] = '_';
+			$this->extConf['prePostTagChar'] = $this->extConfPremium['prePostTagChar'];
 		} else {
 			// MySQL has problems also with #
 			// but we have wrapped # with " and it works.
@@ -184,7 +185,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		$this->isEmptySearch = $this->isEmptySearch();
 
 		// chooseBestIndex is only needed for MySQL-Search. Not for Sphinx
-		if(!t3lib_extMgm::isLoaded('ke_search_premium')) {
+		if(!$this->extConfPremium['enableSphinxSearch']) {
 			// precount results to find the best index
 			$this->db->chooseBestIndex($this->wordsAgainst, $this->tagsAgainst);
 		}
@@ -1065,7 +1066,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			$tagsAgainst = $this->div->removeXSS($tagsAgainst);
 
 			// chooseBestIndex is only needed for MySQL-Search. Not for Sphinx
-			if(!t3lib_extMgm::isLoaded('ke_search_premium')) {
+			if(!$this->extConfPremium['enableSphinxSearch']) {
 				$this->db->chooseBestIndex($this->wordsAgainst, t3lib_div::trimExplode(',', $tagsAgainst));
 			}
 
@@ -1102,7 +1103,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			$tagChar = $this->extConf['prePostTagChar'];
 
-			if(t3lib_extMgm::isLoaded('ke_search_premium') && !$this->isEmptySearch) {
+			if($this->extConfPremium['enableSphinxSearch'] && !$this->isEmptySearch) {
 				require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');
 				$sphinx = t3lib_div::makeInstance('user_kesearchpremium');
 				$sphinx->setLimit(0, 10000, 10000);
@@ -1487,7 +1488,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// use sphinx mode only when a searchstring is given.
 		// TODO: Sphinx has problems to show results when no query is given
-		if(t3lib_extMgm::isLoaded('ke_search_premium') && !$this->isEmptySearch) {
+		if($this->extConfPremium['enableSphinxSearch'] && !$this->isEmptySearch) {
 			require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');
 			$this->user_kesearchpremium = t3lib_div::makeInstance('user_kesearchpremium');
 

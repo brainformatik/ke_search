@@ -34,6 +34,7 @@
 class tx_kesearch_indexer {
 	var $counter;
 	var $extConf; // extension configuration
+	var $extConfPremium = array(); // extension configuration of ke_search_premium, if installed
 	var $indexerConfig = array(); // saves the indexer configuration of current loop
 	var $lockFile = '';
 	var $additionalFields = '';
@@ -61,9 +62,9 @@ class tx_kesearch_indexer {
 		// sphinx has problems with # in query string.
 		// so you have the possibility to change # against some other char
 		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
-			$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search_premium']);
-			if(!$extConf['prePostTagChar']) $extConf['prePostTagChar'] = '_';
-			$this->extConf['prePostTagChar'] = $extConf['prePostTagChar'];
+			$this->extConfPremium = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search_premium']);
+			if(!$this->extConfPremium['prePostTagChar']) $this->extConfPremium['prePostTagChar'] = '_';
+			$this->extConf['prePostTagChar'] = $this->extConfPremium['prePostTagChar'];
 		} else {
 			// MySQL has problems also with #
 			// but we have wrapped # with " and it works.
@@ -285,21 +286,20 @@ class tx_kesearch_indexer {
 		$where = 'tstamp < ' . $this->registry->get('tx_kesearch', 'startTimeOfIndexer');
 		$GLOBALS['TYPO3_DB']->exec_DELETEquery($table, $where);
 
-		// check if ke_search_premium is loaded
+		// check if Sphinx is enabled
 		// in this case we have to update sphinx index, too.
-		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
-			$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search_premium']);
-			if(!$extConf['sphinxIndexerName']) $extConf['sphinxIndexerConf'] = '--all';
-			if(is_file($extConf['sphinxIndexerPath']) && is_executable($extConf['sphinxIndexerPath']) && file_exists($extConf['sphinxSearchdPath']) && is_executable($extConf['sphinxIndexerPath'])) {
+		if($this->extConfPremium['enableSphinxSearch']) {
+			if(!$this->extConfPremium['sphinxIndexerName']) $this->extConfPremium['sphinxIndexerConf'] = '--all';
+			if(is_file($this->extConfPremium['sphinxIndexerPath']) && is_executable($this->extConfPremium['sphinxIndexerPath']) && file_exists($this->extConfPremium['sphinxSearchdPath']) && is_executable($this->extConfPremium['sphinxIndexerPath'])) {
 				$found = preg_match_all('/exec|system/', ini_get('disable_functions'), $match);
 				if($found === 0) { // executables are allowed
-					$ret = system($extConf['sphinxIndexerPath'] . ' --rotate ' . $extConf['sphinxIndexerName']);
+					$ret = system($this->extConfPremium['sphinxIndexerPath'] . ' --rotate ' . $this->extConfPremium['sphinxIndexerName']);
 					$content .= $ret;
 				} elseif($found === 1) { // one executable is allowed
 					if($match[0] == 'system') {
-						$ret = system($extConf['sphinxIndexerPath'] . ' --rotate ' . $extConf['sphinxIndexerName']);
+						$ret = system($this->extConfPremium['sphinxIndexerPath'] . ' --rotate ' . $this->extConfPremium['sphinxIndexerName']);
 					} else { // use exec
-						exec($extConf['sphinxIndexerPath'] . ' --rotate ' . $extConf['sphinxIndexerName'], $retArr);
+						exec($this->extConfPremium['sphinxIndexerPath'] . ' --rotate ' . $this->extConfPremium['sphinxIndexerName'], $retArr);
 						$ret = implode(';', $retArr);
 					}
 					$content .= $ret;
