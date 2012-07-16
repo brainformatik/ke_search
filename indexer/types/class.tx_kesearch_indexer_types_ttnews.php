@@ -159,7 +159,9 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 					$additionalFields                // additional fields added by hooks
 				);
 			}
-			$content = '<p><b>Indexer "' . $this->indexerConfig['title'] . '": ' . $resCount . ' News have been indexed.</b></p>'."\n";
+			$content = '<p><b>Indexer "' . $this->indexerConfig['title'] . '":</b><br />' . "\n"
+					. $resCount . ' News have been indexed.</p>' . "\n";
+			$content .= $this->showTime();
 		}
 		return $content;
 	}
