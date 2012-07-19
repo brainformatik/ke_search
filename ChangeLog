@@ -6,6 +6,7 @@ Current SVN trunk
 * bugfix: Preselected filters in checkbox filter have not been displayed correctly.
 * added better integration for ke_search_premium
 * added showTime call for tt_news indexer, indexer now shows the time needed for indexing.
+* css modification for autocomplete in premium version
 
 Version 1.1.0, June 2012
 * bugfix: Error-handling for Ajax-FE missing / Remove invalid characters. Thanks to Jan Bartels, http://forge.typo3.org/issues/34808

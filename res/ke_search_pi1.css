@@ -74,7 +74,7 @@ span.kesGreyButt:hover{
     text-decoration: none;
     -webkit-box-shadow: inset 0px 1px 2px 0px #999;
     -moz-box-shadow: inset 0px 1px 2px 0px #999;
-    box-shadow: inset 0px 1px 2px 0px #999; 
+    box-shadow: inset 0px 1px 2px 0px #999;
     cursor: pointer;
     background: #d1d1d1; /* Old browsers */
     background: -moz-linear-gradient(top,  #d1d1d1 0%, #eeeeee 100%); /* FF3.6+ */
@@ -271,7 +271,7 @@ div.kesearchbox{
 /* Results */
 #kesearch_num_results{
     font-size: 12px;
-    padding: 0 0 5px 0;    
+    padding: 0 0 5px 0;
 }
 
 #kesearch_results .result-list-item{
@@ -455,4 +455,8 @@ div.kesearchbox{
 }
 .tx-kesearch-pi1 #kesearch_ordering div.clearer {
     clear: left;
+}
+/* needed for autocomplete */
+ul.ui-autocomplete li a {
+	font-size: 12px;
 }
