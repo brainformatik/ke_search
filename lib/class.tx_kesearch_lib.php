@@ -1361,21 +1361,6 @@ class tx_kesearch_lib extends tslib_pibase {
 				$GLOBALS['TSFE']->register['ke_search_queryTime'] = (t3lib_div::milliseconds() - $GLOBALS['TSFE']->register['ke_search_queryStartTime']);
 				$objResponse->addAssign('kesearch_query_time', 'innerHTML', sprintf($this->pi_getLL('query_time'), $GLOBALS['TSFE']->register['ke_search_queryTime']));
 			}
-
-			// Show error message
-			if ($this->div->showShortMessage) {
-				$errorMessage = $this->cObj->getSubpart($this->templateCode,'###GENERAL_MESSAGE###');
-				// attention icon
-				unset($imageConf);
-				$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/attention.gif';
-				$imageConf['altText'] = $this->pi_getLL('searchword_length_error');
-				$errorMessage = $this->cObj->substituteMarker($errorMessage,'###IMAGE###', $this->cObj->IMAGE($imageConf));
-				$errorMessage = $this->cObj->substituteMarker($errorMessage,'###MESSAGE###', $this->pi_getLL('searchword_length_error'));
-
-				$objResponse->addAssign("kesearch_error", "innerHTML", $errorMessage);
-			} else {
-				$objResponse->addAssign("kesearch_error", "innerHTML", '');
-			}
 		}
 		// return response xml
 		return $objResponse->getXML();

@@ -202,7 +202,6 @@ function hideSpinner() {
 
 
 <!-- ###RESULT_LIST### start -->
-	<span id="kesearch_error"></span>
 	<div id="kesearch_num_results">###NUMBER_OF_RESULTS###</div>
 
 	<div id="kesearch_pagebrowser_top">###PAGEBROWSER_TOP###</div>
