@@ -1263,6 +1263,22 @@ class tx_kesearch_lib extends tslib_pibase {
 
 
 	/**
+	 * create hide spinner img-tag
+	 * this is needed to make results and filters visible in AJAX-Mode
+	 *
+	 * @return string HTML IMG-Tag
+	 */
+	public function createHideSpinner() {
+		// generate onload image
+		$path = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/blank.gif';
+		if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
+			$spinnerFunction = 'hideSpinnerFiltersOnly()';
+		} else $spinnerFunction = 'hideSpinner()';
+		return $this->cObj->fileResource($path, 'onload="' . $spinnerFunction . ';" alt="" title=""');
+	}
+
+
+	/**
 	 * This function will be called from AJAX directly, so this must be public
 	 *
 	 * @param $data
@@ -1294,11 +1310,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		}
 
 		// generate onload image
-		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/blank.gif';
-		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" />';
-		if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
-			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
-		}
+		$this->onloadImage = $this->createHideSpinner();
 
 		// init javascript onclick actions
 		$this->initOnclickActions();
@@ -1400,11 +1412,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		$objResponse = new tx_xajax_response();
 
 		// generate onload image
-		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/blank.gif';
-		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" />';
-		if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
-			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
-		}
+		$this->onloadImage = $this->createHideSpinner();
 
 		// set filters
 		$objResponse->addAssign('kesearch_filters', 'innerHTML', $this->renderFilters().$this->onloadImage );
@@ -1465,11 +1473,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 */
 	public function getSearchResults() {
 		// generate and add onload image
-		$onloadSrc = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/blank.gif';
-		$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinner();" alt="" />';
-		if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
-			$this->onloadImage = '<img src="'.$onloadSrc.'?ts='.time().'" onload="hideSpinnerFiltersOnly();" alt="" /> ';
-		}
+		$this->onloadImage = $this->createHideSpinner();
 
 		// use sphinx mode only when a searchstring is given.
 		// TODO: Sphinx has problems to show results when no query is given
