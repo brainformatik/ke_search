@@ -87,7 +87,16 @@ class tx_kesearch_indexer {
 		if($this->registry->get('tx_kesearch', 'startTimeOfIndexer') === null) {
 			$this->registry->set('tx_kesearch', 'startTimeOfIndexer', time());
 		} else {
-			return 'You can\'t start the indexer twice. Please wait while first indexer process is currently running';
+			// check lock time
+			$lockTime = $this->registry->get('tx_kesearch', 'startTimeOfIndexer');
+			$compareTime = time() - (60*60*12);
+			if ($lockTime < $compareTime) {
+				// lock is older than 12 hours - remove 
+				$this->registry->removeAllByNamespace('tx_kesearch');
+				$this->registry->set('tx_kesearch', 'startTimeOfIndexer', time());
+			} else {
+				return 'You can\'t start the indexer twice. Please wait while first indexer process is currently running';
+			}
 		}
 
 		// set indexing start time
