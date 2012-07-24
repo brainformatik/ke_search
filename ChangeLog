@@ -1,6 +1,9 @@
 ChangeLog
 
 Current SVN trunk
+* ...
+
+Version 1.1.1, July 2012
 * bugfix: ke_yac indexer: store additional fields in db
 * bugfix: In dropdown filters the preselected filter options (via backend flexform) haven been added to search even if the user selected a different filter option of the same filter in the frontend. That lead to empty search result lists.
 * bugfix: Preselected filters in checkbox filter have not been displayed correctly.
