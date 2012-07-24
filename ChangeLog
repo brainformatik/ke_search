@@ -13,6 +13,7 @@ Version 1.1.1, July 2012
 * bugfix: double errormessages regarding too small words in AJAX-Mode
 * bugfix: ke_search does not work in TYPO3 4.7
 * feature: delete index LOCK entry in sys_registry if it's older than 12 hours
+* bugfix: make template w3c compatible
 
 Version 1.1.0, June 2012
 * bugfix: Error-handling for Ajax-FE missing / Remove invalid characters. Thanks to Jan Bartels, http://forge.typo3.org/issues/34808
