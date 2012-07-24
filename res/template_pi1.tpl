@@ -179,7 +179,7 @@ function hideSpinner() {
 	###HIDDENFIELDS###
 
 	<div class="kesearchbox">
-		<input type="text" id="ke_search_sword" name="tx_kesearch_pi1[sword]"  value="###SWORD_VALUE###" onfocus="###SWORD_ONFOCUS###" /></b>
+		<input type="text" id="ke_search_sword" name="tx_kesearch_pi1[sword]"  value="###SWORD_VALUE###" onfocus="###SWORD_ONFOCUS###" />
 		<input type="image" id="kesearch_submit" src="typo3conf/ext/ke_search/res/img/kesearch_submit.png" class="submit" value="###SUBMIT_VALUE###" onclick="document.getElementById('pagenumber').value=1; document.getElementById('xajax_form_kesearch_pi1').submit();" />
 		<div class="clearer">&nbsp;</div>
 	</div>

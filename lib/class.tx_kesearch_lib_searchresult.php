@@ -73,7 +73,6 @@ class tx_kesearch_lib_searchresult {
 	 */
 	public function init(tx_kesearch_lib $pObj) {
 		$this->pObj = $pObj;
-		$this->row = $row;
 		$this->cObj = $this->pObj->cObj;
 		$this->conf = $this->pObj->conf;
 	}
@@ -119,14 +118,12 @@ class tx_kesearch_lib_searchresult {
 	 * @return string The results URL
 	 */
 	public function getResultUrl($linked = FALSE) {
-		$resultUrl = t3lib_div::getIndpEnv('TYPO3_SITE_URL') . $this->cObj->typoLink_URL(
-			$this->getResultLinkConfiguration()
-		);
+		$linkText = $this->cObj->typoLink_URL($this->getResultLinkConfiguration());
+		$linkText = htmlspecialchars($linkText);
+		$resultUrl = $this->cObj->typoLink($linkText, $this->getResultLinkConfiguration());
 		if($linked) {
-			$linkConf['parameter'] = $resultUrl;
-			$resultUrl = $this->cObj->typoLink($resultUrl, $linkConf);
-		}
-		return $resultUrl;
+			return $this->cObj->typoLink($linkText, $this->getResultLinkConfiguration());
+		} return $linkText;
 	}
 
 
@@ -156,7 +153,6 @@ class tx_kesearch_lib_searchresult {
 				$linkconf['target'] = $this->conf['resultLinkTarget'];
 				break;
 		}
-
 		return $linkconf;
 	}
 

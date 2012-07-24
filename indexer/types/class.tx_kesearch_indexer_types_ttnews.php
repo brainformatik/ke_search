@@ -43,6 +43,25 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 
 
 	/**
+	 * converts the datetime of a record into variables you can use in realurl
+	 *
+	 * @param	integer the timestamp to convert into a HR date
+	 * @return array
+	 */
+	function getParamsForHrDateSingleView($tstamp) {
+		$params = array('tx_ttnews' => array(
+			'year' => date('Y', $tstamp),
+			'month' => date('m', $tstamp),
+		));
+		// TODO: This "if" is not configurable!
+		if(!$this->conf['useHRDatesSingleWithoutDay']) {
+			$params['tx_ttnews']['day'] = date('d', $tstamp);
+		}
+		return $params;
+	}
+
+
+	/**
 	 * This function was called from indexer object and saves content to index table
 	 *
 	 * @return string content which will be displayed in backend
@@ -113,8 +132,16 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 					$content .= "\n".$newsRecord['keywords'];
 				}
 
+				// create content
 				$fullContent = $abstract . "\n" . $content;
-				$params = '&tx_ttnews[tt_news]=' . $newsRecord['uid'];
+
+				// create params
+				$paramsSingleView = $this->getParamsForHrDateSingleView($newsRecord['datetime']);
+				$paramsSingleView['tx_ttnews']['tt_news'] = $newsRecord['uid'];
+				$params = '&' . http_build_query($paramsSingleView, NULL, '&');
+				$params = rawurldecode($params);
+
+				// create tags
 				if($this->indexerConfig['index_use_page_tags']) {
 					$tags = $this->pageRecords[intval($newsRecord['pid'])]['tags'];
 				} else $tags = '';
