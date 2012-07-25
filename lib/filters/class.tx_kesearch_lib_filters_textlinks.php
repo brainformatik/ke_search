@@ -194,7 +194,7 @@ class tx_kesearch_lib_filters_textlinks {
 	 */
 	public function getFilter($uid) {
 		if(intval($uid)) {
-			$filters = $this->pObj->getFiltersFromFlexform();
+			$filters = $this->pObj->filters->getFilters();
 			if(is_array($filters) && count($filters)) {
 				$filter = $filters[$uid];
 				if(is_array($filter) && count($filter)) {
