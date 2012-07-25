@@ -344,10 +344,10 @@ div.kesearchbox{
 }
 
 /* Spinner / updating */
-#kesearch_updating_filters,
-#kesearch_updating_results {
+.tx-kesearch-pi1 #kesearch_updating_filters,
+.tx-kesearch-pi1 #kesearch_updating_results {
     display:none;
-    margin: 20px 0 20px 0;
+    text-align: center;
 }
 .tx-kesearch-pi1 #testbox {
     margin-top: 100px;

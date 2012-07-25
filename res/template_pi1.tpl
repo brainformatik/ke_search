@@ -180,7 +180,7 @@ function hideSpinner() {
 
 	<div class="kesearchbox">
 		<input type="text" id="ke_search_sword" name="tx_kesearch_pi1[sword]"  value="###SWORD_VALUE###" onfocus="###SWORD_ONFOCUS###" />
-		<input type="image" id="kesearch_submit" src="typo3conf/ext/ke_search/res/img/kesearch_submit.png" class="submit" value="###SUBMIT_VALUE###" onclick="document.getElementById('pagenumber').value=1; document.getElementById('xajax_form_kesearch_pi1').submit();" />
+		<input type="image" id="kesearch_submit" src="typo3conf/ext/ke_search/res/img/kesearch_submit.png" alt="###SUBMIT_VALUE###" class="submit" onclick="document.getElementById('pagenumber').value=1; document.getElementById('xajax_form_kesearch_pi1').submit();" />
 		<div class="clearer">&nbsp;</div>
 	</div>
 
@@ -192,7 +192,7 @@ function hideSpinner() {
 	<div id="kesearch_filters">###FILTER###</div>
 
 	<!-- ###SHOW_SPINNER### begin -->
-	<div id="kesearch_updating_filters"><center>###SPINNER###<br /></center></div>
+	<div id="kesearch_updating_filters">###SPINNER###<br /></div>
 	<!-- ###SHOW_SPINNER### end -->
 	<span class="resetbutt">###RESET###</span>
 	<span class="submitbutt">###SUBMIT###</span>
@@ -209,7 +209,7 @@ function hideSpinner() {
 
 	<div id="kesearch_results">###MESSAGE###</div>
 
-	<div id="kesearch_updating_results"><center>###SPINNER###<br /></center></div>
+	<div id="kesearch_updating_results">###SPINNER###<br /></div>
 	<div id="kesearch_pagebrowser_bottom">###PAGEBROWSER_BOTTOM###</div>
 	<!-- ###SUB_QUERY_TIME### start -->
 	<div id="kesearch_query_time">###QUERY_TIME###</div>
