@@ -67,7 +67,8 @@ class tx_kesearch_db implements t3lib_Singleton {
 			if(count($this->searchResults) === 0) {
 				$this->hasSearchResults = FALSE;
 			}
-		} else return $this->searchResults;
+		}
+		return $this->searchResults;
 	}
 
 
@@ -101,17 +102,17 @@ class tx_kesearch_db implements t3lib_Singleton {
 		$this->user_kesearchpremium = t3lib_div::makeInstance('user_kesearchpremium');
 
 		// set ordering
-		$this->user_kesearchpremium->setSorting($this->db->getOrdering());
+		$this->user_kesearchpremium->setSorting($this->getOrdering());
 
 		// set limit
-		$limit = $this->db->getLimit();
-		$this->user_kesearchpremium->setLimit($limit[0], $limit[1]);
+		//$limit = $this->getLimit();
+		//$this->user_kesearchpremium->setLimit($limit[0], $limit[1]);
 
 		// generate query
 		$queryForSphinx = '';
-		if($this->wordsAgainst) $queryForSphinx .= ' @(title,content) ' . $this->wordsAgainst;
-		if(count($this->tagsAgainst)) {
-			foreach($this->tagsAgainst as $value) {
+		if($this->pObj->wordsAgainst) $queryForSphinx .= ' @(title,content) ' . $this->pObj->wordsAgainst;
+		if(count($this->pObj->tagsAgainst)) {
+			foreach($this->pObj->tagsAgainst as $value) {
 				// in normal case only checkbox mode has spaces
 				$queryForSphinx .= ' @tags ' . str_replace('" "', '" | "', trim($value));
 			}
@@ -137,13 +138,19 @@ class tx_kesearch_db implements t3lib_Singleton {
 				$queryForSphinx = $_procObj->appendWhereToSphinx($queryForSphinx, $this->user_kesearchpremium, $this);
 			}
 		}
-		$res = $this->user_kesearchpremium->getResForSearchResults($queryForSphinx);
+		$rows = $this->user_kesearchpremium->getSearchResults($queryForSphinx);
 
 		// get number of records
 		$this->numberOfResults = $this->user_kesearchpremium->getTotalFound();
+		return $rows;
 	}
 
 
+	/**
+	 * get query parts like SELECT, FROM and WHERE for MySQL-Query
+	 *
+	 * @return array Array containing the query parts for MySQL
+	 */
 	public function getQueryParts() {
 		$fields = '*';
 		$table = $this->table . $this->bestIndex;

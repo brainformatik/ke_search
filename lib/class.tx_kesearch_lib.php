@@ -370,12 +370,11 @@ class tx_kesearch_lib extends tslib_pibase {
 	 */
 	public function renderFilters() {
 		foreach($this->filters->getFilters() as $filter) {
+			$options = array(); // reset variable for each loop
 			foreach($filter['options'] as $option) {
 				// check filter availability?
 				if($this->conf['checkFilterCondition'] != 'none') {
 					if($this->filters->checkIfTagMatchesRecords($option['tag'])) {
-						// process check in condition to other filters or without condition
-
 						// Is the filter option selected in the frontend via piVars
 						// or in the backend via flexform configuration?
 						$selected = 0;
@@ -481,7 +480,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		$optionSubpart = '###SUB_FILTER_SELECT_OPTION###';
 
 		// add standard option "all"
-		$optionsContent .= $this->cObj->getSubpart($this->templateCode,$optionSubpart);
+		$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
 		$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $filters[$filterUid]['title']);
 		$optionsContent = $this->cObj->substituteMarker($optionsContent,'###VALUE###', '');
 		$optionsContent = $this->cObj->substituteMarker($optionsContent,'###SELECTED###','');
@@ -840,158 +839,6 @@ class tx_kesearch_lib extends tslib_pibase {
 			$checkboxSubmit = $this->cObj->substituteMarkerArray($checkboxSubmit,$markerArray);
 		} else $checkboxSubmit = '';
 		$contentFilters = $this->cObj->substituteSubpart($contentFilters, '###SUB_CHECKBOX_SUBMIT', $checkboxSubmit);
-
-		return $contentFilters;
-	}
-
-
-	public function renderTextlinks($filterUid, $options) {
-		$filters = $this->filters->getFilters();
-		$allOptionsOfCurrentFilter = $this->getFilterOptions($filters[$filterUid]['options']);
-		$allOptionsOfCurrentFilter = t3lib_div::array_merge_recursive_overrule((array)$allOptionsOfCurrentFilter, (array)$options);
-		$allOptionKeys = array_keys($allOptionsOfCurrentFilter);
-
-		// sorting multidimensional array
-		foreach((array)$allOptionsOfCurrentFilter as $key => $array) {
-			$results[$key] = $array['results'];
-			$tags[$key] = $array['tag'];
-		}
-		array_multisort($results, SORT_DESC, SORT_NUMERIC, $tags, SORT_ASC, SORT_STRING, $allOptionKeys, SORT_DESC, SORT_NUMERIC, $allOptionsOfCurrentFilter);
-
-		// after multisort all keys are 0,1,2,3. So we have to restore our old keys
-		$allOptionsOfCurrentFilter = array_combine($allOptionKeys, array_values($allOptionsOfCurrentFilter));
-
-		// getSubparts
-		$template['filter'] = $this->cObj->getSubpart($this->templateCode, '###SUB_FILTER_TEXTLINKS###');
-		$template['options'] = $this->cObj->getSubpart($this->templateCode, '###SUB_FILTER_TEXTLINK_OPTION###');
-
-		// loop through options
-		if(is_array($allOptionsOfCurrentFilter)) {
-			$counter = 0;
-			$countActives = 0;
-			foreach($allOptionsOfCurrentFilter as $key => $data) {
-				// hook: modifyOptionForTextlinks
-				if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyOptionForTextlinks'])) {
-					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyOptionForTextlinks'] as $_classRef) {
-						$_procObj = &t3lib_div::getUserObj($_classRef);
-						$_procObj->modifyOptionForTextlinks($key, $data, $this->conf, $this);
-					}
-				}
-
-				$isOptionInOptionArray = 0;
-
-				// check if current option (of searchresults) is in array of all possible options
-				foreach((array)$options as $optionKey => $optionValue) {
-					if(is_array($options[$optionKey]) && t3lib_div::inArray($options[$optionKey], $data['tag'])) {
-						$isOptionInOptionArray = 1;
-						break;
-					}
-				}
-
-				// if multi is set, then more than one entry can be selected
-				if($this->piVars['multi'] && $this->piVars['filter'][$filterUid][$key]) {
-					if($isOptionInOptionArray) {
-						$countActives++;
-					}
-					$markerArray['###TEXTLINK###'] = $data['title'];
-					$markerArray['###CLASS###'] = 'active';
-					$hiddenFields .= '<input type="hidden" name="tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']" id="tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']" value="' . $data['tag'] . '" />';					$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
-					continue;
-				}
-				// if option is in optionArray, we have to mark the selection
-				if($isOptionInOptionArray && $counter < (int)$filters[$filterUid]['amount']) {
-					// if user has clicked on a link it must be selected on the resultpage, too.
-					if($this->piVars['filter'][$filterUid][$key]) {
-						$countActives++;
-						$markerArray['###CLASS###'] = 'active';
-						$markerArray['###TEXTLINK###'] = $options[$optionKey]['title'];
-						$hiddenFields .= '<input type="hidden" name="tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']" id="tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']" value="' . $data['tag'] . '" />';
-						$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
-					}
-					if(empty($this->piVars['filter'][$filterUid])) {
-						$markerArray['###CLASS###'] = 'normal';
-						$markerArray['###TEXTLINK###'] = $this->cObj->typoLink(
-							$options[$optionKey]['title'] . '<span> (' . $options[$optionKey]['results'] . ')</span>',
-							array(
-								'parameter' => $this->conf['resultPage'],
-								'additionalParams' => '&tx_kesearch_pi1[filter][' . $filterUid . '][' . $key . ']=' . $data['tag'] . '&tx_kesearch_pi1[page]=1' . $this->addParam,
-								'addQueryString' => 1,
-								'addQueryString.' => array(
-									'exclude' => 'uid,sortByField,sortByDir'
-								)
-							)
-						);
-						$counter++;
-						$contentOptions .= $this->cObj->substituteMarkerArray($template['options'], $markerArray);
-					}
-				}
-			}
-			$optionsCount = count($allOptionsOfCurrentFilter);
-		}
-
-		// modify filter options by hook
-		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'])) {
-			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptions'] as $_classRef) {
-				$_procObj = & t3lib_div::getUserObj($_classRef);
-				$contentOptions .= $_procObj->modifyFilterOptions(
-					$filterUid,
-					$contentOptions,
-					$optionsCount,
-					$this
-				);
-			}
-		}
-
-		unset($markerArray);
-
-		// render filter
-		$contentFilters = $this->cObj->substituteSubpart(
-			$template['filter'],
-			'###SUB_FILTER_TEXTLINK_OPTION###',
-			$contentOptions
-		);
-
-		// get title
-		$filterTitle = $filters[$filterUid]['title'];
-		$filters[$filterUid]['target_pid'] = ($filters[$filterUid]['target_pid']) ? $filters[$filterUid]['target_pid'] : $this->conf['resultPage'];
-
-		// fill markers
-		$markerArray['###FILTERTITLE###'] = $filterTitle;
-		$markerArray['###HIDDEN_FIELDS###'] = $hiddenFields;
-
-		if(count($this->piVars['filter']) <= 1) {
-			$exclude = 'tx_kesearch_pi1[page],tx_kesearch_pi1[multi],tx_kesearch_pi1[filter][' . $filterUid . ']';
-		} else $exclude = 'tx_kesearch_pi1[page],tx_kesearch_pi1[filter][' . $filterUid . ']';
-
-		if($countActives) {
-			$markerArray['###LINK_MULTISELECT###'] = '';
-			$markerArray['###LINK_RESET_FILTER###'] = $this->cObj->typoLink(
-				$this->pi_getLL('reset_filter'),
-				array(
-					'parameter' => $this->conf['resultPage'],
-					'addQueryString' => 1,
-					'addQueryString.' => array(
-						'exclude' => $exclude
-					)
-				)
-			);
-		} else {
-			// check if there is a special translation for current filter
-			$linkTextMore = $this->pi_getLL('linktext_more_' . $filterUid, $this->pi_getLL('linktext_more'));
-			$markerArray['###LINK_MULTISELECT###'] = $this->cObj->typoLink(
-				sprintf($linkTextMore, $filterTitle),
-				array(
-					'parameter' => $filters[$filterUid]['target_pid'],
-					'addQueryString' => 1,
-					'addQueryString.' => array(
-						'exclude' => 'id,tx_kesearch_pi1[page]'
-					)
-				)
-			);
-			$markerArray['###LINK_RESET_FILTER###'] = '';
-		}
-
-		$contentFilters = $this->cObj->substituteMarkerArray($contentFilters, $markerArray);
 
 		return $contentFilters;
 	}

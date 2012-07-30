@@ -76,12 +76,12 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 		$template['multioption'] = $this->cObj->getSubpart($template['multifilter'], '###SUB_FILTER_MULTISELECT_OPTION###');
 
 		// get current filter
-		$filter = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow(
-			'*',
-			'tx_kesearch_filters',
-			'target_pid = ' . intval($GLOBALS['TSFE']->id),
-			'', '', ''
-		);
+		$filters = $this->filters->getFilters();
+		foreach($filters as $filter) {
+			if($filter['target_pid'] == intval($GLOBALS['TSFE']->id)) {
+				break;
+			}
+		}
 
 		// hook for modifying content
 		if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyMultiselectContent'])) {
@@ -90,19 +90,16 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 				$content = $_procObj->modifyMultiselectContent($template['multiselect'], $filter, $this);
 			}
 		}
-		if($filter != NULL) {
+		if(is_array($filter) && count($filter)) {
 			$contentOptions = '';
-			$tagChar = $this->extConf['prePostTagChar'];
 			$optionsAmountArray = $GLOBALS['TSFE']->fe_user->getKey('ses', 'ke_search.tagsInSearchResults');
 			$countLoops = 1;
 			if(is_array($this->piVars['filter'][$filter['uid']]) && count($this->piVars['filter'][$filter['uid']])) {
 				$this->piVars['filter'][$filter['uid']] = array_unique($this->piVars['filter'][$filter['uid']]);
 			}
-			$options = $this->getFilterOptions($filter['options'], true);
-			foreach($options as $optionKey => $option) {
-				$tag = $tagChar . $option['tag'] . $tagChar;
-				if($optionsAmountArray[$tag]) {
-					$optionCounter = $optionsAmountArray[$tag];
+			foreach($filter['options'] as $optionKey => $option) {
+				if($optionsAmountArray[$option['tag']]) {
+					$optionCounter = $optionsAmountArray[$option['tag']];
 				} else $optionCounter = 0;
 				$selected = ($this->piVars['filter'][$filter['uid']][$optionKey]) ? 'checked="checked"' : '';
 				$markerArray['###ADDCLASS###'] = ($countLoops%3) ? '' : ' last';

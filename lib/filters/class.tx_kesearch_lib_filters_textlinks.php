@@ -96,7 +96,8 @@ class tx_kesearch_lib_filters_textlinks {
 	 * @return string HTML
 	 */
 	public function renderTextlinks($filterUid, $optionsOfSearchresult) {
-		$filter = $this->getFilter($filterUid);
+		$filters = $this->pObj->filters->getFilters();
+		$filter = $filters[$filterUid];
 		if(!is_array($filter) || count($filter) == 0) return '';
 		$optionsOfFilter = $this->getOptionsOfFilter($filter, $optionsOfSearchresult);
 		if(!is_array($optionsOfFilter) || count($optionsOfFilter) == 0) return '';
@@ -187,25 +188,6 @@ class tx_kesearch_lib_filters_textlinks {
 
 
 	/**
-	 * get Filter record
-	 *
-	 * @param integer $uid
-	 * @return array Array containing the needed filter record
-	 */
-	public function getFilter($uid) {
-		if(intval($uid)) {
-			$filters = $this->pObj->filters->getFilters();
-			if(is_array($filters) && count($filters)) {
-				$filter = $filters[$uid];
-				if(is_array($filter) && count($filter)) {
-					return $filter;
-				} else return array();
-			} else return array();
-		} else return array();
-	}
-
-
-	/**
 	 * get options of given filter and regarding current search result
 	 * Only options which are also found in result will be returned
 	 *
@@ -216,7 +198,8 @@ class tx_kesearch_lib_filters_textlinks {
 	public function getOptionsOfFilter($filter, $additionalOptionValues) {
 		if(is_array($filter) && count($filter) && is_array($additionalOptionValues)) {
 			// get all options
-			$allOptionsOfCurrentFilter = $this->pObj->getFilterOptions($filter['options']);
+			$filters = $this->pObj->filters->getFilters();
+			$allOptionsOfCurrentFilter = $filters[$filter['uid']]['options'];
 			// build intersection of both arrays
 			$optionsOfCurrentFilter = array_intersect_key($allOptionsOfCurrentFilter, $additionalOptionValues);
 			// merge additional values into option array

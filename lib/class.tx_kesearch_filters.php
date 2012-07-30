@@ -123,7 +123,7 @@ class tx_kesearch_filters {
 		return $this->languageOverlay(
 			$GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 				$fields, $table, $where,
-				'', 'FIND_IN_SET(uid, "' . $GLOBALS['TYPO3_DB']->quoteStr($optionUids, $table) . '")', ''
+				'', 'FIND_IN_SET(uid, "' . $GLOBALS['TYPO3_DB']->quoteStr($optionUids, $table) . '")', '', 'uid'
 			),
 			$table
 		);
@@ -179,8 +179,9 @@ class tx_kesearch_filters {
 	 * @return boolean TRUE if tag was found. Else FALSE
 	 */
 	public function checkIfTagMatchesRecords($tag) {
-		$GLOBALS['TSFE']->fe_user->setKey('ses', 'ke_search.tagsInSearchResults', $this->tagsInSearchResult);
-		return array_key_exists($this->tagChar . $tag . $this->tagChar, $this->db->getTagsFromSearchResult());
+		$tagsInSearchResult = $this->pObj->tagsInSearchResult = $this->db->getTagsFromSearchResult();
+		$GLOBALS['TSFE']->fe_user->setKey('ses', 'ke_search.tagsInSearchResults', $tagsInSearchResult);
+		return array_key_exists($this->tagChar . $tag . $this->tagChar, $tagsInSearchResult);
 	}
 }
 
