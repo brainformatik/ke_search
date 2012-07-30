@@ -352,7 +352,7 @@ class tx_kesearch_lib_filters_textlinks {
 		$attributes = array();
 		$attributes['type'] = 'hidden';
 		$attributes['name'] = 'tx_kesearch_pi1[filter][' . $filterUid . '][' . $option['uid'] . ']';
-		$attributes['id'] = 'tx_kesearch_pi1[filter][' . $filterUid . '][' . $option['uid'] . ']';
+		$attributes['id'] = 'tx_kesearch_pi1_' . $filterUid . '_' . $option['uid'];
 		$attributes['value'] = $option['tag'];
 
 		foreach($attributes as $key => $attribut) {

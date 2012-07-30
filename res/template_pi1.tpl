@@ -303,12 +303,10 @@ function hideSpinner() {
 		</span>
 		<input type="hidden" name="###FILTERNAME###" id="###FILTERID###" value="###VALUE###" />
 		<ul id="options_###FILTERID###" class="###LISTCSSCLASS###">
-			<span class="###SPECIAL_CSS_CLASS###">
 			<!-- ###SUB_FILTER_LIST_OPTION### start -->
-			<li class="###OPTIONCSSCLASS###" ###ONCLICK###>###TITLE###</li>
+			<li class="###OPTIONCSSCLASS### ###SPECIAL_CSS_CLASS###" ###ONCLICK###>###TITLE###</li>
 			<!-- ###SUB_FILTER_LIST_OPTION### end -->
-			</span>
-			<span class="kesGreyButt" ###ONCLICK_RESET###>###RESET_FILTER###</span>
+			<li><span class="kesGreyButt" ###ONCLICK_RESET###>###RESET_FILTER###</span></li>
 		</ul>
 
 	</div>
@@ -323,21 +321,20 @@ function hideSpinner() {
 		###SWITCH_AREA_START### ###FILTERTITLE### ###SWITCH_AREA_END###
 	</span>
 	<ul id="options_###FILTERID###" class="###LISTCSSCLASS### checkboxList">
-	    <span class="###SPECIAL_CSS_CLASS###">
-			<!-- ###SUB_CHECKBOX_SWITCH### start -->
-			<li class="checkboxButton">
-				<span class="kesGreyButt" onclick="enableCheckboxes(###FILTER_UID###)">###LABEL_ALL###</span>
-			</li>
-			<!-- ###SUB_CHECKBOX_SWITCH### end -->
+		<!-- ###SUB_CHECKBOX_SWITCH### start -->
+		<li class="checkboxButton">
+			<span class="kesGreyButt" onclick="enableCheckboxes(###FILTER_UID###)">###LABEL_ALL###</span>
+		</li>
+		<!-- ###SUB_CHECKBOX_SWITCH### end -->
 
-			<!-- ###SUB_FILTER_CHECKBOX_OPTION### start -->
-			<li name="###OPTIONNAME###" class="###OPTIONCSSCLASS###">
-				<input type="checkbox" name="###FILTERNAME###[###OPTIONKEY###]" id="###OPTIONID###" value="###VALUE###" ###OPTIONSELECT### ###OPTIONDISABLED### />
-				<label for="###OPTIONID###">###TITLE###</label>
-				<div class="clearer"></div>
-			</li>
-			<!-- ###SUB_FILTER_CHECKBOX_OPTION### end -->
-	    </span>
+		<!-- ###SUB_FILTER_CHECKBOX_OPTION### start -->
+		<li class="###OPTIONCSSCLASS### ###SPECIAL_CSS_CLASS###">
+			<input type="checkbox" name="###FILTERNAME###[###OPTIONKEY###]" id="###OPTIONID###" value="###VALUE###" ###OPTIONSELECT### ###OPTIONDISABLED### />
+			<label for="###OPTIONID###">###TITLE###</label>
+			<div class="clearer"></div>
+		</li>
+		<!-- ###SUB_FILTER_CHECKBOX_OPTION### end -->
+
 		<li class="clearer"></li>
 
 		<!-- ###SUB_CHECKBOX_RESET### start -->
