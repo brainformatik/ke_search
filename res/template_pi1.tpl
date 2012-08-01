@@ -21,13 +21,19 @@ function resetCheckboxes(filter) {
 
 function enableCheckboxes(filter) {
 	var lis = document.getElementsByTagName("LI");
+	//alert(lis.count());
 	var allCb = new Array();
 	var allCbChecked = true;
 	var count = 0;
+	var optionClass = new Array();
 	for(var i = 0; i < lis.length; i++) {
-		if(lis[i].getAttribute("name", 1) == "optionCheckBox" + filter) {
-			allCb[count] = lis[i].getElementsByTagName("input")[0];
-			count++;
+		if (optionClasses = lis[i].getAttribute("class", 1)) {
+			optionClassesArray = optionClasses.split(" ");
+			//alert(optionClasses);
+			if(optionClassesArray[1] == "optionCheckBox" + filter) {
+				allCb[count] = lis[i].getElementsByTagName("input")[0];
+				count++;
+			}
 		}
 	}
 	for(i = 0; i < allCb.length; i++) {

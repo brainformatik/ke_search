@@ -744,7 +744,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$markerArray['###VALUE###'] = $data['tag'];
 				$markerArray['###OPTIONKEY###'] = $key;
 				$markerArray['###OPTIONID###'] = 'filter_' . $filterUid . '_' . $key;
-				$markerArray['###OPTIONCSSCLASS###'] = 'optionCheckBox optionCheckBox' . $key;
+				$markerArray['###OPTIONCSSCLASS###'] = 'optionCheckBox optionCheckBox' . $filterUid . ' optionCheckBox' . $filterUid . '_' . $key;
 				$markerArray['###OPTIONSELECT###'] = $checkBoxParams['selected'];
 				$markerArray['###OPTIONDISABLED###'] = $checkBoxParams['disabled'];
 
