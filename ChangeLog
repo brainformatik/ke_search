@@ -1,6 +1,9 @@
 ChangeLog
 
 Current SVN trunk
+* bugfix: Function checkIfTagMatchesRecords didn't work properly with all filter types. Please note: Due to a complete rewrite of this functionality your hooks may need adjustments if they call functions which do not exist anymore.
+* Many filter methods were collected in one new filter class now.
+* Many changes in db-Object to reduce queries to the database.
 * Fixed javascript function "enable/disable all checkboxes" for checkbox filter, was broken since last version
 
 Version 1.1.1, July 2012
