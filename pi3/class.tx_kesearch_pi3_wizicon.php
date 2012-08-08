@@ -58,8 +58,13 @@ class tx_kesearch_pi3_wizicon {
 					 * @return	The array with language labels
 					 */
 					function includeLocalLang()	{
-						$llFile = t3lib_extMgm::extPath('ke_search').'pi3/locallang.xml';
-						$LOCAL_LANG = t3lib_div::readLLXMLfile($llFile, $GLOBALS['LANG']->lang);
+						$llFile = t3lib_extMgm::extPath('ke_search') . 'pi3/locallang.xml';
+						if(t3lib_div::compat_version('4.6')) {
+							$xmlParser = t3lib_div::makeInstance('t3lib_l10n_parser_Llxml');
+							$LOCAL_LANG = $xmlParser->getParsedData($llFile, $GLOBALS['LANG']->lang);
+						} else {
+							$LOCAL_LANG = t3lib_div::readLLXMLfile($llFile, $GLOBALS['LANG']->lang);
+						}
 						return $LOCAL_LANG;
 					}
 
