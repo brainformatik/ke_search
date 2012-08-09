@@ -5,7 +5,7 @@ Current SVN trunk
 * Many filter methods were collected in one new filter class now.
 * Many changes in db-Object to reduce queries to the database.
 * Fixed javascript function "enable/disable all checkboxes" for checkbox filter, was broken since last version
-* make ke_search TYPO3 6.0 compatible
+* make ke_search TYPO3 6.0 compatible by removing deprecated translation functions.
 
 Version 1.1.1, July 2012
 * bugfix: ke_yac indexer: store additional fields in db
