@@ -6,6 +6,7 @@ Current SVN trunk
 * Many changes in db-Object to reduce queries to the database.
 * Fixed javascript function "enable/disable all checkboxes" for checkbox filter, was broken since last version
 * make ke_search TYPO3 6.0 compatible by removing deprecated translation functions.
+* new feature in tt_news indexer: respect the useHRDatesSingle feature of tt_news and add month, year and day params to the news link. Right now, this feature is always turned on.
 
 Version 1.1.1, July 2012
 * bugfix: ke_yac indexer: store additional fields in db

@@ -49,13 +49,20 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 	 * @return array
 	 */
 	function getParamsForHrDateSingleView($tstamp) {
-		$params = array('tx_ttnews' => array(
-			'year' => date('Y', $tstamp),
-			'month' => date('m', $tstamp),
-		));
-		// TODO: This "if" is not configurable!
-		if(!$this->conf['useHRDatesSingleWithoutDay']) {
-			$params['tx_ttnews']['day'] = date('d', $tstamp);
+			// TODO: make this configurable
+		$this->conf['useHRDatesSingle'] = 1;
+		$this->conf['useHRDatesSingleWithoutDay'] = 0;
+
+		if($this->conf['useHRDatesSingle']) {
+			$params = array('tx_ttnews' => array(
+				'year' => date('Y', $tstamp),
+				'month' => date('m', $tstamp),
+			));
+			if(!$this->conf['useHRDatesSingleWithoutDay']) {
+				$params['tx_ttnews']['day'] = date('d', $tstamp);
+			}
+		} else {
+			return array();
 		}
 		return $params;
 	}
