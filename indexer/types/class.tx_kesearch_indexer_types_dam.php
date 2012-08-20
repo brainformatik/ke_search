@@ -100,7 +100,7 @@ class tx_kesearch_indexer_types_dam extends tx_kesearch_indexer_types {
 					if (count($damRecordTags)) {
 						foreach ($damRecordTags as $key => $tagUid)  {
 							if($tags) {
-								$tags .= $tagChar . $this->getTag($tagUid) . $tagChar;
+								$tags .= ',' . $tagChar . $this->getTag($tagUid) . $tagChar;
 							} else $tags = $tagChar . $this->getTag($tagUid) . $tagChar;
 							$clearTextTags .= chr(13).$this->getTag($tagUid, true);
 						}
