@@ -91,7 +91,7 @@ class tx_kesearch_indexer {
 			$lockTime = $this->registry->get('tx_kesearch', 'startTimeOfIndexer');
 			$compareTime = time() - (60*60*12);
 			if ($lockTime < $compareTime) {
-				// lock is older than 12 hours - remove 
+				// lock is older than 12 hours - remove
 				$this->registry->removeAllByNamespace('tx_kesearch');
 				$this->registry->set('tx_kesearch', 'startTimeOfIndexer', time());
 			} else {
@@ -142,8 +142,11 @@ class tx_kesearch_indexer {
 		}
 
 		// process index cleanup?
-		$content .= "\n".'<p><b>Index cleanup processed</b></p>'."\n";
+		$content .= "\n".'<p><b>Index cleanup processed.</b></p>'."\n";
 		$content .= $this->cleanUpIndex();
+
+		$count = $GLOBALS['TYPO3_DB']->exec_SELECTcountRows('*', 'tx_kesearch_index');
+		$content .= '<p><b>Index contains ' . $count . ' entries.</b></p>';
 
 		// clean up process after indezing to free memory
 		$this->cleanUpProcessAfterIndexing();
@@ -293,6 +296,8 @@ class tx_kesearch_indexer {
 		$startMicrotime = microtime(true);
 		$table = 'tx_kesearch_index';
 		$where = 'tstamp < ' . $this->registry->get('tx_kesearch', 'startTimeOfIndexer');
+		$count = $GLOBALS['TYPO3_DB']->exec_SELECTcountRows('*', $table, $where);
+		$content .= '<p>' . $count . ' entries deleted.</p>';
 		$GLOBALS['TYPO3_DB']->exec_DELETEquery($table, $where);
 
 		// check if Sphinx is enabled
