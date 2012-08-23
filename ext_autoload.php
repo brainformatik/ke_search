@@ -13,6 +13,7 @@ return array(
 	'tx_kesearch_lib' => $extensionPath . 'lib/class.tx_kesearch_lib.php',
 	'tx_kesearch_lib_div' => $extensionPath . 'lib/class.tx_kesearch_lib_div.php',
 	'tx_kesearch_lib_fileinfo' => $extensionPath . 'lib/class.tx_kesearch_lib_fileinfo.php',
+	'tx_kesearch_lib_searchphrase' => $extensionPath . 'lib/class.tx_kesearch_lib_searchphrase.php',
 	'tx_kesearch_lib_searchresult' => $extensionPath . 'lib/class.tx_kesearch_lib_searchresult.php',
 	'tx_kesearch_lib_sorting' => $extensionPath . 'lib/class.tx_kesearch_lib_sorting.php',
 	'tx_kesearch_lib_filters_textlinks' => $extensionPath . 'lib/filters/class.tx_kesearch_lib_filters_textlinks.php',

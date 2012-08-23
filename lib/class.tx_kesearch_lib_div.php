@@ -76,130 +76,6 @@ class tx_kesearch_lib_div {
 		return intval($pageArray[0]);
 	}
 
-	public function getSearchString() {
-		// replace plus and minus chars
-		$searchString = str_replace('-', ' ', $searchString);
-		$searchString = str_replace('+', ' ', $searchString);
-
-		// split several words
-		$searchWordArray = t3lib_div::trimExplode(' ', $searchString, true);
-
-		// build against clause for all searchwords
-		if(count($searchWordArray)) {
-			foreach ($searchWordArray as $key => $searchWord) {
-				// ignore words under length of 4 chars
-				if (t3lib_cs::utf8_strlen($searchWord) >= $this->pObj->extConf['searchWordLength']) {
-					$newSearchString .= '+'.$GLOBALS['TYPO3_DB']->quoteStr($searchWord, 'tx_kesearch_index').'* ';
-				} else {
-					unset ($searchWordArray[$key]);
-				}
-			}
-			return $newSearchString;
-		} else {
-			return '';
-		}
-	}
-
-
-	/**
- 	* Build search strings for SQL Query from piVars
- 	*
- 	* @return  array
- 	* @author  Christian Buelter <buelter@kennziffer.com>
- 	* @since   Wed Mar 16 2011 15:03:26 GMT+0100
- 	*/
-	public function buildSearchphrase() {
-		// prepare searchword for query
-		$sword = $this->removeXSS($this->pObj->piVars['sword']);
-
-		// ignore default search box content
-		if (strtolower(trim($sword)) == strtolower($this->pObj->pi_getLL('searchbox_default_value'))) {
-			$sword = '';
-		}
-
-		// replace plus and minus chars
-		$sword = str_replace('-', ' ', $sword);
-		$sword = str_replace('+', ' ', $sword);
-
-		// split several words
-		$swords = t3lib_div::trimExplode(' ', $sword, true);
-
-		// build words searchphrase
-		$wordsAgainst = '';
-		$scoreAgainst = '';
-
-		// build against clause for all searchwords
-		if(count($swords)) {
-			foreach($swords as $key => $word) {
-				// ignore words under length of 4 chars
-				if(t3lib_cs::utf8_strlen($word) >= $this->pObj->extConf['searchWordLength']) {
-					$scoreAgainst .= $GLOBALS['TYPO3_DB']->quoteStr($word, 'tx_kesearch_index' ) .' ';
-					$wordsAgainst .= '+' . $GLOBALS['TYPO3_DB']->quoteStr($word, 'tx_kesearch_index') . '* ';
-				} else {
-					$this->pObj->hasTooShortWords = true;
-					unset ($swords[$key]);
-
-					// if any of the search words is below 3 characters
-					$this->showShortMessage = true;
-				}
-			}
-		}
-
-		// build tag searchphrase
-		$tagsAgainst = array();
-		$tagChar = $this->pObj->extConf['prePostTagChar'];
-
-		// add preselected filter options (preselected in the backend flexform)
-		foreach($this->pObj->preselectedFilter as $key => $filterTags) {
-
-			// add it only, if no other filter options of this filter has been
-			// selected in the frontend
-			if (!isset($this->pObj->piVars['filter'][$key]) && !is_array($this->pObj->piVars['filter'][$key])) {
-				// Quote the tags for use in database query
-				foreach ($filterTags as $k => $v) {
-					$filterTags[$k] = $GLOBALS['TYPO3_DB']->quoteStr($v, 'tx_kesearch_index');
-				}
-				// if we are in checkbox mode
-				if(count($this->pObj->preselectedFilter[$key]) >= 2) {
-					$tagsAgainst[$key] .= ' "' . $tagChar . implode($tagChar . '" "' . $tagChar, $filterTags) . $tagChar . '"';
-				// if we are in select or list mode
-				} elseif(count($this->pObj->preselectedFilter[$key]) == 1) {
-					$tagsAgainst[$key] .= ' +"' . $tagChar . array_shift($filterTags) . $tagChar . '"';
-				}
-			}
-		}
-
-		// add filter options selected in the frontend
-		if(is_array($this->pObj->piVars['filter'])) {
-			foreach($this->pObj->piVars['filter'] as $key => $tag)  {
-				if(is_array($this->pObj->piVars['filter'][$key])) {
-					foreach($this->pObj->piVars['filter'][$key] as $subkey => $subtag)  {
-						// Don't add the tag if it is already inserted by preselected filters
-						if(!empty($subtag) && strstr($tagsAgainst[$key], $subtag) === false) {
-							// Don't add a "+", because we are here in checkbox mode. It's a OR.
-							$tagsAgainst[$key] .= ' "' . $tagChar . $GLOBALS['TYPO3_DB']->quoteStr($subtag, 'tx_kesearch_index') . $tagChar . '"';
-						}
-					}
-				} else {
-					// Don't add the tag if it is already inserted by preselected filters
-					if(!empty($tag) && strstr($tagsAgainst[$key], $subtag) === false) {
-						$tagsAgainst[$key] .= ' +"' . $tagChar . $GLOBALS['TYPO3_DB']->quoteStr($tag, 'tx_kesearch_index') . $tagChar . '"';
-					}
-				}
-			}
-		}
-
-		$searchArray = array(
-			'sword' => implode(' ', $swords), // f.e. hello karl-heinz +mueller
-			'swords' => $swords, // f.e. Array: hello|karl|heinz|mueller
-			'wordsAgainst' => $wordsAgainst, // f.e. +hello* +karl* +heinz* +mueller*
-			'tagsAgainst' => $tagsAgainst, // f.e. Array: +#category_213# +#color_123# +#city_42#
-			'scoreAgainst' => $scoreAgainst // f.e. hello karl heinz mueller
-		);
-
-		return $searchArray;
-	}
-
 
 	/**
 	* Use removeXSS function from t3lib_div if exists
@@ -269,8 +145,8 @@ class tx_kesearch_lib_div {
 				case 'sword':
 				case 'orderByField':
 					$value = trim($value);
-					$value = str_replace(array('"', "'"), array(' ', ' '), $value);
-					$piVars[$key] = htmlspecialchars($value, ENT_QUOTES);
+					//$value = str_replace(array('"', "'"), array(' ', ' '), $value);
+					$piVars[$key] = htmlspecialchars($value, ENT_NOQUOTES);
 					break;
 
 				// "asc" or "desc"

@@ -171,7 +171,9 @@ class tx_kesearch_lib extends tslib_pibase {
 		$this->firstStartingPoint = $this->div->getFirstStartingPoint($this->startingPoints);
 
 		// build words searchphrase
-		$searchWordInformation = $this->div->buildSearchphrase();
+		$searchPhrase = t3lib_div::makeInstance('tx_kesearch_lib_searchphrase');
+		$searchPhrase->initialize($this);
+		$searchWordInformation = $searchPhrase->buildSearchPhrase();
 
 		// Hook: modifySearchWords
 		if(isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifySearchWords'])) {
@@ -274,17 +276,12 @@ class tx_kesearch_lib extends tslib_pibase {
 		$content = $this->cObj->substituteMarker($content,'###SUBMIT_VALUE###',$this->pi_getLL('submit'));
 
 		// searchword input value
-		$searchWordValue = trim($this->piVars['sword']);
+		$searchString = trim($this->piVars['sword']);
 
-		if (!empty($searchWordValue) && $searchWordValue != $this->pi_getLL('searchbox_default_value')) {
-			// no searchword entered
-			$this->swordValue = $this->piVars['sword'] ? $this->div->removeXSS($this->piVars['sword']) : '';
+		if(!empty($searchString) && $searchString != $this->pi_getLL('searchbox_default_value')) {
+			$this->swordValue = $searchString ? str_replace('"', '&quot;', $searchString) : '';
 			$searchboxFocusJS = '';
-		// } else if ($this->conf['renderMethod'] != 'static') {
 		} else {
-			// do not use when static mode is called
-
-			// get default value from LL
 			$this->swordValue = $this->pi_getLL('searchbox_default_value');
 
 			// set javascript for resetting searchbox value

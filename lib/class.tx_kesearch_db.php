@@ -185,8 +185,6 @@ class tx_kesearch_db implements t3lib_Singleton {
 			'LIMIT' => $limit[0] . ',' . $limit[1]
 		);
 
-		//$query = $GLOBALS['TYPO3_DB']->SELECTquery($fields, $table, $where, '', $orderBy, $limit[0] . ',' . $limit[1]);
-		//return $query;
 		return $queryParts;
 	}
 
