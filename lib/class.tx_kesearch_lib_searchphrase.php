@@ -127,9 +127,22 @@ class tx_kesearch_lib_searchphrase {
 					unset($searchParts[$key]);
 				}
 			}
-			// make the words save for the database
 			foreach($searchParts as $key => $word) {
-				$searchParts[$key] = $GLOBALS['TYPO3_DB']->quoteStr($word, 'tx_kesearch_index');
+				if($word != '|') {
+					// add + explizit to all search words to make the searchresults equal to sphinx search results
+					if($this->pObj->extConf['enableExplizitAnd']) {
+						$searchParts[$key] = '+' . ltrim($word, '+');
+					}
+
+					// enable part searching if configured. But be careful: Enabling this is much slower
+					if($this->pObj->extConf['enablePartSearch']) {
+						$searchParts[$key] = rtrim($word, '*') . '*';
+					}
+				}
+
+
+				// make the words save for the database
+				$searchParts[$key] = $GLOBALS['TYPO3_DB']->quoteStr($searchParts[$key], 'tx_kesearch_index');
 			}
 			return array_values($searchParts);
 		} return array();

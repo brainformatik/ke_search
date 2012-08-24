@@ -4,16 +4,22 @@ multiplyValueToTitle = 1
 # cat=basic//20; type=options[1,2,3,4,5,6,7,8,9,10]; label = Change searchword length: Leave this to 4 if you have no access to MySQL-Server configuration. If you have configured MySQL to search for 3 digit words, you have to set this option to 3, too.
 searchWordLength = 4
 
-# cat=notification//30; type=boolean; label= Send notification when finished: If activated, a notification email will be sent when indexing process is finished in CLI / scheduler mode.
+# cat=basic//30; type=boolean; label=Enable part search: In normal case if you search for "snow" ke_search will only search for the whole word "snow". After enabling this option, ke_search adds transparently a * behind all searchwords "snow*" automatically so words like "snowman" will also be found. But doing so is a little bit slower.
+enablePartSearch = 0
+
+# cat=basic//40; type=boolean; label=Enable explizit AND: On MySQL-Servers two words were search with help of an OR clause internally. If both words are found in a search result it gets a higher ranking. To prevent OR searching you can activate AND clause searching. All words will prepended with +. After enabling that ke_search works a little bit like google or sphinx-search.
+enableExplizitAnd = 0
+
+# cat=notification//10; type=boolean; label= Send notification when finished: If activated, a notification email will be sent when indexing process is finished in CLI / scheduler mode.
 finishNotification = 0
 
-# cat=notification//50; type=string; label= Indexer notification recipient: Indexer notifications are sent to this address.
+# cat=notification//20; type=string; label= Indexer notification recipient: Indexer notifications are sent to this address.
 notificationRecipient =
 
-# cat=notification//50; type=string; label= Indexer notification sender: sender email address.
+# cat=notification//30; type=string; label= Indexer notification sender: sender email address.
 notificationSender = no_reply@domain.com
 
-# cat=notification//60; type=string; label= Indexer notification subject: Subject of notification mails
+# cat=notification//40; type=string; label= Indexer notification subject: Subject of notification mails
 notificationSubject = [KE_SEARCH INDEXER NOTIFICATION]
 
 # cat=filepath//10; type=string; label=Path to pdftotext: This path must be valid, if you want to extract content from pdf files
