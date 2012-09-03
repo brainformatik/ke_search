@@ -11,6 +11,9 @@
     border:0 none;
     margin: 0 0 20px 0;
 }
+.tx-kesearch-pi1 .kesearch_searchbox {
+	border:none;
+}
 .tx-kesearch-pi1 input[type="text"],
 .tx-kesearch-pi1 select,
 .tx-kesearch-pi1 textarea{

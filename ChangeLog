@@ -7,6 +7,7 @@ Current Trunk
 * feature: Partial word searching can be enabled/disabled in the extension manager.
 * feature: "AND"-linking of words can explicitly enabled in the extension manager, otherwise "OR" ist used to link more than one word in the search string.
 * feature: Make new HRDate-option for tt_news-indexer configurable, Thanks to Jan Bartels, http://forge.typo3.org/issues/40068
+* added <fieldset> tag to search form in order to make the html code compatible to XHTML 1.1, http://forge.typo3.org/issues/40431
 
 Version 1.2.0, August 2012
 * bugfix: Function checkIfTagMatchesRecords didn't work properly with all filter types. Please note: Due to a complete rewrite of this functionality your hooks may need adjustments if they call functions which do not exist anymore.

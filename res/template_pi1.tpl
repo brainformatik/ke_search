@@ -181,6 +181,7 @@ function hideSpinner() {
 
 <!-- ###SEARCHBOX_STATIC### start -->
 <form method="get" id="xajax_form_kesearch_pi1" name="xajax_form_kesearch_pi1"  action="###FORM_ACTION###" class="static" ###ONSUBMIT###>
+	<fieldset class="kesearch_searchbox">
 	<input type="hidden" name="id" value="###FORM_TARGET_PID###" />
 	###HIDDENFIELDS###
 
@@ -202,6 +203,7 @@ function hideSpinner() {
 	<!-- ###SHOW_SPINNER### end -->
 	<span class="resetbutt">###RESET###</span>
 	<span class="submitbutt">###SUBMIT###</span>
+	</fieldset>
 
 </form>
 <!-- ###SEARCHBOX_STATIC### end -->
