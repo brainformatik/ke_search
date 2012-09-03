@@ -70,6 +70,8 @@
 			<label index="tx_kesearch_indexerconfig.index_news_category_mode.I.1">All</label>
 			<label index="tx_kesearch_indexerconfig.index_news_category_mode.I.2">Only the following categories:</label>
 			<label index="tx_kesearch_indexerconfig.index_news_category_selection">Categories:</label>
+			<label index="tx_kesearch_indexerconfig.index_news_useHRDatesSingle">Use dates for single-view-URLs:</label>
+			<label index="tx_kesearch_indexerconfig.index_news_useHRDatesSingleWithoutDay">Use dates without day for single-view-URLs:</label>
 			<label index="tx_kesearch_indexerconfig.index_dam_categories">Select DAM categories</label>
 			<label index="tx_kesearch_indexerconfig.index_dam_without_categories">Index dam records without defined categories</label>
 			<label index="tx_kesearch_indexerconfig.index_dam_categories_recursive">Index DAM categories recursive?</label>
@@ -144,6 +146,8 @@
 			<label index="tx_kesearch_indexerconfig.index_news_category_mode.I.1">Alle</label>
 			<label index="tx_kesearch_indexerconfig.index_news_category_mode.I.2">Nur die folgenden Kategorien:</label>
 			<label index="tx_kesearch_indexerconfig.index_news_category_selection">Kategorien:</label>
+			<label index="tx_kesearch_indexerconfig.index_news_useHRDatesSingle">Datum in Single-View-URLs:</label>
+			<label index="tx_kesearch_indexerconfig.index_news_useHRDatesSingleWithoutDay">Datum ohne Tag in Single-View-URLs:</label>
 			<label index="tx_kesearch_indexerconfig.index_dam_categories">Welche Kategorien sollen indiziert werden?</label>
 			<label index="tx_kesearch_indexerconfig.index_dam_without_categories">Indexiere DAM Datensätze, die keiner Kategorie zugeordnet sind?</label>
 			<label index="tx_kesearch_indexerconfig.index_dam_categories_recursive">Kategorien rekursiv indizieren?</label>

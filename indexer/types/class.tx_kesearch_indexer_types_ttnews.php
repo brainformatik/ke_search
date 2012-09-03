@@ -49,9 +49,6 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 	 * @return array
 	 */
 	function getParamsForHrDateSingleView($tstamp) {
-			// TODO: make this configurable
-		$this->conf['useHRDatesSingle'] = 1;
-		$this->conf['useHRDatesSingleWithoutDay'] = 0;
 
 		if($this->conf['useHRDatesSingle']) {
 			$params = array('tx_ttnews' => array(
@@ -75,6 +72,9 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 	 */
 	public function startIndexing() {
 		$content = '';
+
+		$this->conf['useHRDatesSingle'] = $this->indexerConfig['index_news_useHRDatesSingle'];
+		$this->conf['useHRDatesSingleWithoutDay'] = $this->indexerConfig['index_news_useHRDatesSingleWithoutDay'];
 
 			// get all the tt_news entries to index
 			// don't index hidden or deleted news, BUT

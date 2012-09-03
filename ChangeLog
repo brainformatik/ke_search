@@ -2,9 +2,11 @@ ChangeLog
 
 Current Trunk
 * output of additional information (size of index, deleted entries) after indexer ran. Thanks to Jan Bartels, http://forge.typo3.org/issues/40067
-* Feature: Now you can use search prases like +, -, ~ and |
-* Feature: You can enable part searching
-* Feature: You can enable explizit AND clauses for searchquery
+* feature: Search for phrases using "", example: "french cuisine".
+* feature: Search parameters, you can use + and - in order include or exclude search words explicitly.
+* feature: Partial word searching can be enabled/disabled in the extension manager.
+* feature: "AND"-linking of words can explicitly enabled in the extension manager, otherwise "OR" ist used to link more than one word in the search string.
+* feature: Make new HRDate-option for tt_news-indexer configurable, Thanks to Jan Bartels, http://forge.typo3.org/issues/40068
 
 Version 1.2.0, August 2012
 * bugfix: Function checkIfTagMatchesRecords didn't work properly with all filter types. Please note: Due to a complete rewrite of this functionality your hooks may need adjustments if they call functions which do not exist anymore.

@@ -120,6 +120,8 @@ CREATE TABLE tx_kesearch_indexerconfig (
 	type varchar(90) DEFAULT '' NOT NULL,
 	index_news_category_mode tinyint(4) DEFAULT '0' NOT NULL,
 	index_news_category_selection text,
+	index_news_useHRDatesSingle tinyint(4) DEFAULT '0' NOT NULL,
+	index_news_useHRDatesSingleWithoutDay tinyint(4) DEFAULT '0' NOT NULL,
 	index_dam_categories text,
 	index_dam_without_categories tinyint(4) DEFAULT '0' NOT NULL,
 	index_dam_categories_recursive tinyint(3) DEFAULT '0' NOT NULL,
