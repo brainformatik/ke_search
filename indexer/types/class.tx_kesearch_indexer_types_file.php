@@ -89,7 +89,7 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 
 		// show indexer content?
 		$content .= '<p><b>Indexer "' . $this->indexerConfig['title'] . '": </b><br />'
-			. count($files) . ' files have been indexed.</b></p>' . "\n";
+			. count($files) . ' files have been found for indexing.</b></p>' . "\n";
 
 		$content .= $this->showTime();
 

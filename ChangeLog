@@ -1,13 +1,16 @@
 ChangeLog
 
 Current Trunk
-* output of additional information (size of index, deleted entries) after indexer ran. Thanks to Jan Bartels, http://forge.typo3.org/issues/40067
+* feature: output of additional information (size of index, deleted entries) after indexer ran. Thanks to Jan Bartels, http://forge.typo3.org/issues/40067
 * feature: Search for phrases using "", example: "french cuisine".
 * feature: Search parameters, you can use + and - in order include or exclude search words explicitly.
 * feature: Partial word searching can be enabled/disabled in the extension manager.
 * feature: "AND"-linking of words can explicitly enabled in the extension manager, otherwise "OR" ist used to link more than one word in the search string.
 * feature: Make new HRDate-option for tt_news-indexer configurable, Thanks to Jan Bartels, http://forge.typo3.org/issues/40068
-* added <fieldset> tag to search form in order to make the html code compatible to XHTML 1.1, http://forge.typo3.org/issues/40431
+* template change: added <fieldset> tag to search form in order to make the html code compatible to XHTML 1.1, http://forge.typo3.org/issues/40431
+* feature: File indexer now indexes doc and xls files (in addition to pdf and ppt). Thanks to Lukas Kamber. http://forge.typo3.org/issues/39636
+* bugfix: Indexer did not recognize file type correctly, so it could happen that after the first indexing, files were deleted from the index in the second run.
+* configuration change: changed "pathCatppt" to "pathCatdoc". Please update your configuration in the extension manager!
 
 Version 1.2.0, August 2012
 * bugfix: Function checkIfTagMatchesRecords didn't work properly with all filter types. Please note: Due to a complete rewrite of this functionality your hooks may need adjustments if they call functions which do not exist anymore.

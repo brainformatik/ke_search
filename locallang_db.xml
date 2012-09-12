@@ -79,7 +79,7 @@
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.0">Yes</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">No</label>
 			<label index="tx_kesearch_indexerconfig.directories">Directories</label>
-			<label index="tx_kesearch_indexerconfig.fileext">Comma-separated list of allowed file extensions (eg. pdf,ppt):</label>
+			<label index="tx_kesearch_indexerconfig.fileext">Comma separated list of allowed file extensions (eg. pdf,ppt,doc,xls):</label>
 			<label index="tx_kesearch_indexerconfig.filteroption">Add tag to all indexed elements:</label>
 		</languageKey>
 		<languageKey index="de" type="array">
@@ -155,7 +155,7 @@
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.0">Ja</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">Nein</label>
 			<label index="tx_kesearch_indexerconfig.directories">Verzeichnisse</label>
-			<label index="tx_kesearch_indexerconfig.fileext">Komma-separierte Liste von zu indexierenden Dateiendungen (z.B. pdf,ppt):</label>
+			<label index="tx_kesearch_indexerconfig.fileext">Komma-separierte Liste von zu indexierenden Dateiendungen (z.B. pdf,ppt,doc,xls):</label>
 			<label index="tx_kesearch_indexerconfig.filteroption">Allen indexierten Elementen dieses Schlagwort hinzufügen:</label>
 		</languageKey>
 		<languageKey index="nl" type="array">
@@ -223,7 +223,7 @@
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.0">Ja</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">Nee</label>
 			<label index="tx_kesearch_indexerconfig.directories">Mappen</label>
-			<label index="tx_kesearch_indexerconfig.fileext">Door komma's gescheiden lijst van toegestane bestandsextensies (bijv. pdf, ppt)</label>
+			<label index="tx_kesearch_indexerconfig.fileext">Door komma's gescheiden lijst van toegestane bestandsextensies (bijv. pdf,ppt,doc,xls)</label>
 		</languageKey>
 	</data>
 </T3locallang>

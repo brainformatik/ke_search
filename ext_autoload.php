@@ -9,6 +9,8 @@ return array(
 	'tx_kesearch_indexer_filetypes' => $extensionPath . 'indexer/filetypes/interface.tx_kesearch_indexer_filetypes.php',
 	'tx_kesearch_indexer_filetypes_pdf' => $extensionPath . 'indexer/filetypes/class.tx_kesearch_indexer_filetypes_pdf.php',
 	'tx_kesearch_indexer_filetypes_ppt' => $extensionPath . 'indexer/filetypes/class.tx_kesearch_indexer_filetypes_ppt.php',
+	'tx_kesearch_indexer_filetypes_doc' => $extensionPath . 'indexer/filetypes/class.tx_kesearch_indexer_filetypes_doc.php',
+	'tx_kesearch_indexer_filetypes_xls' => $extensionPath . 'indexer/filetypes/class.tx_kesearch_indexer_filetypes_xls.php',
 	'tx_kesearch_pi1' => $extensionPath . 'pi1/class.tx_kesearch_pi1.php',
 	'tx_kesearch_lib' => $extensionPath . 'lib/class.tx_kesearch_lib.php',
 	'tx_kesearch_lib_div' => $extensionPath . 'lib/class.tx_kesearch_lib_div.php',

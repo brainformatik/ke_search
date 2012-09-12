@@ -28,10 +28,11 @@ require_once(t3lib_extMgm::extPath('ke_search').'indexer/types/class.tx_kesearch
  * Plugin 'Faceted search' for the 'ke_search' extension.
  *
  * @author	Stefan Froemken (kennziffer.com) <froemken@kennziffer.com>
+ * @author	Lukas Kamber
  * @package	TYPO3
  * @subpackage	tx_kesearch
  */
-class tx_kesearch_indexer_filetypes_ppt extends tx_kesearch_indexer_types_file implements tx_kesearch_indexer_filetypes {
+class tx_kesearch_indexer_filetypes_doc extends tx_kesearch_indexer_types_file implements tx_kesearch_indexer_filetypes {
 	var $extConf = array(); // saves the configuration of extension ke_search_hooks
 	var $app = array(); // saves the path to the executables
 	var $isAppArraySet = false;
@@ -44,33 +45,33 @@ class tx_kesearch_indexer_filetypes_ppt extends tx_kesearch_indexer_types_file i
 		// get extension configuration of ke_search
 		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search']);
 
-		// check if path to catppt is correct
+		// check if path to catdoc is correct
 		if($this->extConf['pathCatdoc'])	{
 			$pathCatdoc = rtrim($this->extConf['pathCatdoc'], '/') . '/';
 			$safeModeEnabled = t3lib_utility_PhpOptions::isSafeModeEnabled();
 			$exe = (TYPO3_OS == 'WIN') ? '.exe' : '';
-			if($safeModeEnabled || (@is_file($pathCatdoc . 'catppt' . $exe))) {
-				$this->app['catppt'] = $pathCatdoc . 'catppt' . $exe;
+			if($safeModeEnabled || (@is_file($pathCatdoc . 'catdoc' . $exe))) {
+				$this->app['catdoc'] = $pathCatdoc . 'catdoc' . $exe;
 				$this->isAppArraySet = true;
 			} else $this->isAppArraySet = false;
 		} else $this->isAppArraySet = false;
-		if(!$this->isAppArraySet) t3lib_utility_Debug::debug('The path for the catppttools is not correctly set in extConf. You can get the path with "which catppt".');
+		if(!$this->isAppArraySet) t3lib_utility_Debug::debug('The path for the catdoctools is not correctly set in extConf. You can get the path with "which catdoc".');
 	}
 
 
 	/**
-	 * get Content of PDF file
+	 * get Content of DOC file
 	 *
 	 * @param string $file
 	 * @return string The extracted content of the file
 	 */
 	public function getContent($file) {
 		// create the tempfile which will contain the content
-		$tempFileName = t3lib_div::tempnam('ppt_files-Indexer');
+		$tempFileName = t3lib_div::tempnam('doc_files-Indexer');
 		@unlink ($tempFileName); // Delete if exists, just to be safe.
 
 		// generate and execute the pdftotext commandline tool
-		$cmd = $this->app['catppt'] . ' -s UTF-8 ' . escapeshellarg($file) . ' > ' . $tempFileName;
+		$cmd = $this->app['catdoc'] . ' -s8859-1 -dutf-8 ' . escapeshellarg($file) . ' > ' . $tempFileName;
 		t3lib_utility_Command::exec($cmd);
 
 		// check if the tempFile was successfully created

@@ -366,8 +366,8 @@ class tx_kesearch_indexer {
 		$table = 'tx_kesearch_index';
 		$fieldValues = $this->createFieldValuesForIndexing($storagePid, $title, $type, $targetPid, $content, $tags, $params, $abstract, $language, $starttime, $endtime, $fe_group, $additionalFields);
 
-		// check if record already exists. Average speed: 1-2ms
-		if($fieldValues['type'] == 'file') {
+			// check if record already exists. Average speed: 1-2ms
+		if($type == 'file') {
 			$recordExists = $this->checkIfFileWasIndexed($fieldValues['pid'], $fieldValues['hash']);
 		} else {
 			$recordExists = $this->checkIfRecordWasIndexed($fieldValues['orig_uid'], $fieldValues['pid'], $fieldValues['type'], $fieldValues['language']);
