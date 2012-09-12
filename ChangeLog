@@ -12,6 +12,8 @@ Current Trunk
 * bugfix: Indexer did not recognize file type correctly, so it could happen that after the first indexing, files were deleted from the index in the second run.
 * configuration change: changed "pathCatppt" to "pathCatdoc". Please update your configuration in the extension manager!
 * bugfix: fixed charset setting for ppt file indexer. Thanks to Lukas Kamber. http://forge.typo3.org/issues/39635
+* bugfix: "AND" combination does not work properly
+* bugfix: changed some wordings
 
 Version 1.2.0, August 2012
 * bugfix: Function checkIfTagMatchesRecords didn't work properly with all filter types. Please note: Due to a complete rewrite of this functionality your hooks may need adjustments if they call functions which do not exist anymore.

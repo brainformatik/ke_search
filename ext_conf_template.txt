@@ -4,11 +4,11 @@ multiplyValueToTitle = 1
 # cat=basic//20; type=options[1,2,3,4,5,6,7,8,9,10]; label = Change searchword length: Leave this to 4 if you have no access to MySQL-Server configuration. If you have configured MySQL to search for 3 digit words, you have to set this option to 3, too.
 searchWordLength = 4
 
-# cat=basic//30; type=boolean; label=Enable part search: In normal case if you search for "snow" ke_search will only search for the whole word "snow". After enabling this option, ke_search adds transparently a * behind all searchwords "snow*" automatically so words like "snowman" will also be found. But doing so is a little bit slower.
-enablePartSearch = 0
+# cat=basic//30; type=boolean; label=Enable partial word search: If partial word search is activated, ke_search internaly adds a * behind all searchwords, so if you search for "snow", internally "snow*" is used, that means words like "snowman" will also be found. Partial word search is a little bit slower than full word search.
+enablePartSearch = 1
 
-# cat=basic//40; type=boolean; label=Enable explizit AND: On MySQL-Servers two words were search with help of an OR clause internally. If both words are found in a search result it gets a higher ranking. To prevent OR searching you can activate AND clause searching. All words will prepended with +. After enabling that ke_search works a little bit like google or sphinx-search.
-enableExplizitAnd = 0
+# cat=basic//40; type=boolean; label=Enable explicit AND: By default, one or more searchwords are connected with "OR". If this option is enabled, two or more search words are connected with AND. If it is diesabled, they are connected with OR, where results containing all the search words will get a higher relevance ranking. Enabling this function means, ke_search internally adds a "+" in front of each search word.
+enableExplicitAnd = 0
 
 # cat=notification//10; type=boolean; label= Send notification when finished: If activated, a notification email will be sent when indexing process is finished in CLI / scheduler mode.
 finishNotification = 0
