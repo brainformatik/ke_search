@@ -59,7 +59,7 @@ class tx_kesearch_indexer_filetypes_ppt extends tx_kesearch_indexer_types_file i
 
 
 	/**
-	 * get Content of PDF file
+	 * get Content of PPT file
 	 *
 	 * @param string $file
 	 * @return string The extracted content of the file
@@ -70,7 +70,7 @@ class tx_kesearch_indexer_filetypes_ppt extends tx_kesearch_indexer_types_file i
 		@unlink ($tempFileName); // Delete if exists, just to be safe.
 
 		// generate and execute the pdftotext commandline tool
-		$cmd = $this->app['catppt'] . ' -s UTF-8 ' . escapeshellarg($file) . ' > ' . $tempFileName;
+		$cmd = $this->app['catppt'] . ' -s8859-1 -dutf-8 ' . escapeshellarg($file) . ' > ' . $tempFileName;
 		t3lib_utility_Command::exec($cmd);
 
 		// check if the tempFile was successfully created
