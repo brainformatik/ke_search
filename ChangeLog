@@ -14,6 +14,7 @@ Current Trunk
 * bugfix: fixed charset setting for ppt file indexer. Thanks to Lukas Kamber. http://forge.typo3.org/issues/39635
 * bugfix: "AND" combination does not work properly
 * bugfix: changed some wordings
+* remove deprecated function: Check for version number in class.tx_kesearch_indexer.php, http://forge.typo3.org/issues/41036, Thanks to Tim Wendisch
 
 Version 1.2.0, August 2012
 * bugfix: Function checkIfTagMatchesRecords didn't work properly with all filter types. Please note: Due to a complete rewrite of this functionality your hooks may need adjustments if they call functions which do not exist anymore.

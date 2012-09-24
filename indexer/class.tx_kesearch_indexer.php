@@ -191,7 +191,11 @@ class tx_kesearch_indexer {
 
 				// send the notification message
 				// use swiftmailer in 4.5 and above
-				if (t3lib_div::int_from_ver(TYPO3_version) >= 4005000) {
+                $version = class_exists('t3lib_utility_VersionNumber')
+                    ? t3lib_utility_VersionNumber::convertVersionNumberToInteger(TYPO3_version)
+                    : t3lib_div::int_from_ver(TYPO3_version);
+
+				if ($version >= 4005000) {
 					$mail = t3lib_div::makeInstance('t3lib_mail_Message');
 					$mail->setFrom(array($extConf['notificationSender']));
 					$mail->setTo(array($extConf['notificationRecipient']));
