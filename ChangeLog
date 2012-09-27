@@ -9,7 +9,7 @@ Current Trunk
 * feature: Make new HRDate-option for tt_news-indexer configurable, Thanks to Jan Bartels, http://forge.typo3.org/issues/40068
 * template change: added <fieldset> tag to search form in order to make the html code compatible to XHTML 1.1, http://forge.typo3.org/issues/40431
 * feature: File indexer now indexes doc and xls files (in addition to pdf and ppt). Thanks to Lukas Kamber. http://forge.typo3.org/issues/39636
-* bugfix: Indexer did not recognize file type correctly, so it could happen that after the first indexing, files were deleted from the index in the second run.
+* bugfix: Indexer did not recognize file type correctly, so it could happen that after the first indexing, files were deleted from the index in the second run. See also http://forge.typo3.org/issues/41423.
 * configuration change: changed "pathCatppt" to "pathCatdoc". Please update your configuration in the extension manager!
 * bugfix: fixed charset setting for ppt file indexer. Thanks to Lukas Kamber. http://forge.typo3.org/issues/39635
 * bugfix: "AND" combination does not work properly
