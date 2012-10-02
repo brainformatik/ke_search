@@ -124,7 +124,12 @@ class tx_kesearch_db implements t3lib_Singleton {
 		if(!empty($GLOBALS['TSFE']->gr_list)) {
 			$feGroups = t3lib_div::trimExplode(',', $GLOBALS['TSFE']->gr_list, 1);
 			foreach($feGroups as $key => $group) {
-				if(t3lib_div::intval_positive($group)) {
+				if ($this->getNumericTYPO3versionNumber() >= 6000000) {
+					$intval_positive_group = TYPO3\CMS\Core\Utility\MathUtility::convertToPositiveInteger($group);
+				} else {
+					$intval_positive_group = t3lib_div::intval_positive($group);
+				}
+				if($intval_positive_group) {
 					$feGroups[$key] = '_group_' . $group;
 				} else unset($feGroups[$key]);
 			}
@@ -378,5 +383,21 @@ class tx_kesearch_db implements t3lib_Singleton {
 
 		return $startLimit;
 	}
+
+    /**
+     * Returns the current TYPO3 version number as an integer, eg. 4005000 for version 4.5
+     *
+     * @return int
+     */
+    public function getNumericTYPO3versionNumber() {
+        if (class_exists('VersionNumberUtility')) {
+            $numeric_typo3_version = \TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version);
+        } else if (class_exists('t3lib_utility_VersionNumber')) {
+            $numeric_typo3_version = t3lib_utility_VersionNumber::convertVersionNumberToInteger(TYPO3_version);
+        } else {
+            $numeric_typo3_version = t3lib_div::int_from_ver(TYPO3_version);
+        }
+        return $numeric_typo3_version;
+    }
 }
 ?>

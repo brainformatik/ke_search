@@ -204,7 +204,11 @@ class tx_kesearch_lib extends tslib_pibase {
 		$cssFile = $GLOBALS['TSFE']->tmpl->getFileName($this->conf['cssFile']);
 		if(!empty($cssFile)) {
 			$cssTag = $this->cObj->wrap($cssFile, '<link rel="stylesheet" type="text/css" href="|" />');
-			$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId . '_css'] = $cssTag;
+            if ($this->getNumericTYPO3versionNumber() >= 6000000) {
+                $GLOBALS['TSFE']->getPageRenderer()->addCssFile($cssFile);
+            } else {
+				$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId . '_css'] = $cssTag;
+			}
 		}
 	}
 
@@ -916,7 +920,14 @@ class tx_kesearch_lib extends tslib_pibase {
 	public function initXajax()	{
 		// Include xaJax
 		if(!class_exists('xajax')) {
-			require_once(t3lib_extMgm::extPath('xajax') . 'class.tx_xajax.php');
+			// if t3lib_extMgm::extPath does not exist (as in TYPO3 6.0 Beta2),
+			// assume the default path
+			if (function_exists('t3lib_extMgm::extPath')) {
+				$path_to_xajax = t3lib_extMgm::extPath('xajax') . 'class.tx_xajax.php';
+			} else {
+				$path_to_xajax = 'typo3conf/ext/xajax/class.tx_xajax.php';
+			}
+			require_once($path_to_xajax);
 		}
 		// Make the instance
 		$this->xajax = t3lib_div::makeInstance('tx_xajax');
@@ -943,7 +954,12 @@ class tx_kesearch_lib extends tslib_pibase {
 		$this->xajax->processRequests();
 
 		// Create javacript and add it to the normal output
-		$GLOBALS['TSFE']->additionalHeaderData['xajax_search_filters'] = $this->xajax->getJavascript(t3lib_extMgm::siteRelPath('xajax'));
+		$jsCode = $this->xajax->getJavascript(t3lib_extMgm::siteRelPath('xajax'));
+		if ($this->getNumericTYPO3versionNumber() >= 6000000) {
+			$GLOBALS['TSFE']->getPageRenderer()->addHeaderData($jsCode);
+		} else {
+			$GLOBALS['TSFE']->additionalHeaderData['xajax_search_filters'] = $jsCode;
+		}
 	}
 
 
@@ -1797,7 +1813,11 @@ class tx_kesearch_lib extends tslib_pibase {
 		$content = $this->cObj->substituteMarkerArray($content, $markerArray);
 
 		// add JS to page header
-		$GLOBALS['TSFE']->additionalHeaderData['jsContent'] = $content;
+		if ($this->getNumericTYPO3versionNumber() >= 6000000) {
+			$GLOBALS['TSFE']->getPageRenderer()->addHeaderData($content);
+		} else {
+			$GLOBALS['TSFE']->additionalHeaderData['jsContent'] = $content;
+		}
 	}
 
 
@@ -1858,6 +1878,22 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 		}
         return false;
+    }
+
+    /**
+     * Returns the current TYPO3 version number as an integer, eg. 4005000 for version 4.5
+     *
+     * @return int
+     */
+    public function getNumericTYPO3versionNumber() {
+        if (class_exists('VersionNumberUtility')) {
+            $numeric_typo3_version = \TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version);
+        } else if (class_exists('t3lib_utility_VersionNumber')) {
+            $numeric_typo3_version = t3lib_utility_VersionNumber::convertVersionNumberToInteger(TYPO3_version);
+        } else {
+            $numeric_typo3_version = t3lib_div::int_from_ver(TYPO3_version);
+        }
+        return $numeric_typo3_version;
     }
 
 }
