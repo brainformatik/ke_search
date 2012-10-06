@@ -145,4 +145,8 @@ class tx_kesearch_indexer_filetypes_pdf extends tx_kesearch_indexer_types_file i
 		return trim(preg_replace('/['.LF.chr(12).']*$/', '', $string));
 	}
 }
+
+if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/indexer/filetypes/class.tx_kesearch_indexer_filetypes_pdf.php'])	{
+	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/indexer/filetypes/class.tx_kesearch_indexer_filetypes_pdf.php']);
+}
 ?>

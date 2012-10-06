@@ -158,4 +158,8 @@ class tx_kesearch_indexer_types_t3s_content extends tx_kesearch_indexer_types {
 		}
 	}
 }
+
+if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/indexer/types/class.tx_kesearch_indexer_types_t3s_content.php'])	{
+	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/indexer/types/class.tx_kesearch_indexer_types_t3s_content.php']);
+}
 ?>

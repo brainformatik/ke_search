@@ -47,4 +47,8 @@ class tx_kesearch_classes_flexform {
 		}
 	}
 }
+
+if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/classes/class.tx_kesearch_classes_flexform.php'])	{
+	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/classes/class.tx_kesearch_classes_flexform.php']);
+}
 ?>

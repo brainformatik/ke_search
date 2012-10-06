@@ -72,7 +72,7 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 				'pages',
 				'pid = 0' .
 				t3lib_BEfunc::BEenableFields('pages') .
-				t3lib_BEfunc::deleteClause('pages') 
+				t3lib_BEfunc::deleteClause('pages')
 			);
 			$GLOBALS['TT'] = new t3lib_timeTrackNull;
 			$GLOBALS['TSFE'] = t3lib_div::makeInstance('tslib_fe', $GLOBALS['TYPO3_CONF_VARS'], $row['uid'], 0);
@@ -294,5 +294,9 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 			);
 		}
 	}
+}
+
+if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/indexer/types/class.tx_kesearch_indexer_types_templavoila.php'])	{
+	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/indexer/types/class.tx_kesearch_indexer_types_templavoila.php']);
 }
 ?>

@@ -1897,4 +1897,8 @@ class tx_kesearch_lib extends tslib_pibase {
     }
 
 }
+
+if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/lib/class.tx_kesearch_lib.php'])	{
+	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/lib/class.tx_kesearch_lib.php']);
+}
 ?>

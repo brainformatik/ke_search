@@ -363,8 +363,7 @@ class tx_kesearch_lib_filters_textlinks {
 	}
 }
 
-
-if(defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/pi1/class.tx_kesearch_lib_filters_textlinks.php']) {
-	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/pi1/class.tx_kesearch_lib_filters_textlinks.php']);
+if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/lib/filters/class.tx_kesearch_lib_filters_textlinks.php'])	{
+	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/lib/filters/class.tx_kesearch_lib_filters_textlinks.php']);
 }
 ?>
