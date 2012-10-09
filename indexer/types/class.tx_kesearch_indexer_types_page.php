@@ -166,6 +166,45 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
 
 	/**
+	 * creates a rootline and searches for valid feGroups
+	 *
+	 * @param integer $uid
+	 * @return array
+	 */
+	public function getRecursiveFeGroups($uid) {
+		$tempRootline[] = $this->cachedPageRecords[0][$uid]['uid'];
+		while($this->cachedPageRecords[0][$uid]['pid']) {
+			$uid = $this->cachedPageRecords[0][$uid]['pid'];
+			if(is_array($this->cachedPageRecords[0][$uid])) {
+				$tempRootline[] = $this->cachedPageRecords[0][$uid]['uid'];
+			}
+		}
+		krsort($tempRootline);
+		foreach($tempRootline as $page) {
+			$rootline[] = $page;
+		}
+		// now we have a full rootline of the current page. 0 = level 0, 1 = level 1 and so on
+		$extendToSubpages = false;
+		foreach($rootline as $uid) {
+			if($this->cachedPageRecords[0][$uid]['extendToSubpages'] || $extendToSubpages) {
+				if(!empty($this->cachedPageRecords[0][$uid]['fe_group'])) {
+					$tempFeGroups = explode(',', $this->cachedPageRecords[0][$uid]['fe_group']);
+					foreach($tempFeGroups as $group) {
+						$feGroups[] = $group;
+					}
+				}
+				$extendToSubpages = true;
+			} else {
+				if(!empty($this->cachedPageRecords[0][$uid]['fe_group'])) {
+					$feGroups = explode(',', $this->cachedPageRecords[0][$uid]['fe_group']);
+				} else $feGroups = array();
+			}
+		}
+		return $feGroups;
+	}
+
+
+	/**
 	 * get content of current page and save data to db
 	 * @param $uid page-UID that has to be indexed
 	 */
@@ -239,20 +278,20 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		// store record in index table
 		foreach($pageContent as $langKey => $content) {
 			$this->pObj->storeInIndex(
-				$indexerConfig['storagepid'],                           // storage PID
-				$this->cachedPageRecords[$langKey][$uid]['title'],      // page title
-				'page',                                                 // content type
-				$uid,                                                   // target PID: where is the single view?
-				$content,                                               // indexed content, includes the title (linebreak after title)
-				$tags,                                                  // tags
-				'',                                                     // typolink params for singleview
-				$this->cachedPageRecords[$langKey][$uid]['abstract'],   // abstract
-				$langKey,                                               // language uid
-				$this->cachedPageRecords[$langKey][$uid]['starttime'],  // starttime
-				$this->cachedPageRecords[$langKey][$uid]['endtime'],    // endtime
-				$this->cachedPageRecords[$langKey][$uid]['fe_group'],   // fe_group
-				false,                                                  // debug only?
-				$additionalFields                                       // additional fields added by hooks
+				$indexerConfig['storagepid'],                          // storage PID
+				$this->cachedPageRecords[$langKey][$uid]['title'],     // page title
+				'page',                                                // content type
+				$uid,                                                  // target PID: where is the single view?
+				$content,                                              // indexed content, includes the title (linebreak after title)
+				$tags,                                                 // tags
+				'',                                                    // typolink params for singleview
+				$this->cachedPageRecords[$langKey][$uid]['abstract'],  // abstract
+				$langKey,                                              // language uid
+				$this->cachedPageRecords[$langKey][$uid]['starttime'], // starttime
+				$this->cachedPageRecords[$langKey][$uid]['endtime'],   // endtime
+				implode(',', $this->getRecursiveFeGroups($uid)),       // fe_group
+				false,                                                 // debug only?
+				$additionalFields                                      // additional fields added by hooks
 			);
 		}
 
