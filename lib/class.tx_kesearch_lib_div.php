@@ -95,6 +95,23 @@ class tx_kesearch_lib_div {
 
 
 	/**
+	 * Returns the current TYPO3 version number as an integer, eg. 4005000 for version 4.5
+	 *
+	 * @return int
+	 */
+	public function getNumericTYPO3versionNumber() {
+		if (class_exists('VersionNumberUtility')) {
+			$numeric_typo3_version = \TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version);
+		} else if (class_exists('t3lib_utility_VersionNumber')) {
+			$numeric_typo3_version = t3lib_utility_VersionNumber::convertVersionNumberToInteger(TYPO3_version);
+		} else {
+			$numeric_typo3_version = t3lib_div::int_from_ver(TYPO3_version);
+		}
+		return $numeric_typo3_version;
+	}
+
+
+	/**
 	 * function cleanPiVars
 	 *
 	 * cleans all piVars used in this EXT

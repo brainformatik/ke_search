@@ -53,6 +53,11 @@ class tx_kesearch_indexer {
 	 */
 	var $registry;
 
+	/**
+	 * @var tx_kesearch_lib_div
+	 */
+	var $div;
+
 
 	/**
 	 * Constructor of this class
@@ -71,6 +76,7 @@ class tx_kesearch_indexer {
 			$this->extConf['prePostTagChar'] = '#';
 		}
 		$this->registry = t3lib_div::makeInstance('t3lib_Registry');
+		$this->div = t3lib_div::makeInstance('tx_kesearch_lib_div');
 	}
 
 	/*
@@ -191,7 +197,7 @@ class tx_kesearch_indexer {
 
 				// send the notification message
 				// use swiftmailer in 4.5 and above
-				if ($$this->getNumericTYPO3versionNumber() >= 4005000) {
+				if ($this->div->getNumericTYPO3versionNumber() >= 4005000) {
 					$mail = t3lib_div::makeInstance('t3lib_mail_Message');
 					$mail->setFrom(array($extConf['notificationSender']));
 					$mail->setTo(array($extConf['notificationRecipient']));
@@ -208,22 +214,6 @@ class tx_kesearch_indexer {
 		// verbose or quiet output? as set in function call!
 		if($verbose) return $content;
 	}
-
-    /**
-     * Returns the current TYPO3 version number as an integer, eg. 4005000 for version 4.5
-     *
-     * @return int
-     */
-    public function getNumericTYPO3versionNumber() {
-        if (class_exists('VersionNumberUtility')) {
-            $numeric_typo3_version = \TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version);
-        } else if (class_exists('t3lib_utility_VersionNumber')) {
-            $numeric_typo3_version = t3lib_utility_VersionNumber::convertVersionNumberToInteger(TYPO3_version);
-        } else {
-            $numeric_typo3_version = t3lib_div::int_from_ver(TYPO3_version);
-        }
-        return $numeric_typo3_version;
-    }
 
 
 	/**

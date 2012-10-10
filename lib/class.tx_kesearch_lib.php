@@ -204,7 +204,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		$cssFile = $GLOBALS['TSFE']->tmpl->getFileName($this->conf['cssFile']);
 		if(!empty($cssFile)) {
 			$cssTag = $this->cObj->wrap($cssFile, '<link rel="stylesheet" type="text/css" href="|" />');
-            if ($this->getNumericTYPO3versionNumber() >= 6000000) {
+            if ($this->div->getNumericTYPO3versionNumber() >= 6000000) {
                 $GLOBALS['TSFE']->getPageRenderer()->addCssFile($cssFile);
             } else {
 				$GLOBALS['TSFE']->additionalHeaderData[$this->prefixId . '_css'] = $cssTag;
@@ -955,7 +955,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// Create javacript and add it to the normal output
 		$jsCode = $this->xajax->getJavascript(t3lib_extMgm::siteRelPath('xajax'));
-		if ($this->getNumericTYPO3versionNumber() >= 6000000) {
+		if ($this->div->getNumericTYPO3versionNumber() >= 6000000) {
 			$GLOBALS['TSFE']->getPageRenderer()->addHeaderData($jsCode);
 		} else {
 			$GLOBALS['TSFE']->additionalHeaderData['xajax_search_filters'] = $jsCode;
@@ -1813,7 +1813,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		$content = $this->cObj->substituteMarkerArray($content, $markerArray);
 
 		// add JS to page header
-		if ($this->getNumericTYPO3versionNumber() >= 6000000) {
+		if ($this->div->getNumericTYPO3versionNumber() >= 6000000) {
 			$GLOBALS['TSFE']->getPageRenderer()->addHeaderData($content);
 		} else {
 			$GLOBALS['TSFE']->additionalHeaderData['jsContent'] = $content;
@@ -1867,7 +1867,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * @author Christian Bülter <buelter@kennziffer.com>
 	 * @since 11.07.12
 	 */
-    public function in_multiarray($needle, $haystack) {
+	public function in_multiarray($needle, $haystack) {
 		foreach ($haystack as $value) {
 			if (is_array($value)) {
 				if ($this->in_multiarray($needle, $value)) {
@@ -1877,25 +1877,8 @@ class tx_kesearch_lib extends tslib_pibase {
 				return true;
 			}
 		}
-        return false;
-    }
-
-    /**
-     * Returns the current TYPO3 version number as an integer, eg. 4005000 for version 4.5
-     *
-     * @return int
-     */
-    public function getNumericTYPO3versionNumber() {
-        if (class_exists('VersionNumberUtility')) {
-            $numeric_typo3_version = \TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version);
-        } else if (class_exists('t3lib_utility_VersionNumber')) {
-            $numeric_typo3_version = t3lib_utility_VersionNumber::convertVersionNumberToInteger(TYPO3_version);
-        } else {
-            $numeric_typo3_version = t3lib_div::int_from_ver(TYPO3_version);
-        }
-        return $numeric_typo3_version;
-    }
-
+		return false;
+	}
 }
 
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/ke_search/lib/class.tx_kesearch_lib.php'])	{
