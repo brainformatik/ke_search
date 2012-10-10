@@ -97,10 +97,10 @@ class tx_kesearch_filters {
 		$fields = '*';
 		$table = 'tx_kesearch_filters';
 		$where = 'pid in (' . $GLOBALS['TYPO3_DB']->quoteStr($this->startingPoints, $table) . ')';
-		$where .= ' AND uid in (' . $GLOBALS['TYPO3_DB']->quoteStr($this->conf['filters'], 'tx_kesearch_filters') . ')';
+		$where .= ' AND find_in_set(uid, "' . $GLOBALS['TYPO3_DB']->quoteStr($this->conf['filters'], 'tx_kesearch_filters') . '")';
 		$where .= $this->cObj->enableFields($table);
 		$rows = $this->languageOverlay(
-			$GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '', 'uid'),
+			$GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', 'find_in_set(uid, "' . $GLOBALS['TYPO3_DB']->quoteStr($this->conf['filters'], 'tx_kesearch_filters') . '")', '', 'uid'),
 			$table
 		);
 		return $this->addOptionsToFilters($rows);

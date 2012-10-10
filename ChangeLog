@@ -19,6 +19,7 @@ Current Trunk
 * bugfix: updated all XCLASS declarations
 * bugfix: make use of extendToSubpages while searching for parent fe_group.
 * added dependency PHP 5.3 (namespace feature is now used)
+* bugfix: keep ordering of filters in plugin also in FE
 
 Version 1.2.0, August 2012
 * bugfix: Function checkIfTagMatchesRecords didn't work properly with all filter types. Please note: Due to a complete rewrite of this functionality your hooks may need adjustments if they call functions which do not exist anymore.
