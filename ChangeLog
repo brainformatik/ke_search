@@ -17,7 +17,7 @@ Current Trunk
 * removed deprecated function: Check for version number in class.tx_kesearch_indexer.php, http://forge.typo3.org/issues/41036, Thanks to Tim Wendisch
 * made ke_search compatible with TYPO3 6.0. Tested against TYPO3 6.0 Beta2.
 * bugfix: updated all XCLASS declarations
-* bugfix: make use of extendToSubpages while searching for parent fe_group. Thanks to Tobias Pierschel.
+* bugfix: make use of extendToSubpages while searching for parent fe_group. 
 
 Version 1.2.0, August 2012
 * bugfix: Function checkIfTagMatchesRecords didn't work properly with all filter types. Please note: Due to a complete rewrite of this functionality your hooks may need adjustments if they call functions which do not exist anymore.
