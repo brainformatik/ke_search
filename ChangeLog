@@ -1,6 +1,6 @@
 ChangeLog
 
-Current Trunk
+Version 1.3.0, October 2012
 * feature: output of additional information (size of index, deleted entries) after indexer ran. Thanks to Jan Bartels, http://forge.typo3.org/issues/40067
 * feature: Search for phrases using "", example: "french cuisine".
 * feature: Search parameters, you can use + and - in order include or exclude search words explicitly.
