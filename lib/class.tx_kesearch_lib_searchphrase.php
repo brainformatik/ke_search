@@ -88,13 +88,13 @@ class tx_kesearch_lib_searchphrase {
 	 * @param string $searchString
 	 * @return string Returns the searchstring or an empty string
 	 */
-	public function checkAgainstDefaultValue($searchString) {
-		$searchString = strtolower(trim($searchString));
-		$defaultValue = strtolower($this->pObj->pi_getLL('searchbox_default_value'));
-		if ($searchString === $defaultValue) $searchString = '';
+    public function checkAgainstDefaultValue($searchString) {
+        $searchStringToLower = strtolower(trim($searchString));
+        $defaultValueToLower = strtolower($this->pObj->pi_getLL('searchbox_default_value'));
+        if ($searchStringToLower === $defaultValueToLower) $searchString = '';
 
-		return $searchString;
-	}
+        return $searchString;
+    }
 
 
 	/**
