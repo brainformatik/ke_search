@@ -129,6 +129,7 @@ CREATE TABLE tx_kesearch_indexerconfig (
 	directories text,
 	fileext tinytext,
 	filteroption int(11) DEFAULT '0' NOT NULL,
+	tvpath varchar(255) DEFAULT '' NOT NULL,
 
 	PRIMARY KEY (uid),
 	KEY parent (pid)

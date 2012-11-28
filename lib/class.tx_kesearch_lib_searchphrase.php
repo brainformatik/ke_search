@@ -136,10 +136,13 @@ class tx_kesearch_lib_searchphrase {
 
 					// enable part searching by default. But be careful: Enabling this slows down the search engine
 					if(!isset($this->pObj->extConf['enablePartSearch']) || $this->pObj->extConf['enablePartSearch']) {
-						$searchParts[$key] = rtrim($searchParts[$key], '*') . '*';
+						if($this->pObj->extConfPremium['enableInWordSearch']) {
+							$searchParts[$key] = '*' . trim($searchParts[$key], '*') . '*';
+						} else {
+							$searchParts[$key] = rtrim($searchParts[$key], '*') . '*';
+						}
 					}
 				}
-
 
 				// make the words save for the database
 				$searchParts[$key] = $GLOBALS['TYPO3_DB']->quoteStr($searchParts[$key], 'tx_kesearch_index');

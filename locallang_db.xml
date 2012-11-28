@@ -81,6 +81,7 @@
 			<label index="tx_kesearch_indexerconfig.directories">Directories</label>
 			<label index="tx_kesearch_indexerconfig.fileext">Comma separated list of allowed file extensions (eg. pdf,ppt,doc,xls):</label>
 			<label index="tx_kesearch_indexerconfig.filteroption">Add tag to all indexed elements:</label>
+			<label index="tx_kesearch_indexerconfig.tvpath">Tell us in which field configuration the indexer can find the tt_content uids. Normally it should be "field_content":</label>
 		</languageKey>
 		<languageKey index="de" type="array">
 			<label index="pages.tx_kesearch_tags">Schlagworte für facettierte Suche</label>
@@ -157,6 +158,7 @@
 			<label index="tx_kesearch_indexerconfig.directories">Verzeichnisse</label>
 			<label index="tx_kesearch_indexerconfig.fileext">Komma-separierte Liste von zu indexierenden Dateiendungen (z.B. pdf,ppt,doc,xls):</label>
 			<label index="tx_kesearch_indexerconfig.filteroption">Allen indexierten Elementen dieses Schlagwort hinzufügen:</label>
+			<label index="tx_kesearch_indexerconfig.tvpath">Geben Sie an in welcher Feldkonfiguration der Indexer die Aufstellung aller enthaltenen tt_content UIS findet. Normalerweise "field_content":</label>
 		</languageKey>
 		<languageKey index="nl" type="array">
 			<label index="pages.tx_kesearch_tags">Labels voor Facet Zoeken</label>
@@ -224,6 +226,7 @@
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">Nee</label>
 			<label index="tx_kesearch_indexerconfig.directories">Mappen</label>
 			<label index="tx_kesearch_indexerconfig.fileext">Door komma's gescheiden lijst van toegestane bestandsextensies (bijv. pdf,ppt,doc,xls)</label>
+			<label index="tx_kesearch_indexerconfig.tvpath">Tell us in which field configuration the indexer can find the tt_content uids. Normally it should be "field_content":</label>
 		</languageKey>
 	</data>
 </T3locallang>
