@@ -495,6 +495,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.7', 'file', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_7.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.8', 't3s_content', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_8.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.9', 'templavoila', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_9.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.10', 'mmforum', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_10.gif'),
 				),
 				'itemsProcFunc' => 'tx_kesearch_lib_items->fillIndexerConfig',
 				'size' => 1,
@@ -531,7 +532,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'sysfolder' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.sysfolder',
-			'displayCond' => 'FIELD:type:IN:ke_yac,ttnews,dam,tt_address',
+			'displayCond' => 'FIELD:type:IN:ke_yac,ttnews,dam,tt_address,mmforum',
 			'config' => array (
 				'type' => 'group',
 				'internal_type' => 'db',
@@ -654,7 +655,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'index_use_page_tags' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.index_use_page_tags',
-			'displayCond' => 'FIELD:type:=:ttnews,tt_address',
+			'displayCond' => 'FIELD:type:=:ttnews,tt_address,mmforum',
 			'config' => array (
 				'type'    => 'check',
 				'default' => '0'
