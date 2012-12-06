@@ -237,4 +237,8 @@ class tx_kesearch_indexer_types_mmforum extends tx_kesearch_indexer_types {
 		return $content;
 	}
 }
+
+if (defined('TYPO3_MODE') && $GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/ke_search/indexer/types/class.tx_kesearch_indexer_types_mmforum.php'])	{
+	include_once($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/ke_search/indexer/types/class.tx_kesearch_indexer_types_mmforum.php']);
+}
 ?>
