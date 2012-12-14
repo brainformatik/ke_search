@@ -201,10 +201,15 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 		$flex = t3lib_div::xml2array($flex);
 
 		// TODO: Maybe I need a more detailed collection of retrieving CE UIDS
+		$contentElementUids = array();
 		if(!$this->indexerConfig['tvpath']) {
-			$tvPath = 'field_content';
-		} else $tvPath = $this->indexerConfig['tvpath'];
-		$contentElementUids = $flex['data']['sDEF']['lDEF'][$tvPath]['vDEF'];
+			$tvPaths = 'field_content';
+		} else $tvPaths = $this->indexerConfig['tvpath'];
+		$tvPaths = t3lib_div::trimExplode(',', $tvPaths);
+		foreach ($tvPaths as $tvPath) {
+			$contentElementUids[] = $flex['data']['sDEF']['lDEF'][$tvPath]['vDEF'];
+		}
+		$contentElementUids = implode(',', $contentElementUids);
 		if(empty($contentElementUids)) return '';
 
 		// TODO: Maybe it's good to check comma seperated list for int values

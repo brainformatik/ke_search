@@ -161,7 +161,7 @@
 			<label index="tx_kesearch_indexerconfig.directories">Verzeichnisse</label>
 			<label index="tx_kesearch_indexerconfig.fileext">Komma-separierte Liste von zu indexierenden Dateiendungen (z.B. pdf,ppt,doc,xls):</label>
 			<label index="tx_kesearch_indexerconfig.filteroption">Allen indexierten Elementen dieses Schlagwort hinzufügen:</label>
-			<label index="tx_kesearch_indexerconfig.tvpath">Geben Sie an in welcher Feldkonfiguration der Indexer die Aufstellung aller enthaltenen tt_content UIS findet. Normalerweise "field_content":</label>
+			<label index="tx_kesearch_indexerconfig.tvpath">Geben Sie an in welcher Feldkonfiguration der Indexer die Aufstellung aller enthaltenen tt_content UIS findet. Normalerweise "field_content". Mehrere Felder können kommasepariert eingetragen werden:</label>
 		</languageKey>
 		<languageKey index="nl" type="array">
 			<label index="pages.tx_kesearch_tags">Labels voor Facet Zoeken</label>
