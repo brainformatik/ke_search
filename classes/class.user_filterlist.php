@@ -71,12 +71,10 @@ class user_filterlist {
 		} else {
 			$currentPid = $config['row']['pid'];
 		}
-		// t3lib_div::debug($currentPid,'pid');
 
 		// get the page TSconfig
         $this->pageTSconfig=t3lib_BEfunc::GetPagesTSconfig($currentPid);
         $this->modTSconfig=$this->pageTSconfig['ke_search.'];
-		// t3lib_div::debug($this->modTSconfig,'modTSConfig');
 
 		// get filters
 		$fields = '*';

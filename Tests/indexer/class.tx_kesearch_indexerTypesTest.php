@@ -164,7 +164,6 @@ class IndexerTypesTest extends Tx_Extbase_BaseTestCase {
 
 		// add the tags of each page to the global page array
 		$this->pageIndexer->addTagsToPageRecords($indexPids);
-		//t3lib_utility_Debug::debug($this->pageIndexer->pageRecords, 'pages');
 	}
 }
 ?>
