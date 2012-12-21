@@ -128,6 +128,7 @@ CREATE TABLE tx_kesearch_indexerconfig (
 	index_use_page_tags tinyint(3) DEFAULT '0' NOT NULL,
 	directories text,
 	fileext tinytext,
+	commenttypes tinytext,
 	filteroption int(11) DEFAULT '0' NOT NULL,
 	tvpath varchar(255) DEFAULT '' NOT NULL,
 

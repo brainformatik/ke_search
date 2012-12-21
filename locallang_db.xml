@@ -61,7 +61,8 @@
 			<label index="tx_kesearch_indexerconfig.type.I.7">Files</label>
 			<label index="tx_kesearch_indexerconfig.type.I.8">t3s_content</label>
 			<label index="tx_kesearch_indexerconfig.type.I.9">TemplaVoila</label>
-			<label index="tx_kesearch_indexerconfig.type.I.10">MM-Forum</label>
+			<label index="tx_kesearch_indexerconfig.type.I.10">MM-Forum (mm_forum)</label>
+			<label index="tx_kesearch_indexerconfig.type.I.11">Comments (comments)</label>
 			<label index="tx_kesearch_indexerconfig.type">Type</label>
 			<label index="tx_kesearch_indexerconfig.index_content_with_restrictions">Index content elements with restrictions?</label>
 			<label index="tx_kesearch_indexerconfig.index_content_with_restrictions.I.0">Yes</label>
@@ -81,6 +82,7 @@
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">No</label>
 			<label index="tx_kesearch_indexerconfig.directories">Directories</label>
 			<label index="tx_kesearch_indexerconfig.fileext">Comma separated list of allowed file extensions (eg. pdf,ppt,doc,xls):</label>
+			<label index="tx_kesearch_indexerconfig.commenttypes">Comma separated list of comment types (eg. pages):</label>
 			<label index="tx_kesearch_indexerconfig.filteroption">Add tag to all indexed elements:</label>
 			<label index="tx_kesearch_indexerconfig.tvpath">Tell us in which field configuration the indexer can find the tt_content uids. Normally it should be "field_content":</label>
 		</languageKey>
@@ -140,7 +142,8 @@
 			<label index="tx_kesearch_indexerconfig.type.I.7">Dateien</label>
 			<label index="tx_kesearch_indexerconfig.type.I.8">t3s_content</label>
 			<label index="tx_kesearch_indexerconfig.type.I.9">TemplaVoila</label>
-			<label index="tx_kesearch_indexerconfig.type.I.10">MM-Forum</label>
+			<label index="tx_kesearch_indexerconfig.type.I.10">MM-Forum (mm_forum)</label>
+			<label index="tx_kesearch_indexerconfig.type.I.11">Kommentare (comments)</label>
 			<label index="tx_kesearch_indexerconfig.type">Typ</label>
 			<label index="tx_kesearch_indexerconfig.index_content_with_restrictions">Indiziere Content-Elemente mit eingeschränkter Zugänglichkeit?</label>
 			<label index="tx_kesearch_indexerconfig.index_content_with_restrictions.I.0">Ja</label>
@@ -160,6 +163,7 @@
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">Nein</label>
 			<label index="tx_kesearch_indexerconfig.directories">Verzeichnisse</label>
 			<label index="tx_kesearch_indexerconfig.fileext">Komma-separierte Liste von zu indexierenden Dateiendungen (z.B. pdf,ppt,doc,xls):</label>
+			<label index="tx_kesearch_indexerconfig.commenttypes">Komma-separierte Liste von zu indexierenden Kommentartypen (pages):</label>
 			<label index="tx_kesearch_indexerconfig.filteroption">Allen indexierten Elementen dieses Schlagwort hinzufügen:</label>
 			<label index="tx_kesearch_indexerconfig.tvpath">Geben Sie an in welcher Feldkonfiguration der Indexer die Aufstellung aller enthaltenen tt_content UIS findet. Normalerweise "field_content". Mehrere Felder können kommasepariert eingetragen werden:</label>
 		</languageKey>

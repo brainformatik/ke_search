@@ -468,7 +468,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 			)
 		),
 		'targetpid' => array (
-			'displayCond' => 'FIELD:type:!IN:page,tt_content,file,templavoila',
+			'displayCond' => 'FIELD:type:!IN:page,tt_content,file,templavoila,comments',
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.targetpid',
 			'config' => array (
@@ -496,6 +496,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.8', 't3s_content', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_8.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.9', 'templavoila', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_9.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.10', 'mmforum', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_10.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.11', 'comments', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_11.gif'),
 				),
 				'itemsProcFunc' => 'tx_kesearch_lib_items->fillIndexerConfig',
 				'size' => 1,
@@ -506,7 +507,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'startingpoints_recursive' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.startingpoints_recursive',
-			'displayCond' => 'FIELD:type:=:page,tt_content,ttnews,tt_address,templavoila',
+			'displayCond' => 'FIELD:type:=:page,tt_content,ttnews,tt_address,templavoila,comments',
 			'config' => array (
 				'type' => 'group',
 				'internal_type' => 'db',
@@ -532,7 +533,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'sysfolder' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.sysfolder',
-			'displayCond' => 'FIELD:type:IN:ke_yac,ttnews,dam,tt_address,mmforum',
+			'displayCond' => 'FIELD:type:IN:ke_yac,ttnews,dam,tt_address,mmforum,comments',
 			'config' => array (
 				'type' => 'group',
 				'internal_type' => 'db',
@@ -655,7 +656,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'index_use_page_tags' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.index_use_page_tags',
-			'displayCond' => 'FIELD:type:=:ttnews,tt_address,mmforum',
+			'displayCond' => 'FIELD:type:=:ttnews,tt_address,mmforum,comments',
 			'config' => array (
 				'type'    => 'check',
 				'default' => '0'
@@ -681,6 +682,16 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 				'type' => 'input',
 				'size' => '30',
 				'default' => 'pdf,ppt,doc,xls'
+			)
+		),
+		'commenttypes' => array (
+			'exclude' => 0,
+			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.commenttypes',
+			'displayCond' => 'FIELD:type:=:comments',
+			'config' => array (
+				'type' => 'input',
+				'size' => '30',
+				'default' => 'pages'
 			)
 		),
 		'filteroption' => array (
@@ -709,7 +720,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		),
 	),
 	'types' => array (
-		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, storagepid,targetpid;;;;3-3-3,type,startingpoints_recursive,single_pages,sysfolder,index_content_with_restrictions,index_passed_events,index_news_category_mode,index_news_category_selection,index_news_useHRDatesSingle,index_news_useHRDatesSingleWithoutDay,index_dam_categories,index_dam_without_categories,index_dam_categories_recursive,index_use_page_tags,directories,fileext,filteroption,tvpath')
+		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, storagepid,targetpid;;;;3-3-3,type,startingpoints_recursive,single_pages,sysfolder,index_content_with_restrictions,index_passed_events,index_news_category_mode,index_news_category_selection,index_news_useHRDatesSingle,index_news_useHRDatesSingleWithoutDay,index_dam_categories,index_dam_without_categories,index_dam_categories_recursive,index_use_page_tags,directories,fileext,commenttypes,filteroption,tvpath')
 	),
 	'palettes' => array (
 		'1' => array('showitem' => '')
