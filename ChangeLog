@@ -1,11 +1,13 @@
 ChangeLog
 
+Current Trunk
+* Feature: Now you can add multiple TV-fields divided by comma
+
 Version 1.3.1, December 2012
 * Bugfix: Search for words with umlauts failed on some installations. http://forge.typo3.org/issues/42345
 * Feature: Fixed fieldname 'main_content' für TemplaVoila indexer. Thanks to Christian Ducrot. http://forge.typo3.org/issues/43078
 * Feature: Add new indexer for mm_forum. Thanks to Jan Bartels
 * Bugfix: Changed TYPO3_CONF_VARS to globals scope
-* Feature: Now you can add multiple TV-fields divided by comma
 
 Version 1.3.0, October 2012
 * feature: output of additional information (size of index, deleted entries) after indexer ran. Thanks to Jan Bartels, http://forge.typo3.org/issues/40067
