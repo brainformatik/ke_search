@@ -1,6 +1,8 @@
 ChangeLog
 
 Current Trunk
+
+Version 1.4, Januar 2013
 * Feature: Now you can add multiple TV-fields divided by comma
 * Feature: Added indexer for extension "comments".
 
