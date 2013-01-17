@@ -1,6 +1,7 @@
 ChangeLog
 
 Current Trunk
+* Increased max. directories to 100 for file indexer.
 
 Version 1.4, Januar 2013
 * Feature: Now you can add multiple TV-fields divided by comma

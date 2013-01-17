@@ -671,7 +671,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 				'internal_type' => 'folder',
 				'size' => 5,
 				'minitems' => 0,
-				'maxitems' => 10,
+				'maxitems' => 100,
 			)
 		),
 		'fileext' => array (
