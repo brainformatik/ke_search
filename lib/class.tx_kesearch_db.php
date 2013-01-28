@@ -79,6 +79,19 @@ class tx_kesearch_db implements t3lib_Singleton {
 	 */
 	public function getSearchResultByMySQL() {
 		$queryParts = $this->getQueryParts();
+		
+		// log query
+		if ($this->conf['logQuery']) {
+			$query = $GLOBALS['TYPO3_DB']->SELECTquery(
+				$queryParts['SELECT'],
+				$queryParts['FROM'],
+				$queryParts['WHERE'],
+				$queryParts['GROUPBY'],
+				$queryParts['ORDERBY'],
+				'' // limit
+			);
+			t3lib_div::devLog('Search result query', $this->pObj->extKey, 0, array($query));
+		}
 
 		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 			$queryParts['SELECT'],

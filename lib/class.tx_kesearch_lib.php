@@ -1175,11 +1175,6 @@ class tx_kesearch_lib extends tslib_pibase {
 			// set attention icon?
 			$content = $this->cObj->substituteMarker($content,'###IMAGE###', $attentionImage);
 
-			// add query
-			if ($this->conf['showQuery']) {
-				$content .= '<br />'.$query.'<br />';
-			}
-
 			// add onload image if in AJAX mode
 			if($this->conf['renderMethod'] != 'static') {
 				$content .= $this->onloadImage;
@@ -1307,16 +1302,6 @@ class tx_kesearch_lib extends tslib_pibase {
 				$subContent = '';
 			}
 			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_TAGS###', $subContent, $recursive=1);
-
-			// show query?
-			if ($this->conf['showQuery']) {
-				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_QUERY###');
-				$subContent = $this->cObj->substituteMarker($subContent,'###LABEL_QUERY###', $this->pi_getLL('label_query'));
-				$subContent = $this->cObj->substituteMarker($subContent,'###QUERY###', $query);
-			} else {
-				$subContent = '';
-			}
-			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_QUERY###', $subContent, $recursive=1);
 
 			// type icon
 			if ($this->conf['showTypeIcon']) {

@@ -217,7 +217,7 @@ function hideSpinner() {
 
 	<div id="kesearch_results">###MESSAGE###</div>
 
-	<div id="kesearch_updating_results">###SPINNER###<br /></div>
+	<diY id="kesearch_updating_results">###SPINNER###<br /></div>
 	<div id="kesearch_pagebrowser_bottom">###PAGEBROWSER_BOTTOM###</div>
 	<!-- ###SUB_QUERY_TIME### start -->
 	<div id="kesearch_query_time">###QUERY_TIME###</div>
@@ -275,9 +275,6 @@ function hideSpinner() {
 	    <!-- ###SUB_TAGS### start -->
 		<i>###LABEL_TAGS###:</i> ###TAGS###<br />
 	    <!-- ###SUB_TAGS### end -->
-	    <!-- ###SUB_QUERY### start -->
-		<i>###LABEL_QUERY###:</i> ###QUERY###
-	    <!-- ###SUB_QUERY### end -->
 	</div>
 </div>
 <!-- ###RESULT_ROW### end -->

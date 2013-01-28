@@ -54,7 +54,7 @@
 
 			<label index="ff.page.debug">Debug (Admin)</label>
 			<label index="ff.showTags">Show tags?</label>
-			<label index="ff.showQuery">Show query?</label>
+			<label index="ff.logQuery">Log query in backend (needs devLog extension)?</label>
 			<label index="ff.showTaggedContentOnly">Show tagged content only?</label>
 
 			<label index="ff.page.filter">Filter</label>
@@ -80,7 +80,6 @@
 			<label index="label_score_percent">Percental score</label>
 			<label index="label_score_scale">Score scale</label>
 			<label index="label_tags">Tags</label>
-			<label index="label_query">DB-Query</label>
 			<label index="label_all">select all / deselect all</label>
 
 			<label index="loading">Loading</label>
@@ -152,7 +151,7 @@
 
 			<label index="ff.page.debug">Debug (Admin)</label>
 			<label index="ff.showTags">Zeige Schlagworte?</label>
-			<label index="ff.showQuery">Zeige Such-Query?</label>
+			<label index="ff.logQuery">Logge Such-Query im Backend (benötigt devLog Extension)?</label>
 			<label index="ff.showTaggedContentOnly">Nur Inhalte mit Schlagworten zeigen?</label>
 
 			<label index="ff.page.filter">Filtereinstellungen</label>
@@ -178,7 +177,6 @@
 			<label index="label_score_percent">Prozentuale Relevanz</label>
 			<label index="label_score_scale">Relevanz-Skala</label>
 			<label index="label_tags">Schlagworte</label>
-			<label index="label_query">DB-Query</label>
 			<label index="label_all">alle auswählen / alle abwählen</label>
 
 			<label index="loading">laedt</label>
@@ -244,7 +242,7 @@
 			<label index="ff.showScoreScale">Toon score schaal?</label>
 			<label index="ff.page.debug">Debug (Admin)</label>
 			<label index="ff.showTags">Toon labels?</label>
-			<label index="ff.showQuery">Toon query?</label>
+			<label index="ff.logQuery">Toon query (backend devLog extension)?</label>
 			<label index="ff.showTaggedContentOnly">Toon alleen gelabelde inhoud?</label>
 			<label index="ff.page.filter">Filter</label>
 			<label index="ff.filters">Filters</label>
@@ -267,7 +265,6 @@
 			<label index="label_score_percent">procentuele score</label>
 			<label index="label_score_scale">Score schaal</label>
 			<label index="label_tags">Labels</label>
-			<label index="label_query">DB-Query</label>
 			<label index="label_all">Selecteer alles / deselecteer alles</label>
 			<label index="loading">Laden</label>
 			<label index="all_options">Allemaal</label>
