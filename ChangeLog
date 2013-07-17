@@ -4,6 +4,9 @@ Current Trunk
 * Increased max. directories to 100 for file indexer.
 * Removed "Show query" Debug option (was not functional anyway anymore), added "Log query" option in plugin configuration (needs devLog extension).
 
+Version 1.4.1, July 2013
+* security bugfix
+
 Version 1.4, Januar 2013
 * Feature: Now you can add multiple TV-fields divided by comma
 * Feature: Added indexer for extension "comments".
