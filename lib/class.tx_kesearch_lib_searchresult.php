@@ -222,6 +222,7 @@ class tx_kesearch_lib_searchresult {
 		if(is_array($wordArray) && count($wordArray)) {
 			foreach($wordArray as $word) {
 				$word = str_replace('/', '\/', $word);
+				$word = htmlspecialchars($word);
 				$content = preg_replace('/(' . $word . ')/iu','<span class="hit">\0</span>', $content);
 			}
 		}

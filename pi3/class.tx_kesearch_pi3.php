@@ -98,6 +98,8 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 				$this->piVars['filter'][$filter['uid']] = array_unique($this->piVars['filter'][$filter['uid']]);
 			}
 			foreach($filter['options'] as $optionKey => $option) {
+				$option['title'] = htmlspecialchars($option['title']);
+				$option['tag'] = htmlspecialchars($option['tag']);
 				if($optionsAmountArray[$option['tag']]) {
 					$optionCounter = $optionsAmountArray[$option['tag']];
 				} else $optionCounter = 0;
@@ -163,7 +165,7 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 		}
 		$content = $this->cObj->substituteSubpart($content, '###SUB_FILTER_MULTISELECT_HIDDEN###', $hidden);
 		$content = $this->cObj->substituteMarker($content, '###PAGEID###', $this->conf['resultPage']);
-		$content = $this->cObj->substituteMarker($content, '###SWORD###', $this->piVars['sword']);
+		$content = $this->cObj->substituteMarker($content, '###SWORD###', htmlspecialchars($this->piVars['sword']));
 
 		return $this->pi_wrapInBaseClass($content);
 	}

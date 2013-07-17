@@ -131,19 +131,21 @@ class tx_kesearch_lib_div {
 			// process further cleaning regarding to param type
 			switch ($key) {
 
-				// intvals - default 1
+				// integer - default 1
 				case 'page':
 					$piVars[$key] = intval($value);
 					// set to "1" if no value set
 					if (!$piVars[$key]) $piVars[$key] = 1;
 					break;
 
-				// intvals
+				// integer
 				case 'resetFilters':
 					$piVars[$key] = intval($value);
 					break;
 
-				// string arrays
+				// array of strings. Defined in the TYPO3 backend
+				// and posted as piVar. Should not contain any special 
+				// chars (<>"), but just to make sure we remove them here.
 				case 'filter':
 					if(is_array($piVars[$key])) {
 						foreach($piVars[$key] as $filterId => $filterValue)  {
@@ -158,20 +160,29 @@ class tx_kesearch_lib_div {
 					}
 					break;
 
-				// string
+				// string, no further XSS cleaning here (except removeXSS, 
+				// see above), cleaning is done on output
 				case 'sword':
+					$piVars[$key] = trim($piVars[$key]);
+					break;
+
+				// only characters
+				case 'sortByField':
 				case 'orderByField':
-					$value = trim($value);
-					//$value = str_replace(array('"', "'"), array(' ', ' '), $value);
-					$piVars[$key] = htmlspecialchars($value, ENT_NOQUOTES);
+					$piVars[$key] = preg_replace('/[^a-zA-Z0-9]/', '', $piVars[$key]);
 					break;
 
 				// "asc" or "desc"
+				case 'sortByDir':
 				case 'orderByDir':
-					$piVars[$key] = strtolower(htmlspecialchars($value, ENT_QUOTES));
 					if ($piVars[$key] != 'asc' && $piVars[$key] != 'desc') {
 						$piVars[$key] = 'asc';
 					}
+					break;
+
+				// remove all other piVars
+				default:
+					unset($piVars[$key]);
 					break;
 			}
 		}

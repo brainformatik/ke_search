@@ -280,10 +280,10 @@ class tx_kesearch_lib extends tslib_pibase {
 		$content = $this->cObj->substituteMarker($content,'###SUBMIT_VALUE###',$this->pi_getLL('submit'));
 
 		// searchword input value
-		$searchString = trim($this->piVars['sword']);
+		$searchString = $this->piVars['sword'];
 
 		if(!empty($searchString) && $searchString != $this->pi_getLL('searchbox_default_value')) {
-			$this->swordValue = $searchString ? str_replace('"', '&quot;', $searchString) : '';
+			$this->swordValue = $searchString;
 			$searchboxFocusJS = '';
 		} else {
 			$this->swordValue = $this->pi_getLL('searchbox_default_value');
@@ -292,7 +292,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			$searchboxFocusJS = ' searchboxFocus(this);  ';
 		}
 
-		$content = $this->cObj->substituteMarker($content,'###SWORD_VALUE###', $this->swordValue);
+		$content = $this->cObj->substituteMarker($content,'###SWORD_VALUE###', htmlspecialchars($this->swordValue));
 		$content = $this->cObj->substituteMarker($content,'###SWORD_ONFOCUS###', $searchboxFocusJS);
 		$content = $this->cObj->substituteMarker($content,'###SORTBYFIELD###', $this->piVars['sortByField']);
 		$content = $this->cObj->substituteMarker($content,'###SORTBYDIR###', $this->piVars['sortByDir']);
@@ -327,7 +327,8 @@ class tx_kesearch_lib extends tslib_pibase {
 		// mountpoint parameter
 		$mpParam = t3lib_div::_GET('MP');
 		if (isset($mpParam)) {
-			$hiddenFieldValue = htmlentities($mpParam);
+			// the only allowed characters in the MP parameter are digits and , and -
+			$hiddenFieldValue = preg_replace('/[^0-9,-]/', '', $mpParam);
 			$hiddenFieldsContent .= '<input type="hidden" name="MP" value="'.$hiddenFieldValue.'" />';
 		}
 		$content = $this->cObj->substituteMarker($content,'###HIDDENFIELDS###', $hiddenFieldsContent);
@@ -482,7 +483,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// add standard option "all"
 		$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
-		$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $filters[$filterUid]['title']);
+		$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', htmlspecialchars($filters[$filterUid]['title']));
 		$optionsContent = $this->cObj->substituteMarker($optionsContent,'###VALUE###', '');
 		$optionsContent = $this->cObj->substituteMarker($optionsContent,'###SELECTED###','');
 		$optionsContent = $this->cObj->substituteMarker($optionsContent,'###CSS_CLASS###', 'class="label" ' );
@@ -492,8 +493,8 @@ class tx_kesearch_lib extends tslib_pibase {
 			foreach ($options as $key => $data) {
 				$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###ONCLICK###', $this->onclickFilter);
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $data['title']);
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###VALUE###', $data['value']);
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', htmlspecialchars($data['title']));
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###VALUE###', htmlspecialchars($data['value']));
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###SELECTED###', $data['selected'] ? ' selected="selected" ' : '');
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###CSS_CLASS###', ' ' );
 				$optionsCount++;
@@ -516,7 +517,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		// fill markers
 		$filterContent = $this->cObj->getSubpart($this->templateCode, $filterSubpart);
 		$filterContent = $this->cObj->substituteSubpart ($filterContent, $optionSubpart, $optionsContent, $recursive=1);
-		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $filters[$filterUid]['title']);
+		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', htmlspecialchars($filters[$filterUid]['title']));
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERNAME###', 'tx_kesearch_pi1[filter]['.$filterUid.']');
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERID###', 'filter_' . $filterUid);
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###DISABLED###', $optionsCount > 0 ? '' : ' disabled="disabled" ');
@@ -559,7 +560,7 @@ class tx_kesearch_lib extends tslib_pibase {
 					$linkconf['parameter'] = $GLOBALS['TSFE']->id;
 					$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'].'&tx_kesearch_pi1[filter]['.$filterUid.']='.$data['value'];
 					$linkconf['useCacheHash'] = false;
-					$optionLink = $this->cObj->typoLink($data['title'],$linkconf);
+					$optionLink = $this->cObj->typoLink(htmlspecialchars($data['title']),$linkconf);
 
 					$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
 					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###ONCLICK###', '');
@@ -599,7 +600,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				// fill markers
 				$filterContent = $this->cObj->getSubpart($this->templateCode, $filterSubpart);
 				$filterContent = $this->cObj->substituteSubpart ($filterContent, $optionSubpart, $optionsContent);
-				$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $filters[$filterUid]['title']);
+				$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', htmlspecialchars($filters[$filterUid]['title']));
 				$filterContent = $this->cObj->substituteMarker($filterContent,'###SWITCH_AREA_START###', '');
 				$filterContent = $this->cObj->substituteMarker($filterContent,'###SWITCH_AREA_END###', '');
 				$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERNAME###', 'tx_kesearch_pi1[filter]['.$filterUid.']');
@@ -621,19 +622,19 @@ class tx_kesearch_lib extends tslib_pibase {
 				foreach ($options as $key => $data) {
 
 					$onclick = '';
-					$tempField = strtolower(t3lib_div::removeXSS($this->piVars['orderByField']));
-					$tempDir = strtolower(t3lib_div::removeXSS($this->piVars['orderByDir']));
+					$tempField = $this->piVars['orderByField'];
+					$tempDir = $this->piVars['orderByDir'];
 					if($tempField != '' && $tempDir != '') {
 						$onclick = 'setOrderBy(' . $tempField . ', ' . $tempDir . ');';
 					}
-					$onclick = $onclick . ' document.getElementById(\'filter_' . $filterUid . '\').value=\''.$data['value'].'\'; ';
+					$onclick = $onclick . ' document.getElementById(\'filter_' . $filterUid . '\').value=' . t3lib_div::quoteJSvalue($data['value']) . '; ';
 					$onclick .= ' document.getElementById(\'pagenumber\').value=\'1\'; ';
 					$onclick .= $this->onclickFilter;
 					$onclick = 'onclick="'.$onclick.'"';
 
 					$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
 					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###ONCLICK###', $onclick);
-					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', $data['title']);
+					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', htmlspecialchars($data['title']));
 					$cssClass = 'option ';
 					$cssClass .= $data['selected'] ? 'selected' : '';
 					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONCSSCLASS###', $cssClass);
@@ -662,7 +663,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			// fill markers
 			$filterContent = $this->cObj->getSubpart($this->templateCode, $filterSubpart);
 			$filterContent = $this->cObj->substituteSubpart ($filterContent, $optionSubpart, $optionsContent);
-			$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', $filters[$filterUid]['title']);
+			$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', htmlspecialchars($filters[$filterUid]['title']));
 			$filterContent = $this->cObj->substituteMarker($filterContent,'###SWITCH_AREA_START###', '<a href="javascript:switchArea(\'filter_'.$filterUid.'\')">');
 			$filterContent = $this->cObj->substituteMarker($filterContent,'###SWITCH_AREA_END###', '</a>');
 			$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERNAME###', 'tx_kesearch_pi1[filter]['.$filterUid.']');
@@ -741,8 +742,8 @@ class tx_kesearch_lib extends tslib_pibase {
 					$checkBoxParams['disabled'] = 'disabled="disabled"';
 				}
 
-				$markerArray['###TITLE###'] = $data['title'];
-				$markerArray['###VALUE###'] = $data['tag'];
+				$markerArray['###TITLE###'] = htmlspecialchars($data['title']);
+				$markerArray['###VALUE###'] = htmlspecialchars($data['tag']);
 				$markerArray['###OPTIONKEY###'] = $key;
 				$markerArray['###OPTIONID###'] = 'filter_' . $filterUid . '_' . $key;
 				$markerArray['###OPTIONCSSCLASS###'] = 'optionCheckBox optionCheckBox' . $filterUid . ' optionCheckBox' . $filterUid . '_' . $key;
@@ -773,7 +774,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		$contentFilters = $this->cObj->substituteSubpart($template['filter'], '###SUB_FILTER_CHECKBOX_OPTION###', $contentOptions);
 
 		// get title
-		$filterTitle = $filters[$filterUid]['title'];
+		$filterTitle = htmlspecialchars($filters[$filterUid]['title']);
 
 		// get bullet image
 		$bulletSrc = $filters[$filterUid]['expandbydefault'] ? 'list-head-expanded.gif' : 'list-head-closed.gif';
@@ -1297,7 +1298,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$tags = str_replace('#', ' ', $tags);
 				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_TAGS###');
 				$subContent = $this->cObj->substituteMarker($subContent,'###LABEL_TAGS###', $this->pi_getLL('label_tags'));
-				$subContent = $this->cObj->substituteMarker($subContent,'###TAGS###', $tags);
+				$subContent = $this->cObj->substituteMarker($subContent,'###TAGS###', htmlspecialchars($tags));
 			} else {
 				$subContent = '';
 			}

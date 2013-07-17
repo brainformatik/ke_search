@@ -148,7 +148,7 @@ class tx_kesearch_lib_filters_textlinks {
 		$filter['target_pid'] = ($filter['target_pid']) ? $filter['target_pid'] : $this->conf['resultPage'];
 
 		// fill markers
-		$markerArray['###FILTERTITLE###'] = $filterTitle;
+		$markerArray['###FILTERTITLE###'] = htmlspecialchars($filterTitle);
 		$markerArray['###HIDDEN_FIELDS###'] = implode(CHR(10), $this->contentOfHiddenFields);
 
 		$exclude = 'tx_kesearch_pi1[page],tx_kesearch_pi1[multi],tx_kesearch_pi1[filter][' . $filterUid . ']';
@@ -275,7 +275,7 @@ class tx_kesearch_lib_filters_textlinks {
 		//if($this->pObj->piVars['multi'] && $this->pObj->piVars['filter'][$filterUid][$option['uid']]) {
 		$this->countActiveOptions++;
 		$markerArray['###CLASS###'] = 'active';
-		$markerArray['###TEXTLINK###'] = $option['title'];
+		$markerArray['###TEXTLINK###'] = htmlspecialchars($option['title']);
 		$this->contentOfHiddenFields[] = $this->renderHiddenField($filterUid, $option);
 		return $this->cObj->substituteMarkerArray($this->templateArray['options'], $markerArray);
 	}
@@ -353,7 +353,7 @@ class tx_kesearch_lib_filters_textlinks {
 		$attributes['type'] = 'hidden';
 		$attributes['name'] = 'tx_kesearch_pi1[filter][' . $filterUid . '][' . $option['uid'] . ']';
 		$attributes['id'] = 'tx_kesearch_pi1_' . $filterUid . '_' . $option['uid'];
-		$attributes['value'] = $option['tag'];
+		$attributes['value'] = htmlspecialchars($option['tag']);
 
 		foreach($attributes as $key => $attribut) {
 			$attributes[$key] = $key . $this->cObj->wrap($attribut, '="|"');
