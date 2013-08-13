@@ -100,6 +100,15 @@ class tx_kesearch_pi1 extends tx_kesearch_lib {
 		}
 		$content = $this->cObj->substituteMarker($content,'###LOADING###',$this->pi_getLL('loading'));
 
+		
+		// hook for additional searchbox markers
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['additionalSearchboxContent'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['additionalSearchboxContent'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$_procObj->additionalSearchboxContent($content, $this);
+			}
+		}
+		
 		return $this->pi_wrapInBaseClass($content);
 	}
 
