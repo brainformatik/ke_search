@@ -58,8 +58,9 @@
 			<label index="ff.showTaggedContentOnly">Show tagged content only?</label>
 
 			<label index="ff.page.filter">Filter</label>
-			<label index="ff.filters">Filters</label>
-			<label index="ff.preselected_filters">Preselected filters</label>
+			<label index="ff.filters">Shown Filters</label>
+			<label index="ff.hiddenfilters">Hidden Filters (for use with "preselected filter options")</label>
+			<label index="ff.preselected_filters">Preselected filter options</label>
 			<label index="ff.checkFilterCondition">Availability check for filter options</label>
 			<label index="ff.checkFilterCondition.I.0">Check in condition to other filters</label>
 			<label index="ff.checkFilterCondition.I.1">no check</label>
@@ -155,8 +156,9 @@
 			<label index="ff.showTaggedContentOnly">Nur Inhalte mit Schlagworten zeigen?</label>
 
 			<label index="ff.page.filter">Filtereinstellungen</label>
-			<label index="ff.filters">Filter</label>
-			<label index="ff.preselected_filters">Vorausgewählte Filter</label>
+			<label index="ff.filters">Angezeigte Filter</label>
+			<label index="ff.hiddenfilters">Versteckte Filter (zur Benutzung mit "Vorausgewählte Filteroptionen")</label>
+			<label index="ff.preselected_filters">Vorausgewählte Filteroptionen</label>
 			<label index="ff.checkFilterCondition">Verfügbarkeitsprüfung für Filter</label>
 			<label index="ff.checkFilterCondition.I.0">Prüfung mit Abhängigkeit zu anderen Filtern</label>
 			<label index="ff.checkFilterCondition.I.1">keine Verfügbarkeitsprüfung</label>

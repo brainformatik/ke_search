@@ -1,6 +1,13 @@
 ChangeLog
 
 Current Trunk
+* feature: indexer for ext:news
+* feature: create filter options from ext:news categories automatically while indexing
+* feature: hidden filters. Set hidden filters together with preselected filter options in plugin configuration in order to have preselected filters which are not shown in the frontend.
+* feature: tt_address indexer: allow modification of starttime, endtime, fe_group and sys_languge_uid by hook
+* feature: added onblur function for search word input field
+* cleanup: tt_address indexer: remove adding of orig_uid and orig_pid from hook and put it in the indexer itself
+* bugfix: fixed use of tagChar for ke_search_premium
 * Increased max. directories to 100 for file indexer.
 * Removed "Show query" Debug option (was not functional anyway anymore), added "Log query" option in plugin configuration (needs devLog extension).
 

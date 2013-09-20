@@ -142,17 +142,6 @@ class user_kesearch_sortdate {
 		}
 	}
 
-	public function modifyAddressIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tagContent, &$addressRow, &$additionalFields) {
-		// fill orig_uid
-		if(isset($addressRow['uid']) && $addressRow['uid'] > 0) {
-			$additionalFields['orig_uid'] = $addressRow['uid'];
-		}
-		// fill orig_pid
-		if(isset($addressRow['pid']) && $addressRow['pid'] > 0) {
-			$additionalFields['orig_pid'] = $addressRow['pid'];
-		}
-	}
-
 	public function modifyContentIndexEntry(&$title, &$contentRecord, &$tags, $contentUid, &$additionalFields) {
 		// crdate is always given, but can be overwritten
 		if(isset($contentRecord['crdate']) && $contentRecord['crdate'] > 0) {

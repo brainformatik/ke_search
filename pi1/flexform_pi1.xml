@@ -493,6 +493,22 @@
 						</TCEforms>
 					</filters>
 
+					<hiddenfilters>
+						<TCEforms>
+							<exclude>1</exclude>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.hiddenfilters</label>
+							<config type="array">
+								<type>select</type>
+								<multiple>1</multiple>
+								<maxitems>100</maxitems>
+								<size>5</size>
+								<allownonidvalues>1</allownonidvalues>
+								<items type="array"></items>
+								<itemsProcFunc>user_filterlist->getListOfAvailableFiltersForFlexforms</itemsProcFunc>
+							</config>
+						</TCEforms>
+					</hiddenfilters>
+
 					<preselected_filters>
 						<TCEforms>
 							<exclude>1</exclude>

@@ -497,6 +497,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.9', 'templavoila', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_9.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.10', 'mmforum', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_10.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.11', 'comments', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_11.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.12', 'news', t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_12.gif'),
 				),
 				'itemsProcFunc' => 'tx_kesearch_lib_items->fillIndexerConfig',
 				'size' => 1,
@@ -507,7 +508,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'startingpoints_recursive' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.startingpoints_recursive',
-			'displayCond' => 'FIELD:type:=:page,tt_content,ttnews,tt_address,templavoila,comments',
+			'displayCond' => 'FIELD:type:=:page,tt_content,ttnews,tt_address,templavoila,comments,news',
 			'config' => array (
 				'type' => 'group',
 				'internal_type' => 'db',
@@ -533,7 +534,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'sysfolder' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.sysfolder',
-			'displayCond' => 'FIELD:type:IN:ke_yac,ttnews,dam,tt_address,mmforum,comments',
+			'displayCond' => 'FIELD:type:IN:ke_yac,ttnews,dam,tt_address,mmforum,comments,news',
 			'config' => array (
 				'type' => 'group',
 				'internal_type' => 'db',
@@ -574,7 +575,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'index_news_category_mode' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.index_news_category_mode',
-			'displayCond' => 'FIELD:type:=:ttnews',
+			'displayCond' => 'FIELD:type:=:ttnews,news',
 			'config' => array (
 				'type' => 'select',
 				'items' => array (
@@ -598,6 +599,25 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 				'autoSizeMax' => 50,
 				'minitems' => 0,
 				'maxitems' => 500,
+			)
+		),
+		'index_extnews_category_selection' => array(
+			'exclude' => 1,
+			'l10n_mode' => 'mergeIfNotBlank',
+			'label' => 'LLL:EXT:news/Resources/Private/Language/locallang_db.xml:tx_news_domain_model_news.categories',
+			'displayCond' => 'FIELD:type:=:news',
+			'config' => array(
+				'type' => 'select',
+				'renderMode' => 'tree',
+				'treeConfig' => array(
+					'parentField' => 'parentcategory',
+				),
+				'foreign_table' => 'tx_news_domain_model_category',
+				'foreign_table_where' => ' AND (tx_news_domain_model_category.sys_language_uid = 0 OR tx_news_domain_model_category.l10n_parent = 0) ORDER BY tx_news_domain_model_category.sorting',
+				'size' => 10,
+				'autoSizeMax' => 20,
+				'minitems' => 0,
+				'maxitems' => 20,
 			)
 		),
 		'index_news_useHRDatesSingle' => array (
@@ -656,7 +676,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'index_use_page_tags' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.index_use_page_tags',
-			'displayCond' => 'FIELD:type:=:ttnews,tt_address,mmforum,comments',
+			'displayCond' => 'FIELD:type:=:ttnews,tt_address,mmforum,comments,news',
 			'config' => array (
 				'type'    => 'check',
 				'default' => '0'
@@ -720,7 +740,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		),
 	),
 	'types' => array (
-		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, storagepid,targetpid;;;;3-3-3,type,startingpoints_recursive,single_pages,sysfolder,index_content_with_restrictions,index_passed_events,index_news_category_mode,index_news_category_selection,index_news_useHRDatesSingle,index_news_useHRDatesSingleWithoutDay,index_dam_categories,index_dam_without_categories,index_dam_categories_recursive,index_use_page_tags,directories,fileext,commenttypes,filteroption,tvpath')
+		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, storagepid,targetpid;;;;3-3-3,type,startingpoints_recursive,single_pages,sysfolder,index_content_with_restrictions,index_passed_events,index_news_category_mode,index_news_category_selection,index_extnews_category_selection,index_news_useHRDatesSingle,index_news_useHRDatesSingleWithoutDay,index_dam_categories,index_dam_without_categories,index_dam_categories_recursive,index_use_page_tags,directories,fileext,commenttypes,filteroption,tvpath')
 	),
 	'palettes' => array (
 		'1' => array('showitem' => '')

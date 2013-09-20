@@ -72,7 +72,25 @@ class tx_kesearch_filters {
 		$this->piVars = $this->pObj->piVars;
 		$this->startingPoints = $this->pObj->startingPoints;
 		$this->tagChar = $this->extConf['prePostTagChar'];
-		$this->filters = $this->getFiltersFromUidList($this->conf['filters']);
+		$this->filters = $this->getFiltersFromUidList($this->combineLists($this->conf['filters'], $this->conf['hiddenfilters']));
+	}
+
+	/**
+	 * 
+	 * combines two string comma lists
+	 * 
+	 * @param string $list1
+	 * @param string $list2
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 23.07.13 
+	 * @return string
+	 */
+	public function combineLists($list1 = '', $list2 = '') {
+		if (!empty($list2) && !empty($list2)) {
+			$list1 .= ',';
+		}
+		$list1 .= $list2;
+		return t3lib_div::uniqueList($list1);
 	}
 
 
@@ -97,10 +115,10 @@ class tx_kesearch_filters {
 		$fields = '*';
 		$table = 'tx_kesearch_filters';
 		$where = 'pid in (' . $GLOBALS['TYPO3_DB']->quoteStr($this->startingPoints, $table) . ')';
-		$where .= ' AND find_in_set(uid, "' . $GLOBALS['TYPO3_DB']->quoteStr($this->conf['filters'], 'tx_kesearch_filters') . '")';
+		$where .= ' AND find_in_set(uid, "' . $GLOBALS['TYPO3_DB']->quoteStr($filterUids, 'tx_kesearch_filters') . '")';
 		$where .= $this->cObj->enableFields($table);
 		$rows = $this->languageOverlay(
-			$GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', 'find_in_set(uid, "' . $GLOBALS['TYPO3_DB']->quoteStr($this->conf['filters'], 'tx_kesearch_filters') . '")', '', 'uid'),
+			$GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', 'find_in_set(uid, "' . $GLOBALS['TYPO3_DB']->quoteStr($filterUids, 'tx_kesearch_filters') . '")', '', 'uid'),
 			$table
 		);
 		return $this->addOptionsToFilters($rows);

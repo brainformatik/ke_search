@@ -285,15 +285,18 @@ class tx_kesearch_lib extends tslib_pibase {
 		if(!empty($searchString) && $searchString != $this->pi_getLL('searchbox_default_value')) {
 			$this->swordValue = $searchString;
 			$searchboxFocusJS = '';
+			$searchboxBlurJS = '';
 		} else {
 			$this->swordValue = $this->pi_getLL('searchbox_default_value');
 
 			// set javascript for resetting searchbox value
-			$searchboxFocusJS = ' searchboxFocus(this);  ';
+			$searchboxFocusJS = 'searchboxFocus(this);';
+			$searchboxBlurJS = 'searchboxBlur(this);';
 		}
 
 		$content = $this->cObj->substituteMarker($content,'###SWORD_VALUE###', htmlspecialchars($this->swordValue));
 		$content = $this->cObj->substituteMarker($content,'###SWORD_ONFOCUS###', $searchboxFocusJS);
+		$content = $this->cObj->substituteMarker($content,'###SWORD_ONBLUR###', $searchboxBlurJS);
 		$content = $this->cObj->substituteMarker($content,'###SORTBYFIELD###', $this->piVars['sortByField']);
 		$content = $this->cObj->substituteMarker($content,'###SORTBYDIR###', $this->piVars['sortByDir']);
 
@@ -371,24 +374,40 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * @return string HTML-Content concatenated for each filter
 	 */
 	public function renderFilters() {
-		foreach($this->filters->getFilters() as $filter) {
-			$options = array(); // reset variable for each loop
+		foreach ($this->filters->getFilters() as $filter) {
+
+			// if the current filter is a "hidden filter", skip
+			// rendering of this filter. The filter is only used
+			// to add preselected filter options to the query and
+			// must not be rendered.
+			if (t3lib_div::inList($this->conf['hiddenfilters'], $filter['uid'])) {
+				continue;
+			}
+
+			// get options for this filter
+			// reset options list for each loop
+			$options = array(); 
+			
+			// check filter options availability and preselection status
 			foreach($filter['options'] as $option) {
-				// check filter availability?
+
+				// should we check if the filter option is available in
+				// the current search result?
 				if($this->conf['checkFilterCondition'] != 'none') {
-					if($this->filters->checkIfTagMatchesRecords($option['tag'])) {
+					if ($this->filters->checkIfTagMatchesRecords($option['tag'])) {
+
 						// Is the filter option selected in the frontend via piVars
-						// or in the backend via flexform configuration?
+						// or in the backend via flexform configuration ("preselected filters")?
 						$selected = 0;
 
 						if($this->piVars['filter'][$filter['uid']] == $option['tag']) {
 							$selected = 1;
-						} elseif(is_array($this->piVars['filter'][$filter['uid']])) {
+						} else if (is_array($this->piVars['filter'][$filter['uid']])) {
 							if(t3lib_div::inArray($this->piVars['filter'][$filter['uid']], $option['tag'])) {
 								$selected = 1;
 							}
 							// check preselected filter options
-						} elseif(!isset($this->piVars['filter'][$filter['uid']]) && !is_array($this->piVars['filter'][$filter['uid']])) {
+						} else if (!isset($this->piVars['filter'][$filter['uid']]) && !is_array($this->piVars['filter'][$filter['uid']])) {
 							if (is_array($this->preselectedFilter) && $this->in_multiarray($option['tag'], $this->preselectedFilter)) {
 								$selected = 1;
 								// add preselected filter to piVars
@@ -451,9 +470,10 @@ class tx_kesearch_lib extends tslib_pibase {
 					$textLinkObj = t3lib_div::makeInstance('tx_kesearch_lib_filters_textlinks', $this);
 					$filterContent .= $wrap[0] . $textLinkObj->renderTextlinks($filter['uid'], $options) . $wrap[1];
 					break;
+
 				// use custom render code
 				default:
-						// hook for custom filter renderer
+					// hook for custom filter renderer
 					$customFilterContent = '';
 					if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['customFilterRenderer'])) {
 						foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['customFilterRenderer'] as $_classRef) {

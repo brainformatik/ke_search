@@ -8,6 +8,12 @@ function searchboxFocus(searchbox) {
 	}
 }
 
+function searchboxBlur(searchbox) {
+	if(searchbox.value == "") {
+		searchbox.value = "###SEARCHBOX_DEFAULT_VALUE###";
+	}
+}
+
 function resetCheckboxes(filter) {
 	allLi = document.getElementsByName("optionCheckBox" + filter);
 	allCb = new Array();
@@ -186,7 +192,7 @@ function hideSpinner() {
 	###HIDDENFIELDS###
 
 	<div class="kesearchbox">
-		<input type="text" id="ke_search_sword" name="tx_kesearch_pi1[sword]"  value="###SWORD_VALUE###" onfocus="###SWORD_ONFOCUS###" />
+		<input type="text" id="ke_search_sword" name="tx_kesearch_pi1[sword]"  value="###SWORD_VALUE###" onfocus="###SWORD_ONFOCUS###" onblur="###SWORD_ONBLUR###"/>
 		<input type="image" id="kesearch_submit" src="typo3conf/ext/ke_search/res/img/kesearch_submit.png" alt="###SUBMIT_VALUE###" class="submit" onclick="document.getElementById('pagenumber').value=1; document.getElementById('xajax_form_kesearch_pi1').submit();" />
 		<div class="clearer">&nbsp;</div>
 	</div>
