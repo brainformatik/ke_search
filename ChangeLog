@@ -10,6 +10,7 @@ Current Trunk
 * bugfix: fixed use of tagChar for ke_search_premium
 * Increased max. directories to 100 for file indexer.
 * Removed "Show query" Debug option (was not functional anyway anymore), added "Log query" option in plugin configuration (needs devLog extension).
+* changed default setting: static mode is now default instead of ajax_after_reload since this mode needs no additional extension
 
 Version 1.4.1, July 2013
 * security bugfix

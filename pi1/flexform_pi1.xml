@@ -260,7 +260,7 @@
 									</numIndex>
 								</items>
 								<size>1</size>
-								<default>ajax_after_reload</default>
+								<default>static</default>
 							</config>
 						</TCEforms>
 					</renderMethod>
