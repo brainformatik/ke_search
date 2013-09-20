@@ -12,7 +12,7 @@
 
 $EM_CONF[$_EXTKEY] = array(
 	'title' => 'Faceted Search',
-	'description' => 'Faceted Search for TYPO3. Very easy to install. AJAX Frontend. Fast (tested with 50.000 records) and flexible (you can write your own indexers). Indexes content directly from the databases (no frontend crawling). Visit kesearch.de for further information.',
+	'description' => 'Faceted fulltext search for TYPO3. Very easy to install. Fast (tested with 50.000 records) and flexible (you can write your own indexers). Indexes content directly from the databases (no frontend crawling). AJAX and accessible frontend. Visit kesearch.de for further information.',
 	'category' => 'plugin',
 	'shy' => 0,
 	'version' => '1.4.1',
