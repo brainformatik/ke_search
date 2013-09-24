@@ -86,7 +86,7 @@ $TCA['tx_kesearch_filters'] = array (
 			'disabled' => 'hidden',
 		),
 		'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY).'tca.php',
-		'iconfile'          => t3lib_extMgm::extRelPath($_EXTKEY).'icon_tx_kesearch_filters.gif',
+		'iconfile'          => t3lib_extMgm::extRelPath($_EXTKEY).'res/img/table_icons/icon_tx_kesearch_filters.gif',
 	),
 );
 
@@ -106,7 +106,7 @@ $TCA['tx_kesearch_filteroptions'] = array (
 			'disabled' => 'hidden',
 		),
 		'dynamicConfigFile'        => t3lib_extMgm::extPath($_EXTKEY).'tca.php',
-		'iconfile'                 => t3lib_extMgm::extRelPath($_EXTKEY).'icon_tx_kesearch_filteroptions.gif',
+		'iconfile'                 => t3lib_extMgm::extRelPath($_EXTKEY).'res/img/table_icons/icon_tx_kesearch_filteroptions.gif',
 	),
 );
 
@@ -124,7 +124,7 @@ $TCA['tx_kesearch_index'] = array (
 			'fe_group' => 'fe_group',
 		),
 		'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY).'tca.php',
-		'iconfile'          => t3lib_extMgm::extRelPath($_EXTKEY).'icon_tx_kesearch_index.gif',
+		'iconfile'          => t3lib_extMgm::extRelPath($_EXTKEY).'res/img/table_icons/icon_tx_kesearch_index.gif',
 	),
 );
 
@@ -146,7 +146,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 			'disabled' => 'hidden',
 		),
 		'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY).'tca.php',
-		'iconfile'          => t3lib_extMgm::extRelPath($_EXTKEY).'icon_tx_kesearch_indexerconfig.gif',
+		'iconfile'          => t3lib_extMgm::extRelPath($_EXTKEY).'res/img/table_icons/icon_tx_kesearch_indexerconfig.gif',
 	),
 );
 

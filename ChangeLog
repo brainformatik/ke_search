@@ -11,6 +11,7 @@ Current Trunk
 * Increased max. directories to 100 for file indexer.
 * Removed "Show query" Debug option (was not functional anyway anymore), added "Log query" option in plugin configuration (needs devLog extension).
 * changed default setting: static mode is now default instead of ajax_after_reload since this mode needs no additional extension
+* cleanup: moved backend images from extension root folder to subfolder
 
 Version 1.4.1, July 2013
 * security bugfix

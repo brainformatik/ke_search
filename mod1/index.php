@@ -562,13 +562,13 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 			// build type image path
 			switch($row['type']) {
 				case 'page':
-					$imagePath = t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_0.gif';
+					$imagePath = t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_0.gif';
 					break;
 				case 'ke_yac':
-					$imagePath = t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_1.gif';
+					$imagePath = t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_1.gif';
 					break;
 				default:
-					$imagePath = t3lib_extMgm::extRelPath('ke_search').'selicon_tx_kesearch_indexerconfig_type_2.gif';
+					$imagePath = t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_2.gif';
 					break;
 
 			}
