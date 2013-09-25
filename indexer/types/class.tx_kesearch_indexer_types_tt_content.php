@@ -45,7 +45,12 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 		$table = 'tt_content';
 		$where = 'pid = ' . intval($uid);
 		$where .= ' AND (' . $this->whereClauseForCType. ')';
-		$where .= t3lib_BEfunc::BEenableFields($table);
+
+		// don't index elements which are hidden or deleted, but do index
+		// those with time restrictons, the time restrictens will be 
+		// copied to the index
+		//$where .= t3lib_BEfunc::BEenableFields($table);
+		$where .= ' AND hidden=0';
 		$where .= t3lib_BEfunc::deleteClause($table);
 
 		// if indexing of content elements with restrictions is not allowed
@@ -54,33 +59,35 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 			$where .= ' AND (fe_group = "" OR fe_group = "0") ';
 		}
 
+		// get tags from page
+		$tags = $this->pageRecords[$uid]['tags'];
+
 		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where);
 		if(count($rows)) {
 			foreach($rows as $row) {
-				// header
+				// get page and content element rights and make list elements unique
+				$feGroups = t3lib_div::uniqueList($row['fe_group'] . ',' . implode(',', $this->getRecursiveFeGroups($uid)));
+
+				// get content for this content element
+				$content = '';
+
+				// index header
 				// add header only if not set to "hidden"
 				if ($row['header_layout'] != 100) {
-					$row['header'] = strip_tags($row['header']);
+					$content .= strip_tags($row['header']) . "\n";
 				}
 
-				// bodytext
-				$bodytext = $row['bodytext'];
-				$bodytext = str_replace('<td', ' <td', $bodytext);
-				$bodytext = str_replace('<br', ' <br', $bodytext);
-				$bodytext = str_replace('<p', ' <p', $bodytext);
-				$bodytext = str_replace('<li', ' <li', $bodytext);
-
-				if ($row['CType'] == 'table') {
-					// replace table dividers with whitespace
-					$bodytext = str_replace('|', ' ', $bodytext);
+				// index file uploads or normal content
+				if (in_array($row['CType'], $this->fileCTypes)) {
+					$content .= $this->getContentFromAttachedFilesAndWriteItToIndex($row, $feGroups, $tags) . "\n";
+				} else {
+					$content .= $this->getContentFromContentElement($row) . "\n";
 				}
-				$bodytext = strip_tags($bodytext);
 
-				$tags = $this->pageRecords[$uid]['tags'];
-
+				// prepare additionalFields (to be added via hook)
 				$additionalFields = array();
 
-					// make it possible to modify the indexerConfig via hook
+				// make it possible to modify the indexerConfig via hook
 				$indexerConfig = $this->indexerConfig;
 
 				// hook for custom modifications of the indexed data, e. g. the tags
@@ -98,22 +105,20 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 					}
 				}
 
+				// compile title from page title and content element title
+				// TODO: make changeable via hook
 				$title = $this->pageRecords[$uid]['title'];
 				if ($row['header'] && $row['header_layout'] != 100) {
 					$title = $title . ' - ' . $row['header'];
 				}
 
-				// add page rights to tt_content record and make list unique
-				$feGroups = $row['fe_group'] . ',' . $this->pageRecords[$uid]['fe_group'];
-				$feGroups = t3lib_div::uniqueList($feGroups);
-
 				// save record to index
 				$this->pObj->storeInIndex(
-					$indexerConfig['storagepid'],    		// storage PID
+					$indexerConfig['storagepid'],    	// storage PID
 					$title,                             	// page title inkl. tt_content-title
-					'content',                        		// content type
+					'content',                        	// content type
 					$row['pid'] . '#c' . $row['uid'],      	// target PID: where is the single view?
-					$bodytext,                             	// indexed content, includes the title (linebreak after title)
+					$content,                             	// indexed content, includes the title (linebreak after title)
 					$tags,                                	// tags
 					'',                                    	// typolink params for singleview
 					'',                                   	// abstract

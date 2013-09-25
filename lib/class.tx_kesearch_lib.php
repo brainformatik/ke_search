@@ -1249,7 +1249,9 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 
 			// add type marker
-			$tempMarkerArray['type'] = str_replace(' ', '_', $row['type']);
+			// for file results just use the "file" type, not the file extension (eg. "file:pdf")
+			list($type) = explode(':', $row['type']);
+			$tempMarkerArray['type'] = str_replace(' ', '_', $type);
 
 			// replace markers
 			$tempContent = $this->cObj->substituteMarkerArray($tempContent, $tempMarkerArray, $wrap='###|###', $uppercase=1);
@@ -1635,14 +1637,26 @@ class tx_kesearch_lib extends tslib_pibase {
 	/**
 	 * renders an image tag which will prepend the teaser if activated by user.
 	 *
-	 * @param $type string A value like page, dam, tt_address
+	 * @param $typeComplete string A value like page, dam, tt_address, for files eg. "file:pdf"
 	 */
-	public function renderTypeIcon($type) {
-		$type = $this->div->removeXSS($type);
-		$imageConf['file'] = str_replace(PATH_site, '', t3lib_div::getFileAbsFileName($this->conf['additionalPathForTypeIcons'] . $type . '.gif'));
+	public function renderTypeIcon($typeComplete) {
+		list($type) = explode(':', $typeComplete);
+		$name = str_replace(':', '_', $typeComplete);
+
+		// custom image
+		$imageConf['file'] = str_replace(PATH_site, '', t3lib_div::getFileAbsFileName($this->conf['additionalPathForTypeIcons'] . $name . '.gif'));
+
+		// fallback: default image
 		if(!is_file(PATH_site . $imageConf['file'])) {
-			$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/types/' . $type . '.gif';
+			$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/types/' . $name . '.gif';
+
+			// fallback for file results: use default if no image for this file extension is available
+			if($type == 'file' && !is_file(PATH_site . $imageConf['file'])) {
+				$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/types/file.gif';
+			}
 		}
+
+
 		return $this->cObj->IMAGE($imageConf);
 	}
 

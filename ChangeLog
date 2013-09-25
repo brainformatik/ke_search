@@ -1,5 +1,9 @@
 ChangeLog
 
+Current Trunk
+* feature: FAL based file indexer, indexes files linked in content element "uploads" (file links) and files linked in RTE text (needs at least TYPO3 6.0.0)
+* new icons: added icons for result list in the frontend depending on file type
+
 Version 1.5.0, September 2013
 * feature: indexer for ext:news
 * feature: create filter options from ext:news categories automatically while indexing

@@ -199,11 +199,13 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 			'hash' => $this->getUniqueHashForFile()
 		);
 
+		$type .= 'file:' . $this->fileInfo->getExtension();
+
 		//hook for custom modifications of the indexed data, e. g. the tags
 		if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFileIndexEntry'])) {
 			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFileIndexEntry'] as $_classRef) {
 				$_procObj = & t3lib_div::getUserObj($_classRef);
-				$_procObj->modifyFileIndexEntry($file, $content, additionalFields);
+				$_procObj->modifyFileIndexEntry($file, $content, $additionalFields);
 			}
 		}
 
@@ -211,7 +213,7 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 		$this->pObj->storeInIndex(
 			$this->indexerConfig['storagepid'],    // storage PID
 			$this->fileInfo->getName(),            // page title
-			'file',                                // content type
+			$type,                                // content type
 			1,                                     // target PID: where is the single view?
 			$content,                              // indexed content, includes the title (linebreak after title)
 			$tags,                                 // tags

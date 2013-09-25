@@ -51,6 +51,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	);
 	var $fileCTypes = array('uploads');
 	var $counter = 0;
+	var $fileCounter = 0;
 	var $whereClauseForCType = '';
 	// Name of indexed elements. Will be overwritten in content element indexer.
 	var $indexedElementsName = 'pages';
@@ -75,11 +76,10 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		// get all available sys_language_uid records
 		$this->sysLanguages = t3lib_BEfunc::getSystemLanguages();
 
-
-		// make file repository instance
-		// TODO: do it only when the indexer is set to index files, too and
-		// TYPO3 version is >= 6.0
-		$this->fileRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
+		// make file repository instance only if TYPO3 version is >= 6.0
+		if ($this->pObj->div->getNumericTYPO3versionNumber() >= 6000000) {
+			$this->fileRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
+		}
 	}
 
 	/**
@@ -113,7 +113,12 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$content .= '<p><b>Indexer "' . $this->indexerConfig['title'] . '": </b><br />'
 			. count($this->pageRecords) . ' pages have been found for indexing.<br />' . "\n"
 			. $this->counter . ' ' . $this->indexedElementsName . ' have been indexed.<br />' . "\n"
+			. $this->fileCounter . ' files have been indexed.<br />' . "\n"
 			. '</p>' . "\n";
+
+		if ($this->pObj->div->getNumericTYPO3versionNumber() < 6000000) {
+			$content .= '<p><i>For file indexing from content elements you need at least TYPO3 6.0.0.</i></p>';
+		}
 
 		$content .= $this->showTime();
 
@@ -141,9 +146,9 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where);
 
-		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-			$this->addLocalizedPagesToCache($row);
-			$pages[$row['uid']] = $row;
+		while ($pageRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+			$this->addLocalizedPagesToCache($pageRow);
+			$pages[$pageRow['uid']] = $pageRow;
 		}
 		return $pages;
 	}
@@ -152,18 +157,18 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 * add localized page records to a cache/globalArray
 	 * This is much faster than requesting the DB for each tt_content-record
 	 *
-	 * @param array $row
+	 * @param array $pageRow
 	 * @return void
 	 */
-	public function addLocalizedPagesToCache($row) {
-		$this->cachedPageRecords[0][$row['uid']] = $row;
+	public function addLocalizedPagesToCache($pageRow) {
+		$this->cachedPageRecords[0][$pageRow['uid']] = $pageRow;
 		foreach ($this->sysLanguages as $sysLang) {
 			list($pageOverlay) = t3lib_BEfunc::getRecordsByField(
-					'pages_language_overlay', 'pid', $row['uid'], 'AND sys_language_uid=' . intval($sysLang[1])
+					'pages_language_overlay', 'pid', $pageRow['uid'], 'AND sys_language_uid=' . intval($sysLang[1])
 			);
 			if ($pageOverlay) {
-				$this->cachedPageRecords[$sysLang[1]][$row['uid']] = t3lib_div::array_merge(
-						$row, $pageOverlay
+				$this->cachedPageRecords[$sysLang[1]][$pageRow['uid']] = t3lib_div::array_merge(
+						$pageRow, $pageOverlay
 				);
 			}
 		}
@@ -201,9 +206,9 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 			} else {
 				if (!empty($this->cachedPageRecords[0][$uid]['fe_group'])) {
 					$feGroups = explode(',', $this->cachedPageRecords[0][$uid]['fe_group']);
-				}
-				else
+				} else {
 					$feGroups = array();
+				}
 			}
 		}
 		return $feGroups;
@@ -215,7 +220,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 */
 	public function getPageContent($uid) {
 		// get content elements for this page
-		$fields = 'uid, header, bodytext, CType, sys_language_uid, header_layout';
+		$fields = 'uid, header, bodytext, CType, sys_language_uid, header_layout, fe_group';
 		$table = 'tt_content';
 		$where = 'pid = ' . intval($uid);
 		$where .= ' AND (' . $this->whereClauseForCType . ')';
@@ -228,33 +233,48 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 			$where .= ' AND (fe_group = "" OR fe_group = "0") ';
 		}
 
-		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where);
-		if (count($rows)) {
-			foreach ($rows as $row) {
+		// get frontend groups for this page
+		$feGroupsPages = t3lib_div::uniqueList(implode(',', $this->getRecursiveFeGroups($uid)));
+
+		// get Tags for current page
+		$tags = $this->pageRecords[intval($uid)]['tags'];
+
+		$ttContentRows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where);
+		if (count($ttContentRows)) {
+			foreach ($ttContentRows as $ttContentRow) {
 				$content = '';
 
 				// index header
 				// add header only if not set to "hidden"
-				if ($row['header_layout'] != 100) {
-					$content .= strip_tags($row['header']) . "\n";
+				if ($ttContentRow['header_layout'] != 100) {
+					$content .= strip_tags($ttContentRow['header']) . "\n";
 				}
 
-				// index file uploads or normal content
-				if (in_array($row['CType'], $this->fileCTypes)) {
-					$content .= $this->getIndexContentFromAttachedFiles($row) . "\n";
+				// index content of this content element and find attached or linked files
+				// attached files are saved as file references, the RTE links directly to
+				// a file, thus we get file objects
+				if (in_array($ttContentRow['CType'], $this->fileCTypes)) {
+					$fileObjects = $this->findAttachedFiles($ttContentRow);
 				} else {
-					$content .= $this->getIndexContentFromContentElement($row) . "\n";
+					$fileObjects = $this->findLinkedFilesInRte($ttContentRow);
+					$content .= $this->getContentFromContentElement($ttContentRow) . "\n";
+					/*
+					if ($fileObjects) {
+						debug($fileObjects);
+					}
+					 */
 				}
 
-				$pageContent[$row['sys_language_uid']] .= $content;
+				// index the files fond
+				$this->indexFiles($fileObjects, $ttContentRow, $feGroupsPages, $tags) . "\n";
+
+				// add content from this content element to page content
+				$pageContent[$ttContentRow['sys_language_uid']] .= $content;
 			}
 			$this->counter++;
 		} else {
 			return;
 		}
-
-		// get Tags for current page
-		$tags = $this->pageRecords[intval($uid)]['tags'];
 
 		// make it possible to modify the indexerConfig via hook
 		$indexerConfig = $this->indexerConfig;
@@ -272,20 +292,20 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		// store record in index table
 		foreach ($pageContent as $langKey => $content) {
 			$this->pObj->storeInIndex(
-				$indexerConfig['storagepid'], // storage PID
-				$this->cachedPageRecords[$langKey][$uid]['title'], // page title
-				'page', // content type
-				$uid, // target PID: where is the single view?
-				$content, // indexed content, includes the title (linebreak after title)
-				$tags, // tags
-				'', // typolink params for singleview
-				$this->cachedPageRecords[$langKey][$uid]['abstract'], // abstract
-				$langKey, // language uid
+				$indexerConfig['storagepid'],                          // storage PID
+				$this->cachedPageRecords[$langKey][$uid]['title'],     // page title
+				'page',                                                // content type
+				$uid,                                                  // target PID: where is the single view?
+				$content,                                              // indexed content, includes the title (linebreak after title)
+				$tags,                                                 // tags
+				'',                                                    // typolink params for singleview
+				$this->cachedPageRecords[$langKey][$uid]['abstract'],  // abstract
+				$langKey,                                              // language uid
 				$this->cachedPageRecords[$langKey][$uid]['starttime'], // starttime
-				$this->cachedPageRecords[$langKey][$uid]['endtime'], // endtime
-				implode(',', $this->getRecursiveFeGroups($uid)), // fe_group
-				false, // debug only?
-				$additionalFields				      // additional fields added by hooks
+				$this->cachedPageRecords[$langKey][$uid]['endtime'],   // endtime
+				$feGroupsPages,                                        // fe_group
+				false,                                                 // debug only?
+				$additionalFields				       // additional fields added by hooks
 			);
 		}
 
@@ -294,46 +314,167 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
 	/**
 	 *
-	 * Extracts content from files attached to a content element and
-	 * returns it as plain text for writing it directly to the index
+	 * Extracts content from files given (as array of file objects or file reference objects)
+	 * and writes the content to the index
+	 *
+	 * @param array $fileObjects
+	 * @param array $ttContentRow
+	 * @param string $feGroupsPages comma list
+	 * @param string $tags string
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 25.09.13
+	 */
+	public function indexFiles($fileObjects, $ttContentRow, $feGroupsPages, $tags) {
+		// add content element group restriction to pages group restriction
+		$feGroups = t3lib_div::uniqueList($feGroupsPages . ',' . $ttContentRow['fe_group']);
+
+		if (count($fileObjects)) {
+
+			// loop through files
+			foreach ($fileObjects as $fileObject) {
+
+				// check if the file extension fits in the list of extensions
+				// to index defined in the indexer configuration
+				if (t3lib_div::inList($this->indexerConfig['fileext'], $fileObject->getExtension())) {
+
+					// get file path and URI
+					$fileUri = $fileObject->getStorage()->getPublicUrl($fileObject);
+					$filePath = PATH_site . $fileUri;
+
+					/* @var $fileIndexerObject tx_kesearch_indexer_types_file  */
+					$fileIndexerObject = t3lib_div::makeInstance('tx_kesearch_indexer_types_file', $this->pObj);
+
+					// get file information and  file content (using external tools)
+					// write file data to the index as a seperate index entry
+					// count indexed files, add it to the indexer output
+					if ($fileIndexerObject->fileInfo->setFile($filePath)) {
+						if (($content = $fileIndexerObject->getFileContent($filePath))) {
+							$this->storeFileContentToIndex($fileObject, $content, $fileIndexerObject, $feGroups, $tags, $ttContentRow);
+							$this->fileCounter++;
+						}
+					}
+
+				}
+			}
+		}
+	}
+
+	/**
+	 * Finds files attached to "uploads" content elements
+	 * returns them as file reference objects array
 	 *
 	 * @author Christian Bülter <buelter@kennziffer.com>
 	 * @since 24.09.13
-	 * @param array $row content element
-	 * @return string
+	 * @param array $ttContentRow content element
+	 * @return array
 	 */
-	public function getIndexContentFromAttachedFiles($row) {
-		$content = '';
+	public function findAttachedFiles($ttContentRow) {
+		if ($this->pObj->div->getNumericTYPO3versionNumber() >= 6000000) {
+			// get files attached to the content element
+			$fileReferenceObjects = $this->fileRepository->findByRelation('tt_content', 'media', $ttContentRow['uid']);
+		} else {
+			$fileReferenceObjects = array();
+		}
+		return $fileReferenceObjects;
+	}
 
-		// TODO:
-		// check if we should get the  localized uid of the content element
-		// at this point
 
-		// get files attached to the content element
-		$fileObjects = $this->fileRepository->findByRelation('tt_content', 'media', $row['uid']);
+	/**
+	 * Finds files linked in rte text
+	 * returns them as array of file objects
+	 *
+	 * @param array $ttContentRow content element
+	 * @return array
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 24.09.13
+	 */
+	public function findLinkedFilesInRte($ttContentRow) {
+		$fileObjects = array();
+		// check if there are links to files in the rte text
+		if ($this->pObj->div->getNumericTYPO3versionNumber() >= 6000000) {
+			/* @var $rteHtmlParser \TYPO3\CMS\Core\Html\RteHtmlParser */
+			$rteHtmlParser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Html\\RteHtmlParser');
+			$blockSplit = $rteHtmlParser->splitIntoBlock('link', $ttContentRow['bodytext'], 1);
+			foreach ($blockSplit as $k => $v) {
+				if ($k % 2) {
+					$tagCode = \TYPO3\CMS\Core\Utility\GeneralUtility::unQuoteFilenames(trim(substr($rteHtmlParser->getFirstTag($v), 0, -1)), TRUE);
+					$link_param = $tagCode[1];
+					list($linkHandlerKeyword, $linkHandlerValue) = explode(':', trim($link_param), 2);
+					if ($linkHandlerKeyword === 'file') {
+						//debug($this->fileRepository->findFileReferenceByUid($linkHandlerValue), 'file found: ' . $linkHandlerValue);
+						$fileObjects[] = $this->fileRepository->findByUid($linkHandlerValue);
+					}
+				}
+			}
+		}
+		return $fileObjects;
+	}
 
-		// loop through files
-		/* @var $fileObject \TYPO3\CMS\Core\Resource\FileReference */
-		foreach ($fileObjects as $fileObject) {
 
-			// check if the file extension fits in the list of extensions
-			// to index defined in the indexer configuration
-			$fileExt = $fileObject->getExtension();
+	/**
+	 *
+	 * Store the file content and additional information to the index
+	 *
+	 * @param $fileObject file reference object or file object
+	 * @param string $content file text content
+	 * @param tx_kesearch_indexer_types_file $fileIndexerObject
+	 * @param string $feGroups comma list of groups to assign
+	 * @param array $ttContentRow tt_content element the file was assigned to
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 25.09.13
+	 */
+	public function storeFileContentToIndex($fileObject, $content, $fileIndexerObject, $feGroups, $tags, $ttContentRow) {
 
-			// fetch the file content
-			$fileUri = $fileObject->getStorage()->getPublicUrl($fileObject);
-
-			// add usergroup restrictions of the page and the
-			// content element to the index data
-
-			// add time restrictions to the index data
-
-			// write file data to the index as a seperate index entry
-
-			// count indexed files, add it to the indexer output
+		// if the gifen file is a file reference, we can use the description as abstract
+		if ($fileObject instanceof TYPO3\CMS\Core\Resource\FileReference) {
+			$abstract = $fileObject->getDescription() ? $fileObject->getDescription() : '';
+		} else {
+			$abstract = '';
+		}
+		if ($abstract) {
+			$content = $abstract . "\n" . $content;
 		}
 
-		return $content;
+		$title = $fileIndexerObject->fileInfo->getName();
+		$storagePid = $this->indexerConfig['storagepid'];
+		$type = 'file:' . $fileObject->getExtension();
+
+		$additionalFields = array(
+			'sortdate' => $fileIndexerObject->fileInfo->getModificationTime(),
+			'orig_uid' => 0,
+			'orig_pid' => 0,
+			'directory' => $fileIndexerObject->fileInfo->getPath(),
+			'hash' => $fileIndexerObject->getUniqueHashForFile()
+		);
+
+		//hook for custom modifications of the indexed data, e. g. the tags
+		if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFileIndexEntryFromContentIndexer'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFileIndexEntryFromContentIndexer'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$_procObj->modifyFileIndexEntryFromContentIndexer($fileObject, $content, $fileIndexerObject, $feGroups, $ttContentRow, $storagePid, $title, $tags, $abstract, $additionalFields);
+			}
+		}
+
+		// Store record in index table:
+		// Add usergroup restrictions of the page and the
+		// content element to the index data.
+		// Add time restrictions to the index data.
+		$this->pObj->storeInIndex(
+			$storagePid,                             // storage PID
+			$title,                                  // file name
+			$type,                                   // content type
+			1,                                       // target PID: where is the single view?
+			$content,                                // indexed content
+			$tags,                                   // tags
+			'',                                      // typolink params for singleview
+			$abstract,                               // abstract
+			$ttContentRow['sys_language_uid'],       // language uid
+			$ttContentRow['starttime'],              // starttime
+			$ttContentRow['endtime'],                // endtime
+			$feGroups,                               // fe_group
+			false,                                   // debug only?
+			$additionalFields                        // additional fields added by hooks
+		);
 	}
 
 	/**
@@ -343,12 +484,12 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 *
 	 * @author Christian Bülter <buelter@kennziffer.com>
 	 * @since 24.09.13
-	 * @param array $row content element
+	 * @param array $ttContentRow content element
 	 * @return string
 	 */
-	public function getIndexContentFromContentElement($row) {
+	public function getContentFromContentElement($ttContentRow) {
 		// bodytext
-		$bodytext = $row['bodytext'];
+		$bodytext = $ttContentRow['bodytext'];
 
 		// following lines prevents having words one after the other like: HelloAllTogether
 		$bodytext = str_replace('<td', ' <td', $bodytext);
@@ -356,7 +497,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$bodytext = str_replace('<p', ' <p', $bodytext);
 		$bodytext = str_replace('<li', ' <li', $bodytext);
 
-		if ($row['CType'] == 'table') {
+		if ($ttContentRow['CType'] == 'table') {
 			// replace table dividers with whitespace
 			$bodytext = str_replace('|', ' ', $bodytext);
 		}
