@@ -576,8 +576,8 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 
 			// build tag table
 			$tagTable = '<table class="tags" >';
-			$cols = 5;
-			$tags = t3lib_div::trimExplode('#', $row['tags'], true);
+			$cols = 3;
+			$tags = t3lib_div::trimExplode(',', $row['tags'], true);
 			$i=1;
 			foreach ($tags as $tag) {
 				// write leading tr
