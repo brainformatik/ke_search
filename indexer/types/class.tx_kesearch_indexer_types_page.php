@@ -394,6 +394,13 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 					/* @var $fileIndexerObject tx_kesearch_indexer_types_file  */
 					$fileIndexerObject = t3lib_div::makeInstance('tx_kesearch_indexer_types_file', $this->pObj);
 
+					// add tag to identify this index record as file
+					if (!empty($tags)) {
+						$tags .= ',';
+					}
+					$tagChar = $this->pObj->extConf['prePostTagChar'];
+					$tags .= $tagChar . 'file' . $tagChar;
+
 					// get file information and  file content (using external tools)
 					// write file data to the index as a seperate index entry
 					// count indexed files, add it to the indexer output
