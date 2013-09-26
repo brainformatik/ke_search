@@ -13,6 +13,7 @@
 			<label index="ff.page.main">General</label>
 			<label index="ff.resultPage">Page with result list</label>
 			<label index="ff.resultLinkTarget">Target for result link</label>
+			<label index="ff.resultLinkTargetFiles">Target for result link for files</label>
 			<label index="ff.resultLinkTarget.I.0">Open in new window</label>
 			<label index="ff.resultLinkTarget.I.1">Open in same window</label>
 			<label index="ff.resultChars">Number of chars used by result preview</label>
@@ -111,6 +112,7 @@
 			<label index="ff.page.main">Allgemein</label>
 			<label index="ff.resultPage">Suchergebnis-Seite (Zielseite)</label>
 			<label index="ff.resultLinkTarget">Ziel für Ergebnislink</label>
+			<label index="ff.resultLinkTargetFiles">Ziel für Ergebnislink für Dateien</label>
 			<label index="ff.resultLinkTarget.I.0">In neuem Fenster öffnen</label>
 			<label index="ff.resultLinkTarget.I.1">Im gleichen Fenster öffnen</label>
 			<label index="ff.resultChars">Anzahl Zeichen für Ergebnisvorschau</label>

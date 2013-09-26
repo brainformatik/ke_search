@@ -136,11 +136,12 @@ class tx_kesearch_lib_searchresult {
 	public function getResultLinkConfiguration() {
 		$linkconf = array();
 
-		switch($this->row['type']) {
+		list($type) = explode(':', $this->row['type']);
+		switch($type) {
 			case 'file': // render a link for files
 				$relPath = str_replace(PATH_site, '', $this->row['directory']);
 				$linkconf['parameter'] = $relPath . rawurlencode($this->row['title']);
-				$linkconf['fileTarget'] = $this->conf['resultLinkTarget'];
+				$linkconf['fileTarget'] = $this->conf['resultLinkTargetFiles'];
 				break;
 			default: // render a link for page targets
 				// if params are filled, add them to the link generation process

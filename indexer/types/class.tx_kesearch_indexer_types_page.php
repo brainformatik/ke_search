@@ -25,6 +25,7 @@
 
 require_once(t3lib_extMgm::extPath('ke_search') . 'indexer/class.tx_kesearch_indexer_types.php');
 
+define('DONOTINDEX', -3);
 /**
  * Plugin 'Faceted search' for the 'ke_search' extension.
  *
@@ -109,7 +110,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 				$this->getPageContent($uid);
 		}
 
-		// show indexer content?
+		// show indexer content
 		$content .= '<p><b>Indexer "' . $this->indexerConfig['title'] . '": </b><br />'
 			. count($this->pageRecords) . ' pages have been found for indexing.<br />' . "\n"
 			. $this->counter . ' ' . $this->indexedElementsName . ' have been indexed.<br />' . "\n"
@@ -117,7 +118,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 			. '</p>' . "\n";
 
 		if ($this->pObj->div->getNumericTYPO3versionNumber() < 6000000) {
-			$content .= '<p><i>For file indexing from content elements you need at least TYPO3 6.0.0.</i></p>';
+			$content .= '<p><i>For file indexing from content elements you need at least TYPO3 6.0.0!</i></p>';
 		}
 
 		$content .= $this->showTime();
@@ -250,19 +251,14 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 					$content .= strip_tags($ttContentRow['header']) . "\n";
 				}
 
-				// index content of this content element and find attached or linked files
-				// attached files are saved as file references, the RTE links directly to
-				// a file, thus we get file objects
+				// index content of this content element and find attached or linked files.
+				// Attached files are saved as file references, the RTE links directly to
+				// a file, thus we get file objects.
 				if (in_array($ttContentRow['CType'], $this->fileCTypes)) {
 					$fileObjects = $this->findAttachedFiles($ttContentRow);
 				} else {
 					$fileObjects = $this->findLinkedFilesInRte($ttContentRow);
 					$content .= $this->getContentFromContentElement($ttContentRow) . "\n";
-					/*
-					if ($fileObjects) {
-						debug($fileObjects);
-					}
-					 */
 				}
 
 				// index the files fond
@@ -313,6 +309,60 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	}
 
 	/**
+	 * combine group access restrictons from page(s) and content element
+	 * 
+	 * @param string $feGroupsPages comma list
+	 * @param string $feGroupsContentElement comma list
+	 * @return type
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 26.09.13
+	 */
+	public function getCombinedFeGroupsForContentElement($feGroupsPages, $feGroupsContentElement) {
+
+		// combine frontend groups from page(s) and content elemenet as follows
+		// 1. if page has no groups, but ce has groups, use ce groups
+		// 2. if ce has no groups, but page has grooups, use page groups
+		// 3. if page has "show at any login" (-2) and ce has groups, use ce groups
+		// 4. if ce has "show at any login" (-2) and page has groups, use page groups
+		// 5. if page and ce have explicit groups (not "hide at login" (-1), merge them (use only groups both have)
+		// 6. if page or ce has "hide at login" and the other
+		// has an expclicit group the element will never be shown and we must not index it.
+		// So which group do we set here? Let's use a constant for that and check in the calling function for that.
+
+		if (!$feGroupsPages && $feGroupsContentElement) {
+			$feGroups = $feGroupsContentElement;
+		}
+
+		if ($feGroupsPages && !$feGroupsContentElement) {
+			$feGroups = $feGroupsPages;
+		}
+
+		if ($feGroupsPages == '-2' && $feGroupsContentElement) {
+			$feGroups = $feGroupsContentElement;
+		}
+
+		if ($feGroupsPages && $feGroupsContentElement == '-2') {
+			$feGroups = $feGroupsPages;
+		}
+
+		if ($feGroupsPages && $feGroupsContentElement && $feGroupsPages != '-1' && $feGroupsContentElement != '-1') {
+			$feGroupsContentElementArray = t3lib_div::intExplode(',', $feGroupsContentElement);
+			$feGroupsPagesArray = t3lib_div::intExplode(',', $feGroupsPages);
+			$feGroups = implode(',', array_intersect($feGroupsContentElementArray,$feGroupsContentElementArray));
+		}
+
+		if (
+			($feGroupsContentElement && $feGroupsContentElement != '-1' && $feGroupsContentElement != -2 && $feGroupsPages == '-1')
+			||
+			($feGroupsPages && $feGroupsPages != '-1' && $feGroupsPages != -2 && $feGroupsContentElement == '-1')
+			) {
+			$feGroups = DONOTINDEX;
+		}
+
+		return $feGroups;
+	}
+
+	/**
 	 *
 	 * Extracts content from files given (as array of file objects or file reference objects)
 	 * and writes the content to the index
@@ -325,10 +375,10 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 * @since 25.09.13
 	 */
 	public function indexFiles($fileObjects, $ttContentRow, $feGroupsPages, $tags) {
-		// add content element group restriction to pages group restriction
-		$feGroups = t3lib_div::uniqueList($feGroupsPages . ',' . $ttContentRow['fe_group']);
+		// combine group access restrictons from page(s) and content element
+		$feGroups = $this->getCombinedFeGroupsForContentElement($feGroupsPages, $ttContentRow['fe_group']);
 
-		if (count($fileObjects)) {
+		if (count($fileObjects) && $feGroups != DONOTINDEX) {
 
 			// loop through files
 			foreach ($fileObjects as $fileObject) {

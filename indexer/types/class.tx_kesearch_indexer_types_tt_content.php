@@ -53,20 +53,21 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 		$where .= ' AND hidden=0';
 		$where .= t3lib_BEfunc::deleteClause($table);
 
-		// if indexing of content elements with restrictions is not allowed
-		// get only content elements that have empty group restrictions
-		if($this->indexerConfig['index_content_with_restrictions'] != 'yes') {
-			$where .= ' AND (fe_group = "" OR fe_group = "0") ';
-		}
-
 		// get tags from page
 		$tags = $this->pageRecords[$uid]['tags'];
+
+		// get frontend groups for this page
+		$feGroupsPages = t3lib_div::uniqueList(implode(',', $this->getRecursiveFeGroups($uid)));
 
 		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where);
 		if(count($rows)) {
 			foreach($rows as $row) {
-				// get page and content element rights and make list elements unique
-				$feGroups = t3lib_div::uniqueList($row['fe_group'] . ',' . implode(',', $this->getRecursiveFeGroups($uid)));
+				// combine group access restrictons from page(s) and content element
+				$feGroups = $this->getCombinedFeGroupsForContentElement($feGroupsPages, $row['fe_group']);
+
+				// skip this content element if either the page or the content element is set to "hide at login"
+				// and the other one has a frontend group attached to it
+				if ($feGroups == DONOTINDEX) continue;
 
 				// get content for this content element
 				$content = '';
@@ -77,12 +78,18 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 					$content .= strip_tags($row['header']) . "\n";
 				}
 
-				// index file uploads or normal content
+				// index content of this content element and find attached or linked files.
+				// Attached files are saved as file references, the RTE links directly to
+				// a file, thus we get file objects.
 				if (in_array($row['CType'], $this->fileCTypes)) {
-					$content .= $this->getContentFromAttachedFilesAndWriteItToIndex($row, $feGroups, $tags) . "\n";
+					$fileObjects = $this->findAttachedFiles($row);
 				} else {
+					$fileObjects = $this->findLinkedFilesInRte($row);
 					$content .= $this->getContentFromContentElement($row) . "\n";
 				}
+
+				// index the files fond
+				$this->indexFiles($fileObjects, $row, $feGroupsPages, $tags) . "\n";
 
 				// prepare additionalFields (to be added via hook)
 				$additionalFields = array();

@@ -66,9 +66,31 @@
 									</numIndex>
 								</items>
 								<size>1</size>
+								<default>_self</default>
 							</config>
 						</TCEforms>
 					</resultLinkTarget>
+
+					<resultLinkTargetFiles>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.resultLinkTargetFiles</label>
+							<config>
+								<type>select</type>
+								<items>
+									<numIndex index="0">
+										<numIndex index="0">LLL:EXT:ke_search/pi1/locallang.xml:ff.resultLinkTarget.I.1</numIndex>
+										<numIndex index="1">_self</numIndex>
+									</numIndex>
+									<numIndex index="1">
+										<numIndex index="0">LLL:EXT:ke_search/pi1/locallang.xml:ff.resultLinkTarget.I.0</numIndex>
+										<numIndex index="1">_blank</numIndex>
+									</numIndex>
+								</items>
+								<size>1</size>
+								<default>_blank</default>
+							</config>
+						</TCEforms>
+					</resultLinkTargetFiles>
 
 					<resultChars>
 						<TCEforms>

@@ -547,7 +547,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'index_content_with_restrictions' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.index_content_with_restrictions',
-			'displayCond' => 'FIELD:type:=:page,tt_content',
+			'displayCond' => 'FIELD:type:=:page',
 			'config' => array (
 				'type' => 'select',
 				'items' => array (
@@ -556,6 +556,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 				),
 				'size' => 1,
 				'maxitems' => 1,
+				'default' => 'no'
 			)
 		),
 		'index_passed_events' => array (

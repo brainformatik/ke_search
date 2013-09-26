@@ -554,10 +554,13 @@ class tx_kesearch_indexer {
 	function checkIfRecordWasIndexed($uid, $pid, $type, $language) {
 		$GLOBALS['TYPO3_DB']->sql_query('SET @orig_uid = ' . $uid . ', @pid = ' . $pid . ', @type = ' . $type . ', @language = ' . $language);
 		$res = $GLOBALS['TYPO3_DB']->sql_query('EXECUTE searchStmt USING @orig_uid, @pid, @type, @language;');
-		if(is_resource($res)) {
+		if($GLOBALS['TYPO3_DB']->sql_num_rows($res)) {
 			if($this->currentRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 				return true;
-			} return false;
+			} else {
+				$this->currentRow = array();
+				return false;
+			}
 		} else {
 			$this->currentRow = array();
 			return false;
