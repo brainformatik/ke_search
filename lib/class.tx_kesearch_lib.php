@@ -47,7 +47,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	var $templateCode        = ''; // content of template file
 
 	var $startingPoints      = 0; // comma seperated list of startingPoints
-	var $firstStartingPoint  = 0; // comma seperated list of startingPoints
+	var $firstStartingPoint  = 0; // first entry in list of startingpoints
 	var $conf                = array(); // FlexForm-Configuration
 	var $extConf             = array(); // Extension-Configuration
 	var $extConfPremium      = array(); // Extension-Configuration of ke_search_premium if installed

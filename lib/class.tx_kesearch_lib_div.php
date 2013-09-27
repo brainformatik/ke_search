@@ -44,6 +44,8 @@ class tx_kesearch_lib_div {
 	}
 
 	public function getStartingPoint() {
+		$startingpoint = array();
+
 		// if loadFlexformsFromOtherCE is set
 		// try to get startingPoint of given page
 		if($uid = intval($this->pObj->conf['loadFlexformsFromOtherCE'])) {
@@ -55,15 +57,25 @@ class tx_kesearch_lib_div {
 			);
 			if($GLOBALS['TYPO3_DB']->sql_num_rows($res)) {
 				$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
-				return $this->pObj->pi_getPidList($row['pages'], $row['recursive']);
+				$startingpoint['pages'] = $row['pages'];
+				$startingpoint['recursive'] = $row['recursive'];
 			}
+		} else {
+			// if loadFlexformsFromOtherCE is NOT set
+			// get startingPoints of current page
+			$startingpoint['pages'] = $this->pObj->cObj->data['pages'];
+			$startingpoint['recursive'] = $this->pObj->cObj->data['recursive'];
 		}
-		// if loadFlexformsFromOtherCE is NOT set
-		// get startingPoints of current page
-		return $this->pObj->pi_getPidList(
-			$this->pObj->cObj->data['pages'],
-			$this->pObj->cObj->data['recursive']
-		);
+
+		// allow to override startingpoint with typoscript like this
+		// plugin.tx_kesearch_pi1.overrideStartingPoint = 123
+		// plugin.tx_kesearch_pi1.overrideStartingPointRecursive = 1
+		if ($this->pObj->conf['overrideStartingPoint']) {
+			$startingpoint['pages'] = $this->pObj->conf['overrideStartingPoint'];
+			$startingpoint['recursive'] = $this->pObj->conf['overrideStartingPointRecursive'];
+		}
+
+		return $this->pObj->pi_getPidList($startingpoint['pages'], $startingpoint['recursive']);
 	}
 
 	/**
