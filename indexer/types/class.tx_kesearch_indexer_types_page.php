@@ -52,6 +52,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	);
 	var $fileCTypes = array('uploads');
 	var $counter = 0;
+	var $counterWithoutContent = 0;
 	var $fileCounter = 0;
 	var $whereClauseForCType = '';
 	// Name of indexed elements. Will be overwritten in content element indexer.
@@ -68,7 +69,6 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	public function __construct($pObj) {
 		parent::__construct($pObj);
 
-		$this->counter = 0;
 		foreach ($this->indexCTypes as $value) {
 			$cTypes[] = 'CType="' . $value . '"';
 		}
@@ -114,8 +114,8 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
 		// show indexer content
 		$content .= '<p><b>Indexer "' . $this->indexerConfig['title'] . '": </b><br />'
-			. count($this->pageRecords) . ' pages have been found for indexing.<br />' . "\n"
-			. $this->counter . ' ' . $this->indexedElementsName . ' have been indexed.<br />' . "\n"
+			. count($indexPids) . ' pages have been found for indexing.<br />' . "\n"
+			. $this->counter . ' ' . $this->indexedElementsName . ' have been indexed (' . $this->counterWithoutContent .' without content).<br />' . "\n"
 			. $this->fileCounter . ' files have been indexed.<br />' . "\n"
 			. '</p>' . "\n";
 
@@ -308,6 +308,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 			}
 			$this->counter++;
 		} else {
+			$this->counterWithoutContent++;
 			return;
 		}
 
