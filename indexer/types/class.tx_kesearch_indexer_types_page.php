@@ -141,9 +141,9 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$where = 'uid IN (' . implode(',', $uids) . ')';
 
 		// index only pages of doktype standard, advanced and "not in menu"
-		// add also sysfolders (254), we need this for the correct inheritage of
+		// add also sysfolders (254) and shortlinks (4), we need this for the correct inheritage of
 		// frontend user groups
-		$where .= ' AND (doktype = 1 OR doktype = 2 OR doktype = 5 OR doktype = 254) ';
+		$where .= ' AND (doktype = 1 OR doktype = 2 OR doktype = 4 OR doktype = 5 OR doktype = 254) ';
 
 		// index only pages which are searchable
 		// index only page which are not hidden
