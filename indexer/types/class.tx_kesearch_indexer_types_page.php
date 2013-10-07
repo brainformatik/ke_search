@@ -98,16 +98,18 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		// create a new list of allowed pids
 		$indexPids = array_keys($this->pageRecords);
 
-		// index only pages of doktype standard, advanced, shortcut and "not in menu"
-		$where = ' (doktype = 1 OR doktype = 2 OR doktype = 4 OR doktype = 5) ';
+		// add tags to pages of doktype standard, advanced, shortcut and "not in menu"
+		// add tags also to subpages of sysfolders (254), since we don't want them to be excluded (see: http://forge.typo3.org/issues/49435)
+		$where = ' (doktype = 1 OR doktype = 2 OR doktype = 4 OR doktype = 5 OR doktype = 254) ';
 
 		// add the tags of each page to the global page array
 		$this->addTagsToRecords($indexPids, $where);
 
 		// loop through pids and collect page content and tags
 		foreach ($indexPids as $uid) {
-			if ($uid)
+			if ($uid) {
 				$this->getPageContent($uid);
+			}
 		}
 
 		// show indexer content
