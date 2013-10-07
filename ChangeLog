@@ -10,6 +10,7 @@ Current Trunk
 * feature: allow to override startingpoint in search plugin via typoscript like this: plugin.tx_kesearch_pi1.overrideStartingPoint = 123 / plugin.tx_kesearch_pi1.overrideStartingPointRecursive = 1 / plugin.tx_kesearch_pi2.overrideStartingPoint = 123 / plugin.tx_kesearch_pi2.overrideStartingPointRecursive = 1
 * bugfix: jump to page one after starting a new search and using the submit button in static mode
 * bugfix: add tags also to subpages of sysfolders (254), since we don't want them to be excluded, http://forge.typo3.org/issues/49435
+* bugfix: fix the inheritage of frontend groups, was not working correctly with "hide at login" page
 
 Version 1.5.0, September 2013
 * feature: indexer for ext:news

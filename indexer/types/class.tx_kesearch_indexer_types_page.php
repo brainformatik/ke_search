@@ -141,7 +141,9 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$where = 'uid IN (' . implode(',', $uids) . ')';
 
 		// index only pages of doktype standard, advanced and "not in menu"
-		$where .= ' AND (doktype = 1 OR doktype = 2 OR doktype = 5) ';
+		// add also sysfolders (254), we need this for the correct inheritage of
+		// frontend user groups
+		$where .= ' AND (doktype = 1 OR doktype = 2 OR doktype = 5 OR doktype = 254) ';
 
 		// index only pages which are searchable
 		// index only page which are not hidden
@@ -184,6 +186,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 * @return array
 	 */
 	public function getRecursiveFeGroups($uid) {
+		$currentPageUid = $uid;
 		$tempRootline[] = $this->cachedPageRecords[0][$uid]['uid'];
 		while ($this->cachedPageRecords[0][$uid]['pid']) {
 			$uid = $this->cachedPageRecords[0][$uid]['pid'];
@@ -195,26 +198,60 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		foreach ($tempRootline as $page) {
 			$rootline[] = $page;
 		}
-		// now we have a full rootline of the current page. 0 = level 0, 1 = level 1 and so on
-		$extendToSubpages = false;
+
+
+		// since now we have a full rootline of the current page. 0 = level 0, 1 = level 1 and so on,
+		// we can fetch the inherited groups from pages above
+		$inheritedFeGroups = array();
 		foreach ($rootline as $uid) {
-			if ($this->cachedPageRecords[0][$uid]['extendToSubpages'] || $extendToSubpages) {
-				if (!empty($this->cachedPageRecords[0][$uid]['fe_group'])) {
-					$tempFeGroups = explode(',', $this->cachedPageRecords[0][$uid]['fe_group']);
-					foreach ($tempFeGroups as $group) {
-						$feGroups[] = $group;
-					}
+			if ($this->cachedPageRecords[0][$uid]['extendToSubpages'] && !empty($this->cachedPageRecords[0][$uid]['fe_group'])) {
+				$tempFeGroups = explode(',', $this->cachedPageRecords[0][$uid]['fe_group']);
+				foreach ($tempFeGroups as $group) {
+					$inheritedFeGroups = $this->addGroup($inheritedFeGroups, $group);
 				}
-				$extendToSubpages = true;
-			} else {
-				if (!empty($this->cachedPageRecords[0][$uid]['fe_group'])) {
-					$feGroups = explode(',', $this->cachedPageRecords[0][$uid]['fe_group']);
-				} else {
-					$feGroups = array();
+			}
+
+		}
+
+		// take the $feGroups of the current page
+		if ($this->cachedPageRecords[0][$currentPageUid]['fe_group']) {
+			$feGroups = explode(',', $this->cachedPageRecords[0][$currentPageUid]['fe_group']);
+		} else {
+			$feGroups = array();
+		}
+
+		// ... and add the inherited groups
+		if ($inheritedFeGroups) {
+			foreach ($inheritedFeGroups as $group) {
+				$feGroups = $this->addGroup($inheritedFeGroups, $group);
+			}
+		}
+
+		return $feGroups;
+	}
+
+	/**
+	 * adds a frontend group to an array of groups. If the new group is a real
+	 * group, remove "hide at login" (-1) and "show for all" (-2) groups from the list.
+	 *
+	 * @param array $groupList
+	 * @param string $group
+	 * @return type
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 07.10.13
+	 */
+	public function addGroup($groupList, $group) {
+		$groupList[] = $group;
+
+		if (intval($group) > 0) {
+			foreach ($groupList as $key => $value) {
+				if ($value < 0) {
+					unset($groupList[$key]);
 				}
 			}
 		}
-		return $feGroups;
+
+		return $groupList;
 	}
 
 	/**
