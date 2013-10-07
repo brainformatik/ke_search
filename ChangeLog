@@ -7,7 +7,7 @@ Current Trunk
 * feature: select link target for files seperately from normal links.
 * changed default behaviour: set "index content elements with restrictions" in page indexer to "no" by default
 * bugfix: fixed check if an index already exists, was false always
-* feature: allow to override startingpoint in search plugin via typoscript like this: plugin.tx_kesearch_pi1.overrideStartingPoint = 123 / plugin.tx_kesearch_pi1.overrideStartingPointRecursive = 1
+* feature: allow to override startingpoint in search plugin via typoscript like this: plugin.tx_kesearch_pi1.overrideStartingPoint = 123 / plugin.tx_kesearch_pi1.overrideStartingPointRecursive = 1 / plugin.tx_kesearch_pi2.overrideStartingPoint = 123 / plugin.tx_kesearch_pi2.overrideStartingPointRecursive = 1
 
 Version 1.5.0, September 2013
 * feature: indexer for ext:news
