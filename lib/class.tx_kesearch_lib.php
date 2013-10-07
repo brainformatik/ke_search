@@ -272,8 +272,10 @@ class tx_kesearch_lib extends tslib_pibase {
 		// get main template code
 		$content = $this->cObj->getSubpart($this->templateCode,'###SEARCHBOX_STATIC###');
 
-		// set page = 1 if not set yet
-		if (!$this->piVars['page']) $this->piVars['page'] = 1;
+		// set page = 1 if not set yet or if we are in static mode
+		if (!$this->piVars['page'] || $this->conf['renderMethod'] == 'static') {
+			$this->piVars['page'] = 1;
+		}
 		$content = $this->cObj->substituteMarker($content,'###HIDDEN_PAGE_VALUE###',$this->piVars['page']);
 
 		// submit
@@ -546,7 +548,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		if ($this->conf['renderMethod'] == 'static') {
 			$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCHANGE###', '');
 		} else {
-			$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCHANGE###', $this->onclickFilter);
+			$filterContent = $this->cObj->substituteMarker($filterContent,'###ONCHANGE###', 'onchange="' . $this->onclickFilter . '"');
 		}
 
 		return $filterContent;

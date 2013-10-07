@@ -297,7 +297,7 @@ function hideSpinner() {
 
 <!-- ###SUB_FILTER_SELECT### start -->
     <div>
-	<select id="###FILTERID###" name="###FILTERNAME###" onchange="document.getElementById('pagenumber').value=1; ###ONCHANGE###" ###DISABLED###>
+	<select id="###FILTERID###" name="###FILTERNAME###" ###ONCHANGE### ###DISABLED###>
 	    <!-- ###SUB_FILTER_SELECT_OPTION### start -->
 		<option value="###VALUE###" ###SELECTED###>###TITLE###</option>
 	    <!-- ###SUB_FILTER_SELECT_OPTION### end -->
