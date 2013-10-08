@@ -110,8 +110,8 @@ $TCA['tx_kesearch_filters'] = array (
 				'foreign_table' => 'tx_kesearch_filteroptions',
 				'maxitems' => 500,
 				'appearance' => Array(
-					'collapseAll' => 0,
-					'expandSingle' => 0,
+					'collapseAll' => 1,
+					'expandSingle' => 1,
 					'useSortable' => 1,
 				),
 			),
