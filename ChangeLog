@@ -12,6 +12,7 @@ Current Trunk
 * bugfix: add tags also to subpages of sysfolders (254), since we don't want them to be excluded, http://forge.typo3.org/issues/49435
 * bugfix: fix the inheritage of frontend groups, was not working correctly with "hide at login" page
 * bugfix: inherit frontend groups also on shortcut pages
+* changed default behaviour: set sorting for relevance by default after a user enters a searchword if sorting is changeable in the frontend
 
 Version 1.5.0, September 2013
 * feature: indexer for ext:news

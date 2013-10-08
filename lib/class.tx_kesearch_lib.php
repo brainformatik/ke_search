@@ -88,10 +88,6 @@ class tx_kesearch_lib extends tslib_pibase {
 	 */
 	var $filters;
 
-
-
-
-
 	/**
 	 * Initializes flexform, conf vars and some more
 	 *
@@ -149,6 +145,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// get extension configuration array
 		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->extKey]);
+
 		// sphinx has problems with # in query string.
 		// so you have the possibility to change # against another char
 		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
@@ -193,6 +190,19 @@ class tx_kesearch_lib extends tslib_pibase {
 		$this->scoreAgainst = $searchWordInformation['scoreAgainst'];
 
 		$this->isEmptySearch = $this->isEmptySearch();
+
+		// Since sorting for "relevance" in most cases ist the most useful option and
+		// this sorting option is not available until a searchword is given, make it
+		// the default sorting after a searchword has been given.
+		// Set default sorting to "relevance" if the following conditions are true:
+		// * sorting by user is allowed
+		// * sorting for "relevance" is allowed (internal: "score")
+		// * user did not select his own sorting yet
+		// * a searchword is given
+		if($this->conf['showSortInFrontend'] && t3lib_div::inList($this->conf['sortByVisitor'], 'score') && !$this->piVars['sortByField'] && $this->sword) {
+			$this->piVars['sortByField'] = 'score';
+			$this->piVars['sortByDir'] = 'desc';
+		}
 
 		// chooseBestIndex is only needed for MySQL-Search. Not for Sphinx
 		if(!$this->extConfPremium['enableSphinxSearch']) {
