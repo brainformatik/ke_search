@@ -130,10 +130,12 @@ class tx_kesearch_db implements t3lib_Singleton {
 				$queryForSphinx .= ' @tags ' . str_replace('" "', '" | "', trim($value));
 			}
 		}
+
+		// add language
 		$queryForSphinx .= ' @language _language_-1 | _language_' . $GLOBALS['TSFE']->sys_language_uid;
-		$queryForSphinx .= ' @fe_group _group_NULL | _group_0';
 
 		// add fe_groups to query
+		$queryForSphinx .= ' @fe_group _group_NULL | _group_0';
 		if(!empty($GLOBALS['TSFE']->gr_list)) {
 			$feGroups = t3lib_div::trimExplode(',', $GLOBALS['TSFE']->gr_list, 1);
 			foreach($feGroups as $key => $group) {
@@ -147,6 +149,20 @@ class tx_kesearch_db implements t3lib_Singleton {
 				} else unset($feGroups[$key]);
 			}
 			if(is_array($feGroups) && count($feGroups)) $queryForSphinx .= ' | ' . implode(' | ', $feGroups);
+		}
+
+		// restrict to storage page (in MySQL: $where .= ' AND pid in (' .  . ') ';)
+		$startingPoints = t3lib_div::trimExplode(',', $this->pObj->startingPoints);
+		$queryForSphinx .= ' @pid ';
+		$first = true;
+		foreach ($startingPoints as $startingPoint) {
+			if (!$first) {
+				$queryForSphinx .= ' | ';
+			} else {
+				$first = false;
+			}
+
+			$queryForSphinx .= ' _pid_' . $startingPoint;
 		}
 
 		// hook for appending additional where clause to sphinx query

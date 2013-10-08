@@ -14,6 +14,7 @@ Current Trunk
 * bugfix: inherit frontend groups also on shortcut pages
 * changed default behaviour: set sorting for relevance by default after a user enters a searchword if sorting is changeable in the frontend
 * feature: new indexer configuration option for FAL based file indexer: add tags from linking pages to indexed files?
+* bugfix ke_search_premium: take pid into account when using sphinx
 
 Version 1.5.0, September 2013
 * feature: indexer for ext:news
