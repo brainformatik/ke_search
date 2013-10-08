@@ -705,6 +705,15 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 				'default' => 'pdf,ppt,doc,xls'
 			)
 		),
+		'index_use_page_tags_for_files' => array (
+			'exclude' => 0,
+			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.index_use_page_tags_for_files',
+			'displayCond' => 'FIELD:type:=:page,tt_content',
+			'config' => array (
+				'type'    => 'check',
+				'default' => '0'
+			)
+		),
 		'commenttypes' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.commenttypes',
@@ -741,7 +750,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		),
 	),
 	'types' => array (
-		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, storagepid,targetpid;;;;3-3-3,type,startingpoints_recursive,single_pages,sysfolder,index_content_with_restrictions,index_passed_events,index_news_category_mode,index_news_category_selection,index_extnews_category_selection,index_news_useHRDatesSingle,index_news_useHRDatesSingleWithoutDay,index_dam_categories,index_dam_without_categories,index_dam_categories_recursive,index_use_page_tags,directories,fileext,commenttypes,filteroption,tvpath')
+		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, storagepid,targetpid;;;;3-3-3,type,startingpoints_recursive,single_pages,sysfolder,index_content_with_restrictions,index_passed_events,index_news_category_mode,index_news_category_selection,index_extnews_category_selection,index_news_useHRDatesSingle,index_news_useHRDatesSingleWithoutDay,index_dam_categories,index_dam_without_categories,index_dam_categories_recursive,index_use_page_tags,directories,fileext,index_use_page_tags_for_files,commenttypes,filteroption,tvpath')
 	),
 	'palettes' => array (
 		'1' => array('showitem' => '')

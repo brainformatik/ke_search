@@ -434,6 +434,11 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 					/* @var $fileIndexerObject tx_kesearch_indexer_types_file  */
 					$fileIndexerObject = t3lib_div::makeInstance('tx_kesearch_indexer_types_file', $this->pObj);
 
+					// add tags from linking page to this index record?
+					if (!$this->indexerConfig['index_use_page_tags_for_files']) {
+						$tags = '';
+					}
+
 					// add tag to identify this index record as file
 					if (!empty($tags)) {
 						$tags .= ',';

@@ -1,7 +1,7 @@
 ChangeLog
 
 Current Trunk
-* feature: FAL based file indexer, indexes files linked in content element "uploads" (file links) and files linked in RTE text (needs at least TYPO3 6.0.0), access restrictions will be taken into accoutn, combined from page and content element.
+* feature: FAL based file indexer, indexes files linked in content element "uploads" (file links) and files linked in RTE text (needs at least TYPO3 6.0.0), access restrictions will be taken into account, combined from page and content element.
 * new icons: added icons for result list in the frontend depending on file type
 * removed "index content elements with restrictions" option from tt_content indexer, fix permission check for content element. So every content element will be indexed and the correct fe_group setting will be used for the index entry.
 * feature: select link target for files seperately from normal links.
@@ -13,6 +13,7 @@ Current Trunk
 * bugfix: fix the inheritage of frontend groups, was not working correctly with "hide at login" page
 * bugfix: inherit frontend groups also on shortcut pages
 * changed default behaviour: set sorting for relevance by default after a user enters a searchword if sorting is changeable in the frontend
+* feature: new indexer configuration option for FAL based file indexer: add tags from linking pages to indexed files?
 
 Version 1.5.0, September 2013
 * feature: indexer for ext:news

@@ -80,6 +80,7 @@
 			<label index="tx_kesearch_indexerconfig.index_dam_without_categories">Index dam records without defined categories</label>
 			<label index="tx_kesearch_indexerconfig.index_dam_categories_recursive">Index DAM categories recursive?</label>
 			<label index="tx_kesearch_indexerconfig.index_use_page_tags">Add tags of parent pages/sys-folders?</label>
+			<label index="tx_kesearch_indexerconfig.index_use_page_tags_for_files">Add tags of linking pages to indexed files?</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.0">Yes</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">No</label>
 			<label index="tx_kesearch_indexerconfig.directories">Directories</label>
@@ -163,6 +164,7 @@
 			<label index="tx_kesearch_indexerconfig.index_dam_without_categories">Indexiere DAM Datensätze, die keiner Kategorie zugeordnet sind?</label>
 			<label index="tx_kesearch_indexerconfig.index_dam_categories_recursive">Kategorien rekursiv indizieren?</label>
 			<label index="tx_kesearch_indexerconfig.index_use_page_tags">Schlagworte der übergeordneten Seite/des Sys-Ordners übernehmen?</label>
+			<label index="tx_kesearch_indexerconfig.index_use_page_tags_for_files">Schlagworte der verlinktenden Seite für Dateien übernehmen?</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.0">Ja</label>
 			<label index="tx_kesearch_indexerconfig.index_passed_events.I.1">Nein</label>
 			<label index="tx_kesearch_indexerconfig.directories">Verzeichnisse</label>
