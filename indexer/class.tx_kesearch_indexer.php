@@ -324,10 +324,10 @@ class tx_kesearch_indexer {
 					}
 					$content .= $ret;
 				} else {
-					$content .= 'Check your php.ini configuration for disable_functions. For now it is not allowed to execute a shell script.';
+					$content .= '<div class="error">Check your php.ini configuration for disable_functions. For now it is not allowed to execute a shell script.</div>';
 				}
 			} else {
-				$content .= 'We can\'t find the sphinx executables or execution permission is missing.';
+				$content .= '<div class="error">We can\'t find the sphinx executables or execution permission is missing.</div>';
 			}
 		}
 
