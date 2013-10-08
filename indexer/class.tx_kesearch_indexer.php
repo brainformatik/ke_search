@@ -359,26 +359,30 @@ class tx_kesearch_indexer {
 	function storeInIndex($storagePid, $title, $type, $targetPid, $content, $tags='', $params='', $abstract='', $language=0, $starttime=0, $endtime=0, $fe_group, $debugOnly=false, $additionalFields=array()) {
 		// if there are errors found in current record return false and break processing
 		if(!$this->checkIfRecordHasErrorsBeforeIndexing($storagePid, $title, $type, $targetPid)) return false;
-		// optionally add indexer-tag
-		if (!empty($this->indexerConfig['filteroption'])) {
+
+		// optionally add tag set in the indexer configuration
+		if (!empty($this->indexerConfig['filteroption']) && (substr($type, 0, 4) != 'file' || (substr($type, 0, 4) == 'file' && $this->indexerConfig['index_use_page_tags_for_files']))) {
 			$indexerTag = $this->getTag( $this->indexerConfig['filteroption'] );
 			$tagChar = $this->extConf['prePostTagChar'];
-			if($tags) {
+			if ($tags) {
 				$tags .= ',' . $tagChar . $indexerTag . $tagChar;
-			} else $tags = $tagChar . $indexerTag . $tagChar;
+			} else {
+				$tags = $tagChar . $indexerTag . $tagChar;
+			}
 			$tags = t3lib_div::uniqueList($tags);
 		}
 
 		$table = 'tx_kesearch_index';
 		$fieldValues = $this->createFieldValuesForIndexing($storagePid, $title, $type, $targetPid, $content, $tags, $params, $abstract, $language, $starttime, $endtime, $fe_group, $additionalFields);
 
-			// check if record already exists. Average speed: 1-2ms
-		if(substr($type, 0, 4) == 'file') {
+		// check if record already exists. Average speed: 1-2ms
+		if (substr($type, 0, 4) == 'file') {
 			$recordExists = $this->checkIfFileWasIndexed($fieldValues['pid'], $fieldValues['hash']);
 		} else {
 			$recordExists = $this->checkIfRecordWasIndexed($fieldValues['orig_uid'], $fieldValues['pid'], $fieldValues['type'], $fieldValues['language']);
 		}
-		if($recordExists) { // update existing record
+
+		if ($recordExists) { // update existing record
 			$where = 'uid=' . intval($this->currentRow['uid']);
 			unset($fieldValues['crdate']);
 			if ($debugOnly) { // do not process - just debug query
@@ -699,9 +703,11 @@ class tx_kesearch_indexer {
 			$where
 		);
 
-		if($clearText) {
+		if ($clearText) {
 			return $row['title'];
-		} else return $row['tag'];
+		} else {
+			return $row['tag'];
+		}
 	}
 
 
