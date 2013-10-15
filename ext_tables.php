@@ -86,6 +86,7 @@ $TCA['tx_kesearch_filters'] = array(
 	),
 	'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY) . 'tca.php',
 	'iconfile' => t3lib_extMgm::extRelPath($_EXTKEY) . 'res/img/table_icons/icon_tx_kesearch_filters.gif',
+	'searchFields' => 'title'
     ),
 );
 
@@ -106,6 +107,7 @@ $TCA['tx_kesearch_filteroptions'] = array(
 	),
 	'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY) . 'tca.php',
 	'iconfile' => t3lib_extMgm::extRelPath($_EXTKEY) . 'res/img/table_icons/icon_tx_kesearch_filteroptions.gif',
+	'searchFields' => 'title,tag'
     ),
 );
 
@@ -146,6 +148,7 @@ $TCA['tx_kesearch_indexerconfig'] = array(
 	),
 	'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY) . 'tca.php',
 	'iconfile' => t3lib_extMgm::extRelPath($_EXTKEY) . 'res/img/table_icons/icon_tx_kesearch_indexerconfig.gif',
+	'searchFields' => 'title'
     ),
 );
 
