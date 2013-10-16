@@ -224,7 +224,7 @@ class tx_kesearch_lib_sorting {
 		$conf = array();
 		$conf['parameter'] = $GLOBALS['TSFE']->id;
 		$conf['addQueryString'] = '1';
-		$conf['addQueryString.']['exclude'] = 'id,tx_kesearch_pi1[multi]';
+		$conf['addQueryString.']['exclude'] = 'id,tx_kesearch_pi1[multi],cHash';
 		$conf['additionalParams'] = '&' . implode('&', $params);
 
 		return $this->cObj->typoLink(
