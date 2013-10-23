@@ -49,7 +49,7 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 	var $whereClauseForCType = '';
 
 	// Name of indexed elements. Will be overwritten in content element indexer.
-	var $indexedElementsName = 'pages';
+	var $indexedElementsName = 'TemplaVoila records';
 
 	/**
 	 * @var tx_templavoila_pi1
@@ -68,7 +68,7 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 
 		if(t3lib_extMgm::isLoaded('templavoila')) {
 			$row = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow(
-				'uid',
+				'uid,title',
 				'pages',
 				'pid = 0' .
 				t3lib_BEfunc::BEenableFields('pages') .
@@ -79,8 +79,24 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 			$GLOBALS['TSFE']->sys_page = t3lib_div::makeInstance('t3lib_pageSelect');
 			$GLOBALS['TSFE']->sys_page->init(TRUE);
 			$GLOBALS['TSFE']->initTemplate();
-			$this->tv = t3lib_div::makeInstance('tx_templavoila_pi1');
-		}
+
+			// Filling the config-array, first with the main "config." part
+			if (is_array($GLOBALS['TSFE']->tmpl->setup['config.'])) {
+				$GLOBALS['TSFE']->config['config'] = $GLOBALS['TSFE']->tmpl->setup['config.'];
+			}
+
+			// override it with the page/type-specific "config."
+			if (is_array($GLOBALS['TSFE']->pSetup['config.'])) {
+				$GLOBALS['TSFE']->config['config'] = t3lib_div::array_merge_recursive_overrule($GLOBALS['TSFE']->config['config'], $GLOBALS['TSFE']->pSetup['config.']);
+			}
+
+			// generate basic rootline
+			$GLOBALS['TSFE']->rootLine = array(
+				0 => array('uid' => $row['uid'], 'title' => $row['title'])
+			);
+
+
+			$this->tv = t3lib_div::makeInstance('tx_templavoila_pi1'); }
 
 		$this->counter = 0;
 		foreach($this->indexCTypes as $value) {
@@ -112,8 +128,9 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 		// create a new list of allowed pids
 		$indexPids = array_keys($this->pageRecords);
 
-		// index only pages of doktype standard, advanced, shortcut and "not in menu"
-		$where = ' (doktype = 1 OR doktype = 2 OR doktype = 4 OR doktype = 5) ';
+		// add tags to pages of doktype standard, advanced, shortcut and "not in menu"
+		// add tags also to subpages of sysfolders (254), since we don't want them to be excluded (see: http://forge.typo3.org/issues/49435)
+		$where = ' (doktype = 1 OR doktype = 2 OR doktype = 4 OR doktype = 5 OR doktype = 254) ';
 
 		// add the tags of each page to the global page array
 		$this->addTagsToRecords($indexPids, $where);
@@ -126,7 +143,7 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 		// show indexer content?
 		$content .= '<p><b>Indexer "' . $this->indexerConfig['title'] . '": </b><br />'
 			. count($this->pageRecords) . ' pages for TemplaVoila have been found for indexing.<br />' . "\n"
-			. $this->counter . ' ' . $this->indexedElementsName . ' TemplaVoila records have been indexed.<br />' . "\n"
+			. $this->counter . ' ' . $this->indexedElementsName . ' have been indexed.<br />' . "\n"
 			. '</p>' . "\n";
 
 		$content .= $this->showTime();
@@ -148,7 +165,9 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 		$where = 'uid IN (' . implode(',', $uids) . ')';
 
 		// index only pages of doktype standard, advanced and "not in menu"
-		$where .= ' AND (doktype = 1 OR doktype = 2 OR doktype = 5) ';
+		// add also sysfolders (254) and shortlinks (4), we need this for the correct inheritage of
+		// frontend user groups
+		$where .= ' AND (doktype = 1 OR doktype = 2 OR doktype = 4 OR doktype = 5 OR doktype = 254) ';
 
 		// index only pages which are searchable
 		// index only page which are not hidden
@@ -209,7 +228,7 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 		foreach ($tvPaths as $tvPath) {
 			$contentElementUids[] = $flex['data']['sDEF']['lDEF'][$tvPath]['vDEF'];
 		}
-		$contentElementUids = implode(',', $contentElementUids);
+		$contentElementUids = t3lib_div::uniqueList(implode(',', $contentElementUids));
 		if(empty($contentElementUids)) return '';
 
 		// TODO: Maybe it's good to check comma seperated list for int values
