@@ -213,17 +213,16 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
 		}
 
-		// take the $feGroups of the current page
+		// use the fe_groups restriction of the current page OR use the inherited groups, do not combine them
 		if ($this->cachedPageRecords[0][$currentPageUid]['fe_group']) {
 			$feGroups = explode(',', $this->cachedPageRecords[0][$currentPageUid]['fe_group']);
 		} else {
-			$feGroups = array();
-		}
-
-		// ... and add the inherited groups
-		if ($inheritedFeGroups) {
-			foreach ($inheritedFeGroups as $group) {
-				$feGroups = $this->addGroup($inheritedFeGroups, $group);
+			if ($inheritedFeGroups) {
+				foreach ($inheritedFeGroups as $group) {
+					$feGroups = $this->addGroup($inheritedFeGroups, $group);
+				}
+			} else {
+				$feGroups = array();
 			}
 		}
 
