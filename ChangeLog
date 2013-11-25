@@ -19,6 +19,7 @@ Current Trunk
 * bugfix: remove cHash in sorting link
 * bugfix: init "config" array and basic rootLine for templavoila indexer, in order to prevent fatal errors while indexing certain kind of content elements
 * bugfix: while indexing use the fe_groups restriction of the current page OR use the inherited groups, do not combine them
+* task: remove ( and ) and _ when generating tags from news categories (ext:news indexer)
 
 Version 1.5.0, September 2013
 * feature: indexer for ext:news

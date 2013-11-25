@@ -334,6 +334,9 @@ class tx_kesearch_indexer_types_news extends tx_kesearch_indexer_types {
 			$catTitle = str_replace('#', '', $catTitle);
 			$catTitle = str_replace(',', '', $catTitle);
 			$catTitle = str_replace(' ', '', $catTitle);
+			$catTitle = str_replace('(', '', $catTitle);
+			$catTitle = str_replace(')', '', $catTitle);
+			$catTitle = str_replace('_', '', $catTitle);
 			$tags .= $this->pObj->extConf['prePostTagChar'] . $catTitle . $this->pObj->extConf['prePostTagChar'];
 		}
 
