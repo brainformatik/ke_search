@@ -21,6 +21,8 @@ Current Trunk
 * bugfix: while indexing use the fe_groups restriction of the current page OR use the inherited groups, do not combine them
 * task: remove ( and ) and _ when generating tags from news categories (ext:news indexer)
 * task: index FAL files even if they are attached to a access protected content element, the index entry for that file itself will be access protected in that case.
+* bugfix: fix indexing of files protected by naw_securedl extension by using the getForLocalProcessing property, not the publicUri property.
+* feature: add error reporting for indexer (use $this->addError() function to add errors).
 
 Version 1.5.0, September 2013
 * feature: indexer for ext:news

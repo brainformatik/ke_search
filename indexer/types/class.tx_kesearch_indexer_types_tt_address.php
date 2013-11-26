@@ -179,6 +179,10 @@ class tx_kesearch_indexer_types_tt_address extends tx_kesearch_indexer_types {
 		}
 
 		$content = '<p><b>Indexer "' . $this->indexerConfig['title'] . '": ' . $resCount . ' address records have been indexed.</b></p>'."\n";
+
+		$content .= $this->showErrors();
+		$content .= $this->showTime();
+
 		return $content;
 	}
 }

@@ -234,6 +234,9 @@ class tx_kesearch_indexer_types_mmforum extends tx_kesearch_indexer_types {
 				. $topicCount . ' mm_forum topics have been indexed.</p>' . "\n";
 			$content .= $this->showTime();
 		}
+
+		$content .= $this->showErrors();
+
 		return $content;
 	}
 }

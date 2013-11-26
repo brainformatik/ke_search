@@ -54,6 +54,8 @@ class tx_kesearch_indexer_types_t3s_content extends tx_kesearch_indexer_types {
 
 		// show indexer content?
 		$content .= '<p><b>Indexer "' . $this->indexerConfig['title'] . '": ' . count($ttContent) . ' t3s_content entries have been found for indexing.</b></p>' . "\n";
+
+		$content .= $this->showErrors();
 		$content .= $this->showTime();
 
 		return $content;

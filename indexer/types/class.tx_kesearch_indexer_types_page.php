@@ -127,6 +127,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 			$content .= '<p><i>For file indexing from content elements you need at least TYPO3 6.0.0!</i></p>';
 		}
 
+		$content .= $this->showErrors();
 		$content .= $this->showTime();
 
 		return $content;
@@ -436,7 +437,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
 					// get file path and URI
 					$fileUri = $fileObject->getStorage()->getPublicUrl($fileObject);
-					$filePath = PATH_site . $fileUri;
+					$filePath = $fileObject->getForLocalProcessing(FALSE);
 
 					/* @var $fileIndexerObject tx_kesearch_indexer_types_file  */
 					$fileIndexerObject = t3lib_div::makeInstance('tx_kesearch_indexer_types_file', $this->pObj);
@@ -460,6 +461,9 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 						if (($content = $fileIndexerObject->getFileContent($filePath))) {
 							$this->storeFileContentToIndex($fileObject, $content, $fileIndexerObject, $feGroups, $tags, $ttContentRow);
 							$this->fileCounter++;
+						} else {
+							$this->addError($fileIndexerObject->getErrors());
+							$this->addError('Could not index file ' . $filePath);
 						}
 					}
 
@@ -510,7 +514,6 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 					$link_param = $tagCode[1];
 					list($linkHandlerKeyword, $linkHandlerValue) = explode(':', trim($link_param), 2);
 					if ($linkHandlerKeyword === 'file') {
-						//debug($this->fileRepository->findFileReferenceByUid($linkHandlerValue), 'file found: ' . $linkHandlerValue);
 						$fileObjects[] = $this->fileRepository->findByUid($linkHandlerValue);
 					}
 				}

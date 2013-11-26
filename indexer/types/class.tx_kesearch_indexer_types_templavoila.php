@@ -146,6 +146,7 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 			. $this->counter . ' ' . $this->indexedElementsName . ' have been indexed.<br />' . "\n"
 			. '</p>' . "\n";
 
+		$content .= $this->showErrors();
 		$content .= $this->showTime();
 
 		return $content;

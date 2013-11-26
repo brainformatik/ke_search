@@ -46,9 +46,11 @@ class tx_kesearch_indexer_types {
 	 */
 	var $queryGen;
 
-
-
-
+	/**
+	 *
+	 * @var array
+	 */
+	protected $errors;
 
 	/**
 	 * Constructor of this object
@@ -211,6 +213,50 @@ class tx_kesearch_indexer_types {
 		} else {
 			return '<p><i>Indexing process for "' . $this->indexerConfig['title'] . '" took '.$duration.' ms.</i> </p>'."\n\n";
 		}
+	}
+
+	/**
+	 * Prints errors which occured while indexing.
+	 *
+	 * @return string
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 26.11.13
+	 */
+	public function showErrors() {
+		if (count($this->errors)) {
+			return '<div class="error">' . implode('<br />' . "\n", $this->errors) . '</div>';
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * adds an error to the error array
+	 *
+	 * @param string or array of strings $errorMessage
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 26.11.13
+	 */
+	public function addError($errorMessage) {
+		if (is_array($errorMessage)) {
+			if (count($errorMessage)) {
+				foreach ($errorMessage as $message) {
+					$this->errors[] = $message;
+				}
+			}
+		} else {
+			$this->errors[] = $errorMessage;
+		}
+	}
+
+	/**
+	 *
+	 * @return array
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 26.11.13
+	 */
+	public function getErrors() {
+		return $this->errors;
 	}
 
 

@@ -286,14 +286,13 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					color: red;
 					-moz-border-radius: 10px;
 					border-radius: 10px;
-					border: 3px solid red;
+					border: 1px solid red;
 					padding: 10px;
-					margin-top: 20px;
+					margin: 20px;
 					background: white;
-					box-shadow: 5px 5px 5px red;
+					box-shadow: 2px 2px 2px red;
 					-moz-box-shadow: 5px 5px 5px red;
 					-webkit-box-shadow: 5px 5px 5px red;
-
 				}
 
 			';

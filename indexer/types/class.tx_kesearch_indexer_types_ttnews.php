@@ -195,6 +195,8 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 			}
 			$content = '<p><b>Indexer "' . $this->indexerConfig['title'] . '":</b><br />' . "\n"
 					. $resCount . ' News have been indexed.</p>' . "\n";
+
+			$content .= $this->showErrors();
 			$content .= $this->showTime();
 		}
 		return $content;
