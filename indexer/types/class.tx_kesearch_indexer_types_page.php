@@ -1,6 +1,6 @@
 <?php
 
-/* * *************************************************************
+/* ***************************************************************
  *  Copyright notice
  *
  *  (c) 2010 Andreas Kiefer (kennziffer.com) <kiefer@kennziffer.com>
@@ -21,7 +21,11 @@
  *  GNU General Public License for more details.
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
- * ************************************************************* */
+ * *************************************************************
+ * 
+ * @author Andreas Kiefer <kiefer@kennziffer.com>
+ * @author Christian Bülter <buelter@kennziffer.com>
+ */
 
 require_once(t3lib_extMgm::extPath('ke_search') . 'indexer/class.tx_kesearch_indexer_types.php');
 
@@ -266,12 +270,6 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$where .= t3lib_BEfunc::BEenableFields($table);
 		$where .= t3lib_BEfunc::deleteClause($table);
 
-		// if indexing of content elements with restrictions is not allowed
-		// get only content elements that have empty group restrictions
-		if ($this->indexerConfig['index_content_with_restrictions'] != 'yes') {
-			$where .= ' AND (fe_group = "" OR fe_group = "0") ';
-		}
-
 		// get frontend groups for this page
 		$feGroupsPages = t3lib_div::uniqueList(implode(',', $this->getRecursiveFeGroups($uid)));
 
@@ -292,6 +290,10 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 				// index content of this content element and find attached or linked files.
 				// Attached files are saved as file references, the RTE links directly to
 				// a file, thus we get file objects.
+				// Files go into the index no matter if "index_content_with_restrictions" is set
+				// or not, that means even if protected content elements do not go into the index,
+				// files do. Since each file gets it's own index entry with correct access
+				// restrictons, that's no problem from a access permission perspective (in fact, it's a feature).
 				if (in_array($ttContentRow['CType'], $this->fileCTypes)) {
 					$fileObjects = $this->findAttachedFiles($ttContentRow);
 				} else {
@@ -303,7 +305,13 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 				$this->indexFiles($fileObjects, $ttContentRow, $feGroupsPages, $tags) . "\n";
 
 				// add content from this content element to page content
-				$pageContent[$ttContentRow['sys_language_uid']] .= $content;
+				// ONLY if this content element is not access protected
+				// or protected content elements should go into the index
+				// by configuration.
+				if ($this->indexerConfig['index_content_with_restrictions'] == 'yes' || $ttContentRow['fe_group'] == '' || $ttContentRow['fe_group'] == '0') {
+					$pageContent[$ttContentRow['sys_language_uid']] .= $content;
+				}
+
 			}
 			$this->counter++;
 		} else {
