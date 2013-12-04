@@ -223,7 +223,7 @@ function hideSpinner() {
 
 	<div id="kesearch_results">###MESSAGE###</div>
 
-	<diY id="kesearch_updating_results">###SPINNER###<br /></div>
+	<div id="kesearch_updating_results">###SPINNER###<br /></div>
 	<div id="kesearch_pagebrowser_bottom">###PAGEBROWSER_BOTTOM###</div>
 	<!-- ###SUB_QUERY_TIME### start -->
 	<div id="kesearch_query_time">###QUERY_TIME###</div>
