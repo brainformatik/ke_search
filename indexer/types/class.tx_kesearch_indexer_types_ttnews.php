@@ -164,19 +164,16 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 				$additionalFields['orig_uid'] = $newsRecord['uid'];
 				$additionalFields['orig_pid'] = $newsRecord['pid'];
 
-				// get target page from category if set (first assigned category)
-				if (t3lib_extMgm::isLoaded('tt_news')) {
-					require_once (t3lib_extMgm::extPath('tt_news') . 'pi/class.tx_ttnews.php');
-					$this->ttNews = t3lib_div::makeInstance('tx_ttnews');
-					$categories = $this->ttNews->getCategories($newsRecord['uid']);
-					$firstCategory = reset($categories);
-					if ($firstCategory['single_pid']) {
-						$indexerConfig['targetpid'] = $firstCategory['single_pid'];
-					}
-				}
-
 				// make it possible to modify the indexerConfig via hook
 				$indexerConfig = $this->indexerConfig;
+
+				// get target page from category if set (first assigned category)
+				if (t3lib_extMgm::isLoaded('tt_news')) {
+					$singleViewPage = $this->getSingleViewPageFromCategories($newsRecord['uid']);
+					if ($singleViewPage) {
+						$indexerConfig['targetpid'] = $singleViewPage;
+					}
+				}
 
 				// hook for custom modifications of the indexed data, e. g. the tags
 				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyNewsIndexEntry'])) {
@@ -216,6 +213,75 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 		}
 
 		return $content;
+	}
+
+	/**
+	 * gets categories and subcategories for a news record
+	 * code based on function in tx_ttnews
+	 *
+	 * @param	integer		$uid : uid of the current news record
+	 * @param	bool		$getAll: ...
+	 * @return	array		$categories: array of found categories
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 04.12.13
+	 */
+	function getSingleViewPageFromCategories($uid, $getAll = false) {
+
+		// TODO: make sorting via typoscript available (but that would need a
+		// fully instanciated frontend)
+		$mmCatOrderBy = 'mmsorting';
+
+		// TODO: take Storage PID into account (in tx_ttnws class the
+		// where clause is stored in $this->SPaddWhere)
+		$addWhere = ' AND tt_news_cat.deleted=0';
+		$addWhere .= $getAll ? '' : t3lib_befunc::BEenableFields('tt_news_cat');
+
+		// TODO: take tt_news configuration options useSPidFromCategory and
+		// and useSPidFromCategoryRecusive into account (would need an instance
+		// of the frontend). For now, we assume them set to TRUE
+		$conf['useSPidFromCategory'] = TRUE;
+		$conf['useSPidFromCategoryRecusive'] = TRUE;
+
+		$select_fields = 'tt_news_cat.*,tt_news_cat_mm.sorting AS mmsorting';
+		$from_table = 'tt_news_cat_mm, tt_news_cat ';
+		$where_clause = 'tt_news_cat_mm.uid_local=' . intval($uid) . ' AND tt_news_cat_mm.uid_foreign=tt_news_cat.uid';
+		$where_clause .= $addWhere;
+
+		$groupBy = '';
+		$orderBy = $mmCatOrderBy;
+		$limit = '';
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, $limit);
+
+		$singlePid = 0;
+		while (($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))) {
+			if (!$singlePid) {
+				$singlePid = $this->getRecursiveCategorySinglePid($row['uid']);
+			}
+		}
+		$GLOBALS['TYPO3_DB']->sql_free_result($res);
+
+		return $singlePid;
+	}
+
+	/**
+	 * Searches the category rootline (up) for a single view pid. If nothing is found in the current
+	 * category, the single view pid of the parent categories is taken (recusivly).
+	 * taken from tx_ttnews
+	 *
+	 * @param int $currentCategory: Uid of the current category
+	 * @return int first found single view pid
+	 */
+	function getRecursiveCategorySinglePid($currentCategory) {
+		$addWhere = ' AND tt_news_cat.deleted=0' . t3lib_befunc::BEenableFields('tt_news_cat');
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid,parent_category,single_pid', 'tt_news_cat', 'tt_news_cat.uid=' . $currentCategory . $addWhere);
+		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+		$GLOBALS['TYPO3_DB']->sql_free_result($res);
+		if ($row['single_pid'] > 0) {
+			return $row['single_pid'];
+		} elseif ($row['parent_category'] > 0) {
+			return $this->getRecursiveCategorySinglePid($row['parent_category']);
+		}
 	}
 
 }

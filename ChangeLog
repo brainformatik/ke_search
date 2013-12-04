@@ -26,6 +26,7 @@ Current Trunk
 * bugfix: fixed typo in template (diY --> div), thanks to Jano (http://kesearch.kennziffer.com/dokumentation/facettierung.html)
 * bugfix: in tt_news indexer message print the number of really indexed news, not the totally available news in the system
 * task: move code for setting the sortdate and other additional fields from hook to indexer itself. delete the hook.
+* bugfix: Cronjob Error after Update of tt_news: Call to a member function exec_SELECTquery, http://forge.typo3.org/issues/52038
 
 Version 1.5.0, September 2013
 * feature: indexer for ext:news
