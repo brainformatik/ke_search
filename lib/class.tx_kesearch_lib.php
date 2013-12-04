@@ -28,7 +28,7 @@ require_once(t3lib_extMgm::extPath('ke_search').'lib/class.tx_kesearch_db.php');
 /**
  * Plugin 'Faceted search - searchbox and filters' for the 'ke_search' extension.
  *
- * @author	Stefan Froemken (kennziffer.com) <froemken@kennziffer.com>
+ * @author	Stefan Froemken 
  * @package	TYPO3
  * @subpackage	tx_kesearch
  */

@@ -29,7 +29,7 @@ require_once(t3lib_extMgm::extPath('ke_search').'indexer/class.tx_kesearch_index
  * Plugin 'Faceted search' for the 'ke_search' extension.
  *
  * @author	Andreas Kiefer (kennziffer.com) <kiefer@kennziffer.com>
- * @author	Stefan Froemken (kennziffer.com) <froemken@kennziffer.com>
+ * @author	Stefan Froemken 
  * @author	Jan Bartels (ADFC NRW) <j.bartels@adfc-nrw.de>
  * @package	TYPO3
  * @subpackage	tx_kesearch

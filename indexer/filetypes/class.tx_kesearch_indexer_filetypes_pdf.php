@@ -3,7 +3,7 @@
 /* * *************************************************************
  *  Copyright notice
  *
- *  (c) 2011 Stefan Froemken (kennziffer.com) <froemken@kennziffer.com>
+ *  (c) 2011 Stefan Froemken 
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -28,7 +28,7 @@ require_once(t3lib_extMgm::extPath('ke_search') . 'indexer/types/class.tx_kesear
 /**
  * Plugin 'Faceted search' for the 'ke_search' extension.
  *
- * @author	Stefan Froemken (kennziffer.com) <froemken@kennziffer.com>
+ * @author	Stefan Froemken
  * @package	TYPO3
  * @subpackage	tx_kesearch
  */
