@@ -30,6 +30,7 @@ require_once(t3lib_extMgm::extPath('ke_search') . 'indexer/class.tx_kesearch_ind
  *
  * @author	Andreas Kiefer (kennziffer.com) <kiefer@kennziffer.com>
  * @author	Stefan Froemken 
+ * @author	Christian Bülter (kennziffer.com) <buelter@kennziffer.com>
  * @package	TYPO3
  * @subpackage	tx_kesearch
  */
@@ -93,9 +94,9 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 		$where .= t3lib_befunc::BEenableFields($table);
 		$where .= t3lib_befunc::deleteClause($table);
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where);
-		$resCount = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
+		$counter = 0;
 
-		if ($resCount) {
+		if ($GLOBALS['TYPO3_DB']->sql_num_rows($res)) {
 			while (($newsRecord = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))) {
 
 				// if mode equals 'choose categories for indexing' (2). 1 = All
@@ -181,13 +182,16 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 					false,                            // debug only?
 					$additionalFields		  // additional fields added by hooks
 				);
+				$counter++;
 			}
+
 			$content = '<p><b>Indexer "' . $this->indexerConfig['title'] . '":</b><br />' . "\n"
-				. $resCount . ' News have been indexed.</p>' . "\n";
+				. $counter . ' news have been indexed.</p>' . "\n";
 
 			$content .= $this->showErrors();
 			$content .= $this->showTime();
 		}
+
 		return $content;
 	}
 

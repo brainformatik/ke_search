@@ -24,6 +24,7 @@ Current Trunk
 * bugfix: fix indexing of files protected by naw_securedl extension by using the getForLocalProcessing property, not the publicUri property.
 * feature: add error reporting for indexer (use $this->addError() function to add errors).
 * bugfix: fixed typo in template (diY --> div), thanks to Jano (http://kesearch.kennziffer.com/dokumentation/facettierung.html)
+* bugfix: in tt_news indexer message print the number of really indexed news, not the totally available news in the system
 
 Version 1.5.0, September 2013
 * feature: indexer for ext:news
