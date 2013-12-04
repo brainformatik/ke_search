@@ -22,7 +22,6 @@ t3lib_extMgm::addPItoST43($_EXTKEY, 'pi3/class.tx_kesearch_pi3.php', '_pi3', 'li
 // use hooks for generation of sortdate values
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['registerAdditionalFields'][] = 'EXT:ke_search/hooks/class.user_kesearchhooks.php:user_kesearch_sortdate';
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyPagesIndexEntry'][] = 'EXT:ke_search/hooks/class.user_kesearchhooks.php:user_kesearch_sortdate';
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyNewsIndexEntry'][] = 'EXT:ke_search/hooks/class.user_kesearchhooks.php:user_kesearch_sortdate';
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyYACIndexEntry'][] = 'EXT:ke_search/hooks/class.user_kesearchhooks.php:user_kesearch_sortdate';
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyDAMIndexEntry'][] = 'EXT:ke_search/hooks/class.user_kesearchhooks.php:user_kesearch_sortdate';
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyContentIndexEntry'][] = 'EXT:ke_search/hooks/class.user_kesearchhooks.php:user_kesearch_sortdate';

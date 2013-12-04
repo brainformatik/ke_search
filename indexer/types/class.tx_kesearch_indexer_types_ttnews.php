@@ -107,7 +107,7 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 						t3lib_befunc::deleteClause('tt_news_cat'), '', '', ''
 					);
 
-					if (is_resource($resCat)) {
+					if ($GLOBALS['TYPO3_DB']->sql_num_rows($resCat)) {
 						$isInList = false;
 						while ($newsCat = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($resCat)) {
 							// if category was found in list, set isInList to true and break further processing.
@@ -152,6 +152,29 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 
 				$additionalFields = array();
 
+				// crdate is always given, but can be overwritten
+				$additionalFields['sortdate'] = $newsRecord['crdate'];
+
+				// last changed date
+				if (isset($newsRecord['datetime']) && $newsRecord['datetime'] > 0) {
+					$additionalFields['sortdate'] = $newsRecord['datetime'];
+				}
+
+				// fill orig_uid and orig_pid
+				$additionalFields['orig_uid'] = $newsRecord['uid'];
+				$additionalFields['orig_pid'] = $newsRecord['pid'];
+
+				// get target page from category if set (first assigned category)
+				if (t3lib_extMgm::isLoaded('tt_news')) {
+					require_once (t3lib_extMgm::extPath('tt_news') . 'pi/class.tx_ttnews.php');
+					$this->ttNews = t3lib_div::makeInstance('tx_ttnews');
+					$categories = $this->ttNews->getCategories($newsRecord['uid']);
+					$firstCategory = reset($categories);
+					if ($firstCategory['single_pid']) {
+						$indexerConfig['targetpid'] = $firstCategory['single_pid'];
+					}
+				}
+
 				// make it possible to modify the indexerConfig via hook
 				$indexerConfig = $this->indexerConfig;
 
@@ -167,20 +190,20 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 
 				// ... and store them
 				$this->pObj->storeInIndex(
-					$indexerConfig['storagepid'],     // storage PID
-					$title,                           // news title
-					'tt_news',                        // content type
-					$indexerConfig['targetpid'],      // target PID: where is the single view?
-					$fullContent,                     // indexed content, includes the title (linebreak after title)
-					$tags,                            // tags
-					$params,                          // typolink params for singleview
-					$abstract,                        // abstract
-					$newsRecord['sys_language_uid'],  // language uid
-					$newsRecord['starttime'],         // starttime
-					$newsRecord['endtime'],           // endtime
-					$newsRecord['fe_group'],          // fe_group
-					false,                            // debug only?
-					$additionalFields		  // additional fields added by hooks
+					$indexerConfig['storagepid'], // storage PID
+					$title, // news title
+					'tt_news', // content type
+					$indexerConfig['targetpid'], // target PID: where is the single view?
+					$fullContent, // indexed content, includes the title (linebreak after title)
+					$tags, // tags
+					$params, // typolink params for singleview
+					$abstract, // abstract
+					$newsRecord['sys_language_uid'], // language uid
+					$newsRecord['starttime'], // starttime
+					$newsRecord['endtime'], // endtime
+					$newsRecord['fe_group'], // fe_group
+					false, // debug only?
+					$additionalFields    // additional fields added by hooks
 				);
 				$counter++;
 			}

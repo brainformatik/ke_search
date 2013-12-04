@@ -69,35 +69,6 @@ class user_kesearch_sortdate {
 		}
 	}
 
-	public function modifyNewsIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tags, $newsRecord, &$additionalFields, &$indexerConfig) {
-		// crdate is always given, but can be overwritten
-		if(isset($newsRecord['crdate']) && $newsRecord['crdate'] > 0) {
-			$additionalFields['sortdate'] = $newsRecord['crdate'];
-		}
-		// if TYPO3 sets last changed
-		if(isset($newsRecord['datetime']) && $newsRecord['datetime'] > 0) {
-			$additionalFields['sortdate'] = $newsRecord['datetime'];
-		}
-
-		// fill orig_uid
-		if(isset($newsRecord['uid']) && $newsRecord['uid'] > 0) {
-			$additionalFields['orig_uid'] = $newsRecord['uid'];
-		}
-		// fill orig_pid
-		if(isset($newsRecord['pid']) && $newsRecord['pid'] > 0) {
-			$additionalFields['orig_pid'] = $newsRecord['pid'];
-		}
-
-		// http://forge.typo3.org/issues/33701
-		if(t3lib_extMgm::isLoaded('tt_news')) {
-			require_once (t3lib_extMgm::extPath('tt_news') . 'pi/class.tx_ttnews.php');
-			$this->ttNews = t3lib_div::makeInstance('tx_ttnews');
-			$categories = $this->ttNews->getCategories($newsRecord['uid']);
-			$firstCategory = reset($categories);
-			if($firstCategory['single_pid']) $indexerConfig['targetpid'] = $firstCategory['single_pid'];
-		}
-	}
-
 	public function modifyYACIndexEntry(&$title, &$abstract, &$fullContent, &$params, &$tags, $yacRecord, $targetPID, &$additionalFields) {
 		// crdate is always given, but can be overwritten
 		if(isset($yacRecord['crdate']) && $yacRecord['crdate'] > 0) {
