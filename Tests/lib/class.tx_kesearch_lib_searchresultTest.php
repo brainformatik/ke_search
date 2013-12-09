@@ -7,7 +7,11 @@ class SearchResultTest extends Tx_Extbase_BaseTestCase {
 
 
 	public function setUp() {
-		$GLOBALS['TSFE']->csConvObj = t3lib_div::makeInstance('t3lib_cs');
+		if (TYPO3_VERSION_INTEGER >= 6002000) {
+			$GLOBALS['TSFE']->csConvObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_cs');
+		} else {
+			$GLOBALS['TSFE']->csConvObj = t3lib_div::makeInstance('t3lib_cs');
+		}
 	}
 
 	public function tearDown() {
@@ -24,7 +28,11 @@ class SearchResultTest extends Tx_Extbase_BaseTestCase {
 	 * @test
 	 */
 	public function checkIsArrayOfWordsInString() {
-		$lib = t3lib_div::makeInstance('tx_kesearch_lib');
+		if (TYPO3_VERSION_INTEGER >= 6002000) {
+			$lib = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_kesearch_lib');
+		} else {
+			$lib = t3lib_div::makeInstance('tx_kesearch_lib');
+		}
 		$sr = new tx_kesearch_lib_searchresult($lib);
 
 		// check if one word can be found
@@ -73,12 +81,22 @@ class SearchResultTest extends Tx_Extbase_BaseTestCase {
 	 * @test
 	 */
 	public function checkHighlightArrayOfWordsInContent() {
-		$lib = t3lib_div::makeInstance('tx_kesearch_lib');
+		if (TYPO3_VERSION_INTEGER >= 6002000) {
+			$lib = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_kesearch_lib');
+		} else {
+			$lib = t3lib_div::makeInstance('tx_kesearch_lib');
+		}
+
 		$lib->conf['resultChars'] = 300;
 		$lib->swords = array(
 			'Abgangszeugnis'
 		);
-		$lib->cObj = t3lib_div::makeInstance('tslib_cObj');
+
+		if (TYPO3_VERSION_INTEGER >= 6002000) {
+			$lib->cObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tslib_cObj');
+		} else {
+			$lib->cObj = t3lib_div::makeInstance('tslib_cObj');
+		}
 		$sr = new tx_kesearch_lib_searchresult($lib);
 
 		// highlight one word
@@ -110,12 +128,21 @@ class SearchResultTest extends Tx_Extbase_BaseTestCase {
 	 * @test
 	 */
 	public function checkBuildTeaserContent() {
-		$lib = t3lib_div::makeInstance('tx_kesearch_lib');
+		if (TYPO3_VERSION_INTEGER >= 6002000) {
+			$lib = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_kesearch_lib');
+		} else {
+			$lib = t3lib_div::makeInstance('tx_kesearch_lib');
+		}
 		$lib->conf['resultChars'] = 300;
 		$lib->swords = array(
 			'Abgangszeugnis'
 		);
-		$lib->cObj = t3lib_div::makeInstance('tslib_cObj');
+
+		if (TYPO3_VERSION_INTEGER >= 6002000) {
+			$lib->cObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tslib_cObj');
+		} else {
+			$lib->cObj = t3lib_div::makeInstance('tslib_cObj');
+		}
 		$sr = new tx_kesearch_lib_searchresult($lib);
 
 		// test without highlighting

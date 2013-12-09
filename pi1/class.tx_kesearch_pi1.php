@@ -22,8 +22,6 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-require_once(t3lib_extMgm::extPath('ke_search').'lib/class.tx_kesearch_lib.php');
-
 /**
  * Plugin 'Faceted search - searchbox and filters' for the 'ke_search' extension.
  *

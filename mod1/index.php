@@ -29,12 +29,13 @@
 
 
 $LANG->includeLLFile('EXT:ke_search/mod1/locallang.xml');
-require_once(PATH_t3lib . 'class.t3lib_scbase.php');
-require_once(t3lib_extMgm::extPath('ke_search') . 'indexer/class.tx_kesearch_indexer.php');
+
+if (TYPO3_VERSION_INTEGER < 6002000) {
+	require_once(PATH_t3lib . 'class.t3lib_scbase.php');
+}
+
 $BE_USER->modAccess($MCONF,1);	// This checks permissions and exits if the users has no permission for entry.
 	// DEFAULT initialization of a module [END]
-
-
 
 /**
  * Module 'Indexer' for the 'ke_search' extension.
@@ -92,7 +93,11 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 		if (($this->id && $access) || ($GLOBALS['BE_USER']->user['admin'] && !$this->id))	{
 
 				// Draw the header.
-			$this->doc = t3lib_div::makeInstance('mediumDoc');
+			if (TYPO3_VERSION_INTEGER >= 6002000) {
+				$this->doc = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('mediumDoc');
+			} else {
+				$this->doc = t3lib_div::makeInstance('mediumDoc');
+			}
 			$this->doc->backPath = $BACK_PATH;
 			$this->doc->form='<form action="" method="post" enctype="multipart/form-data">';
 
@@ -317,7 +322,11 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 		} else {
 				// If no access or if ID == zero
 
-			$this->doc = t3lib_div::makeInstance('mediumDoc');
+			if (TYPO3_VERSION_INTEGER >= 6002000) {
+				$this->doc = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('mediumDoc');
+			} else {
+				$this->doc = t3lib_div::makeInstance('mediumDoc');
+			}
 			$this->doc->backPath = $BACK_PATH;
 
 			$this->content.=$this->doc->startPage($LANG->getLL('title'));
@@ -356,12 +365,19 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 			// start indexing process
 			case 1:
 				$content = '';
-				$this->registry = t3lib_div::makeInstance('t3lib_Registry');
+				if (TYPO3_VERSION_INTEGER >= 6002000) {
+					$this->registry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_Registry');
+				} else {
+					$this->registry = t3lib_div::makeInstance('t3lib_Registry');
+				}
 
 				if (t3lib_div::_GET('do') == 'startindexer') {
 					// make indexer instance and init
-					$indexer = t3lib_div::makeInstance('tx_kesearch_indexer');
-					$verbose = true;
+					if (TYPO3_VERSION_INTEGER >= 6002000) {
+						$indexer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_kesearch_indexer');
+					} else {
+						$indexer = t3lib_div::makeInstance('tx_kesearch_indexer');
+					}
 					$cleanup = $this->extConf['cleanupInterval'];
 					$content .= $indexer->startIndexing(true, $this->extConf); // start indexing in verbose mode with cleanup process
 				} else if (t3lib_div::_GET('do') == 'rmLock') {
@@ -411,8 +427,11 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 				if ($this->id) {
 
 					if (t3lib_div::_GET('do') == 'reindex') {
-						$indexer = t3lib_div::makeInstance('tx_kesearch_indexer');
-						$verbose = true;
+						if (TYPO3_VERSION_INTEGER >= 6002000) {
+							$indexer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_kesearch_indexer');
+						} else {
+							$indexer = t3lib_div::makeInstance('tx_kesearch_indexer');
+						}
 						$cleanup = $this->extConf['cleanupInterval'];
 						$content = $indexer->startIndexing(true, $this->extConf); // start indexing in verbose mode with cleanup process
 					}
@@ -743,7 +762,11 @@ if (defined('TYPO3_MODE') && $GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['
 
 
 // Make instance:
-$SOBE = t3lib_div::makeInstance('tx_kesearch_module1');
+if (TYPO3_VERSION_INTEGER >= 6002000) {
+	$SOBE = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_kesearch_module1');
+} else {
+	$SOBE = t3lib_div::makeInstance('tx_kesearch_module1');
+}
 $SOBE->init();
 
 // Include files?

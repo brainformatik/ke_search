@@ -4,8 +4,9 @@ if (!defined('TYPO3_MODE')) {
 	die('Access denied.');
 }
 
-if (TYPO3_MODE == 'BE')
-	require_once(t3lib_extMgm::extPath('ke_search') . 'lib/class.tx_kesearch_lib_items.php');
+if (TYPO3_MODE == 'BE') {
+	require_once(t3lib_extMgm::extPath('ke_search') . 'Classes/lib/class.tx_kesearch_lib_items.php');
+}
 
 $tempColumns = array(
     'tx_kesearch_tags' => array(

@@ -26,10 +26,12 @@
 if (!defined('TYPO3_cliMode'))  die('You cannot run this script directly!');
 
 // Include basis cli class
-require_once(PATH_t3lib.'class.t3lib_cli.php');
+if (TYPO3_VERSION_INTEGER < 6002000) {
+	require_once(PATH_t3lib . 'class.t3lib_cli.php');
+}
 
 // include indexer class
-require_once(t3lib_extMgm::extPath('ke_search').'indexer/class.tx_kesearch_indexer.php');
+require_once(t3lib_extMgm::extPath('ke_search') . 'Classes/indexer/class.tx_kesearch_indexer.php');
 
 
 class tx_kesearch_cli extends t3lib_cli {
@@ -76,7 +78,11 @@ class tx_kesearch_cli extends t3lib_cli {
 
 			case 'startIndexing':
 
-				$indexer = t3lib_div::makeInstance('tx_kesearch_indexer');
+				if (TYPO3_VERSION_INTEGER >= 6002000) {
+					$indexer  = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_kesearch_indexer');
+				} else {
+					$indexer = t3lib_div::makeInstance('tx_kesearch_indexer');
+				}
 				$this->cli_echo(chr(10));
 				$verboseMode = true;
 				$cleanup = $this->extConf['cleanupInterval'];
@@ -93,7 +99,11 @@ class tx_kesearch_cli extends t3lib_cli {
 }
 
 // Call the functionality
-$cleanerObj = t3lib_div::makeInstance('tx_kesearch_cli');
+if (TYPO3_VERSION_INTEGER >= 6002000) {
+	$cleanerObj  = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_kesearch_cli');
+} else {
+	$cleanerObj = t3lib_div::makeInstance('tx_kesearch_cli');
+}
 $cleanerObj->cli_main($_SERVER['argv']);
 
 ?>

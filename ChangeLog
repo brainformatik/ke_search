@@ -15,7 +15,7 @@ Current Trunk
 * changed default behaviour: set sorting for relevance by default after a user enters a searchword if sorting is changeable in the frontend
 * feature: new indexer configuration option for FAL based file indexer: add tags from linking pages to indexed files?
 * bugfix ke_search_premium: take pid into account when using sphinx
-* feature: add search fields, search for filters, indexer configurations and filter options in the backend is now possible
+* feature: add search fields: search for filters, indexer configurations and filter options in the backend is now possible
 * bugfix: remove cHash in sorting link
 * bugfix: init "config" array and basic rootLine for templavoila indexer, in order to prevent fatal errors while indexing certain kind of content elements
 * bugfix: while indexing use the fe_groups restriction of the current page OR use the inherited groups, do not combine them
@@ -27,6 +27,8 @@ Current Trunk
 * bugfix: in tt_news indexer message print the number of really indexed news, not the totally available news in the system
 * task: move code for setting the sortdate and other additional fields from hook to indexer itself. delete the hook.
 * bugfix: Cronjob Error after Update of tt_news: Call to a member function exec_SELECTquery, http://forge.typo3.org/issues/52038
+* task: move class files to Classes/ directory.
+* task: Prepare ke_search for TYPO3 CMS 6.2: remove require_once calls where possible. Change calls to t3lib_div::makeInstance to \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance.
 
 Version 1.5.0, September 2013
 * feature: indexer for ext:news
