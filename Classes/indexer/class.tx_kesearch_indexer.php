@@ -77,10 +77,8 @@ class tx_kesearch_indexer {
 
 		if (TYPO3_VERSION_INTEGER >= 6002000) {
 			$this->registry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_Registry');
-			$this->div = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_kesearch_lib_div');
 		} else {
 			$this->registry = t3lib_div::makeInstance('t3lib_Registry');
-			$this->div = t3lib_div::makeInstance('tx_kesearch_lib_div');
 		}
 	}
 
@@ -753,7 +751,7 @@ class tx_kesearch_indexer {
 	}
 }
 
-if (defined('TYPO3_MODE') && $GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/ke_search/indexer/class.tx_kesearch_indexer.php'])	{
-	include_once($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/ke_search/indexer/class.tx_kesearch_indexer.php']);
+if (defined('TYPO3_MODE') && $GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/ke_search/Classes/indexer/class.tx_kesearch_indexer.php'])	{
+	include_once($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/ke_search/Classes/indexer/class.tx_kesearch_indexer.php']);
 }
 ?>

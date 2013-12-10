@@ -1,7 +1,8 @@
 ChangeLog
 
-Current Trunk
+Version 1.6.1, December 2013
 * bugfix: missing class error when editing the plugin in backend, http://forge.typo3.org/issues/54297
+* bugfix: fixed XCLASS calls (classes were moved in version 1.6.0).
 
 Version 1.6.0, December 2013
 * feature: FAL based file indexer, indexes files linked in content element "uploads" (file links) and files linked in RTE text (needs at least TYPO3 6.0.0), access restrictions will be taken into account, combined from page and content element.

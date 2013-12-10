@@ -280,6 +280,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$tags = $this->pageRecords[intval($uid)]['tags'];
 
 		$ttContentRows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where);
+		$pageContent = array();
 		if (count($ttContentRows)) {
 			foreach ($ttContentRows as $ttContentRow) {
 				$content = '';
@@ -336,23 +337,25 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		}
 
 		// store record in index table
-		foreach ($pageContent as $langKey => $content) {
-			$this->pObj->storeInIndex(
-				$indexerConfig['storagepid'],                          // storage PID
-				$this->cachedPageRecords[$langKey][$uid]['title'],     // page title
-				'page',                                                // content type
-				$uid,                                                  // target PID: where is the single view?
-				$content,                                              // indexed content, includes the title (linebreak after title)
-				$tags,                                                 // tags
-				'',                                                    // typolink params for singleview
-				$this->cachedPageRecords[$langKey][$uid]['abstract'],  // abstract
-				$langKey,                                              // language uid
-				$this->cachedPageRecords[$langKey][$uid]['starttime'], // starttime
-				$this->cachedPageRecords[$langKey][$uid]['endtime'],   // endtime
-				$feGroupsPages,                                        // fe_group
-				false,                                                 // debug only?
-				$additionalFields				       // additional fields added by hooks
-			);
+		if (count($pageContent)) {
+			foreach ($pageContent as $langKey => $content) {
+				$this->pObj->storeInIndex(
+					$indexerConfig['storagepid'],                          // storage PID
+					$this->cachedPageRecords[$langKey][$uid]['title'],     // page title
+					'page',                                                // content type
+					$uid,                                                  // target PID: where is the single view?
+					$content,                                              // indexed content, includes the title (linebreak after title)
+					$tags,                                                 // tags
+					'',                                                    // typolink params for singleview
+					$this->cachedPageRecords[$langKey][$uid]['abstract'],  // abstract
+					$langKey,                                              // language uid
+					$this->cachedPageRecords[$langKey][$uid]['starttime'], // starttime
+					$this->cachedPageRecords[$langKey][$uid]['endtime'],   // endtime
+					$feGroupsPages,                                        // fe_group
+					false,                                                 // debug only?
+					$additionalFields				       // additional fields added by hooks
+				);
+			}
 		}
 
 		return;
@@ -631,7 +634,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
 }
 
-if (defined('TYPO3_MODE') && $GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/ke_search/indexer/types/class.tx_kesearch_indexer_types_page.php']) {
-	include_once($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/ke_search/indexer/types/class.tx_kesearch_indexer_types_page.php']);
+if (defined('TYPO3_MODE') && $GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/ke_search/Classes/indexer/types/class.tx_kesearch_indexer_types_page.php']) {
+	include_once($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/ke_search/Classes/indexer/types/class.tx_kesearch_indexer_types_page.php']);
 }
 ?>
