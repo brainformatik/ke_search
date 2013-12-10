@@ -1,6 +1,9 @@
 ChangeLog
 
 Current Trunk
+* bugfix: missing class error when editing the plugin in backend, http://forge.typo3.org/issues/54297
+
+Version 1.6.0, December 2013
 * feature: FAL based file indexer, indexes files linked in content element "uploads" (file links) and files linked in RTE text (needs at least TYPO3 6.0.0), access restrictions will be taken into account, combined from page and content element.
 * new icons: added icons for result list in the frontend depending on file type
 * removed "index content elements with restrictions" option from tt_content indexer, fix permission check for content element. So every content element will be indexed and the correct fe_group setting will be used for the index entry.

@@ -173,7 +173,7 @@
 								<size>5</size>
 								<relevanceNotAllowed>1</relevanceNotAllowed>
 								<default>sortdate desc</default>
-								<itemsProcFunc>EXT:ke_search/classes/class.tx_kesearch_classes_flexform.php:tx_kesearch_classes_flexform->listAvailableOrderingsForAdmin</itemsProcFunc>
+								<itemsProcFunc>EXT:ke_search/Classes/Backend/class.tx_kesearch_classes_flexform.php:tx_kesearch_classes_flexform->listAvailableOrderingsForAdmin</itemsProcFunc>
 							</config>
 						</TCEforms>
 					</sortWithoutSearchword>
@@ -198,7 +198,7 @@
 								<type>select</type>
 								<maxitems>100</maxitems>
 								<size>5</size>
-								<itemsProcFunc>EXT:ke_search/classes/class.tx_kesearch_classes_flexform.php:tx_kesearch_classes_flexform->listAvailableOrderingsForFrontend</itemsProcFunc>
+								<itemsProcFunc>EXT:ke_search/Classes/Backend/class.tx_kesearch_classes_flexform.php:tx_kesearch_classes_flexform->listAvailableOrderingsForFrontend</itemsProcFunc>
 							</config>
 						</TCEforms>
 					</sortByVisitor>
@@ -211,7 +211,7 @@
 								<type>select</type>
 								<maxitems>1</maxitems>
 								<size>5</size>
-								<itemsProcFunc>EXT:ke_search/classes/class.tx_kesearch_classes_flexform.php:tx_kesearch_classes_flexform->listAvailableOrderingsForAdmin</itemsProcFunc>
+								<itemsProcFunc>EXT:ke_search/Classes/Backend/class.tx_kesearch_classes_flexform.php:tx_kesearch_classes_flexform->listAvailableOrderingsForAdmin</itemsProcFunc>
 							</config>
 						</TCEforms>
 					</sortByAdmin>
@@ -314,7 +314,7 @@
 								<size>5</size>
 								<relevanceNotAllowed>1</relevanceNotAllowed>
 								<default>sortdate desc</default>
-								<itemsProcFunc>EXT:ke_search/classes/class.tx_kesearch_classes_flexform.php:tx_kesearch_classes_flexform->listAvailableOrderingsForAdmin</itemsProcFunc>
+								<itemsProcFunc>EXT:ke_search/Classes/Backend/class.tx_kesearch_classes_flexform.php:tx_kesearch_classes_flexform->listAvailableOrderingsForAdmin</itemsProcFunc>
 							</config>
 						</TCEforms>
 					</sortWithoutSearchword>
@@ -338,7 +338,7 @@
 								<type>select</type>
 								<maxitems>100</maxitems>
 								<size>5</size>
-								<itemsProcFunc>EXT:ke_search/classes/class.tx_kesearch_classes_flexform.php:tx_kesearch_classes_flexform->listAvailableOrderingsForFrontend</itemsProcFunc>
+								<itemsProcFunc>EXT:ke_search/Classes/Backend/class.tx_kesearch_classes_flexform.php:tx_kesearch_classes_flexform->listAvailableOrderingsForFrontend</itemsProcFunc>
 							</config>
 						</TCEforms>
 					</sortByVisitor>
@@ -351,7 +351,7 @@
 								<type>select</type>
 								<maxitems>1</maxitems>
 								<size>5</size>
-								<itemsProcFunc>EXT:ke_search/classes/class.tx_kesearch_classes_flexform.php:tx_kesearch_classes_flexform->listAvailableOrderingsForAdmin</itemsProcFunc>
+								<itemsProcFunc>EXT:ke_search/Classes/Backend/class.tx_kesearch_classes_flexform.php:tx_kesearch_classes_flexform->listAvailableOrderingsForAdmin</itemsProcFunc>
 								<default>score desc</default>
 							</config>
 						</TCEforms>

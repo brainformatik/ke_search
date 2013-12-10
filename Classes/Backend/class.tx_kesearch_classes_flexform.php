@@ -56,7 +56,7 @@ class tx_kesearch_classes_flexform {
 	}
 }
 
-if (defined('TYPO3_MODE') && $GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/ke_search/classes/class.tx_kesearch_classes_flexform.php'])	{
-	include_once($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/ke_search/classes/class.tx_kesearch_classes_flexform.php']);
+if (defined('TYPO3_MODE') && $GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/ke_search/Classes/Backend/class.tx_kesearch_classes_flexform.php'])	{
+	include_once($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/ke_search/Classes/Backend/Class.tx_kesearch_classes_flexform.php']);
 }
 ?>
