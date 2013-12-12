@@ -302,9 +302,11 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// set page = 1 if not set yet or if we are in static mode
 		if (!$this->piVars['page'] || $this->conf['renderMethod'] == 'static') {
-			$this->piVars['page'] = 1;
+			$pageValue = 1;
+		} else {
+			$pageValue = $this->piVars['page'];
 		}
-		$content = $this->cObj->substituteMarker($content,'###HIDDEN_PAGE_VALUE###',$this->piVars['page']);
+		$content = $this->cObj->substituteMarker($content,'###HIDDEN_PAGE_VALUE###', $pageValue);
 
 		// submit
 		$content = $this->cObj->substituteMarker($content,'###SUBMIT_VALUE###',$this->pi_getLL('submit'));

@@ -1,5 +1,8 @@
 ChangeLog
 
+Version 1.6.2, December 2013
+* bufix: Fix pagebrowser which is not working in static mode (first 10 results are shown on every page). Thanks to Morton Jonuschat, http://forge.typo3.org/issues/54352
+
 Version 1.6.1, December 2013
 * bugfix: missing class error when editing the plugin in backend, http://forge.typo3.org/issues/54297
 * bugfix: fixed XCLASS calls (classes were moved in version 1.6.0).
