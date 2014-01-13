@@ -57,6 +57,10 @@ class tx_kesearch_indexer {
 	 */
 	var $div;
 
+	/**
+	 * @var array
+	 */
+	var $defaultIndexerTypes = array();
 
 	/**
 	 * Constructor of this class
@@ -80,6 +84,12 @@ class tx_kesearch_indexer {
 		} else {
 			$this->registry = t3lib_div::makeInstance('t3lib_Registry');
 		}
+
+		// fetch the list of the default indexers which come with ke_search
+		foreach ($GLOBALS['TCA']['tx_kesearch_indexerconfig']['columns']['type']['config']['items'] as $indexerType) {
+			$this->defaultIndexerTypes[] = $indexerType[1];
+		}
+
 	}
 
 	/*
@@ -131,17 +141,20 @@ class tx_kesearch_indexer {
 		foreach($configurations as $indexerConfig) {
 			$this->indexerConfig = $indexerConfig;
 
-			$path = t3lib_extMgm::extPath('ke_search') . 'Classes/indexer/types/class.tx_kesearch_indexer_types_' . $this->indexerConfig['type'] . '.php';
-			if(is_file($path)) {
-				require_once($path);
-				if (TYPO3_VERSION_INTEGER >= 6002000) {
-					$searchObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_kesearch_indexer_types_' . $this->indexerConfig['type'], $this);
+			// run custom indexers
+			if (in_array($this->indexerConfig['type'], $this->defaultIndexerTypes)) {
+				$path = t3lib_extMgm::extPath('ke_search') . 'Classes/indexer/types/class.tx_kesearch_indexer_types_' . $this->indexerConfig['type'] . '.php';
+				if(is_file($path)) {
+					require_once($path);
+					if (TYPO3_VERSION_INTEGER >= 6002000) {
+						$searchObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_kesearch_indexer_types_' . $this->indexerConfig['type'], $this);
+					} else {
+						$searchObj = t3lib_div::makeInstance('tx_kesearch_indexer_types_' . $this->indexerConfig['type'], $this);
+					}
+					$content .= $searchObj->startIndexing();
 				} else {
-					$searchObj = t3lib_div::makeInstance('tx_kesearch_indexer_types_' . $this->indexerConfig['type'], $this);
+					$content = '<div class="error"> Could not find file ' . $path . '</div>' . "\n";
 				}
-				$content .= $searchObj->startIndexing();
-			} else {
-				$content = '<div class="error"> Could not find file ' . $path . '</div>' . "\n";
 			}
 
 			// hook for custom indexer
