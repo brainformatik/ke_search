@@ -2,7 +2,7 @@
 /***************************************************************
 *  Copyright notice
 *
-*  (c) 2010 Stefan Froemken 
+*  (c) 2010 Stefan Froemken
 *  All rights reserved
 *
 *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -26,7 +26,7 @@
 /**
  * Plugin 'Faceted search - searchbox and filters' for the 'ke_search' extension.
  *
- * @author	Stefan Froemken 
+ * @author	Stefan Froemken
  * @package	TYPO3
  * @subpackage	tx_kesearch
  */
@@ -221,10 +221,14 @@ class tx_kesearch_lib_searchresult {
 	 */
 	public function highlightArrayOfWordsInContent($wordArray, $content) {
 		if(is_array($wordArray) && count($wordArray)) {
+			$highlightedWord = (!empty($this->conf['highlightedWord_stdWrap.']))?
+				$this->cObj->stdWrap('\0', $this->conf['highlightedWord_stdWrap.']) :
+				'<span class="hit">\0</span>';
+
 			foreach($wordArray as $word) {
 				$word = str_replace('/', '\/', $word);
 				$word = htmlspecialchars($word);
-				$content = preg_replace('/(' . $word . ')/iu','<span class="hit">\0</span>', $content);
+				$content = preg_replace('/(' . $word . ')/iu', $highlightedWord, $content);
 			}
 		}
 		return $content;
