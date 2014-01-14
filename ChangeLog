@@ -3,6 +3,7 @@ ChangeLog
 Current Trunk
 * bugfix: Custom indexer throws errors. http://forge.typo3.org/issues/54398
 * feature: Enable stdWrap for highlighted word. Thanks to Dan Untenzu, http://forge.typo3.org/issues/54515
+* bugfix: don't call htmlspecialchars with NULL parameter.
 
 Version 1.6.2, December 2013
 * bugfix: Fix pagebrowser which is not working in static mode (first 10 results are shown on every page). Thanks to Morton Jonuschat, http://forge.typo3.org/issues/54352

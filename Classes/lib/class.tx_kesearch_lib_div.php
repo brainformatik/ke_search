@@ -149,7 +149,9 @@ class tx_kesearch_lib_div {
 									$piVars[$key][$filterId][$key] = htmlspecialchars($value, ENT_QUOTES);
 								}
 							} else {
-								$piVars[$key][$filterId] = htmlspecialchars($filterValue, ENT_QUOTES);
+								if($piVars[$key][$filterId] != NULL) {
+									$piVars[$key][$filterId] = htmlspecialchars($filterValue, ENT_QUOTES);
+								}
 							}
 						}
 					}
