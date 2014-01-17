@@ -86,6 +86,10 @@ class tx_kesearch_indexer {
 		}
 
 		// fetch the list of the default indexers which come with ke_search
+		// load TCA definition first (only necessary in TYPO3 below 6.1)
+		if (TYPO3_VERSION_INTEGER < 6001000) {
+			t3lib_div::loadTCA('tx_kesearch_indexerconfig');
+		}
 		foreach ($GLOBALS['TCA']['tx_kesearch_indexerconfig']['columns']['type']['config']['items'] as $indexerType) {
 			$this->defaultIndexerTypes[] = $indexerType[1];
 		}

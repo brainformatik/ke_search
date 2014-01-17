@@ -37,6 +37,7 @@ class tx_kesearch_db implements t3lib_Singleton {
 	var $table = 'tx_kesearch_index';
 	protected $hasSearchResults = TRUE;
 	protected $searchResults = array();
+	protected $numberOfResults = 0;
 
 	/**
 	 * @var tx_kesearch_pi1
@@ -61,10 +62,12 @@ class tx_kesearch_db implements t3lib_Singleton {
 
 		// if result array is empty start search on DB, else return cached result list
 		if(!count($this->searchResults)) {
-			if($this->pObj->extConfPremium['enableSphinxSearch'] && !$this->pObj->isEmptySearch) {
+			if($this->sphinxSearchEnabled()) {
 				$this->searchResults = $this->getSearchResultBySphinx();
-			} else $this->searchResults = $this->getSearchResultByMySQL();
-			if(count($this->searchResults) === 0) {
+			} else {
+				$this->getSearchResultByMySQL();
+			}
+			if($this->getAmountOfSearchResults() === 0) {
 				$this->hasSearchResults = FALSE;
 			}
 		}
@@ -79,7 +82,7 @@ class tx_kesearch_db implements t3lib_Singleton {
 	 */
 	public function getSearchResultByMySQL() {
 		$queryParts = $this->getQueryParts();
-		
+
 		// log query
 		if ($this->conf['logQuery']) {
 			$query = $GLOBALS['TYPO3_DB']->SELECTquery(
@@ -88,20 +91,26 @@ class tx_kesearch_db implements t3lib_Singleton {
 				$queryParts['WHERE'],
 				$queryParts['GROUPBY'],
 				$queryParts['ORDERBY'],
-				'' // limit
+				$queryParts['LIMIT']
 			);
 			t3lib_div::devLog('Search result query', $this->pObj->extKey, 0, array($query));
 		}
 
-		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
+		$this->searchResults = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 			$queryParts['SELECT'],
 			$queryParts['FROM'],
 			$queryParts['WHERE'],
 			$queryParts['GROUPBY'],
 			$queryParts['ORDERBY'],
-			'',
+			$queryParts['LIMIT'],
 			'uid'
 		);
+		$result = $GLOBALS['TYPO3_DB']->sql_query('SELECT FOUND_ROWS();');
+		if($result) {
+			$data = $GLOBALS['TYPO3_DB']->sql_fetch_row($result);
+			$GLOBALS['TYPO3_DB']->sql_free_result($result);
+			$this->numberOfResults = $data[0];
+		}
 	}
 
 
@@ -190,19 +199,20 @@ class tx_kesearch_db implements t3lib_Singleton {
 	 * @return array Array containing the query parts for MySQL
 	 */
 	public function getQueryParts() {
-		$fields = '*';
+		$fields = 'SQL_CALC_FOUND_ROWS *';
 		$table = $this->table . $this->bestIndex;
 		$where = '1=1';
 
 		// if a searchword was given, calculate percent of score
 		if($this->pObj->sword) {
-			$fields .= ',
-				MATCH (title, content) AGAINST ("' . $this->pObj->scoreAgainst . '") + (' . $this->pObj->extConf['multiplyValueToTitle'] . ' * MATCH (title) AGAINST ("' . $this->pObj->scoreAgainst . '")) AS score,
-				IFNULL(ROUND((MATCH (title, content) AGAINST ("' . $this->pObj->scoreAgainst . '") + (' . $this->pObj->extConf['multiplyValueToTitle'] . ' * MATCH (title) AGAINST ("' . $this->pObj->scoreAgainst . '"))) / maxScore * 100), 0) AS percent
-			';
-			$table .= ',
-				(SELECT MAX(MATCH (title, content) AGAINST ("' . $this->pObj->scoreAgainst . '") + (' . $this->pObj->extConf['multiplyValueToTitle'] . ' * MATCH (title) AGAINST ("' . $this->pObj->scoreAgainst . '"))) AS maxScore FROM ' . $this->table . ') maxScoreTable
-			';
+			$fields .= ', MATCH (title, content) AGAINST ("' . $this->pObj->scoreAgainst . '") + (' . $this->pObj->extConf['multiplyValueToTitle'] . ' * MATCH (title) AGAINST ("' . $this->pObj->scoreAgainst . '")) AS score';
+			// The percentage calculation is really expensive and forces a full table scan for each
+			// search query. If we don't use the percentage we skip this and can make efficient use
+			// of the fulltext index.
+			if($this->conf['showPercentalScore']) {
+				$fields .= ', IFNULL(ROUND((MATCH (title, content) AGAINST ("' . $this->pObj->scoreAgainst . '") + (' . $this->pObj->extConf['multiplyValueToTitle'] . ' * MATCH (title) AGAINST ("' . $this->pObj->scoreAgainst . '"))) / maxScore * 100), 0) AS percent';
+				$table .= ', (SELECT MAX(MATCH (title, content) AGAINST ("' . $this->pObj->scoreAgainst . '") + (' . $this->pObj->extConf['multiplyValueToTitle'] . ' * MATCH (title) AGAINST ("' . $this->pObj->scoreAgainst . '"))) AS maxScore FROM ' . $this->table . ') maxScoreTable';
+			}
 		}
 
 		// add where clause
@@ -234,8 +244,7 @@ class tx_kesearch_db implements t3lib_Singleton {
 	 * @return integer Amount of SearchResults
 	 */
 	public function getAmountOfSearchResults() {
-		$this->getSearchResults();
-		return count($this->searchResults);
+		return intval($this->numberOfResults);
 	}
 
 
@@ -246,19 +255,62 @@ class tx_kesearch_db implements t3lib_Singleton {
 	 * @return array Array containing the tags as key and the sum as value
 	 */
 	public function getTagsFromSearchResult() {
-		$rows = $this->getSearchResults();
-		if(is_array($rows) && count($rows)) {
-			$tagChar = $this->pObj->extConf['prePostTagChar'];
-			foreach($rows as $row) {
-				$divider = $tagChar . ',' . $tagChar;
-				$row['tags'] = trim($row['tags'], $tagChar);
-				foreach(explode($divider, $row['tags']) as $tag) {
-					$tags[$tag] += 1;
-				}
-			} return $tags;
-		} else return array();
+		$tags = $tagsForResult = array();
+		$tagChar = $this->pObj->extConf['prePostTagChar'];
+		$tagDivider = $tagChar . ',' . $tagChar;
+
+		if($this->sphinxSearchEnabled()) {
+			$tagsForResult = $this->getTagsFromSphinx();
+		} else {
+			$tagsForResult = $this->getTagsFromMySQL();
+		}
+		foreach($tagsForResult as $tagSet) {
+			$tagSet = explode($tagDivider, trim($tagSet, $tagChar));
+			foreach($tagSet as $tag) {
+				$tags[$tag] += 1;
+			}
+		}
+		return $tags;
 	}
 
+	/**
+	 * Determine the available tags for the search result by looking at
+	 * all the tag fields
+	 *
+	 * @return array
+	 */
+	protected function getTagsFromSphinx() {
+		if(is_array($this->searchResults) && count($this->searchResults)) {
+			return array_unique(array_map(
+				function($row) { return $row['tags']; },
+				$this->searchResults
+			));
+		} else {
+			return array();
+		}
+	}
+
+	/**
+	 * Determine the valid tags by querying MySQL
+	 *
+	 * @return array
+	 */
+	protected function getTagsFromMySQL() {
+		$queryParts = $this->getQueryParts();
+		$tagRows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
+			'tags',
+			$queryParts['FROM'],
+			$queryParts['WHERE'],
+			'',
+			'',
+			'',
+			''
+		);
+		return array_map(
+			function($row) { return $row['tags']; },
+			$tagRows
+		);
+	}
 
 	/**
 	 * This function is useful to decide which index to use
@@ -415,6 +467,15 @@ class tx_kesearch_db implements t3lib_Singleton {
 		}
 
 		return $startLimit;
+	}
+
+	/**
+	 * Check if Sphinx search is enabled
+	 *
+	 * @return  boolean
+	 */
+	protected function sphinxSearchEnabled() {
+		return $this->pObj->extConfPremium['enableSphinxSearch'] && !$this->pObj->isEmptySearch;
 	}
 }
 

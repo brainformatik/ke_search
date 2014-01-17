@@ -418,8 +418,8 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			// get options for this filter
 			// reset options list for each loop
-			$options = array(); 
-			
+			$options = array();
+
 			// check filter options availability and preselection status
 			foreach($filter['options'] as $option) {
 
@@ -646,16 +646,18 @@ class tx_kesearch_lib extends tslib_pibase {
 				$linkconf['parameter'] = $GLOBALS['TSFE']->id;
 				$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'];
 				$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$filterUid.']=';
-				foreach ($this->piVars['filter'] as $key => $value) {
-					if ($key != $filterUid) {
-						$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$key.']='.$value.'';
+				if (is_array($this->piVars['filter']) && count($this->piVars['filter'])) {
+					foreach ($this->piVars['filter'] as $key => $value) {
+						if ($key != $filterUid) {
+							$linkconf['additionalParams'] .= '&tx_kesearch_pi1[filter]['.$key.']='.$value.'';
+						}
 					}
 				}
 				$resetFilterLink = $this->cObj->typoLink($this->pi_getLL('reset_filter'),$linkconf);
 
 				// fill markers
 				$filterContent = $this->cObj->getSubpart($this->templateCode, $filterSubpart);
-				$filterContent = $this->cObj->substituteSubpart ($filterContent, $optionSubpart, $optionsContent);
+				$filterContent = $this->cObj->substituteSubpart($filterContent, $optionSubpart, $optionsContent);
 				$filterContent = $this->cObj->substituteMarker($filterContent,'###FILTERTITLE###', htmlspecialchars($filters[$filterUid]['title']));
 				$filterContent = $this->cObj->substituteMarker($filterContent,'###SWITCH_AREA_START###', '');
 				$filterContent = $this->cObj->substituteMarker($filterContent,'###SWITCH_AREA_END###', '');
@@ -1193,7 +1195,10 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		$limit = $this->db->getLimit();
 		$rows = $this->db->getSearchResults();
-		$rows = array_slice($rows, $limit[0], $limit[1]);
+		// TODO: Check how Sphinx handles this, seems to return full result set
+		if(count($rows) > $limit[1]) {
+			$rows = array_slice($rows, $limit[0], $limit[1]);
+		}
 		$this->numberOfResults = $this->db->getAmountOfSearchResults();
 
 		// count searchword with ke_stats

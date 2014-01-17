@@ -1,9 +1,12 @@
 ChangeLog
 
-Current Trunk
+Version 1.6.3, January 2014
 * bugfix: Custom indexer throws errors. http://forge.typo3.org/issues/54398
 * feature: Enable stdWrap for highlighted word. Thanks to Dan Untenzu, http://forge.typo3.org/issues/54515
 * bugfix: don't call htmlspecialchars with NULL parameter.
+* feature: improve memory consumption drastically. Thanks to Morton Jonuschat, http://forge.typo3.org/issues/53946
+* feature: improve search speed, do not calculate percentage scores unless required, Thanks to Morton Jonuschat, http://forge.typo3.org/issues/53979
+* bugfix: check if filter is set before building the link to reset the filter.
 
 Version 1.6.2, December 2013
 * bugfix: Fix pagebrowser which is not working in static mode (first 10 results are shown on every page). Thanks to Morton Jonuschat, http://forge.typo3.org/issues/54352
