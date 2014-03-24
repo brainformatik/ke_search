@@ -398,7 +398,8 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 						// lock is older than 12 hours
 						// remove lock and show "start index" button
 						$this->registry->removeAllByNamespace('tx_kesearch');
-						$content .= '<br /><a class="index-button" href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=startindexer">Start Indexer</a>';
+						$moduleUrl = TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('web_txkesearchM1', array('id' => $this->id, 'do' => 'startindexer'));
+						$content .= '<br /><a class="index-button" href="' . $moduleUrl . '">Start Indexer</a>';
 					} else {
 						// lock is not older than 12 hours
 						if (!$GLOBALS['BE_USER']->user['admin']) {
@@ -410,12 +411,14 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 							$content .= '<br /><p>The indexer is already running and can not be started twice.</p>';
 							$content .= '<p>The indexing process was started at '.strftime('%c', $lockTime).'.</p>';
 							$content .= '<p>You can remove the lock by clicking the following button.</p>';
-							$content .= '<br /><a class="lock-button" href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=rmLock">RemoveLock</a>';
+							$moduleUrl = TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('web_txkesearchM1', array('id' => $this->id, 'do' => 'rmLock'));
+							$content .= '<br /><a class="lock-button" href="' . $moduleUrl . '">RemoveLock</a>';
 						}
 					}
 				} else {
 					// no lock set - show "start indexer" link
-					$content .= '<br /><a class="index-button" href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=startindexer">Start Indexer</a>';
+					$moduleUrl = TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('web_txkesearchM1', array('id' => $this->id, 'do' => 'startindexer'));
+					$content .= '<br /><a class="index-button" href="' . $moduleUrl . '">Start Indexer</a>';
 				}
 
 				$this->content.=$this->doc->section('INDEXER FOR KE_SEARCH',$content,0,1);
@@ -439,11 +442,6 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					// page is selected: get indexed content
 					$content = '<h2>Index content for page '.$this->id.'</h2>';
 					$content .= $this->getIndexedContent($this->id);
-
-					// Start RE-Indexing for current page
-					// TODO
-					// $content .= '<a href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=reindex" class="reindex-button">Re-Index</a>';
-
 				} else {
 					// no page selected: show message
 					$content = 'Select page first';
@@ -488,7 +486,8 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					$content .= '<p>Search index table contains ' . $row['number_of_records'] . ' records.</p>';
 
 					// show "clear index" link
-					$content .= '<br /><a class="index-button" href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=clear">Clear whole search index!</a>';
+					$moduleUrl = TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('web_txkesearchM1', array('id' => $this->id, 'do' => 'clear'));
+					$content .= '<br /><a class="index-button" href="' . $moduleUrl . '">Clear whole search index!</a>';
 				} else {
 					$content .= '<p>Clear search index: This function is available to admins only.</p>';
 				}
