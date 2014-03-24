@@ -386,7 +386,7 @@ class tx_kesearch_indexer {
 	 * @param boolean $debugOnly
 	 * @param array $additionalFields
 	 */
-	function storeInIndex($storagePid, $title, $type, $targetPid, $content, $tags='', $params='', $abstract='', $language=0, $starttime=0, $endtime=0, $fe_group, $debugOnly=false, $additionalFields=array()) {
+	function storeInIndex($storagePid, $title, $type, $targetPid, $content, $tags='', $params='', $abstract='', $language=0, $starttime=0, $endtime=0, $fe_group='', $debugOnly=false, $additionalFields=array()) {
 		// if there are errors found in current record return false and break processing
 		if(!$this->checkIfRecordHasErrorsBeforeIndexing($storagePid, $title, $type, $targetPid)) return false;
 
@@ -646,7 +646,7 @@ class tx_kesearch_indexer {
 	 * @param string $fe_group
 	 * @param array $additionalFields
 	 */
-	public function createFieldValuesForIndexing($storagepid, $title, $type, $targetpid, $content, $tags='', $params='', $abstract='', $language=0, $starttime=0, $endtime=0, $fe_group, $additionalFields=array()) {
+	public function createFieldValuesForIndexing($storagepid, $title, $type, $targetpid, $content, $tags='', $params='', $abstract='', $language=0, $starttime=0, $endtime=0, $fe_group='', $additionalFields=array()) {
 		$now = time();
 		$fieldsValues = array(
 			'pid' => intval($storagepid),
