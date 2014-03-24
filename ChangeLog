@@ -3,6 +3,7 @@ ChangeLog
 Verison 1.6.4, March 2014
 * bugfix: use API function getModuleUrl for link generation. http://forge.typo3.org/issues/56719
 * task: add default value for $fe_group parameter. http://forge.typo3.org/issues/56563
+* task: added labels for next/previous navigation in search result list. http://forge.typo3.org/issues/53044
 
 Version 1.6.3, January 2014
 * bugfix: Custom indexer throws errors. http://forge.typo3.org/issues/54398

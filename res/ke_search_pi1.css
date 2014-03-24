@@ -410,6 +410,7 @@ div.kesearchbox{
     height:29px;
     color:transparent;
     text-decoration:none;
+	overflow:hidden;
 }
 .tx-kesearch-pi1 .next{background: transparent url('img/arrow-next.gif') no-repeat left 0;}
 .tx-kesearch-pi1 .prev{background: transparent url('img/arrow-prev.gif') no-repeat right 0;}

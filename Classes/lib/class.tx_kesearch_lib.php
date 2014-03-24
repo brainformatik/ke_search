@@ -1610,7 +1610,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 
 			$linkconf['ATagParams'] = 'class="prev" ';
-			$previous = $this->cObj->typoLink(' ', $linkconf);
+			$previous = $this->cObj->typoLink($this->pi_getLL('pagebrowser_prev'), $linkconf);
 		} else {
 			$previous = '';
 		}
@@ -1638,7 +1638,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 
 			$linkconf['ATagParams'] = 'class="next" ';
-			$next = $this->cObj->typoLink(' ', $linkconf);
+			$next = $this->cObj->typoLink($this->pi_getLL('pagebrowser_next'), $linkconf);
 		} else {
 			$next = '';
 		}
