@@ -28,7 +28,7 @@
  */
 
 
-$LANG->includeLLFile('EXT:ke_search/mod1/locallang.xml');
+$GLOBALS['LANG']->includeLLFile('EXT:ke_search/mod1/locallang.xml');
 
 if (TYPO3_VERSION_INTEGER < 6002000) {
 	require_once(PATH_t3lib . 'class.t3lib_scbase.php');
@@ -53,7 +53,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 	 * @return	void
 	 */
 	function init()	{
-		global $BE_USER,$LANG,$BACK_PATH,$TCA_DESCR,$TCA,$CLIENT,$TYPO3_CONF_VARS;
+		global $BE_USER,$BACK_PATH,$TCA_DESCR,$TCA,$CLIENT,$TYPO3_CONF_VARS;
 		parent::init();
 	}
 
@@ -63,14 +63,13 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 	 * @return	void
 	 */
 	function menuConfig()	{
-		global $LANG;
 		$this->MOD_MENU = Array (
 			'function' => Array (
-				'1' => $LANG->getLL('function1'),
-				'2' => $LANG->getLL('function2'),
-				'3' => $LANG->getLL('function3'),
-				'4' => $LANG->getLL('function4'),
-				'5' => $LANG->getLL('function5'),
+				'1' => $GLOBALS['LANG']->getLL('function1'),
+				'2' => $GLOBALS['LANG']->getLL('function2'),
+				'3' => $GLOBALS['LANG']->getLL('function3'),
+				'4' => $GLOBALS['LANG']->getLL('function4'),
+				'5' => $GLOBALS['LANG']->getLL('function5'),
 			)
 		);
 		parent::menuConfig();
@@ -83,7 +82,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 	 * @return	[type]		...
 	 */
 	function main()	{
-		global $BE_USER,$LANG,$BACK_PATH,$TCA_DESCR,$TCA,$CLIENT,$TYPO3_CONF_VARS;
+		global $BE_USER,$BACK_PATH,$TCA_DESCR,$TCA,$CLIENT,$TYPO3_CONF_VARS;
 
 		// Access check!
 		// The page will show only if there is a valid page and if this page may be viewed by the user
@@ -302,9 +301,9 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 
 			';
 
-			$headerSection = $this->doc->getHeader('pages',$this->pageinfo,$this->pageinfo['_thePath']).'<br />'.$LANG->sL('LLL:EXT:lang/locallang_core.xml:labels.path').': '.t3lib_div::fixed_lgd_cs($this->pageinfo['_thePath'],-50);
-			$this->content.=$this->doc->startPage($LANG->getLL('title'));
-			$this->content.=$this->doc->header($LANG->getLL('title'));
+			$headerSection = $this->doc->getHeader('pages',$this->pageinfo,$this->pageinfo['_thePath']).'<br />'.$GLOBALS['LANG']->sL('LLL:EXT:lang/locallang_core.xml:labels.path').': '.t3lib_div::fixed_lgd_cs($this->pageinfo['_thePath'],-50);
+			$this->content.=$this->doc->startPage($GLOBALS['LANG']->getLL('title'));
+			$this->content.=$this->doc->header($GLOBALS['LANG']->getLL('title'));
 			$this->content.=$this->doc->spacer(5);
 			$this->content.=$this->doc->section('',$this->doc->funcMenu($headerSection,t3lib_BEfunc::getFuncMenu($this->id,'SET[function]',$this->MOD_SETTINGS['function'],$this->MOD_MENU['function'])));
 			$this->content.=$this->doc->divider(5);
@@ -329,11 +328,11 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 			}
 			$this->doc->backPath = $BACK_PATH;
 
-			$this->content.=$this->doc->startPage($LANG->getLL('title'));
-			$this->content.=$this->doc->header($LANG->getLL('title'));
+			$this->content.=$this->doc->startPage($GLOBALS['LANG']->getLL('title'));
+			$this->content.=$this->doc->header($GLOBALS['LANG']->getLL('title'));
 			$this->content.=$this->doc->spacer(5);
 
-			$this->content.= $LANG->getLL('select_a_page');
+			$this->content.= $GLOBALS['LANG']->getLL('select_a_page');
 
 			$this->content.=$this->doc->spacer(10);
 		}
@@ -385,7 +384,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					if ($GLOBALS['BE_USER']->user['admin']) {
 						$this->registry->removeAllByNamespace('tx_kesearch');
 					} else {
-						$content .= '<p>You are not allowed to remove the indexer lock! This is for admins only!</p>';
+						$content .= '<p>' . $GLOBALS['LANG']->getLL('not_allowed_remove_indexer_lock') . '</p>';
 					}
 				}
 
@@ -399,7 +398,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 						// remove lock and show "start index" button
 						$this->registry->removeAllByNamespace('tx_kesearch');
 						$moduleUrl = TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('web_txkesearchM1', array('id' => $this->id, 'do' => 'startindexer'));
-						$content .= '<br /><a class="index-button" href="' . $moduleUrl . '">Start Indexer</a>';
+						$content .= '<br /><a class="index-button" href="' . $moduleUrl . '">' . $GLOBALS['LANG']->getLL('start_indexer') . '</a>';
 					} else {
 						// lock is not older than 12 hours
 						if (!$GLOBALS['BE_USER']->user['admin']) {
@@ -418,7 +417,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 				} else {
 					// no lock set - show "start indexer" link
 					$moduleUrl = TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('web_txkesearchM1', array('id' => $this->id, 'do' => 'startindexer'));
-					$content .= '<br /><a class="index-button" href="' . $moduleUrl . '">Start Indexer</a>';
+					$content .= '<br /><a class="index-button" href="' . $moduleUrl . '">' . $GLOBALS['LANG']->getLL('start_indexer') . '</a>';
 				}
 
 				$this->content.=$this->doc->section('INDEXER FOR KE_SEARCH',$content,0,1);
