@@ -397,8 +397,12 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 						// lock is older than 12 hours
 						// remove lock and show "start index" button
 						$this->registry->removeAllByNamespace('tx_kesearch');
-						$moduleUrl = TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('web_txkesearchM1', array('id' => $this->id, 'do' => 'startindexer'));
-						$content .= '<br /><a class="index-button" href="' . $moduleUrl . '">' . $GLOBALS['LANG']->getLL('start_indexer') . '</a>';
+						if (TYPO3_VERSION_INTEGER < 6002000) {
+							$content .= '<br /><a class="index-button" href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=startindexer">' . $GLOBALS['LANG']->getLL('start_indexer') . '</a>';
+						} else {
+							$moduleUrl = TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('web_txkesearchM1', array('id' => $this->id, 'do' => 'startindexer'));
+							$content .= '<br /><a class="index-button" href="' . $moduleUrl . '">' . $GLOBALS['LANG']->getLL('start_indexer') . '</a>';
+						}
 					} else {
 						// lock is not older than 12 hours
 						if (!$GLOBALS['BE_USER']->user['admin']) {
@@ -410,14 +414,22 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 							$content .= '<br /><p>The indexer is already running and can not be started twice.</p>';
 							$content .= '<p>The indexing process was started at '.strftime('%c', $lockTime).'.</p>';
 							$content .= '<p>You can remove the lock by clicking the following button.</p>';
-							$moduleUrl = TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('web_txkesearchM1', array('id' => $this->id, 'do' => 'rmLock'));
-							$content .= '<br /><a class="lock-button" href="' . $moduleUrl . '">RemoveLock</a>';
+							if (TYPO3_VERSION_INTEGER < 6002000) {
+								$content .= '<br /><a class="lock-button" href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=rmLock">RemoveLock</a>';
+							} else{
+								$moduleUrl = TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('web_txkesearchM1', array('id' => $this->id, 'do' => 'rmLock'));
+								$content .= '<br /><a class="lock-button" href="' . $moduleUrl . '">RemoveLock</a>';
+							}
 						}
 					}
 				} else {
 					// no lock set - show "start indexer" link
-					$moduleUrl = TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('web_txkesearchM1', array('id' => $this->id, 'do' => 'startindexer'));
-					$content .= '<br /><a class="index-button" href="' . $moduleUrl . '">' . $GLOBALS['LANG']->getLL('start_indexer') . '</a>';
+					if (TYPO3_VERSION_INTEGER < 6002000) {
+						$content .= '<br /><a class="index-button" href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=startindexer">' . $GLOBALS['LANG']->getLL('start_indexer') . '</a>';
+					} else {
+						$moduleUrl = TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('web_txkesearchM1', array('id' => $this->id, 'do' => 'startindexer'));
+						$content .= '<br /><a class="index-button" href="' . $moduleUrl . '">' . $GLOBALS['LANG']->getLL('start_indexer') . '</a>';
+					}
 				}
 
 				$this->content.=$this->doc->section('INDEXER FOR KE_SEARCH',$content,0,1);
@@ -485,8 +497,12 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					$content .= '<p>Search index table contains ' . $row['number_of_records'] . ' records.</p>';
 
 					// show "clear index" link
-					$moduleUrl = TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('web_txkesearchM1', array('id' => $this->id, 'do' => 'clear'));
-					$content .= '<br /><a class="index-button" href="' . $moduleUrl . '">Clear whole search index!</a>';
+					if (TYPO3_VERSION_INTEGER < 6002000) {
+						$content .= '<br /><a class="index-button" href="mod.php?id='.$this->id.'&M=web_txkesearchM1&do=clear">Clear whole search index!</a>';
+					} else {
+						$moduleUrl = TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('web_txkesearchM1', array('id' => $this->id, 'do' => 'clear'));
+						$content .= '<br /><a class="index-button" href="' . $moduleUrl . '">Clear whole search index!</a>';
+					}
 				} else {
 					$content .= '<p>Clear search index: This function is available to admins only.</p>';
 				}
@@ -774,3 +790,4 @@ $SOBE->main();
 $SOBE->printContent();
 
 ?>
+

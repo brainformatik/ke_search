@@ -1,5 +1,8 @@
 ChangeLog
 
+Version 1.6.5, March 2014
+* bugfix: fix regression in backend module for TYPO3 versions 4.7 and below. http://forge.typo3.org/issues/57349
+
 Verison 1.6.4, March 2014
 * bugfix: use API function getModuleUrl for link generation. http://forge.typo3.org/issues/56719
 * task: add default value for $fe_group parameter. http://forge.typo3.org/issues/56563
