@@ -1746,6 +1746,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 	/*
 	 * count searchwords and phrases in statistic tables
+	 * assumes that charset ist UTF-8 and uses mb_strtolower
 	 *
 	 * @param $searchPhrase string
 	 * @param $searchWordsArray array
@@ -1761,12 +1762,18 @@ class tx_kesearch_lib extends tslib_pibase {
 		$replace = array('', '', '');
 		$tagsAgainst = str_replace($search, $replace, implode(' ', $tagsAgainst));
 
+		if (extension_loaded('mbstring')) {
+			$searchPhrase = mb_strtolower($searchPhrase, 'UTF-8');
+		} else {
+			$searchPhrase = strtolower($searchPhrase);
+		}
+
 		// count search phrase
 		if (!empty($searchPhrase)) {
 			$table = 'tx_kesearch_stat_search';
 			$fields_values = array(
 				'pid' => $this->firstStartingPoint,
-				'searchphrase' => strtolower($searchPhrase),
+				'searchphrase' => $searchPhrase,
 				'tstamp' => time(),
 				'hits' => $hits,
 				'tagsagainst' => $tagsAgainst,
@@ -1776,12 +1783,17 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		// count single words
 		foreach ($searchWordsArray as $searchWord) {
+			if (extension_loaded('mbstring')) {
+				$searchWord = mb_strtolower($searchPhrase, 'UTF-8');
+			} else {
+				$searchWord = strtolower($searchPhrase);
+			}
 			$table = 'tx_kesearch_stat_word';
 			$timestamp = time();
 			if (!empty($searchWord)) {
 				$fields_values = array(
 					'pid' => $this->firstStartingPoint,
-					'word' => strtolower($searchWord),
+					'word' => $searchWord,
 					'tstamp' => $timestamp,
 					'pageid' => $GLOBALS['TSFE']->id,
 					'resultsfound' => $hits ? 1 : 0,

@@ -1,5 +1,8 @@
 ChangeLog
 
+Current Trunk
+* bugfix: Use mb_strtolower to convert strings saved to the statistic table. This words are also used for the autocomplete function with ke_search_premium. Attention: The function is called with "UTF-8" as charset parameter, so if you have the mbstring PHP extension installed but use another charset than UTF-8 this will possibly lead to problem.s
+
 Version 1.6.5, March 2014
 * bugfix: fix regression in backend module for TYPO3 versions 4.7 and below. http://forge.typo3.org/issues/57349
 
