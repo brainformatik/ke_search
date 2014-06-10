@@ -1,8 +1,8 @@
 ChangeLog
 
-Current Trunk
-* bugfix: Use mb_strtolower to convert strings saved to the statistic table. This words are also used for the autocomplete function with ke_search_premium. Attention: The function is called with "UTF-8" as charset parameter, so if you have the mbstring PHP extension installed but use another charset than UTF-8 this will possibly lead to problems.
-* bugfix: Fix PHP Warning in scheduler for file indexer in TYPO3 >= 6.2.
+Version 1.6.6, June 2014
+* bugfix: use mb_strtolower to convert strings saved to the statistic table. This words are also used for the autocomplete function with ke_search_premium. Attention: The function is called with "UTF-8" as charset parameter, so if you have the mbstring PHP extension installed but use another charset than UTF-8 this will possibly lead to problems.
+* bugfix: fix PHP warning in scheduler for file indexer in TYPO3 >= 6.2.
 * task: make ext:news indexer with ext:news version 3.0. This version features system categories instead of extension specific categories, http://forge.typo3.org/issues/58759
 
 Version 1.6.5, March 2014
