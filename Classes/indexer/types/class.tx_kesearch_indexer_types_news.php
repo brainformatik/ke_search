@@ -240,18 +240,33 @@ class tx_kesearch_indexer_types_news extends tx_kesearch_indexer_types {
 		    'title_list' => array()
 		);
 
-		$resCat = $GLOBALS['TYPO3_DB']->exec_SELECT_mm_query(
-			'tx_news_domain_model_category.uid, tx_news_domain_model_category.single_pid, tx_news_domain_model_category.title',
-			'tx_news_domain_model_news',
-			'tx_news_domain_model_news_category_mm',
-			'tx_news_domain_model_category',
-			' AND tx_news_domain_model_news.uid = ' . $newsRecord['uid'] .
-			t3lib_befunc::BEenableFields('tx_news_domain_model_category') .
-			t3lib_befunc::deleteClause('tx_news_domain_model_category'),
-			'', // groupBy
-			'tx_news_domain_model_news_category_mm.sorting' // orderBy
-			
-		);
+		// news version 3 features system categories instead of it's own
+		// category system used in previous versions
+		if (version_compare(t3lib_extMgm::getExtensionVersion('news'), '3.0.0') >= 0) {
+			$resCat = $GLOBALS['TYPO3_DB']->exec_SELECT_mm_query(
+				'sys_category.uid, sys_category.single_pid, sys_category.title',
+				'sys_category',
+				'sys_category_record_mm',
+				'tx_news_domain_model_news',
+				' AND tx_news_domain_model_news.uid = ' . $newsRecord['uid'] .
+				t3lib_befunc::BEenableFields('sys_category') .
+				t3lib_befunc::deleteClause('sys_category'),
+				'', // groupBy
+				'sys_category_record_mm.sorting' // orderBy
+			);
+		} else {
+			$resCat = $GLOBALS['TYPO3_DB']->exec_SELECT_mm_query(
+				'tx_news_domain_model_category.uid, tx_news_domain_model_category.single_pid, tx_news_domain_model_category.title',
+				'tx_news_domain_model_news',
+				'tx_news_domain_model_news_category_mm',
+				'tx_news_domain_model_category',
+				' AND tx_news_domain_model_news.uid = ' . $newsRecord['uid'] .
+				t3lib_befunc::BEenableFields('tx_news_domain_model_category') .
+				t3lib_befunc::deleteClause('tx_news_domain_model_category'),
+				'', // groupBy
+				'tx_news_domain_model_news_category_mm.sorting' // orderBy
+			);
+		}
 
 		while (($newsCat = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($resCat))) {
 			$categoryData['uid_list'][] = $newsCat['uid'];
