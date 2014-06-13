@@ -135,14 +135,6 @@ if (t3lib_extMgm::isLoaded('tt_news')) {
 	include_once(t3lib_extMgm::extPath('tt_news') . 'lib/class.tx_ttnews_TCAform_selectTree.php');
 }
 
-// news version 3 features system categories instead of it's own
-// category system used in previous versions
-if (version_compare(t3lib_extMgm::getExtensionVersion('news'), '3.0.0') >= 0) {
-	$GLOBAlS['TCA']['tx_kesearch_indexerconfig']['columns']['index_extnews_category_selection']['config']['treeConfig']['parentField'] = 'parent';
-	$GLOBAls['TCA']['tx_kesearch_indexerconfig']['columns']['index_extnews_category_selection']['config']['foreign_table'] = 'sys_category';
-	$GLOBAls['TCA']['tx_kesearch_indexerconfig']['columns']['index_extnews_category_selection']['config']['foreign_table_where'] = '';
-}
-
 $TCA['tx_kesearch_indexerconfig'] = array(
     'ctrl' => array(
 	'title' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig',
@@ -160,6 +152,14 @@ $TCA['tx_kesearch_indexerconfig'] = array(
 	'searchFields' => 'title'
     ),
 );
+
+// news version 3 features system categories instead of it's own
+// category system which was used in previous versions
+if (version_compare(t3lib_extMgm::getExtensionVersion('news'), '3.0.0') >= 0) {
+	$TCA['tx_kesearch_indexerconfig']['columns']['index_extnews_category_selection']['config']['treeConfig']['parentField'] = 'parent';
+	$TCA['tx_kesearch_indexerconfig']['columns']['index_extnews_category_selection']['config']['foreign_table'] = 'sys_category';
+	$TCA['tx_kesearch_indexerconfig']['columns']['index_extnews_category_selection']['config']['foreign_table_where'] = '';
+}
 
 if (TYPO3_MODE == 'BE') {
 	$TBE_MODULES_EXT['xMOD_db_new_content_el']['addElClasses']['tx_kesearch_pi1_wizicon'] = t3lib_extMgm::extPath($_EXTKEY) . 'pi1/class.tx_kesearch_pi1_wizicon.php';
