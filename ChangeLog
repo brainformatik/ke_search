@@ -1,5 +1,7 @@
 ChangeLog
 
+Current Trunk (1.6.8DEV)
+
 Version 1.6.7, June 2014
 * bugfix: fix ext:news indexer compatibility with news 3.0 in the backend (was introduced in last version).
 
