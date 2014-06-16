@@ -153,14 +153,6 @@ $TCA['tx_kesearch_indexerconfig'] = array(
     ),
 );
 
-// news version 3 features system categories instead of it's own
-// category system which was used in previous versions
-if (version_compare(t3lib_extMgm::getExtensionVersion('news'), '3.0.0') >= 0) {
-	$TCA['tx_kesearch_indexerconfig']['columns']['index_extnews_category_selection']['config']['treeConfig']['parentField'] = 'parent';
-	$TCA['tx_kesearch_indexerconfig']['columns']['index_extnews_category_selection']['config']['foreign_table'] = 'sys_category';
-	$TCA['tx_kesearch_indexerconfig']['columns']['index_extnews_category_selection']['config']['foreign_table_where'] = '';
-}
-
 if (TYPO3_MODE == 'BE') {
 	$TBE_MODULES_EXT['xMOD_db_new_content_el']['addElClasses']['tx_kesearch_pi1_wizicon'] = t3lib_extMgm::extPath($_EXTKEY) . 'pi1/class.tx_kesearch_pi1_wizicon.php';
 	$TBE_MODULES_EXT['xMOD_db_new_content_el']['addElClasses']['tx_kesearch_pi2_wizicon'] = t3lib_extMgm::extPath($_EXTKEY) . 'pi2/class.tx_kesearch_pi2_wizicon.php';

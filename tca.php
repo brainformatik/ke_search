@@ -756,4 +756,12 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'1' => array('showitem' => '')
 	)
 );
+
+// news version 3 features system categories instead of it's own
+// category system which was used in previous versions
+if (version_compare(t3lib_extMgm::getExtensionVersion('news'), '3.0.0') >= 0) {
+	$TCA['tx_kesearch_indexerconfig']['columns']['index_extnews_category_selection']['config']['treeConfig']['parentField'] = 'parent';
+	$TCA['tx_kesearch_indexerconfig']['columns']['index_extnews_category_selection']['config']['foreign_table'] = 'sys_category';
+	$TCA['tx_kesearch_indexerconfig']['columns']['index_extnews_category_selection']['config']['foreign_table_where'] = '';
+}
 ?>
