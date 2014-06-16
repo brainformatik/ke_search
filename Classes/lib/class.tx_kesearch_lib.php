@@ -1773,32 +1773,32 @@ class tx_kesearch_lib extends tslib_pibase {
 			$table = 'tx_kesearch_stat_search';
 			$fields_values = array(
 				'pid' => $this->firstStartingPoint,
-				'searchphrase' => $searchPhrase,
+                'searchphrase' => '\'' . $searchPhrase . '\'',
 				'tstamp' => time(),
 				'hits' => $hits,
 				'tagsagainst' => $tagsAgainst,
 			);
-			$GLOBALS['TYPO3_DB']->exec_INSERTquery($table,$fields_values,$no_quote_fields=FALSE);
+            $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $fields_values, array('searchphrase'));
 		}
 
 		// count single words
 		foreach ($searchWordsArray as $searchWord) {
 			if (extension_loaded('mbstring')) {
-				$searchWord = mb_strtolower($searchPhrase, 'UTF-8');
+                $searchWord = mb_strtolower($searchWord, 'UTF-8');
 			} else {
-				$searchWord = strtolower($searchPhrase);
+                $searchWord = strtolower($searchWord);
 			}
 			$table = 'tx_kesearch_stat_word';
 			$timestamp = time();
 			if (!empty($searchWord)) {
 				$fields_values = array(
 					'pid' => $this->firstStartingPoint,
-					'word' => $searchWord,
+                    'word' => '\'' . $searchWord . '\'',
 					'tstamp' => $timestamp,
 					'pageid' => $GLOBALS['TSFE']->id,
 					'resultsfound' => $hits ? 1 : 0,
 				);
-				$GLOBALS['TYPO3_DB']->exec_INSERTquery($table,$fields_values,$no_quote_fields=FALSE);
+                $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $fields_values, array('word'));
 			}
 		}
 	}
