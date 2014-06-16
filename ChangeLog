@@ -1,5 +1,7 @@
 ChangeLog
 
+Current Trunk (Version 1.6.9DEV)
+
 Version 1.6.8, June 2014
 * bugfix: fix ext:news indexer compatibility with news 3.0 in the backend (fix in last version was not correct).
 * bugfix: tx_kesearch_stat_search.searchphrase and tx_kesearch_stat_word.word double escaped and kesearch_stat_word is filled with the complete searchphrase instead of separate words. Thanks to Frans Saris, http://forge.typo3.org/issues/59595
