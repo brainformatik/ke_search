@@ -145,7 +145,7 @@ class tx_kesearch_indexer {
 		foreach($configurations as $indexerConfig) {
 			$this->indexerConfig = $indexerConfig;
 
-			// run custom indexers
+			// run default indexers shipped with ke_search
 			if (in_array($this->indexerConfig['type'], $this->defaultIndexerTypes)) {
 				$path = t3lib_extMgm::extPath('ke_search') . 'Classes/indexer/types/class.tx_kesearch_indexer_types_' . $this->indexerConfig['type'] . '.php';
 				if(is_file($path)) {
