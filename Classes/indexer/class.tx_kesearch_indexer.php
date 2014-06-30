@@ -173,7 +173,7 @@ class tx_kesearch_indexer {
 			$this->storeTempRecordsToIndex('both');
 		}
 
-		// process index cleanup?
+		// process index cleanup
 		$content .= "\n".'<p><b>Index cleanup processed.</b></p>'."\n";
 		$content .= $this->cleanUpIndex();
 
