@@ -127,42 +127,45 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 				}
 
 				.box {
-					-moz-border-radius: 10px;
-					border-radius: 10px;
+					-moz-border-radius: 5px;
+					border-radius: 5px;
 					border: 1px solid #666;
 					padding: 5px;
-					margin-top: 20px;
+					margin-top: 10px;
 					background: #DDD;
-					box-shadow: 5px 5px 5px #AFAFAF;
-					-moz-box-shadow: 5px 5px 5px #AFAFAF;
-					-webkit-box-shadow: 5px 5px 5px #AFAFAF;
+					box-shadow: 2px 2px 2px #AFAFAF;
+					-moz-box-shadow: 2px 2px 2px #AFAFAF;
+					-webkit-box-shadow: 2px 2px 2px #AFAFAF;
 				}
 				.box .headline {
-					-moz-border-radius: 8px;
-					border-radius: 8px;
+					-moz-border-radius: 5px;
+					border-radius: 5px;
 					border: 1px solid #666;
-					padding: 5px;
+					padding: 1px 1px 1px 5px;
 					background: #888;
 					color: white;
-					font-weight: bold;
-					margin-bottom: 6px;
+					margin-bottom: 3px;
 					text-transform: uppercase;
-					font-size: 110%;
 				}
 				.box .content {
-					-moz-border-radius: 8px;
-					border-radius: 8px;
+					-moz-border-radius: 5px;
+					border-radius: 5px;
 					border: 1px solid #666;
-					padding: 5px;
+					padding: 1px 1px 1px 5px;
 					background: white;
 				}
 
-				table.tags td {
+				.info, .tag {
 					padding: 2px 4px;
-					-moz-border-radius: 8px;
-					border-radius: 8px;
+					-moz-border-radius: 5px;
+					border-radius: 5px;
 					border: 1px solid black;
 					background: white;
+					margin-left:2px;
+				}
+				.info {
+					width:48%;
+					float:left;
 				}
 
 				.summary {
@@ -170,7 +173,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					border-radius: 10px;
 					border: 3px solid #666;
 					padding: 10px;
-					margin-top: 20px;
+					margin-top: 10px;
 					background: white;
 					box-shadow: 5px 5px 5px #AFAFAF;
 					-moz-box-shadow: 5px 5px 5px #AFAFAF;
@@ -185,25 +188,17 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 				}
 				.summary .leftcol {
 					float: left;
-					width: 30px;
 				}
 				.summary .rightcol {
 					float: right;
 					text-align: left;
-					width: 410px;
 				}
 				.label {
-					float:left;
 					font-weight: bold;
-					width: 120px;
 				}
 				.value {
-					float: right:
 					text-align: left;
-					margin-left: 125px;
 				}
-
-
 
 				.reindex-button,
 				a.index-button:hover,
@@ -292,7 +287,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					border-radius: 10px;
 					border: 1px solid red;
 					padding: 10px;
-					margin: 20px;
+					margin: 10px;
 					background: white;
 					box-shadow: 2px 2px 2px red;
 					-moz-box-shadow: 5px 5px 5px red;
@@ -301,16 +296,15 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 
 			';
 
-			$headerSection = $this->doc->getHeader('pages',$this->pageinfo,$this->pageinfo['_thePath']).'<br />'.$GLOBALS['LANG']->sL('LLL:EXT:lang/locallang_core.xml:labels.path').': '.t3lib_div::fixed_lgd_cs($this->pageinfo['_thePath'],-50);
-			$this->content.=$this->doc->startPage($GLOBALS['LANG']->getLL('title'));
-			$this->content.=$this->doc->header($GLOBALS['LANG']->getLL('title'));
-			$this->content.=$this->doc->spacer(5);
-			$this->content.=$this->doc->section('',$this->doc->funcMenu($headerSection,t3lib_BEfunc::getFuncMenu($this->id,'SET[function]',$this->MOD_SETTINGS['function'],$this->MOD_MENU['function'])));
-			$this->content.=$this->doc->divider(5);
+			$this->content .= '<div id="typo3-docheader"><div class="typo3-docheader-functions">';
+			$this->content .= $this->doc->funcMenu(t3lib_BEfunc::getFuncMenu($this->id,'SET[function]',$this->MOD_SETTINGS['function'],$this->MOD_MENU['function']));
+			$this->content .= '</div></div>';
+			$this->content .= '<div id="typo3-docbody"><div id="typo3-inner-docbody">';
+			$this->content .= $this->doc->startPage($GLOBALS['LANG']->getLL('title'));
+			$this->content .= $this->doc->header($GLOBALS['LANG']->getLL('title'));
 
 			// Render content:
 			$this->moduleContent();
-
 
 			// ShortCut
 			if ($BE_USER->mayMakeShortcut())	{
@@ -327,15 +321,10 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 				$this->doc = t3lib_div::makeInstance('mediumDoc');
 			}
 			$this->doc->backPath = $BACK_PATH;
-
-			$this->content.=$this->doc->startPage($GLOBALS['LANG']->getLL('title'));
-			$this->content.=$this->doc->header($GLOBALS['LANG']->getLL('title'));
-			$this->content.=$this->doc->spacer(5);
-
 			$this->content.= $GLOBALS['LANG']->getLL('select_a_page');
-
 			$this->content.=$this->doc->spacer(10);
 		}
+			$this->content.='</div></div>';
 
 	}
 
@@ -432,7 +421,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 					}
 				}
 
-				$this->content.=$this->doc->section('INDEXER FOR KE_SEARCH',$content,0,1);
+				$this->content.=$this->doc->section('Start Indexer',$content,0,1);
 			break;
 
 
@@ -452,13 +441,14 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 
 					// page is selected: get indexed content
 					$content = '<h2>Index content for page '.$this->id.'</h2>';
+					$content .= $GLOBALS['LANG']->sL('LLL:EXT:lang/locallang_core.xml:labels.path').': '.t3lib_div::fixed_lgd_cs($this->pageinfo['_thePath'],-50);
 					$content .= $this->getIndexedContent($this->id);
 				} else {
 					// no page selected: show message
 					$content = 'Select page first';
 				}
 
-				$this->content.=$this->doc->section('FACETED SEARCH',$content,0,1);
+				$this->content.=$this->doc->section('Show Indexed Content',$content,0,1);
 				break;
 
 
@@ -466,7 +456,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 			case 3:
 
 				$content = $this->renderIndexTableInformation();
-				$this->content.=$this->doc->section('FACETED SEARCH',$content,0,1);
+				$this->content.=$this->doc->section('Index Table Information',$content,0,1);
 
 				break;
 
@@ -474,7 +464,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 			case 4:
 
 				$content = $this->getSearchwordStatistics($this->id);
-				$this->content.=$this->doc->section('FACETED SEARCH',$content,0,1);
+				$this->content.=$this->doc->section('Searchword Statistics',$content,0,1);
 
 				break;
 
@@ -508,7 +498,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 				}
 
 
-				$this->content.=$this->doc->section('FACETED SEARCH',$content,0,1);
+				$this->content.=$this->doc->section('Clear Index',$content,0,1);
 
 				break;
 
@@ -607,79 +597,49 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 
 
 			// build tag table
-			$tagTable = '<table class="tags" >';
+			$tagTable = '<div class="tags" >';
 			$cols = 3;
 			$tags = t3lib_div::trimExplode(',', $row['tags'], true);
 			$i=1;
 			foreach ($tags as $tag) {
-				// write leading tr
-				if ($i % $cols == 1) $tagTable .= '<tr>';
-				//write Tags
-				$tagTable .= '<td>'.$tag.'</td>';
-				// write trailing tr
-				if ($i % $cols == 0) $tagTable .= '</tr>';
-				$i++;
+				$tagTable .= '<span class="tag">' . $tag . '</span>';
 			}
-			$tagTable .= '</table>';
+			$tagTable .= '</div>';
 
 			// build content
+			$timeformat = '%d.%m.%Y %H:%M';
 			$content .= '
-				<div class="summary">
-					<div class="leftcol">
-						<img src="'.$imagePath.'" border="0">
-					</div>
-					<div class="rightcol">
-						<span class="title">'.$row['title'].'</span>
-						<div class="clearer">&nbsp;</div>
-
-						<div class="label">Type:</div>
-						<div class="value">'.$row['type'].'</div>
-						<div class="clearer">&nbsp;</div>
-
-						<div class="label">Words:</div>
-						<div class="value">'.str_word_count($row['content']).'</div>
-						<div class="clearer">&nbsp;</div>
-
-						<div class="label">Language (UID):</div>
-						<div class="value">'.$row['language'].'</div>
-						<div class="clearer">&nbsp;</div>
-					</div>
-					<div class="clearer">&nbsp;</div>
-				</div>
-
-				<div class="box">
-					<div class="headline">Content</div>
-					<div class="content">
-						'.wordwrap(nl2br($row['content']), 70, '<br />', 1).'
-					</div>
-				</div>
-
-				<div class="box">
-					<div class="headline">Tags</div>
-					'.$tagTable.'
-				</div>
-
-				<div class="box">
-					<div class="headline">Further information</div>
-					<div class="content">
-						<table class="info">
-							<tr>
-								<td class="label">Index created</td>
-								<td class="value">'.strftime('%d.%m.%Y %H:%M', $row['crdate']).'</td>
-							</tr>
-							<tr>
-								<td class="label">Last modification</td>
-								<td class="value">'.strftime('%d.%m.%Y %H:%M', $row['tstamp']).'</td>
-							</tr>
-						</table>
-					</div>
-				</div>
-				';
+				<div class="summary">'
+				. '<img src="'.$imagePath.'" border="0" style="float:right;">'
+				. '<span class="title">'.$row['title'].'</span>'
+				. '<div class="clearer">&nbsp;</div>'
+				. $this->renderFurtherInformation('Type', $row['type'])
+				. $this->renderFurtherInformation('Words', str_word_count($row['content']))
+				. $this->renderFurtherInformation('Language', $row['language'])
+				. $this->renderFurtherInformation('Created', strftime($timeformat, $row['crdate']))
+				. $this->renderFurtherInformation('Modified', strftime($timeformat, $row['tstamp']))
+				. $this->renderFurtherInformation('Sortdate', ($row['sortdate'] ? strftime($timeformat, $row['sortdate']) : ''))
+				. $this->renderFurtherInformation('Starttime', ($row['starttime'] ? strftime($timeformat, $row['starttime']) : ''))
+				. $this->renderFurtherInformation('Endtime', ($row['endtime'] ? strftime($timeformat, $row['endtime']) : ''))
+				. $this->renderFurtherInformation('FE Group', $row['fe_group'])
+				. $this->renderFurtherInformation('Target Page', $row['targetpid'])
+				. $this->renderFurtherInformation('URL Params', $row['params'])
+				. $this->renderFurtherInformation('Original PID', $row['orig_pid'])
+				. $this->renderFurtherInformation('Original UID', $row['orig_uid'])
+				. '<div class="clearer">&nbsp;</div>'
+				. '<div class="box"><div class="headline">Abstract</div><div class="content">' . nl2br($row['abstract']) .'</div></div>'
+				. '<div class="box"><div class="headline">Content</div><div class="content">' . nl2br($row['content']) .'</div></div>'
+				.  '<div class="box"><div class="headline">Tags</div><div class="content">'.$tagTable.'</div></div>'
+				. '</div>';
 
 		}
 
 		return $content;
 
+	}
+
+	function renderFurtherInformation($label, $content) {
+		return '<div class="info"><span class="label">' . $label . ': </span><span class="value">' . $content . '</span></div>';
 	}
 
 
