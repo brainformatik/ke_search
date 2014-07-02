@@ -59,8 +59,14 @@ class user_filterlist {
 			$config['items'][] = array($row['title'], $row['uid']);
 		}
 
+		// hook for custom filter
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['customFilterFlexformEntry'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['customFilterFlexformEntry'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$_procObj->customFilterFlexformEntry($config, $intString);
+			}
+		}
 	}
-
 
 
 	function getListOfAvailableFiltersForTCA(&$config) {
