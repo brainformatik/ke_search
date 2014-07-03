@@ -218,6 +218,14 @@ class tx_kesearch_lib_searchphrase {
 				}
 			}
 		}
+
+		// hook for modifiying the tags to filter for
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyTagsAgainst'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyTagsAgainst'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$_procObj->modifyTagsAgainst($tagsAgainst, $this);
+			}
+		}
 	}
 }
 
