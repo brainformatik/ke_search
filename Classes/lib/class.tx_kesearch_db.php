@@ -233,6 +233,14 @@ class tx_kesearch_db implements t3lib_Singleton {
 			'LIMIT' => $limit[0] . ',' . $limit[1]
 		);
 
+		// hook for third party applications to manipulate last part of query building
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['getQueryParts'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['getQueryParts'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$queryParts = $_procObj->getQueryParts($queryParts, $this);
+			}
+		}
+
 		return $queryParts;
 	}
 

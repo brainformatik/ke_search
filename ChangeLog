@@ -3,6 +3,7 @@ ChangeLog
 Current Trunk (Version 1.6.9DEV)
 * task: improve backend module rendering (adjust to TYPO3 6.2), add more information in "show indexed content" mode.
 * task: add hook for modifiying the tags to filter for ('modifyTagsAgainst').
+* task: add hook for third party applications to manipulate last part of query building. Thanks to Bastian Bringenberg and Felix Jacobi, http://forge.typo3.org/issues/58285.
 
 Version 1.6.8, June 2014
 * bugfix: fix ext:news indexer compatibility with news 3.0 in the backend (fix in last version was not correct).
