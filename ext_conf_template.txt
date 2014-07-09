@@ -7,7 +7,7 @@ searchWordLength = 4
 # cat=basic//30; type=boolean; label=Enable partial word search: If partial word search is activated, ke_search internaly adds a * behind all searchwords, so if you search for "snow", internally "snow*" is used, that means words like "snowman" will also be found. Partial word search is a little bit slower than full word search.
 enablePartSearch = 1
 
-# cat=basic//40; type=boolean; label=Enable explicit AND: By default, one or more searchwords are connected with "OR". If this option is enabled, two or more search words are connected with AND. If it is diesabled, they are connected with OR, where results containing all the search words will get a higher relevance ranking. Enabling this function means, ke_search internally adds a "+" in front of each search word.
+# cat=basic//40; type=boolean; label=Enable explicit AND: By default, one or more searchwords are connected with "OR". If this option is enabled, two or more search words are connected with AND. If it is disabled, they are connected with OR, where results containing all the search words will get a higher relevance ranking. Enabling this function means, ke_search internally adds a "+" in front of each search word.
 enableExplicitAnd = 0
 
 # cat=notification//10; type=boolean; label= Send notification when finished: If activated, a notification email will be sent when indexing process is finished in CLI / scheduler mode.
