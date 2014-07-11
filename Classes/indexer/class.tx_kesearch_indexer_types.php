@@ -51,7 +51,7 @@ class tx_kesearch_indexer_types {
 	 *
 	 * @var array
 	 */
-	protected $errors;
+	protected $errors = array();
 
 	/**
 	 * Constructor of this object
