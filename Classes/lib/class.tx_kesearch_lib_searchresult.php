@@ -102,7 +102,6 @@ class tx_kesearch_lib_searchresult {
 		$linktext = $this->row['title'];
 		$linktext = strip_tags($linktext);
 		$linktext = $this->pObj->div->removeXSS($linktext);
-		$linktext = $linktext;
 
 		// highlight hits in result title?
 		if($this->conf['highlightSword'] && count($this->pObj->swords)) {
