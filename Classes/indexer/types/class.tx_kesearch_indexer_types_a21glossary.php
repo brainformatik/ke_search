@@ -105,10 +105,10 @@ class tx_kesearch_indexer_types_a21glossary extends tx_kesearch_indexer_types {
 				$additionalFields['sortdate'] = $record['crdate'];
 
 				// hook for custom modifications of the indexed data, e.g. the tags
-				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyExtNewsIndexEntry'])) {
-					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyExtNewsIndexEntry'] as $_classRef) {
+				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifya21glossaryIndexEntry'])) {
+					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifya21glossaryIndexEntry'] as $_classRef) {
 						$_procObj = & t3lib_div::getUserObj($_classRef);
-						$_procObj->modifyExtNewsIndexEntry(
+						$_procObj->modifya21glossaryIndexEntry(
 							$title,
 							$abstract,
 							$fullContent,
@@ -117,7 +117,6 @@ class tx_kesearch_indexer_types_a21glossary extends tx_kesearch_indexer_types {
 							$record,
 							$additionalFields,
 							$indexerConfig,
-							$categoryData,
 							$this
 						);
 					}
