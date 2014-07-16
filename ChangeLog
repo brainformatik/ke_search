@@ -1,6 +1,7 @@
 ChangeLog
 
 Current Trunk, Version 1.6.11DEV
+* feature: indexer for extension a21glossary.
 
 Version 1.6.10, July 2014
 * task: make file indexer work again. Implement workaround for core bug. Directories must now typed in comma-separated and cannot be selected via element browser, http://forge.typo3.org/issues/59261 and http://forge.typo3.org/issues/49082.

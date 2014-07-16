@@ -498,6 +498,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.10', 'mmforum', t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_10.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.11', 'comments', t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_11.gif'),
 					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.12', 'news', t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_12.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.13', 'a21glossary', t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_13.gif'),
 				),
 				'itemsProcFunc' => 'tx_kesearch_lib_items->fillIndexerConfig',
 				'size' => 1,
@@ -508,7 +509,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'startingpoints_recursive' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.startingpoints_recursive',
-			'displayCond' => 'FIELD:type:=:page,tt_content,ttnews,tt_address,templavoila,comments,news',
+			'displayCond' => 'FIELD:type:=:page,tt_content,ttnews,tt_address,templavoila,comments,news,a21glossary',
 			'config' => array (
 				'type' => 'group',
 				'internal_type' => 'db',
@@ -534,7 +535,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 		'sysfolder' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.sysfolder',
-			'displayCond' => 'FIELD:type:IN:ke_yac,ttnews,dam,tt_address,mmforum,comments,news',
+			'displayCond' => 'FIELD:type:IN:ke_yac,ttnews,dam,tt_address,mmforum,comments,news,a21glossary',
 			'config' => array (
 				'type' => 'group',
 				'internal_type' => 'db',
