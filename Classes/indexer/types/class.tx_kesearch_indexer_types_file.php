@@ -240,7 +240,7 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 			$tags, // tags
 			'', // typolink params for singleview
 			'', // abstract
-			0, // language uid
+			-1, // language uid
 			0, // starttime
 			0, // endtime
 			0, // fe_group
