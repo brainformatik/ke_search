@@ -1,6 +1,6 @@
 ChangeLog
 
-Current Trunk, Version 1.6.11DEV
+Version 1.6.11
 * feature: indexer for extension a21glossary.
 * bugfix: Using tx_news with sys categories in the indexer does not always return the right category. Thanks to Sebastian Haak, https://forge.typo3.org/issues/61072.
 * bugfix: Don't index non-FAL-files, otherwise error "uid of file has to be numeric" may appear when indexing pages. Thanks to Frans Saris, https://forge.typo3.org/issues/60883.
