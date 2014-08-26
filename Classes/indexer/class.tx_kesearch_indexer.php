@@ -405,9 +405,9 @@ class tx_kesearch_indexer {
 		$table = 'tx_kesearch_index';
 		$fieldValues = $this->createFieldValuesForIndexing($storagePid, $title, $type, $targetPid, $content, $tags, $params, $abstract, $language, $starttime, $endtime, $fe_group, $additionalFields);
 
-		// check if record already exists. Average speed: 1-2ms
+		// check if record already exists
 		if (substr($type, 0, 4) == 'file') {
-			$recordExists = $this->checkIfFileWasIndexed($fieldValues['pid'], $fieldValues['hash']);
+			$recordExists = $this->checkIfFileWasIndexed($fieldValues['type'], $fieldValues['hash']);
 		} else {
 			$recordExists = $this->checkIfRecordWasIndexed($fieldValues['orig_uid'], $fieldValues['pid'], $fieldValues['type'], $fieldValues['language']);
 		}
@@ -609,18 +609,20 @@ class tx_kesearch_indexer {
 	 *
 	 * TODO: We should create an index to column type
 	 *
-	 * @param integer $uid
-	 * @param integer $pid
-	 * @param string $type
+	 * @param integer $type
+	 * @param integer $hash
 	 * @return boolean true if record was found, false if not
 	 */
-	function checkIfFileWasIndexed($pid, $hash) {
-		$GLOBALS['TYPO3_DB']->sql_query('SET @pid = ' . $pid . ', @hash = ' . $hash);
-		$res = $GLOBALS['TYPO3_DB']->sql_query('EXECUTE searchStmt USING @pid, @hash;');
-		if(is_resource($res)) {
-			if($this->currentRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+	function checkIfFileWasIndexed($type, $hash) {
+		// Query DB if record already exists
+		$GLOBALS['TYPO3_DB']->sql_query( 'SELECT * FROM tx_kesearch_index WHERE ' . 'type = ' . $type . ' AND hash = ' . $hash . ' LIMIT 1');
+		if ($GLOBALS['TYPO3_DB']->sql_num_rows($res)) {
+			if ($this->currentRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 				return true;
-			} return false;
+			} else {
+				$this->currentRow = array();
+				return false;
+			}
 		} else {
 			$this->currentRow = array();
 			return false;
