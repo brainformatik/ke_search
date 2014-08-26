@@ -4,6 +4,7 @@ Current Trunk, Version 1.6.11DEV
 * feature: indexer for extension a21glossary.
 * bugfix: Using tx_news with sys categories in the indexer does not always return the right category. Thanks to Sebastian Haak, https://forge.typo3.org/issues/61072.
 * bugfix: Don't index non-FAL-files, otherwise error "uid of file has to be numeric" may appear when indexing pages. Thanks to Frans Saris, https://forge.typo3.org/issues/60883.
+* bugfix: exception in backend module because of missing second parameter for "funcMenu". https://forge.typo3.org/issues/60485.
 
 Version 1.6.10, July 2014
 * task: make file indexer work again. Implement workaround for core bug. Directories must now typed in comma-separated and cannot be selected via element browser, http://forge.typo3.org/issues/59261 and http://forge.typo3.org/issues/49082.
