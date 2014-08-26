@@ -1,5 +1,8 @@
 ChangeLog
 
+Current Trunk, Version 1.7.0DEV
+
+
 Version 1.6.11
 * feature: indexer for extension a21glossary.
 * bugfix: Using tx_news with sys categories in the indexer does not always return the right category. Thanks to Sebastian Haak, https://forge.typo3.org/issues/61072.
