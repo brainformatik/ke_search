@@ -528,7 +528,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 					$tagCode = \TYPO3\CMS\Core\Utility\GeneralUtility::unQuoteFilenames(trim(substr($rteHtmlParser->getFirstTag($v), 0, -1)), TRUE);
 					$link_param = $tagCode[1];
 					list($linkHandlerKeyword, $linkHandlerValue) = explode(':', trim($link_param), 2);
-					if ($linkHandlerKeyword === 'file') {
+					if ($linkHandlerKeyword === 'file' && is_numeric($linkHandlerValue)) {
 						$fileObjects[] = $this->fileRepository->findByUid($linkHandlerValue);
 					}
 				}
