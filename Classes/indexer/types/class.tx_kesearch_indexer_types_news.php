@@ -249,6 +249,7 @@ class tx_kesearch_indexer_types_news extends tx_kesearch_indexer_types {
 				'sys_category_record_mm',
 				'tx_news_domain_model_news',
 				' AND tx_news_domain_model_news.uid = ' . $newsRecord['uid'] .
+				' AND sys_category_record_mm.tablenames = "tx_news_domain_model_news"' .
 				t3lib_befunc::BEenableFields('sys_category') .
 				t3lib_befunc::deleteClause('sys_category'),
 				'', // groupBy
