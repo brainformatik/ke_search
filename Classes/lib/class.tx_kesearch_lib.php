@@ -549,7 +549,12 @@ class tx_kesearch_lib extends tslib_pibase {
 			foreach ($options as $key => $data) {
 				$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###ONCLICK###', $this->onclickFilter);
-				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', htmlspecialchars($data['title']));
+				if ($filters[$filterUid]['shownumberofresults']) {
+					$number_of_results = $this->makeNumberOfOptionsString($data['results']);
+				} else {
+					$number_of_results = '';
+				}
+				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', htmlspecialchars($data['title']) . $number_of_results);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###VALUE###', htmlspecialchars($data['value']));
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###SELECTED###', $data['selected'] ? ' selected="selected" ' : '');
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###CSS_CLASS###', ' ' );
@@ -607,6 +612,11 @@ class tx_kesearch_lib extends tslib_pibase {
 			// filters are ignored
 			if (is_array($options)) {
 				foreach ($options as $key => $data) {
+					if ($filters[$filterUid]['shownumberofresults']) {
+						$number_of_results = $this->makeNumberOfOptionsString($data['results']);
+					} else {
+						$number_of_results = '';
+					}
 
 					$onclick = '';
 
@@ -616,7 +626,7 @@ class tx_kesearch_lib extends tslib_pibase {
 					$linkconf['parameter'] = $GLOBALS['TSFE']->id;
 					$linkconf['additionalParams'] = '&tx_kesearch_pi1[sword]='.$this->piVars['sword'].'&tx_kesearch_pi1[filter]['.$filterUid.']='.$data['value'];
 					$linkconf['useCacheHash'] = false;
-					$optionLink = $this->cObj->typoLink(htmlspecialchars($data['title']),$linkconf);
+					$optionLink = $this->cObj->typoLink(htmlspecialchars($data['title']) . $number_of_results,$linkconf);
 
 					$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
 					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###ONCLICK###', '');
@@ -678,6 +688,11 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			if (is_array($options)) {
 				foreach ($options as $key => $data) {
+					if ($filters[$filterUid]['shownumberofresults']) {
+						$number_of_results = $this->makeNumberOfOptionsString($data['results']);
+					} else {
+						$number_of_results = '';
+					}
 
 					$onclick = '';
 					$tempField = $this->piVars['orderByField'];
@@ -692,7 +707,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 					$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
 					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###ONCLICK###', $onclick);
-					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', htmlspecialchars($data['title']));
+					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', htmlspecialchars($data['title']) . $number_of_results);
 					$cssClass = 'option ';
 					$cssClass .= $data['selected'] ? 'selected' : '';
 					$optionsContent = $this->cObj->substituteMarker($optionsContent,'###OPTIONCSSCLASS###', $cssClass);
@@ -800,7 +815,13 @@ class tx_kesearch_lib extends tslib_pibase {
 					$checkBoxParams['disabled'] = 'disabled="disabled"';
 				}
 
-				$markerArray['###TITLE###'] = htmlspecialchars($data['title']);
+				if ($filters[$filterUid]['shownumberofresults']) {
+					$number_of_results = $this->makeNumberOfOptionsString($options[$data['uid']]['results']);
+				} else {
+					$number_of_results = '';
+				}
+
+				$markerArray['###TITLE###'] = htmlspecialchars($data['title']) . $number_of_results;
 				$markerArray['###VALUE###'] = htmlspecialchars($data['tag']);
 				$markerArray['###OPTIONKEY###'] = $key;
 				$markerArray['###OPTIONID###'] = 'filter_' . $filterUid . '_' . $key;
@@ -902,6 +923,21 @@ class tx_kesearch_lib extends tslib_pibase {
 		return $contentFilters;
 	}
 
+	/**
+	 * renders brackets around the number of options, returns an empty
+	 * string if the parameter is 0.
+	 *
+	 * @param integer $numberOfOptions
+	 * @return string
+	 */
+	public function makeNumberOfOptionsString($numberOfOptions) {
+		if ($numberOfOptions) {
+			$returnValue = '<span> (' . $numberOfOptions . ') </span>';
+		} else {
+			$returnValue = '';
+		}
+		return $returnValue;
+	}
 
 	/**
 	 * get all filters configured in FlexForm

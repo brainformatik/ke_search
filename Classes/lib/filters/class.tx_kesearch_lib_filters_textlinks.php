@@ -306,6 +306,7 @@ class tx_kesearch_lib_filters_textlinks {
 	 * @return string The complete link as A-Tag
 	 */
 	public function generateLink($filterUid, $option) {
+		$filters = $this->pObj->filters->getFilters();
 		$params = array();
 		$params[] = '[page]=1';
 		$params[] = '[filter][' . $filterUid . '][' . $option['uid'] . ']=' . $option['tag'];
@@ -333,10 +334,13 @@ class tx_kesearch_lib_filters_textlinks {
 		$conf['addQueryString.']['exclude'] = implode(',', $excludes);
 		$conf['additionalParams'] = '&' . implode('&', $params);
 
-		return $this->cObj->typoLink(
-			$option['title'] . '<span> (' . $option['results'] . ')</span>',
-			$conf
-		);
+		if ($filters[$filterUid]['shownumberofresults']) {
+			$number_of_results = $this->pObj->makeNumberOfOptionsString($option['results']);
+		} else {
+			$number_of_results = '';
+		}
+
+		return $this->cObj->typoLink($option['title'] . $number_of_results, $conf);
 	}
 
 
