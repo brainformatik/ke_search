@@ -626,6 +626,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 				. $this->renderFurtherInformation('URL Params', $row['params'])
 				. $this->renderFurtherInformation('Original PID', $row['orig_pid'])
 				. $this->renderFurtherInformation('Original UID', $row['orig_uid'])
+				. $this->renderFurtherInformation('Path', $row['directory'])
 				. '<div class="clearer">&nbsp;</div>'
 				. '<div class="box"><div class="headline">Abstract</div><div class="content">' . nl2br($row['abstract']) .'</div></div>'
 				. '<div class="box"><div class="headline">Content</div><div class="content">' . nl2br($row['content']) .'</div></div>'

@@ -391,7 +391,12 @@ class tx_kesearch_indexer {
 		if(!$this->checkIfRecordHasErrorsBeforeIndexing($storagePid, $title, $type, $targetPid)) return false;
 
 		// optionally add tag set in the indexer configuration
-		if (!empty($this->indexerConfig['filteroption']) && (substr($type, 0, 4) != 'file' || (substr($type, 0, 4) == 'file' && $this->indexerConfig['index_use_page_tags_for_files']))) {
+		if (!empty($this->indexerConfig['filteroption'])
+			&& (
+				(substr($type, 0, 4) != 'file' || (substr($type, 0, 4) == 'file' && $this->indexerConfig['index_use_page_tags_for_files']))
+				|| $this->indexerConfig['type'] == 'file'
+				)
+			) {
 			$indexerTag = $this->getTag( $this->indexerConfig['filteroption'] );
 			$tagChar = $this->extConf['prePostTagChar'];
 			if ($tags) {
