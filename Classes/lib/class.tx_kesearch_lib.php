@@ -932,7 +932,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 */
 	public function makeNumberOfOptionsString($numberOfOptions) {
 		if ($numberOfOptions) {
-			$returnValue = '<span> (' . $numberOfOptions . ') </span>';
+			$returnValue = ' (' . $numberOfOptions . ')';
 		} else {
 			$returnValue = '';
 		}
