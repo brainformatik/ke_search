@@ -26,6 +26,7 @@
  * Plugin 'Faceted search - searchbox and filters' for the 'ke_search' extension.
  *
  * @author	Stefan Froemken 
+ * @author	Christian Bülter
  * @package	TYPO3
  * @subpackage	tx_kesearch
  */
@@ -53,10 +54,6 @@ class tx_kesearch_filters {
 	protected $extConf = array();
 	protected $extConfPremium = array();
 
-
-
-
-
 	/**
 	 * Initializes this object
 	 *
@@ -76,7 +73,60 @@ class tx_kesearch_filters {
 		$this->piVars = $this->pObj->piVars;
 		$this->startingPoints = $this->pObj->startingPoints;
 		$this->tagChar = $this->extConf['prePostTagChar'];
+
+		// get filters and filter options
 		$this->filters = $this->getFiltersFromUidList($this->combineLists($this->conf['filters'], $this->conf['hiddenfilters']));
+
+		// get list of selected filter options (via frontend or backend)
+		foreach ($this->filters as $filter) {
+			$this->filters[$filter['uid']]['selectedOptions'] = $this->getSelectedFilterOptions($filter);
+		}
+	}
+
+	/**
+	 * Finds the selected filter options for a given filter.
+	 * Checks
+	 * - piVars one-dimensional filter
+	 * - piVars multi-dimensional filter
+	 * - backend preselected filter options
+	 *
+	 * returns the filter options uids as values of an array or zero if no option has been selected.
+	 *
+	 * @param array $filter
+	 * @return integer
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 09.09.14
+	 */
+	public function getSelectedFilterOptions($filter) {
+		$selectedOptions = array();
+
+		// run through all the filter options and check if one of them
+		// has been selected.
+		foreach ($filter['options'] as $option) {
+			// Is the filter option selected in the frontend via piVars
+			// or in the backend via flexform configuration ("preselected filters")?
+			$selected = false;
+
+			if ($this->pObj->piVars['filter'][$filter['uid']] == $option['tag']) {
+				$selected = true;
+			} else if (is_array($this->pObj->piVars['filter'][$filter['uid']])) {
+				if(t3lib_div::inArray($this->pObj->piVars['filter'][$filter['uid']], $option['tag'])) {
+					$selected = true;
+				}
+			} else if (!isset($this->pObj->piVars['filter'][$filter['uid']]) && !is_array($this->pObj->piVars['filter'][$filter['uid']])) {
+				if (is_array($this->preselectedFilter) && $this->in_multiarray($option['tag'], $this->preselectedFilter)) {
+					$selected = true;
+					// add preselected filter to piVars
+					$this->pObj->piVars['filter'][$filter['uid']] = array($option['uid'] => $option['tag']);
+				}
+			}
+
+			if ($selected) {
+				$selectedOptions[] = $option['uid'];
+			}
+		}
+
+		return $selectedOptions;
 	}
 
 	/**
@@ -97,7 +147,6 @@ class tx_kesearch_filters {
 		return t3lib_div::uniqueList($list1);
 	}
 
-
 	/**
 	 * get filters and options as associative array
 	 *
@@ -106,7 +155,6 @@ class tx_kesearch_filters {
 	public function getFilters() {
 		return $this->filters;
 	}
-
 
 	/**
 	 * get the filter records from DB which are configured in FlexForm

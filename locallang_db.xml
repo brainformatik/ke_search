@@ -21,10 +21,10 @@
 			<label index="tx_kesearch_filters.shownumberofresults">Show number of results for each filter option?</label>
 			<label index="tx_kesearch_filters.wrap">Wrap</label>
 			<label index="tx_kesearch_filters.rendertype">Rendering type</label>
-			<label index="tx_kesearch_filters.rendertype.I.0">Select</label>
-			<label index="tx_kesearch_filters.rendertype.I.1">List</label>
-			<label index="tx_kesearch_filters.rendertype.I.2">Checkboxen (Multiselection OR)</label>
-			<label index="tx_kesearch_filters.rendertype.I.3">Textlinks</label>
+			<label index="tx_kesearch_filters.rendertype.I.0">Select/Dropdown</label>
+			<label index="tx_kesearch_filters.rendertype.I.1">List/Textlinks</label>
+			<label index="tx_kesearch_filters.rendertype.I.2">Checkboxes (multiselection OR)</label>
+			<label index="tx_kesearch_filters.rendertype.I.3">List/Textlinks with multiselection checkboxes on additional page</label>
 			<label index="tx_kesearch_filters.cssclass">Special CSS-Class for Filter-Box</label>
 			<label index="tx_kesearch_filters.cssclass.I.0">None</label>
 			<label index="tx_kesearch_filters.cssclass.I.1">Small Box</label>

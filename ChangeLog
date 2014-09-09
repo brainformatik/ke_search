@@ -1,10 +1,11 @@
 ChangeLog
 
 Current Trunk, Version 1.7.0DEV
-Note: This version updates the database!
+* Note: This version updates the database!
 * feature: Show number of results per filter option. Configurable in the filter configuration: Activate "Show number of results for each filter option?" in the filter settings.
+* task: After selecting one or more filter options in a certain filter, don't display the other filter options anymore. This was a behaviour which lead to some irritations. Now, after selecting a filter option, you will have to reset this certain filter in order to see all the available filter options. This should be much clearer for the user.
 * bugfix: fix "Illegal string offset 'langChildren'" error in backend when inserting pi3 (textlinks multiselection).
-* task: show path in backend module "show indexed content".
+* task: show path in backend module in mode "show indexed content".
 * bugfix: files indexed by the standalone file indexer can't be tagged. Thanks to Felix Jacobi, https://forge.typo3.org/issues/59543.
 
 Version 1.6.11

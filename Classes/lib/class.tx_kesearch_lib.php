@@ -416,53 +416,8 @@ class tx_kesearch_lib extends tslib_pibase {
 				continue;
 			}
 
-			// get options for this filter
-			// reset options list for each loop
-			$options = array();
-
-			// check filter options availability and preselection status
-			foreach($filter['options'] as $option) {
-
-				// should we check if the filter option is available in
-				// the current search result?
-				if($this->conf['checkFilterCondition'] != 'none') {
-					if ($this->filters->checkIfTagMatchesRecords($option['tag'])) {
-
-						// Is the filter option selected in the frontend via piVars
-						// or in the backend via flexform configuration ("preselected filters")?
-						$selected = 0;
-
-						if($this->piVars['filter'][$filter['uid']] == $option['tag']) {
-							$selected = 1;
-						} else if (is_array($this->piVars['filter'][$filter['uid']])) {
-							if(t3lib_div::inArray($this->piVars['filter'][$filter['uid']], $option['tag'])) {
-								$selected = 1;
-							}
-							// check preselected filter options
-						} else if (!isset($this->piVars['filter'][$filter['uid']]) && !is_array($this->piVars['filter'][$filter['uid']])) {
-							if (is_array($this->preselectedFilter) && $this->in_multiarray($option['tag'], $this->preselectedFilter)) {
-								$selected = 1;
-								// add preselected filter to piVars
-								$this->piVars['filter'][$filter['uid']] = array($option['uid'] => $option['tag']);
-							}
-						}
-
-						$options[$option['uid']] = array(
-							'title' => $option['title'],
-							'value' => $option['tag'],
-							'results' => $this->tagsInSearchResult[$tagChar . $option['tag'] . $tagChar],
-							'selected' => $selected,
-						);
-					}
-				} else {
-					// do not process check; show all filter options
-					$options[$option['uid']] = array(
-						'title' => $option['title'],
-						'value' => $option['tag'],
-						'selected' => $selected,
-					);
-				}
-			}
+			// get filter options which should be displayed
+			$options = $this->findFilterOptionsToDisplay($filter);
 
 			// hook for modifying filter options
 			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptionsArray'])) {
@@ -527,10 +482,54 @@ class tx_kesearch_lib extends tslib_pibase {
 		return $filterContent;
 	}
 
+	/**
+	 * find out which filter options should be displayed for the given filter
+	 * check filter options availability and preselection status
+	 * 
+	 * @param array $filter
+	 * @return array
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 09.09.14 
+	 */
+	public function findFilterOptionsToDisplay($filter) {
+		$options = array();
 
-	/*
-	 * function renderSelect
-	 * @param $arg
+		foreach ($filter['options'] as $option) {
+
+			// should we check if the filter option is available in
+			// the current search result?
+			if ($this->conf['checkFilterCondition'] != 'none') {
+
+				// Once one filter option has been selected, don't display the
+				// others anymore since this leads to a strange behaviour (options are
+				// only displayed if they have BOTH tags: the selected and the other filter option.
+				if ((!count($filter['selectedOptions']) || in_array($option['uid'], $filter['selectedOptions'])) && $this->filters->checkIfTagMatchesRecords($option['tag'])) {
+					$options[$option['uid']] = array(
+						'title' => $option['title'],
+						'value' => $option['tag'],
+						'results' => $this->tagsInSearchResult[$tagChar . $option['tag'] . $tagChar],
+						'selected' => in_array($option['uid'], $filter['selectedOptions']),
+					);
+				}
+			} else {
+				// do not process any checks; show all filter options
+				$options[$option['uid']] = array(
+					'title' => $option['title'],
+					'value' => $option['tag'],
+					'selected' => in_array($option['uid'], $filter['selectedOptions]']),
+				);
+			}
+		}
+
+		return $options;
+	}
+
+	/**
+	 * renders the select filter
+	 *  
+	 * @param integer $filterUid
+	 * @param array $options
+	 * @return string
 	 */
 	public function renderSelect($filterUid, $options) {
 		$filters = $this->filters->getFilters();
@@ -549,11 +548,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			foreach ($options as $key => $data) {
 				$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###ONCLICK###', $this->onclickFilter);
-				if ($filters[$filterUid]['shownumberofresults']) {
-					$number_of_results = $this->makeNumberOfOptionsString($data['results']);
-				} else {
-					$number_of_results = '';
-				}
+				$number_of_results = $this->makeNumberOfResultsString($data['results'], $filters[$filterUid]);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', htmlspecialchars($data['title']) . $number_of_results);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###VALUE###', htmlspecialchars($data['value']));
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###SELECTED###', $data['selected'] ? ' selected="selected" ' : '');
@@ -593,9 +588,12 @@ class tx_kesearch_lib extends tslib_pibase {
 		return $filterContent;
 	}
 
-	/*
-	 * function renderList
-	 * @param $arg
+	/**
+	 * renders the list filter 
+	 * 
+	 * @param integer $filterUid
+	 * @param array $options
+	 * @return string
 	 */
 	public function renderList($filterUid, $options) {
 		$filters = $this->filters->getFilters();
@@ -604,7 +602,6 @@ class tx_kesearch_lib extends tslib_pibase {
 
 		$optionsCount = 0;
 
-
 		if($this->conf['renderMethod'] == 'static') {
 			// STATIC MODE
 			// in static mode, the list filter can not submit other filter values
@@ -612,12 +609,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			// filters are ignored
 			if (is_array($options)) {
 				foreach ($options as $key => $data) {
-					if ($filters[$filterUid]['shownumberofresults']) {
-						$number_of_results = $this->makeNumberOfOptionsString($data['results']);
-					} else {
-						$number_of_results = '';
-					}
-
+					$number_of_results = $this->makeNumberOfResultsString($data['results'], $filters[$filterUid]);
 					$onclick = '';
 
 					// build filter link
@@ -688,12 +680,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			if (is_array($options)) {
 				foreach ($options as $key => $data) {
-					if ($filters[$filterUid]['shownumberofresults']) {
-						$number_of_results = $this->makeNumberOfOptionsString($data['results']);
-					} else {
-						$number_of_results = '';
-					}
-
+					$number_of_results = $this->makeNumberOfResultsString($data['results'], $filters[$filterUid]);
 					$onclick = '';
 					$tempField = $this->piVars['orderByField'];
 					$tempDir = $this->piVars['orderByDir'];
@@ -771,7 +758,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * renders the filters which are in checkbox mode
 	 *
 	 * @param $filterUid UID of the filter which we have to render
-	 * @param $options contains all options which are found in the seach result
+	 * @param $options contains all options which are found in the search result
 	 * @return $string HTML of rendered checkbox filter
 	 */
 	public function renderCheckbox($filterUid, $options) {
@@ -798,7 +785,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				}
 
 				// if option is in optionArray, we have to mark the checkboxes
-				if($isOptionInOptionArray) {
+				if ($isOptionInOptionArray) {
 					// if user has selected a checkbox it must be selected on the resultpage, too.
 					// options which have been preselected in the backend are already in $this->piVars['filter'][$filterUid]
 					if($this->piVars['filter'][$filterUid][$key]) {
@@ -815,12 +802,7 @@ class tx_kesearch_lib extends tslib_pibase {
 					$checkBoxParams['disabled'] = 'disabled="disabled"';
 				}
 
-				if ($filters[$filterUid]['shownumberofresults']) {
-					$number_of_results = $this->makeNumberOfOptionsString($options[$data['uid']]['results']);
-				} else {
-					$number_of_results = '';
-				}
-
+				$number_of_results = $this->makeNumberOfResultsString($options[$data['uid']]['results'], $filters[$filterUid]);
 				$markerArray['###TITLE###'] = htmlspecialchars($data['title']) . $number_of_results;
 				$markerArray['###VALUE###'] = htmlspecialchars($data['tag']);
 				$markerArray['###OPTIONKEY###'] = $key;
@@ -924,15 +906,17 @@ class tx_kesearch_lib extends tslib_pibase {
 	}
 
 	/**
-	 * renders brackets around the number of options, returns an empty
-	 * string if the parameter is 0.
+	 * renders brackets around the number of results, returns an empty
+	 * string if there are no results or if an option for this filter already
+	 * has been selected.
 	 *
-	 * @param integer $numberOfOptions
+	 * @param integer $numberOfResults
+	 * @param array $filter
 	 * @return string
 	 */
-	public function makeNumberOfOptionsString($numberOfOptions) {
-		if ($numberOfOptions) {
-			$returnValue = ' (' . $numberOfOptions . ')';
+	public function makeNumberOfResultsString($numberOfResults, $filter) {
+		if ($filter['shownumberofresults'] && !count($filter['selectedOptions']) && $numberOfResults) {
+			$returnValue = ' (' . $numberOfResults . ')';
 		} else {
 			$returnValue = '';
 		}
