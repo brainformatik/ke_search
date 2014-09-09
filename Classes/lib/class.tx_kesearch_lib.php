@@ -217,9 +217,16 @@ class tx_kesearch_lib extends tslib_pibase {
 		// * sorting for "relevance" is allowed (internal: "score")
 		// * user did not select his own sorting yet
 		// * a searchword is given
-		if($this->conf['showSortInFrontend'] && t3lib_div::inList($this->conf['sortByVisitor'], 'score') && !$this->piVars['sortByField'] && $this->sword) {
+		if ($this->conf['showSortInFrontend'] && t3lib_div::inList($this->conf['sortByVisitor'], 'score') && !$this->piVars['sortByField'] && $this->sword) {
 			$this->piVars['sortByField'] = 'score';
 			$this->piVars['sortByDir'] = 'desc';
+		}
+
+		// after the searchword is removed, sorting for "score" is not possible
+		// anymore. So remove this sorting here and put it back to default.
+		if (!$this->sword && $this->piVars['sortByField'] == 'score') {
+			unset($this->piVars['sortByField']);
+			unset($this->piVars['sortByDir']);
 		}
 
 		// chooseBestIndex is only needed for MySQL-Search. Not for Sphinx

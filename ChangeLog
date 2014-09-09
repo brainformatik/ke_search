@@ -7,6 +7,7 @@ Current Trunk, Version 1.7.0DEV
 * bugfix: fix "Illegal string offset 'langChildren'" error in backend when inserting pi3 (textlinks multiselection).
 * task: show path in backend module in mode "show indexed content".
 * bugfix: files indexed by the standalone file indexer can't be tagged. Thanks to Felix Jacobi, https://forge.typo3.org/issues/59543.
+* bugfix: after the searchword is removed, sorting for "score" is not possible anymore. So remove this sorting and put it back to default.
 
 Version 1.6.11
 * feature: indexer for extension a21glossary.
