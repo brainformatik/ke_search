@@ -73,7 +73,7 @@ class tx_kesearch_filters {
 		$this->conf = $this->pObj->conf;
 		$this->piVars = $this->pObj->piVars;
 		$this->startingPoints = $this->pObj->startingPoints;
-		$this->tagChar = $this->extConf['prePostTagChar'];
+		$this->tagChar = $this->pObj->extConf['prePostTagChar'];
 
 		// get filters and filter options
 		$this->filters = $this->getFiltersFromUidList($this->combineLists($this->conf['filters'], $this->conf['hiddenfilters']));
@@ -258,7 +258,16 @@ class tx_kesearch_filters {
 			$GLOBALS['TSFE']->fe_user->setKey('ses', 'ke_search.tagsInSearchResults', $tagsInSearchResult);
 		}
 
-		return array_key_exists($this->tagChar . $tag . $this->tagChar, $this->tagsInSearchResult);
+		return array_key_exists($tag, $this->tagsInSearchResult);
+	}
+
+	/**
+	 * returns the tag char: a character which wraps tags in the database
+	 *
+	 * @return string
+	 */
+	public function getTagChar() {
+		return $this->tagChar;
 	}
 }
 

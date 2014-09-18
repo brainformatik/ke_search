@@ -131,8 +131,7 @@ class tx_kesearch_db implements t3lib_Singleton {
 		$this->user_kesearchpremium->setSorting($this->getOrdering());
 
 		// set limit
-		//$limit = $this->getLimit();
-		//$this->user_kesearchpremium->setLimit($limit[0], $limit[1]);
+		$this->user_kesearchpremium->setLimit(0, intval($this->pObj->extConfPremium['sphinxLimit']));
 
 		// generate query
 		$queryForSphinx = '';
@@ -289,10 +288,10 @@ class tx_kesearch_db implements t3lib_Singleton {
 	 */
 	protected function getTagsFromSphinx() {
 		if(is_array($this->searchResults) && count($this->searchResults)) {
-			return array_unique(array_map(
+			return array_map(
 				function($row) { return $row['tags']; },
 				$this->searchResults
-			));
+			);
 		} else {
 			return array();
 		}

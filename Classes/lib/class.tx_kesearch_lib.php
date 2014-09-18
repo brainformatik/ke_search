@@ -155,13 +155,13 @@ class tx_kesearch_lib extends tslib_pibase {
 		} else {
 			$this->filters = t3lib_div::makeInstance('tx_kesearch_filters');
 		}
-		$this->filters->initialize($this);
 
 		// get extension configuration array
 		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->extKey]);
 
+		// Set the "tagChar"
 		// sphinx has problems with # in query string.
-		// so you have the possibility to change # against another char
+		// so you we need to change the default char # against something else.
 		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
 			$this->extConfPremium = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search_premium']);
 			if(!$this->extConfPremium['prePostTagChar']) $this->extConfPremium['prePostTagChar'] = '_';
@@ -173,6 +173,9 @@ class tx_kesearch_lib extends tslib_pibase {
 		}
 		$this->extConf['multiplyValueToTitle'] = ($this->extConf['multiplyValueToTitle']) ? $this->extConf['multiplyValueToTitle'] : 1;
 		$this->extConf['searchWordLength'] = ($this->extConf['searchWordLength']) ? $this->extConf['searchWordLength'] : 4;
+
+		// initialize filters
+		$this->filters->initialize($this);
 
 		// get html template
 		$this->templateFile = $this->conf['templateFile'] ? $this->conf['templateFile'] : t3lib_extMgm::siteRelPath($this->extKey).'res/template_pi1.tpl';
@@ -520,7 +523,7 @@ class tx_kesearch_lib extends tslib_pibase {
 					$options[$option['uid']] = array(
 						'title' => $option['title'],
 						'value' => $option['tag'],
-						'results' => $this->tagsInSearchResult[$tagChar . $option['tag'] . $tagChar],
+						'results' => $this->tagsInSearchResult[$option['tag']],
 						'selected' => is_array($filter['selectedOptions']) && in_array($option['uid'], $filter['selectedOptions']),
 					);
 				}
@@ -561,7 +564,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			foreach ($options as $key => $data) {
 				$optionsContent .= $this->cObj->getSubpart($this->templateCode, $optionSubpart);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###ONCLICK###', $this->onclickFilter);
-				$number_of_results = $this->makeNumberOfResultsString($data['results'], $filters[$filterUid]);
+				$number_of_results = $this->renderNumberOfResultsString($data['results'], $filters[$filterUid]);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###TITLE###', htmlspecialchars($data['title']) . $number_of_results);
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###VALUE###', htmlspecialchars($data['value']));
 				$optionsContent = $this->cObj->substituteMarker($optionsContent,'###SELECTED###', $data['selected'] ? ' selected="selected" ' : '');
@@ -622,7 +625,7 @@ class tx_kesearch_lib extends tslib_pibase {
 			// filters are ignored
 			if (is_array($options)) {
 				foreach ($options as $key => $data) {
-					$number_of_results = $this->makeNumberOfResultsString($data['results'], $filters[$filterUid]);
+					$number_of_results = $this->renderNumberOfResultsString($data['results'], $filters[$filterUid]);
 					$onclick = '';
 
 					// build filter link
@@ -684,7 +687,6 @@ class tx_kesearch_lib extends tslib_pibase {
 				$filterContent = $this->cObj->substituteMarker($filterContent,'###DISABLED###', $optionsCount > 0 ? '' : ' disabled="disabled" ');
 				$filterContent = $this->cObj->substituteMarker($filterContent,'###VALUE###', $this->piVars['filter'][$filterUid]);
 			}
-			// return $this->renderSelect($filterUid, $options);
 		} else {
 			// AJAX -MODE
 			// use javascript onclick action for submitting the whole form
@@ -693,7 +695,7 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			if (is_array($options)) {
 				foreach ($options as $key => $data) {
-					$number_of_results = $this->makeNumberOfResultsString($data['results'], $filters[$filterUid]);
+					$number_of_results = $this->renderNumberOfResultsString($data['results'], $filters[$filterUid]);
 					$onclick = '';
 					$tempField = $this->piVars['orderByField'];
 					$tempDir = $this->piVars['orderByDir'];
@@ -815,7 +817,7 @@ class tx_kesearch_lib extends tslib_pibase {
 					$checkBoxParams['disabled'] = 'disabled="disabled"';
 				}
 
-				$number_of_results = $this->makeNumberOfResultsString($options[$data['uid']]['results'], $filters[$filterUid]);
+				$number_of_results = $this->renderNumberOfResultsString($options[$data['uid']]['results'], $filters[$filterUid]);
 				$markerArray['###TITLE###'] = htmlspecialchars($data['title']) . $number_of_results;
 				$markerArray['###VALUE###'] = htmlspecialchars($data['tag']);
 				$markerArray['###OPTIONKEY###'] = $key;
@@ -927,7 +929,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 * @param array $filter
 	 * @return string
 	 */
-	public function makeNumberOfResultsString($numberOfResults, $filter) {
+	public function renderNumberOfResultsString($numberOfResults, $filter) {
 		if ($filter['shownumberofresults'] && !count($filter['selectedOptions']) && $numberOfResults) {
 			$returnValue = ' (' . $numberOfResults . ')';
 		} else {

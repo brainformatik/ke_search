@@ -334,7 +334,7 @@ class tx_kesearch_lib_filters_textlinks {
 		$conf['addQueryString.']['exclude'] = implode(',', $excludes);
 		$conf['additionalParams'] = '&' . implode('&', $params);
 
-		$number_of_results = $this->pObj->makeNumberOfResultsString($option['results'], $filters[$filterUid]);
+		$number_of_results = $this->pObj->renderNumberOfResultsString($option['results'], $filters[$filterUid]);
 
 		return $this->cObj->typoLink($option['title'] . $number_of_results, $conf);
 	}
