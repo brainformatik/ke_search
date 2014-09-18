@@ -235,6 +235,12 @@ class tx_kesearch_lib extends tslib_pibase {
 			$this->db->chooseBestIndex($this->wordsAgainst, $this->tagsAgainst);
 		}
 
+		// perform search at this point already if we need to calculate what
+		// filters to display.
+		if ($this->conf['checkFilterCondition'] != 'none') {
+			$this->db->getSearchResults();
+		}
+
 		// add cssTag to header if set
 		$cssFile = $GLOBALS['TSFE']->tmpl->getFileName($this->conf['cssFile']);
 		if(!empty($cssFile)) {
@@ -515,7 +521,7 @@ class tx_kesearch_lib extends tslib_pibase {
 						'title' => $option['title'],
 						'value' => $option['tag'],
 						'results' => $this->tagsInSearchResult[$tagChar . $option['tag'] . $tagChar],
-						'selected' => in_array($option['uid'], $filter['selectedOptions']),
+						'selected' => is_array($filter['selectedOptions']) && in_array($option['uid'], $filter['selectedOptions']),
 					);
 				}
 			} else {
@@ -523,7 +529,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				$options[$option['uid']] = array(
 					'title' => $option['title'],
 					'value' => $option['tag'],
-					'selected' => in_array($option['uid'], $filter['selectedOptions]']),
+					'selected' => is_array($filter['selectedOptions']) && !empty($filter['selectedOptions']) && in_array($option['uid'], $filter['selectedOptions']),
 				);
 			}
 		}

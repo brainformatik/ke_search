@@ -8,6 +8,8 @@ Current Trunk, Version 1.7.0DEV
 * task: show path in backend module in mode "show indexed content".
 * bugfix: files indexed by the standalone file indexer can't be tagged. Thanks to Felix Jacobi, https://forge.typo3.org/issues/59543.
 * bugfix: after the searchword is removed, sorting for "score" is not possible anymore. So remove this sorting and put it back to default.
+* bugfix: fetch search results early in lib, that's needed for calculating the filter options to display in pi1.
+* task: cache tags in result list for performance reasons.
 
 Version 1.6.11
 * feature: indexer for extension a21glossary.

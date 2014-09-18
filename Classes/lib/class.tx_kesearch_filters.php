@@ -53,6 +53,7 @@ class tx_kesearch_filters {
 	protected $piVars = array();
 	protected $extConf = array();
 	protected $extConfPremium = array();
+	protected $tagsInSearchResult = array();
 
 	/**
 	 * Initializes this object
@@ -249,9 +250,15 @@ class tx_kesearch_filters {
 	 * @return boolean TRUE if tag was found. Else FALSE
 	 */
 	public function checkIfTagMatchesRecords($tag) {
-		$tagsInSearchResult = $this->pObj->tagsInSearchResult = $this->db->getTagsFromSearchResult();
-		$GLOBALS['TSFE']->fe_user->setKey('ses', 'ke_search.tagsInSearchResults', $tagsInSearchResult);
-		return array_key_exists($this->tagChar . $tag . $this->tagChar, $tagsInSearchResult);
+
+		// if tag list is empty, fetch them from the result list
+		// otherwise use the cached result list
+		if (!$this->tagsInSearchResult) {
+			$this->tagsInSearchResult = $this->pObj->tagsInSearchResult = $this->db->getTagsFromSearchResult();
+			$GLOBALS['TSFE']->fe_user->setKey('ses', 'ke_search.tagsInSearchResults', $tagsInSearchResult);
+		}
+
+		return array_key_exists($this->tagChar . $tag . $this->tagChar, $this->tagsInSearchResult);
 	}
 }
 
