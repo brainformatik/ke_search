@@ -666,7 +666,8 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 		$timestampStart = time() - ($days*60*60*24);
 
 		// get data from sysfolder or from single page?
-		$pidWhere = $this->checkSysfolder() ? ' AND pid=' . intval($pageUid) . ' ' : ' AND pageid=' . intval($pageUid) . ' ';
+		$isSysFolder = $this->checkSysfolder();
+		$pidWhere = $isSysFolder ? ' AND pid=' . intval($pageUid) . ' ' : ' AND pageid=' . intval($pageUid) . ' ';
 
 		// get languages
 		$fields = 'language';
@@ -676,13 +677,17 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 		$languageResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where, $groupBy);
 
 		if (!$GLOBALS['TYPO3_DB']->sql_num_rows($languageResult)) {
-			$content .= '<div class="error">No statistic data found!</div>';
+			$content .= '<div class="error">No statistic data found! Please select the sysfolder where your index is stored or the page where your search plugin is placed.</div>';
 			return $content;
 		}
 
 		while ( ($languageRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($languageResult)) ) {
 			$content .= '<h1 style="clear:left; padding-top:1em;">Language ' . $languageRow['language'] . '</h1>';
-			$content .= $this->getAndRenderStatisticTable('tx_kesearch_stat_search', $languageRow['language'], $timestampStart, $pidWhere, 'searchphrase');
+			if ($isSysFolder) {
+				$content .= $this->getAndRenderStatisticTable('tx_kesearch_stat_search', $languageRow['language'], $timestampStart, $pidWhere, 'searchphrase');
+			} else {
+				$content .= '<i>Please select the sysfolder where your index is stored for a list of search phrases</i>';
+			}
 			$content .= $this->getAndRenderStatisticTable('tx_kesearch_stat_word', $languageRow['language'], $timestampStart, $pidWhere, 'word');
 		}
 		$content .= '<br style="clear:left;" />';
