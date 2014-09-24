@@ -29,7 +29,7 @@ if (TYPO3_VERSION_INTEGER < 6002000) {
 /**
  * Plugin 'Faceted search - searchbox and filters' for the 'ke_search' extension.
  *
- * @author	Stefan Froemken 
+ * @author	Stefan Froemken
  * @package	TYPO3
  * @subpackage	tx_kesearch
  */
@@ -1818,32 +1818,34 @@ class tx_kesearch_lib extends tslib_pibase {
 			$table = 'tx_kesearch_stat_search';
 			$fields_values = array(
 				'pid' => $this->firstStartingPoint,
-                'searchphrase' => '\'' . $searchPhrase . '\'',
+				'searchphrase' => '\'' . $searchPhrase . '\'',
 				'tstamp' => time(),
 				'hits' => $hits,
 				'tagsagainst' => $tagsAgainst,
+				'language' => $GLOBALS['TSFE']->sys_language_uid,
 			);
-            $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $fields_values, array('searchphrase'));
+			$GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $fields_values, array('searchphrase'));
 		}
 
 		// count single words
 		foreach ($searchWordsArray as $searchWord) {
 			if (extension_loaded('mbstring')) {
-                $searchWord = mb_strtolower($searchWord, 'UTF-8');
+				$searchWord = mb_strtolower($searchWord, 'UTF-8');
 			} else {
-                $searchWord = strtolower($searchWord);
+				$searchWord = strtolower($searchWord);
 			}
 			$table = 'tx_kesearch_stat_word';
 			$timestamp = time();
 			if (!empty($searchWord)) {
 				$fields_values = array(
 					'pid' => $this->firstStartingPoint,
-                    'word' => '\'' . $searchWord . '\'',
+					'word' => '\'' . $searchWord . '\'',
 					'tstamp' => $timestamp,
 					'pageid' => $GLOBALS['TSFE']->id,
 					'resultsfound' => $hits ? 1 : 0,
+					'language' => $GLOBALS['TSFE']->sys_language_uid,
 				);
-                $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $fields_values, array('word'));
+				$GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $fields_values, array('word'));
 			}
 		}
 	}

@@ -150,6 +150,7 @@ CREATE TABLE tx_kesearch_stat_search (
   tstamp int(11) DEFAULT '0' NOT NULL,
   hits int(11) DEFAULT '0' NOT NULL,
   tagsagainst text,
+  language int(11) DEFAULT '0' NOT NULL,
   PRIMARY KEY (uid)
 ) ENGINE=MyISAM;
 
@@ -163,5 +164,6 @@ CREATE TABLE tx_kesearch_stat_word (
   tstamp int(11) DEFAULT '0' NOT NULL,
   pageid int(11) DEFAULT '0' NOT NULL,
   resultsfound int(1) DEFAULT '0' NOT NULL,
+  language int(11) DEFAULT '0' NOT NULL,
   PRIMARY KEY (uid),
 ) ENGINE=MyISAM;

@@ -463,8 +463,10 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 			// searchword statistics
 			case 4:
 
-				$content = $this->getSearchwordStatistics($this->id);
-				$this->content.=$this->doc->section('Searchword Statistics',$content,0,1);
+				// days to show
+				$days = 30;
+				$content = $this->getSearchwordStatistics($this->id, $days);
+				$this->content.=$this->doc->section('Searchword Statistics for the last ' . $days . ' days', $content, 0, 1);
 
 				break;
 
@@ -525,8 +527,7 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 				$completeLength = $this->formatFilesize($row['Data_length'] + $row['Index_length']);
 
 				$content .= '
-					<h2>Search index table information</h2>
-					<table>
+					<table class="statistics">
 						<tr>
 							<td class="label">Records: </td>
 							<td>'.$row['Rows'].'</td>
@@ -639,68 +640,106 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 
 	}
 
+	/**
+	 *
+	 * @param string $label
+	 * @param string $content
+	 * @return string
+	 */
 	function renderFurtherInformation($label, $content) {
 		return '<div class="info"><span class="label">' . $label . ': </span><span class="value">' . $content . '</span></div>';
 	}
 
-
-	/*
-	 * function getSearchwordStatistics
+	/**
+	 *
+	 * @param integer $pageUid
+	 * @param integer $days
+	 * @return string
 	 */
-	function getSearchwordStatistics($pageUid) {
-
+	function getSearchwordStatistics($pageUid, $days) {
 		if (!$pageUid) {
 			$content = '<div class="error">Select page first!</div>';
 			return $content;
 		}
 
 		// calculate statistic start
-		$timestampStart = time() - (10*60*60*24);
-
-		$content = '<h2>Searchword statistics for last 10 days</h2>';
-		$content .= '(from '.strftime('%d.%m.%Y %H:%M', $timestampStart).' \'til now)';
+		$timestampStart = time() - ($days*60*60*24);
 
 		// get data from sysfolder or from single page?
-		$pidWhere = $this->checkSysfolder() ? ' AND pid="'.$pageUid.'" ' : ' AND pageid="'.$pageUid.'" ';
+		$pidWhere = $this->checkSysfolder() ? ' AND pid=' . intval($pageUid) . ' ' : ' AND pageid=' . intval($pageUid) . ' ';
 
-		// get statistic data from db
-		$fields = 'count(word) as num, word';
+		// get languages
+		$fields = 'language';
 		$table = 'tx_kesearch_stat_word';
-		$where = 'tstamp > "'.$timestampStart.'" ';
-		$where .= $pidWhere;
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields,$table,$where,$groupBy='word HAVING count(word)>0',$orderBy='num desc',$limit='');
-		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
+		$where = 'tstamp > ' . $timestampStart . ' ' . $pidWhere;
+		$groupBy = 'language';
+		$languageResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where, $groupBy);
 
-		if (!$numResults) {
+		if (!$GLOBALS['TYPO3_DB']->sql_num_rows($languageResult)) {
 			$content .= '<div class="error">No statistic data found!</div>';
 			return $content;
 		}
 
-		// get statistic
-		$i=1;
-		while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-			$cssClass = ($i%2==0) ?  'even' : 'odd';
-			$rows .= '<tr>';
-			$rows .= '	<td class="'.$cssClass.'">'.$row['word'].'</td>';
-			$rows .= '	<td class="times '.$cssClass.'">'.$row['num'].'</td>';
-			$rows .= '</tr>';
-			$i++;
+		while ( ($languageRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($languageResult)) ) {
+			$content .= '<h1 style="clear:left; padding-top:1em;">Language ' . $languageRow['language'] . '</h1>';
+			$content .= $this->getAndRenderStatisticTable('tx_kesearch_stat_search', $languageRow['language'], $timestampStart, $pidWhere, 'searchphrase');
+			$content .= $this->getAndRenderStatisticTable('tx_kesearch_stat_word', $languageRow['language'], $timestampStart, $pidWhere, 'word');
 		}
-
-		$content .= '<table class="statistics">
-						<tr>
-							<th>Word</th>
-							<th>Times</th>
-						</tr>'
-						.$rows.
-					'</table>';
-
-
-
+		$content .= '<br style="clear:left;" />';
 		return $content;
 
 	}
 
+	/**
+	 *
+	 * @param string $table
+	 * @param integer $language
+	 * @param integer $timestampStart
+	 * @param string $pidWhere
+	 * @param string $tableCol
+	 * @return string
+	 */
+	public function getAndRenderStatisticTable($table, $language, $timestampStart, $pidWhere, $tableCol) {
+		$content = '<div style="width=50%; float:left; margin-right:1em;">';
+		$content .= '<h2 style="margin:0em;">' . $tableCol . 's</h2>';
+
+		$rows = '';
+
+		// get statistic data from db
+		$fields = 'count('. $tableCol . ') as num, ' . $tableCol;
+		$where = 'tstamp > ' . $timestampStart . ' AND language=' . $language . ' ' . $pidWhere;
+		$groupBy = $tableCol . ' HAVING count(' . $tableCol . ')>0';
+		$orderBy = 'num desc';
+		$limit = '';
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where, $groupBy, $orderBy, $limit);
+		$numResults = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
+
+		// get statistic
+		$i=1;
+		if ($numResults) {
+			while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+				$cssClass = ($i%2==0) ?  'even' : 'odd';
+				$rows .= '<tr>';
+				$rows .= '	<td class="'.$cssClass.'">'.$row[$tableCol].'</td>';
+				$rows .= '	<td class="times '.$cssClass.'">'.$row['num'].'</td>';
+				$rows .= '</tr>';
+				$i++;
+			}
+
+			$content .=
+				'<table class="statistics">
+					<tr>
+					<th>' . $tableCol . '</th>
+					<th>counter</th>
+					</tr>'
+				.$rows.
+				'</table>';
+		}
+
+		$content .= '</div>';
+
+		return $content;
+	}
 
 	/*
 	 * check if selected page is a sysfolder
@@ -727,14 +766,9 @@ class  tx_kesearch_module1 extends t3lib_SCbase {
 
 }
 
-
-
 if (defined('TYPO3_MODE') && $GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/ke_search/mod1/index.php'])	{
 	include_once($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/ke_search/mod1/index.php']);
 }
-
-
-
 
 // Make instance:
 if (TYPO3_VERSION_INTEGER >= 6002000) {
@@ -751,4 +785,3 @@ $SOBE->main();
 $SOBE->printContent();
 
 ?>
-
