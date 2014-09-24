@@ -434,6 +434,11 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			// get filter options which should be displayed
 			$options = $this->findFilterOptionsToDisplay($filter);
+			
+			// alphabetical sorting of filter options
+			if ($filter['alphabeticalsorting'] == 1) {
+				$this->sortArrayByColumn($options, 'title');
+			}
 
 			// hook for modifying filter options
 			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilterOptionsArray'])) {
@@ -779,6 +784,11 @@ class tx_kesearch_lib extends tslib_pibase {
 	public function renderCheckbox($filterUid, $options) {
 		$filters = $this->filters->getFilters();
 		$allOptionsOfCurrentFilter = $filters[$filterUid]['options'];
+
+		// alphabetical sorting of filter options
+		if ($filters[$filterUid]['alphabeticalsorting'] == 1) {
+			$this->sortArrayByColumn($allOptionsOfCurrentFilter, 'title');
+		}
 
 		// getSubparts
 		$template['filter'] = $this->cObj->getSubpart($this->templateCode, '###SUB_FILTER_CHECKBOX###');
@@ -1998,6 +2008,29 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 		}
 		return false;
+	}
+
+
+	/*
+	 * Sort array by given column
+	 *
+	 * @param array $arr	the array
+	 * @param string $col	the column
+	 * @return void
+	 */
+	public function sortArrayByColumn(&$arr, $col) {
+
+		$sort_col = array();
+		foreach ($arr as $key => $row) {
+			$sort_col[$key] = strtoupper($row[$col]);
+		}
+		asort($sort_col, SORT_LOCALE_STRING);
+
+		foreach($sort_col as $key => $val) {
+			$newArray[$key] = $arr[$key];
+		}
+
+		$arr = $newArray;
 	}
 }
 

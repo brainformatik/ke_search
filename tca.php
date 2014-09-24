@@ -145,6 +145,14 @@ $TCA['tx_kesearch_filters'] = array (
 				'default' => '1'
 			)
 		),
+		'alphabeticalsorting' => array (
+			'exclude' => 0,
+			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.alphabeticalsorting',
+			'config' => array (
+				'type'    => 'check',
+				'default' => '1',
+			)
+		),
 		'wrap' => array (
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters.wrap',
@@ -155,10 +163,10 @@ $TCA['tx_kesearch_filters'] = array (
 		),
 	),
 	'types' => array (
-		'select' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, options, shownumberofresults, wrap;;;;4-4-4'),
-		'list' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, expandbydefault, cssclass, options, shownumberofresults, wrap;;;;4-4-4'),
-		'checkbox' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, expandbydefault, markAllCheckboxes, cssclass, options, shownumberofresults, wrap;;;;4-4-4'),
-		'textlinks' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2, rendertype;;;;3-3-3, target_pid, amount, shownumberofresults, wrap;;;;4-4-4, options')
+		'select' => array('showitem' => 'sys_language_uid;;;;1-1-1,l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2,rendertype;;;;3-3-3, options, shownumberofresults, alphabeticalsorting,wrap;;;;4-4-4'),
+		'list' => array('showitem' => 'sys_language_uid;;;;1-1-1,l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2,rendertype;;;;3-3-3, expandbydefault, cssclass, options, shownumberofresults, alphabeticalsorting, wrap;;;;4-4-4'),
+		'checkbox' => array('showitem' => 'sys_language_uid;;;;1-1-1,l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2,rendertype;;;;3-3-3, expandbydefault, markAllCheckboxes, cssclass,options, shownumberofresults, alphabeticalsorting, wrap;;;;4-4-4'),
+		'textlinks' => array('showitem' => 'sys_language_uid;;;;1-1-1,l10n_parent, l10n_diffsource, hidden;;1;;1-1-1, title;;;;2-2-2,rendertype;;;;3-3-3, target_pid, amount, shownumberofresults, alphabeticalsorting, wrap;;;;4-4-4, options')
 	),
 	'palettes' => array (
 		'1' => array('showitem' => '')

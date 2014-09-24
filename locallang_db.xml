@@ -19,6 +19,7 @@
 			<label index="tx_kesearch_filters.target_pid">Choose page where to show all filter options</label>
 			<label index="tx_kesearch_filters.amount">How many textlinks should be displayed?</label>
 			<label index="tx_kesearch_filters.shownumberofresults">Show number of results for each filter option?</label>
+			<label index="tx_kesearch_filters.alphabeticalsorting">Sort filteroptions alphabetically?</label>
 			<label index="tx_kesearch_filters.wrap">Wrap</label>
 			<label index="tx_kesearch_filters.rendertype">Rendering type</label>
 			<label index="tx_kesearch_filters.rendertype.I.0">Select/Dropdown</label>
@@ -105,6 +106,7 @@
 			<label index="tx_kesearch_filters.target_pid">Wählen Sie die Seite auf der alle Filteroptionen angezeigt werden sollen</label>
 			<label index="tx_kesearch_filters.amount">Wie viele Textlinks sollen angezeigt werden?</label>
 			<label index="tx_kesearch_filters.shownumberofresults">Soll die Anzahl der Treffer pro Filteroption angezeigt werden?</label>
+			<label index="tx_kesearch_filters.alphabeticalsorting">Sollen die Filteroptionen automatisch alphabetisch sortiert werden?</label>
 			<label index="tx_kesearch_filters.wrap">Wrap</label>
 			<label index="tx_kesearch_filters.rendertype">Rendering-Typ</label>
 			<label index="tx_kesearch_filters.rendertype.I.0">Selectbox</label>

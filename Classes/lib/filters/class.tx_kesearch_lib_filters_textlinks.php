@@ -98,10 +98,20 @@ class tx_kesearch_lib_filters_textlinks {
 	public function renderTextlinks($filterUid, $optionsOfSearchresult) {
 		$filters = $this->pObj->filters->getFilters();
 		$filter = $filters[$filterUid];
+
 		if(!is_array($filter) || count($filter) == 0) return '';
+
+		// get options
 		$optionsOfFilter = $this->getOptionsOfFilter($filter, $optionsOfSearchresult);
 		if(!is_array($optionsOfFilter) || count($optionsOfFilter) == 0) return '';
+
+		// alphabetical sorting of filter options
+		if ($filter['alphabeticalsorting'] == 1) {
+			$this->pObj->sortArrayByColumn($optionsOfFilter, 'title');
+		}
+
 		$this->maxAllowedNormalOptions = $filter['amount'];
+
 		if(is_array($this->pObj->piVars['filter'][$filterUid]) && count($this->pObj->piVars['filter'][$filterUid])) {
 			$piVarsOptionList = implode(',', array_keys($this->pObj->piVars['filter'][$filterUid]));
 			$optionsOfFilter = $this->pObj->getFilterOptions($piVarsOptionList);

@@ -30,6 +30,7 @@ CREATE TABLE tx_kesearch_filters (
 	target_pid int(11) DEFAULT '0' NOT NULL,
 	amount int(11) DEFAULT '0' NOT NULL,
 	shownumberofresults tinyint(1) DEFAULT '0' NOT NULL,
+	alphabeticalsorting tinyint(1) DEFAULT '0' NOT NULL,
 	wrap tinytext,
 
 	PRIMARY KEY (uid),
