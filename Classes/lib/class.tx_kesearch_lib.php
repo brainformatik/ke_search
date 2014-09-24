@@ -343,6 +343,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		}
 
 		$content = $this->cObj->substituteMarker($content,'###SWORD_VALUE###', htmlspecialchars($this->swordValue));
+		$content = $this->cObj->substituteMarker($content,'###SEARCHBOX_DEFAULT_VALUE###', htmlspecialchars($this->pi_getLL('searchbox_default_value')));
 		$content = $this->cObj->substituteMarker($content,'###SWORD_ONFOCUS###', $searchboxFocusJS);
 		$content = $this->cObj->substituteMarker($content,'###SWORD_ONBLUR###', $searchboxBlurJS);
 		$content = $this->cObj->substituteMarker($content,'###SORTBYFIELD###', $this->piVars['sortByField']);
