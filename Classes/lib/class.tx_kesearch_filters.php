@@ -77,11 +77,20 @@ class tx_kesearch_filters {
 
 		// get filters and filter options
 		$this->filters = $this->getFiltersFromUidList($this->combineLists($this->conf['filters'], $this->conf['hiddenfilters']));
+		
+		// hook to modify filters
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilters'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFilters'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$_procObj->modifyFilters($this->filters, $this);
+			}
+		}
 
 		// get list of selected filter options (via frontend or backend)
 		foreach ($this->filters as $filter) {
 			$this->filters[$filter['uid']]['selectedOptions'] = $this->getSelectedFilterOptions($filter);
 		}
+		
 	}
 
 	/**

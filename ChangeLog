@@ -1,6 +1,7 @@
 ChangeLog
 
 Current Trunk, Version 1.7.1DEV
+* feature: new hook modifyFilters in class tx_kesearch_filters.
 
 Version 1.7.0, September 2014
 * Note: This version updates the database!
