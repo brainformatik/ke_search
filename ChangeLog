@@ -1,5 +1,7 @@
 ChangeLog
 
+Version 1.7.2
+
 Version 1.7.1, September 2014
 * feature: new hook modifyFilters in class tx_kesearch_filters.
 
