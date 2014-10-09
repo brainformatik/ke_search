@@ -1,6 +1,7 @@
 ChangeLog
 
 Version 1.7.2
+* feature: extend page indexer hook. This makes it possible to modify all values written to the indexer. IMPORTANT: Needs adjustent to your page indexer hooks, add the parameter $indexEntryDefaultValues as last parameter to your modifyPagesIndexEntry function!
 
 Version 1.7.1, September 2014
 * feature: new hook modifyFilters in class tx_kesearch_filters.

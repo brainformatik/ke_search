@@ -326,12 +326,21 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		// make it possible to modify the indexerConfig via hook
 		$indexerConfig = $this->indexerConfig;
 
+		// make it possible to modify the default values via hook
+		$indexEntryDefaultValues = array(
+			'type' => 'page',
+			'uid' => $uid,
+			'params' => '',
+			'feGroupsPages' => '',
+			'debugOnly' => FALSE
+		);
+
 		// hook for custom modifications of the indexed data, e. g. the tags
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyPagesIndexEntry'])) {
 			foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyPagesIndexEntry'] as $_classRef) {
 				$_procObj = & t3lib_div::getUserObj($_classRef);
 				$_procObj->modifyPagesIndexEntry(
-					$uid, $pageContent, $tags, $this->cachedPageRecords, $additionalFields, $indexerConfig
+					$uid, $pageContent, $tags, $this->cachedPageRecords, $additionalFields, $indexerConfig, $indexEntryDefaultValues
 				);
 			}
 		}
@@ -342,18 +351,18 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 				$this->pObj->storeInIndex(
 					$indexerConfig['storagepid'],                          // storage PID
 					$this->cachedPageRecords[$langKey][$uid]['title'],     // page title
-					'page',                                                // content type
-					$uid,                                                  // target PID: where is the single view?
+					$indexEntryDefaultValues['type'],                      // content type
+					$indexEntryDefaultValues['uid'],                       // target PID: where is the single view?
 					$content,                                              // indexed content, includes the title (linebreak after title)
 					$tags,                                                 // tags
-					'',                                                    // typolink params for singleview
+					$indexEntryDefaultValues['params'],                    // typolink params for singleview
 					$this->cachedPageRecords[$langKey][$uid]['abstract'],  // abstract
 					$langKey,                                              // language uid
 					$this->cachedPageRecords[$langKey][$uid]['starttime'], // starttime
 					$this->cachedPageRecords[$langKey][$uid]['endtime'],   // endtime
-					$feGroupsPages,                                        // fe_group
-					false,                                                 // debug only?
-					$additionalFields				       // additional fields added by hooks
+					$indexEntryDefaultValues['feGroupsPages'],             // fe_group
+					$indexEntryDefaultValues['debugOnly'],                 // debug only?
+					$additionalFields                                      // additional fields added by hooks
 				);
 			}
 		}
