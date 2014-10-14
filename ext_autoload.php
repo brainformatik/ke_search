@@ -24,6 +24,7 @@ return array(
 	'tx_kesearch_lib_searchresult' => $extensionPath . 'Classes/lib/class.tx_kesearch_lib_searchresult.php',
 	'tx_kesearch_lib_sorting' => $extensionPath . 'Classes/lib/class.tx_kesearch_lib_sorting.php',
 	'tx_kesearch_lib_filters_textlinks' => $extensionPath . 'Classes/lib/filters/class.tx_kesearch_lib_filters_textlinks.php',
+	'tx_kesearch_helper' => $extensionPath . 'Classes/lib/class.tx_kesearch_lib_helper.php',
 	'tx_kesearch_db' => $extensionPath . 'Classes/lib/class.tx_kesearch_db.php',
 	'tx_kesearch_filters' => $extensionPath . 'Classes/lib/class.tx_kesearch_filters.php',
 );

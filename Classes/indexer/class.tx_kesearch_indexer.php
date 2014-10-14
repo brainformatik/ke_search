@@ -66,18 +66,9 @@ class tx_kesearch_indexer {
 	 * Constructor of this class
 	 */
 	public function __construct() {
-		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search']);
-		// sphinx has problems with # in query string.
-		// so you have the possibility to change # against some other char
-		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
-			$this->extConfPremium = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search_premium']);
-			if(!$this->extConfPremium['prePostTagChar']) $this->extConfPremium['prePostTagChar'] = '_';
-			$this->extConf['prePostTagChar'] = $this->extConfPremium['prePostTagChar'];
-		} else {
-			// MySQL has problems also with #
-			// but we have wrapped # with " and it works.
-			$this->extConf['prePostTagChar'] = '#';
-		}
+		// get extension configuration array
+		$this->extConf = tx_kesearch_helper::getExtConf();
+		$this->extConfPremium = tx_kesearch_helper::getExtConfPremium();
 
 		if (TYPO3_VERSION_INTEGER >= 6002000) {
 			$this->registry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_Registry');

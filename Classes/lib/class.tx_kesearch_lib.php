@@ -157,22 +157,9 @@ class tx_kesearch_lib extends tslib_pibase {
 		}
 
 		// get extension configuration array
-		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->extKey]);
-
-		// Set the "tagChar"
-		// sphinx has problems with # in query string.
-		// so you we need to change the default char # against something else.
-		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
-			$this->extConfPremium = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search_premium']);
-			if(!$this->extConfPremium['prePostTagChar']) $this->extConfPremium['prePostTagChar'] = '_';
-			$this->extConf['prePostTagChar'] = $this->extConfPremium['prePostTagChar'];
-		} else {
-			// MySQL has problems also with #
-			// but we have wrapped # with " and it works.
-			$this->extConf['prePostTagChar'] = '#';
-		}
-		$this->extConf['multiplyValueToTitle'] = ($this->extConf['multiplyValueToTitle']) ? $this->extConf['multiplyValueToTitle'] : 1;
-		$this->extConf['searchWordLength'] = ($this->extConf['searchWordLength']) ? $this->extConf['searchWordLength'] : 4;
+		//$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->extKey]);
+		$this->extConf = tx_kesearch_helper::getExtConf();
+		$this->extConfPremium = tx_kesearch_helper::getExtConfPremium();
 
 		// initialize filters
 		$this->filters->initialize($this);
@@ -233,7 +220,7 @@ class tx_kesearch_lib extends tslib_pibase {
 		}
 
 		// chooseBestIndex is only needed for MySQL-Search. Not for Sphinx
-		if(!$this->extConfPremium['enableSphinxSearch']) {
+		if (!$this->extConfPremium['enableSphinxSearch']) {
 			// precount results to find the best index
 			$this->db->chooseBestIndex($this->wordsAgainst, $this->tagsAgainst);
 		}

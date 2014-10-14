@@ -1,6 +1,7 @@
 ChangeLog
 
 Version 1.7.3
+* feature: Make it possible to override extension configuration set in extension manager with page typoscript for ke_search and ke_search_premium (Example: ke_search_premium.extconf.override.enableSphinxSearch = 0).
 
 Version 1.7.2
 * feature: extend page indexer hook. This makes it possible to modify all values written to the indexer. IMPORTANT: Needs adjustent to your page indexer hooks, add the parameter $indexEntryDefaultValues as last parameter to your modifyPagesIndexEntry function!
