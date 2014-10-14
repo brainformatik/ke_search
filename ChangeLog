@@ -1,5 +1,7 @@
 ChangeLog
 
+Version 1.7.4
+
 Version 1.7.3
 * feature: Make it possible to override extension configuration set in extension manager with page typoscript for ke_search and ke_search_premium (Example: ke_search_premium.extconf.override.enableSphinxSearch = 0).
 
