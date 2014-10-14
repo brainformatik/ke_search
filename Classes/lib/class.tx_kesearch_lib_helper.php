@@ -22,7 +22,22 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
+/**
+ * helper functions
+ * may be used used statically!
+ * Example:
+ * $this->extConf = tx_kesearch_helper::getExtConf();
+ */
 class tx_kesearch_helper {
+
+	/**
+	 * get extension manager configuration for ke_search
+	 * and make it possible to override it with page ts setup
+	 *
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 14.10.14
+	 * @return array
+	 */
 	public function getExtConf() {
 		$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search']);
 
@@ -41,15 +56,23 @@ class tx_kesearch_helper {
 		$extConf['searchWordLength'] = ($extConf['searchWordLength']) ? $extConf['searchWordLength'] : 4;
 
 		// override extConf with TS Setup
-		if (is_array($GLOBALS['TSFE']->tmpl->setup['ke_search.']['extconf.']['override.']) && count ($GLOBALS['TSFE']->tmpl->setup['ke_search_premium.']['extconf.']['override.'])) {
+		if (is_array($GLOBALS['TSFE']->tmpl->setup['ke_search.']['extconf.']['override.']) && count($GLOBALS['TSFE']->tmpl->setup['ke_search.']['extconf.']['override.'])) {
 			foreach ($GLOBALS['TSFE']->tmpl->setup['ke_search.']['extconf.']['override.'] as $key => $value) {
-				$extConfPremium[$key] = $value;
+				$extConf[$key] = $value;
 			}
 		}
 
 		return $extConf;
 	}
 
+	/**
+	 * get extension manager configuration for ke_search_premium
+	 * and make it possible to override it with page ts setup
+	 *
+	 * @return array
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 14.10.14
+	 */
 	public function getExtConfPremium() {
 		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
 			$extConfPremium = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search_premium']);
@@ -59,7 +82,7 @@ class tx_kesearch_helper {
 		}
 
 		// override extConfPremium with TS Setup
-		if (is_array($GLOBALS['TSFE']->tmpl->setup['ke_search_premium.']['extconf.']['override.']) && count ($GLOBALS['TSFE']->tmpl->setup['ke_search_premium.']['extconf.']['override.'])) {
+		if (is_array($GLOBALS['TSFE']->tmpl->setup['ke_search_premium.']['extconf.']['override.']) && count($GLOBALS['TSFE']->tmpl->setup['ke_search_premium.']['extconf.']['override.'])) {
 			foreach ($GLOBALS['TSFE']->tmpl->setup['ke_search_premium.']['extconf.']['override.'] as $key => $value) {
 				$extConfPremium[$key] = $value;
 			}
