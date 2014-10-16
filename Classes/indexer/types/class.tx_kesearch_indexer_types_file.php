@@ -46,8 +46,10 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 	 */
 	public function __construct($pObj) {
 		parent::__construct($pObj);
+
 		// get extension configuration of ke_search
-		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search']);
+		$this->extConf = tx_kesearch_helper::getExtConf();
+
 		if (TYPO3_VERSION_INTEGER >= 6002000) {
 			$this->fileInfo = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_kesearch_lib_fileinfo');
 		} else {
@@ -142,6 +144,12 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 			return array();
 	}
 
+	/**
+	 * loops through an array of files an stores their content
+	 * to the index.
+	 *
+	 * @param array $files
+	 */
 	public function extractContentAndSaveToIndex($files) {
 		if (is_array($files) && count($files)) {
 			foreach ($files as $file) {
@@ -211,6 +219,12 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 		return md5($path . $file . '-' . $mtime);
 	}
 
+	/**
+	 * creates a index entry for a given file
+	 *
+	 * @param string $file
+	 * @param string $content
+	 */
 	public function storeToIndex($file, $content) {
 		$additionalFields = array(
 		    'sortdate' => $this->fileInfo->getModificationTime(),
@@ -220,7 +234,7 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 		    'hash' => $this->getUniqueHashForFile()
 		);
 
-		$type .= 'file:' . $this->fileInfo->getExtension();
+		$type = 'file:' . $this->fileInfo->getExtension();
 
 		//hook for custom modifications of the indexed data, e. g. the tags
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFileIndexEntry'])) {
@@ -234,18 +248,18 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 		$this->pObj->storeInIndex(
 			$this->indexerConfig['storagepid'], // storage PID
 			$this->fileInfo->getName(), // page title
-			$type, // content type
-			1, // target PID: where is the single view?
-			$content, // indexed content, includes the title (linebreak after title)
-			$tags, // tags
-			'', // typolink params for singleview
-			'', // abstract
-			-1, // language uid
-			0, // starttime
-			0, // endtime
-			0, // fe_group
-			false, // debug only?
-			$additionalFields	// additional fields added by hooks
+			$type,                      // content type
+			1,                          // target PID: where is the single view?
+			$content,                   // indexed content, includes the title (linebreak after title)
+			$tags,                      // tags
+			'',                         // typolink params for singleview
+			'',                         // abstract
+			-1,                         // language uid
+			0,                          // starttime
+			0,                          // endtime
+			0,                          // fe_group
+			false,                      // debug only?
+			$additionalFields	        // additional fields added by hooks
 		);
 	}
 
