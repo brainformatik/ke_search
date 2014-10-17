@@ -293,10 +293,7 @@ class tx_kesearch_indexer_types_news extends tx_kesearch_indexer_types {
 		if (!empty($newsRecord['keywords'])) {
 			$keywordsList = t3lib_div::trimExplode(',', $newsRecord['keywords']);
 			foreach ($keywordsList as $keyword) {
-				if (!empty($tags)) {
-					$tags .= ',';
-				}
-				$tags .= $this->pObj->extConf['prePostTagChar'] . $keyword . $this->pObj->extConf['prePostTagChar'];
+				tx_kesearch_helper::makeTags($tags, array($keyword));
 			}
 		}
 
@@ -324,10 +321,7 @@ class tx_kesearch_indexer_types_news extends tx_kesearch_indexer_types {
 		);
 			
 		while (($newsTag = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($resTag))) {
-			if (!empty($tags)) {
-				$tags .= ',';
-			}
-			$tags .= $this->pObj->extConf['prePostTagChar'] . $newsTag['title'] . $this->pObj->extConf['prePostTagChar'];
+			tx_kesearch_helper::makeTags($tags, array($newsTag['title']));
 		}
 
 		return $tags;
@@ -335,7 +329,6 @@ class tx_kesearch_indexer_types_news extends tx_kesearch_indexer_types {
 
 	/**
 	 * creates tags from category titles
-	 * removes # and , and space
 	 * 
 	 * @author Christian Bülter <buelter@kennziffer.com>
 	 * @since 26.06.13 15:49
@@ -344,20 +337,7 @@ class tx_kesearch_indexer_types_news extends tx_kesearch_indexer_types {
 	 * @return string
 	 */
 	private function addTagsFromNewsCategories($tags, $categoryData) {
-		foreach ($categoryData['title_list'] as $catTitle) {
-			if (!empty($tags)) {
-				$tags .= ',';
-			}
-			$catTitle = str_replace('#', '', $catTitle);
-			$catTitle = str_replace(',', '', $catTitle);
-			$catTitle = str_replace(' ', '', $catTitle);
-			$catTitle = str_replace('(', '', $catTitle);
-			$catTitle = str_replace(')', '', $catTitle);
-			$catTitle = str_replace('_', '', $catTitle);
-			$tags .= $this->pObj->extConf['prePostTagChar'] . $catTitle . $this->pObj->extConf['prePostTagChar'];
-		}
-
-		return $tags;
+		return tx_kesearch_helper::makeTags($tags, $categoryData['title_list']);
 	}
 }
 

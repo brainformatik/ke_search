@@ -467,11 +467,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 					}
 
 					// add tag to identify this index record as file
-					if (!empty($tags)) {
-						$tags .= ',';
-					}
-					$tagChar = $this->pObj->extConf['prePostTagChar'];
-					$tags .= $tagChar . 'file' . $tagChar;
+					tx_kesearch_helper::makeTags($tags, array('file'));
 
 					// get file information and  file content (using external tools)
 					// write file data to the index as a seperate index entry
@@ -561,14 +557,30 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 */
 	public function storeFileContentToIndex($fileObject, $content, $fileIndexerObject, $feGroups, $tags, $ttContentRow) {
 
-		// if the gifen file is a file reference, we can use the description as abstract
+		// get metadata
 		if ($fileObject instanceof TYPO3\CMS\Core\Resource\FileReference) {
-			$abstract = $fileObject->getDescription() ? $fileObject->getDescription() : '';
+			$orig_uid = $fileObject->getOriginalFile()->getUid();
+			$metadata = $fileObject->getOriginalFile()->_getMetaData();
 		} else {
-			$abstract = '';
+			$orig_uid = $fileObject->getUid();
+			$metadata = $fileObject->_getMetaData();
 		}
-		if ($abstract) {
-			$content = $abstract . "\n" . $content;
+
+		// assign categories as tags
+		$categories = tx_kesearch_helper::getCategories($metadata['uid'], 'sys_file_metadata');
+		tx_kesearch_helper::makeTags($tags, $categories['title_list']);
+
+		if ($metadata['title']) {
+			$content = $metadata['title'] . "\n" . $content;
+		}
+
+		if ($metadata['description']) {
+			$abstract = $metadata['description'];
+			$content = $metadata['description'] . "\n" . $content;
+		}
+
+		if ($metadata['alternative']) {
+			$content .= "\n" . $metadata['alternative'];
 		}
 
 		$title = $fileIndexerObject->fileInfo->getName();
@@ -577,9 +589,9 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
 		$additionalFields = array(
 			'sortdate' => $fileIndexerObject->fileInfo->getModificationTime(),
-			'orig_uid' => 0,
+			'orig_uid' => $orig_uid,
 			'orig_pid' => 0,
-			'directory' => $fileIndexerObject->fileInfo->getPath(),
+			'directory' => $fileIndexerObject->fileInfo->getRelativePath(),
 			'hash' => $fileIndexerObject->getUniqueHashForFile()
 		);
 

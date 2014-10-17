@@ -58,6 +58,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	var $preselectedFilter   = array(); // preselected filters by flexform
 	var $filtersFromFlexform = array(); // array with filter-uids as key and whole data as value
 	var $hasTooShortWords    = false; // contains a boolean value which represents if there are too short words in the searchstring
+	var $fileTypesWithPreviewPossible = array('pdf', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tif', 'tiff');
 
  	/**
 	 * @var tx_xajax
@@ -1408,13 +1409,21 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_TAGS###', $subContent, $recursive=1);
 
+			// preview image (instead of type icon)
+			$subContent = '';
+			if ($this->conf['showFilePreview']) {
+				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_TYPE_ICON###');
+				$imageHtml = $this->renderFilePreview($row);
+				$subContent = $this->cObj->substituteMarker($subContent,'###TYPE_ICON###', $imageHtml);
+				$filePreviewRendered = !empty($imageHtml);
+				unset($imageHtml);
+			}
+
 			// type icon
-			if ($this->conf['showTypeIcon']) {
+			if ($this->conf['showTypeIcon'] && (!$this->conf['showFilePreview'] || !$filePreviewRendered)) {
 				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_TYPE_ICON###');
 				$subContent = $this->cObj->substituteMarker($subContent,'###TYPE_ICON###', $this->renderTypeIcon($row['type']));
-			} else {
-				$subContent = '';
-			}
+			} 
 			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_TYPE_ICON###', $subContent, $recursive=1);
 
 			// add temp content to result list
@@ -1717,6 +1726,38 @@ class tx_kesearch_lib extends tslib_pibase {
 			$sortObj = t3lib_div::makeInstance('tx_kesearch_lib_sorting', $this);
 		}
 		return $sortObj->renderSorting();
+	}
+
+	/**
+	 * renders the preview image of a file result
+	 *
+	 * @param array $row result row
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 17.10.14
+	 * @return string
+	 */
+	public function renderFilePreview($row) {
+		list($type, $filetype) = explode(':', $row['type']);
+
+		if ($type == 'file' && in_array($filetype, $this->fileTypesWithPreviewPossible)) {
+
+			$imageConf = $this->conf['previewImage.'];
+			if (empty($imageConf['file.']['maxW'])) $imageConf['file.']['maxW'] = 150;
+			if (empty($imageConf['file.']['maxH'])) $imageConf['file.']['maxH'] = 150;
+
+			if ($row['orig_uid']) {
+				$fileRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
+				$fileObject = $fileRepository->findByUid($row['orig_uid']);
+				$metadata = $fileObject->_getMetaData();
+				$imageConf['file'] = $fileObject->getPublicUrl();
+				$imageConf['altText'] = $metadata['alternative'];
+			} else {
+				$imageConf['file'] = $row['directory'] . rawurlencode($row['title']);
+			}
+
+			$html = $this->cObj->IMAGE($imageConf);
+		}
+		return $html;
 	}
 
 

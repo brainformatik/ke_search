@@ -82,6 +82,15 @@ class tx_kesearch_lib_fileinfo {
 
 
 	/**
+	 * return relative to site root file path
+	 *
+	 * @return string Filepath (f.e. fileadmin/user_upload/)
+	 */
+	public function getRelativePath() {
+		return str_replace(PATH_site, '', $this->fileInfo['path']);
+	}
+
+	/**
 	 * return file path
 	 *
 	 * @return string Filepath (f.e. /var/www/fileadmin/)

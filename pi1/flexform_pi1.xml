@@ -414,6 +414,16 @@
 						</TCEforms>
 					</showQueryTime>
 
+					<showFilePreview>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showFilePreview</label>
+							<config>
+								<type>check</type>
+								<default>1</default>
+							</config>
+						</TCEforms>
+					</showFilePreview>
+
 					<showTypeIcon>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showTypeIcon</label>

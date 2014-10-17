@@ -1,6 +1,11 @@
 ChangeLog
 
-Version 1.7.4
+Version 1.8.0, October 2014
+* task: Extend hook 'modifyFileIndexEntry' in file indexer. Note: Needs adjustment in your code if you use that hook!
+* feature: Index FAL metadata. Index metadata and categories, translate assigned categories to tags. This makes it possible to filter files by assigning system categories to them.
+* feature: Show Fal metadata. In result list use title from FAL if a FAL file is indexed.
+* feature: Show file thumbnails. Option to show file preview in result list (for pdf and files).
+* feature: Index images. When indexing files and there's no indexer for a certain file type, fallback to FAL meta data indexing. This makes it possible to index images with the standalone file indexer.
 
 Version 1.7.3
 * feature: Make it possible to override extension configuration set in extension manager with page typoscript for ke_search and ke_search_premium (Example: ke_search_premium.extconf.override.enableSphinxSearch = 0).

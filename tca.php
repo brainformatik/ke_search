@@ -764,9 +764,25 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 				'default' => 'field_content'
 			)
 		),
+		'fal_storage' => array (
+			'exclude' => 0,
+			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.fal_storage',
+			'displayCond' => 'FIELD:type:IN:file',
+			'config' => array (
+				'type' => 'select',
+				'items' => array (
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.fal_storage.dont_use_fal', -1),
+				),
+				'size' => 1,
+				'maxitems' => 1,
+				'default' => 'no_fal',
+				'foreign_table' => 'sys_file_storage',
+				'allowNonIdValues' => 1
+			)
+		),
 	),
 	'types' => array (
-		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, storagepid,targetpid;;;;3-3-3,type,startingpoints_recursive,single_pages,sysfolder,index_content_with_restrictions,index_passed_events,index_news_category_mode,index_news_category_selection,index_extnews_category_selection,index_news_useHRDatesSingle,index_news_useHRDatesSingleWithoutDay,index_dam_categories,index_dam_without_categories,index_dam_categories_recursive,index_use_page_tags,directories,fileext,commenttypes,filteroption,tvpath,index_use_page_tags_for_files')
+		'0' => array('showitem' => 'hidden;;1;;1-1-1, title;;;;2-2-2, storagepid,targetpid;;;;3-3-3,type,startingpoints_recursive,single_pages,sysfolder,index_content_with_restrictions,index_passed_events,index_news_category_mode,index_news_category_selection,index_extnews_category_selection,index_news_useHRDatesSingle,index_news_useHRDatesSingleWithoutDay,index_dam_categories,index_dam_without_categories,index_dam_categories_recursive,index_use_page_tags,fal_storage,directories,fileext,commenttypes,filteroption,tvpath,index_use_page_tags_for_files')
 	),
 	'palettes' => array (
 		'1' => array('showitem' => '')

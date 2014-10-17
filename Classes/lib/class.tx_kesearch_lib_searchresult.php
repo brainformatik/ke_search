@@ -51,9 +51,6 @@ class tx_kesearch_lib_searchresult {
 	protected $div;
 
 
-
-
-
 	/**
 	 * The constructor of this class
 	 *
@@ -98,8 +95,25 @@ class tx_kesearch_lib_searchresult {
 		// configure the link
 		$linkconf = $this->getResultLinkConfiguration();
 
+		list($type) = explode(':', $this->row['type']);
+		switch($type) {
+			case 'file':
+				// if we use FAL, see if we have a title in the metadata
+				if ($this->row['orig_uid']) {
+					$fileRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
+					$fileObject = $fileRepository->findByUid($this->row['orig_uid']);
+					$metadata = $fileObject->_getMetaData();
+					$linktext = ($metadata['title'] ? $metadata['title'] : $this->row['title']);
+				} else {
+					$linktext = $this->row['title'];
+				}
+				break;
+			default:
+				$linktext = $this->row['title'];
+				break;
+		}
+
 		// clean title
-		$linktext = $this->row['title'];
 		$linktext = strip_tags($linktext);
 		$linktext = $this->pObj->div->removeXSS($linktext);
 
@@ -112,7 +126,7 @@ class tx_kesearch_lib_searchresult {
 
 
 	/**
-	 * get result url (not linked)
+	 * get result url (not) linked
 	 *
 	 * @return string The results URL
 	 */
@@ -138,8 +152,15 @@ class tx_kesearch_lib_searchresult {
 		list($type) = explode(':', $this->row['type']);
 		switch($type) {
 			case 'file': // render a link for files
-				$relPath = str_replace(PATH_site, '', $this->row['directory']);
-				$linkconf['parameter'] = $relPath . rawurlencode($this->row['title']);
+				// if we use FAL, we can use the API
+				if ($this->row['orig_uid']) {
+					/* @var $fileRepository TYPO3\CMS\Core\Resource\FileRepository */
+					$fileRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
+					$fileObject = $fileRepository->findByUid($this->row['orig_uid']);
+					$linkconf['parameter'] = $fileObject->getPublicUrl();
+				} else {
+					$linkconf['parameter'] = $this->row['directory'] . rawurlencode($this->row['title']);
+				}
 				$linkconf['fileTarget'] = $this->conf['resultLinkTargetFiles'];
 				break;
 			default: // render a link for page targets

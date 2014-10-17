@@ -1,5 +1,4 @@
 <?php
-
 /* * *************************************************************
  *  Copyright notice
  *
@@ -27,6 +26,7 @@
  * Plugin 'Faceted search' for the 'ke_search' extension.
  *
  * @author	Stefan Froemken 
+ * @author	Christian Bülter
  * @package	TYPO3
  * @subpackage	tx_kesearch
  */
@@ -40,6 +40,11 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 	 * @var tx_kesearch_lib_fileinfo
 	 */
 	var $fileInfo;
+
+	/**
+	 * @var TYPO3\CMS\Core\Resource\ResourceStorage
+	 */
+	var $storage;
 
 	/**
 	 * Initializes indexer for files
@@ -90,17 +95,64 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 	public function startIndexing() {
 		$directories = $this->indexerConfig['directories'];
 		$directoryArray = t3lib_div::trimExplode(',', $directories, true);
-		$files = $this->getFilesFromDirectories($directoryArray);
-		$this->extractContentAndSaveToIndex($files);
+
+		if ($this->pObj->indexerConfig['fal_storage'] > 0) {
+			/* @var $storageRepository TYPO3\CMS\Core\Resource\StorageRepository */
+			$storageRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+				'TYPO3\\CMS\\Core\\Resource\\StorageRepository'
+			);
+
+			$this->storage = $storageRepository->findByUid($this->pObj->indexerConfig['fal_storage']);
+
+			$files = array();
+			$this->getFilesFromFal($files, $directoryArray);
+		} else {
+			$files = $this->getFilesFromDirectories($directoryArray);
+		}
+
+		$counter = $this->extractContentAndSaveToIndex($files);
 
 		// show indexer content?
 		$content .= '<p><b>Indexer "' . $this->indexerConfig['title'] . '": </b><br />'
-			. count($files) . ' files have been found for indexing.</b></p>' . "\n";
+			. count($files) . ' files have been found for indexing.<br />' . "\n"
+			. $counter . ' files have been indexed.</p>' . "\n";
 
 		$content .= $this->showErrors();
 		$content .= $this->showTime();
 
 		return $content;
+	}
+
+	/**
+	 * fetches files recurively using FAL
+	 *
+	 * @param array $files
+	 * @param array $directoryArray
+	 */
+	public function getFilesFromFal(&$files, $directoryArray) {
+
+		foreach ($directoryArray as $directory) {
+			$folder = $this->storage->getFolder($directory);
+
+			if ($folder->getName() != '_temp_') {
+				$filesInFolder = $folder->getFiles();
+				if (count($filesInFolder)) {
+					foreach ($filesInFolder as $file) {
+						if (\TYPO3\CMS\Core\Utility\GeneralUtility::inList($this->pObj->indexerConfig['fileext'], $file->getExtension())) {
+							$files[] = $file->getIdentifier();
+						}
+					}
+				}
+
+				// do recursion
+				$subfolders = $folder->getSubFolders();
+				if (count($subfolders)) {
+					foreach ($subfolders as $subfolder) {
+						$this->getFilesFromFal($files, array($subfolder->getIdentifier()));
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -147,23 +199,33 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 	/**
 	 * loops through an array of files an stores their content
 	 * to the index.
+	 * returns number of files indexed.
 	 *
 	 * @param array $files
+	 * @return integer
 	 */
 	public function extractContentAndSaveToIndex($files) {
+		$counter = 0;
+		if ($this->pObj->indexerConfig['fal_storage'] > 0) {
+			$storageConfiguration = $this->storage->getConfiguration();
+			$basepath = rtrim(PATH_site . $storageConfiguration['basePath'], '/');
+		} else {
+			$basepath = '';
+		}
+
 		if (is_array($files) && count($files)) {
 			foreach ($files as $file) {
-				if ($this->fileInfo->setFile($file)) {
-					if (($content = $this->getFileContent($file))) {
+				if ($this->fileInfo->setFile($basepath . $file)) {
+					$content = $this->getFileContent($basepath . $file);
+					if (!($content === false)) {
 						$this->storeToIndex($file, $content);
+						$counter++;
 					}
-					else
-						continue;
 				}
-				else
-					continue;
 			}
 		}
+
+		return $counter;
 	}
 
 	/**
@@ -196,8 +258,15 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 					return false;
 				}
 			} else {
-				$this->addError('No indexer for this type of file. (class ' . $className . ' does not exist).');
-				return false;
+				// if no indexer for this type of file exists, we do a fallback:
+				// we return an empty content. Doing this at least the FAL metadata
+				// can be indexed. So this makes only sense if use FAL.
+				if ($this->pObj->indexerConfig['fal_storage'] > 0) {
+					return '';
+				} else {
+					$this->addError('No indexer for this type of file. (class ' . $className . ' does not exist).');
+					return false;
+				}
 			}
 		} else {
 			$this->addError($file . ' is not a file.');
@@ -226,40 +295,89 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 	 * @param string $content
 	 */
 	public function storeToIndex($file, $content) {
-		$additionalFields = array(
-		    'sortdate' => $this->fileInfo->getModificationTime(),
-		    'orig_uid' => 0,
-		    'orig_pid' => 0,
-		    'directory' => $this->fileInfo->getPath(),
-		    'hash' => $this->getUniqueHashForFile()
+
+		$tags = '';
+		tx_kesearch_helper::makeTags($tags, array('file'));
+
+		// get data from FAL
+		if ($this->pObj->indexerConfig['fal_storage'] > 0) {
+			$storageConfiguration = $this->storage->getConfiguration();
+			$fileObject = $this->storage->getFile($file);
+			$metadata = $fileObject->_getMetaData();
+			$orig_uid = $fileObject->getUid();
+		} else {
+			$orig_uid = 0;
+		}
+
+		$indexRecordValues = array(
+			'storagepid'   => $this->indexerConfig['storagepid'],
+			'title'        => $this->fileInfo->getName(),
+			'type'         => 'file:' . $this->fileInfo->getExtension(),
+			'targetpid'    => 1,
+			'tags'         => $tags,
+			'params'       => '',
+			'abstract'     => '',
+			'language_uid' => -1,
+			'starttime'    => 0,
+			'endtime'      => 0,
+			'fe_group'     => 0,
+			'debug'        => false
 		);
 
-		$type = 'file:' . $this->fileInfo->getExtension();
+		$additionalFields = array(
+		    'sortdate'     => $this->fileInfo->getModificationTime(),
+		    'orig_uid'     => $orig_uid,
+		    'orig_pid'     => 0,
+		    'directory'    => $this->fileInfo->getRelativePath(),
+		    'hash'         => $this->getUniqueHashForFile()
+		);
 
-		//hook for custom modifications of the indexed data, e. g. the tags
+		// add additional content if FAL is used
+		if ($this->pObj->indexerConfig['fal_storage'] > 0) {
+
+			// index meta data from FAL: title, description, alternative
+			if ($metadata['title']) {
+				$indexRecordValues['content'] = $metadata['title'] . "\n" . $indexRecordValues['content'];
+			}
+
+			if ($metadata['description']) {
+				$indexRecordValues['abstract'] = $metadata['description'];
+				$content = $metadata['description'] . "\n" . $content;
+			}
+
+			if ($metadata['alternative']) {
+				$content .= "\n" . $metadata['alternative'];
+			}
+
+			// make tags from assigned categories
+			$categories = tx_kesearch_helper::getCategories($metadata['uid'], 'sys_file_metadata');
+			tx_kesearch_helper::makeTags($indexRecordValues['tags'], $categories['title_list']);
+		}
+
+		// hook for custom modifications of the indexed data, e. g. the tags
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFileIndexEntry'])) {
 			foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyFileIndexEntry'] as $_classRef) {
 				$_procObj = & t3lib_div::getUserObj($_classRef);
-				$_procObj->modifyFileIndexEntry($file, $content, $additionalFields);
+				$_procObj->modifyFileIndexEntry($file, $content, $additionalFields, $indexRecordValues, $this);
 			}
 		}
 
 		// store record in index table
 		$this->pObj->storeInIndex(
-			$this->indexerConfig['storagepid'], // storage PID
-			$this->fileInfo->getName(), // page title
-			$type,                      // content type
-			1,                          // target PID: where is the single view?
-			$content,                   // indexed content, includes the title (linebreak after title)
-			$tags,                      // tags
-			'',                         // typolink params for singleview
-			'',                         // abstract
-			-1,                         // language uid
-			0,                          // starttime
-			0,                          // endtime
-			0,                          // fe_group
-			false,                      // debug only?
-			$additionalFields	        // additional fields added by hooks
+			$indexRecordValues['storagepid'],   // storage PID
+			$indexRecordValues['title'],        // page title
+			$indexRecordValues['type'],         // content type
+			$indexRecordValues['targetpid'],    // target PID: where is the single view?
+			$content,                           // indexed content, includes the title (linebreak after title)
+			$indexRecordValues['tags'],         // tags
+			$indexRecordValues['params'],       // typolink params for singleview
+			$indexRecordValues['abstract'],     // abstract
+			$indexRecordValues['language_uid'], // language uid
+			$indexRecordValues['starttime'],    // starttime
+			$indexRecordValues['endtime'],      // endtime
+			$indexRecordValues['fe_group'],     // fe_group
+			$indexRecordValues['debug'],        // debug only?
+			$additionalFields	                // additional fields added by hooks
 		);
 	}
 

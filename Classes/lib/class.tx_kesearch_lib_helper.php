@@ -91,4 +91,74 @@ class tx_kesearch_helper {
 		return $extConfPremium;
 	}
 
+	/**
+	 * returns the list of assigned categories to a certain record in a certain table
+	 *
+	 * @param integer $uid
+	 * @param string $table
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 17.10.14
+	 * @return array
+	 */
+	public function getCategories($uid, $table) {
+		$categoryData = array(
+			'uid_list' => array(),
+			'title_list' => array()
+		);
+
+		if ($uid && $table) {
+			$resCat = $GLOBALS['TYPO3_DB']->exec_SELECT_mm_query(
+				'sys_category.uid, sys_category.title',
+				'sys_category',
+				'sys_category_record_mm',
+				$table,
+				' AND ' . $table . '.uid = ' . $uid .
+				' AND sys_category_record_mm.tablenames = "' . $table . '"' .
+				t3lib_befunc::BEenableFields('sys_category') .
+				t3lib_befunc::deleteClause('sys_category'),
+				'',
+				'sys_category_record_mm.sorting'
+			);
+
+			if ($GLOBALS['TYPO3_DB']->sql_num_rows($resCat)) {
+				while (($cat = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($resCat))) {
+					$categoryData['uid_list'][] = $cat['uid'];
+					$categoryData['title_list'][] = $cat['title'];
+				}
+			}
+		}
+
+		return $categoryData;
+	}
+
+	/**
+	 * creates tags from category titles
+	 * removes characters: # , space ( ) _
+	 *
+	 * @param string $tags comma-list of tags, new tags will be added to this
+	 * @param array $categoryArray Array of Titles (eg. categories)
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 17.10.14
+	 */
+	public function makeTags(&$tags, $categoryArray) {
+		if (is_array($categoryArray) && count($categoryArray)) {
+			$extConf = tx_kesearch_helper::getExtConf();
+
+			foreach ($categoryArray as $catTitle) {
+				$tag = $catTitle;
+				$tag = str_replace('#', '', $tag);
+				$tag = str_replace(',', '', $tag);
+				$tag = str_replace(' ', '', $tag);
+				$tag = str_replace('(', '', $tag);
+				$tag = str_replace(')', '', $tag);
+				$tag = str_replace('_', '', $tag);
+
+				if (!empty($tags)) {
+					$tags .= ',';
+				}
+				$tags .= $extConf['prePostTagChar'] . $tag . $extConf['prePostTagChar'];
+			}
+		}
+	}
+
 }
