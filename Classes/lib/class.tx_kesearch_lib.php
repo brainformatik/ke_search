@@ -1770,8 +1770,14 @@ class tx_kesearch_lib extends tslib_pibase {
 		list($type) = explode(':', $typeComplete);
 		$name = str_replace(':', '_', $typeComplete);
 
-		// custom image
-		$imageConf['file'] = str_replace(PATH_site, '', t3lib_div::getFileAbsFileName($this->conf['additionalPathForTypeIcons'] . $name . '.gif'));
+		if ($this->conf['resultListTypeIcon.'][$name . '.']) {
+			$imageConf = $this->conf['resultListTypeIcon.'][$name . '.'];
+		} else {
+			// custom image (old configuration option, only for gif images)
+			if ($this->conf['additionalPathForTypeIcons']) {
+				$imageConf['file'] = str_replace(PATH_site, '', t3lib_div::getFileAbsFileName($this->conf['additionalPathForTypeIcons'] . $name . '.gif'));
+			}
+		}
 
 		// fallback: default image
 		if(!is_file(PATH_site . $imageConf['file'])) {
@@ -1782,7 +1788,6 @@ class tx_kesearch_lib extends tslib_pibase {
 				$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/types/file.gif';
 			}
 		}
-
 
 		return $this->cObj->IMAGE($imageConf);
 	}
