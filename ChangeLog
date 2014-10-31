@@ -1,6 +1,7 @@
 ChangeLog
 
 Version 1.8.1
+* task: move getResultLinkConfiguration to a static function in helper class, this makes it possible to call it from out of ke_search (needed for ke_search_premium).
 
 Version 1.8.0, October 2014
 * Thanks to swm medienproduktion for sponsoring this version.

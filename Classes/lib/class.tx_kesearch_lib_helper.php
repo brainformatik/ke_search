@@ -160,4 +160,51 @@ class tx_kesearch_helper {
 			}
 		}
 	}
+
+	/**
+	 * renders a link to a search result
+	 *
+	 * @param array $resultRow
+	 * @param string $targetDefault
+	 * @param string $targetFiles
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 31.10.14
+	 * @return array
+	 */
+	public static function getResultLinkConfiguration($resultRow, $targetDefault='', $targetFiles='') {
+		$linkconf = array();
+
+		list($type) = explode(':', $resultRow['type']);
+
+		switch($type) {
+
+			case 'file':
+				// render a link for files
+				// if we use FAL, we can use the API
+				if ($resultRow['orig_uid']) {
+					/* @var $fileRepository TYPO3\CMS\Core\Resource\FileRepository */
+					$fileRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
+					$fileObject = $fileRepository->findByUid($resultRow['orig_uid']);
+					$linkconf['parameter'] = $fileObject->getPublicUrl();
+				} else {
+					$linkconf['parameter'] = $resultRow['directory'] . rawurlencode($resultRow['title']);
+				}
+				$linkconf['fileTarget'] = $targetFiles;
+				break;
+
+			default:
+				// render a link for page targets
+				// if params are filled, add them to the link generation process
+				if (!empty($resultRow['params'])) {
+					$additionalParams = $resultRow['params'];
+				}
+				$linkconf['additionalParams'] = $additionalParams;
+				$linkconf['parameter'] = $resultRow['targetpid'];
+				$linkconf['useCacheHash'] = true;
+				$linkconf['target'] = $targetDefault;
+				break;
+		}
+
+		return $linkconf;
+	}
 }

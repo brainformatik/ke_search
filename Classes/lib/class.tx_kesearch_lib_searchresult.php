@@ -147,34 +147,7 @@ class tx_kesearch_lib_searchresult {
 	 * @return array configuration for typolink
 	 */
 	public function getResultLinkConfiguration() {
-		$linkconf = array();
-
-		list($type) = explode(':', $this->row['type']);
-		switch($type) {
-			case 'file': // render a link for files
-				// if we use FAL, we can use the API
-				if ($this->row['orig_uid']) {
-					/* @var $fileRepository TYPO3\CMS\Core\Resource\FileRepository */
-					$fileRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
-					$fileObject = $fileRepository->findByUid($this->row['orig_uid']);
-					$linkconf['parameter'] = $fileObject->getPublicUrl();
-				} else {
-					$linkconf['parameter'] = $this->row['directory'] . rawurlencode($this->row['title']);
-				}
-				$linkconf['fileTarget'] = $this->conf['resultLinkTargetFiles'];
-				break;
-			default: // render a link for page targets
-				// if params are filled, add them to the link generation process
-				if (!empty($this->row['params'])) {
-					$additionalParams = $this->row['params'];
-				}
-				$linkconf['additionalParams'] = $additionalParams;
-				$linkconf['parameter'] = $this->row['targetpid'];
-				$linkconf['useCacheHash'] = true;
-				$linkconf['target'] = $this->conf['resultLinkTarget'];
-				break;
-		}
-		return $linkconf;
+		return tx_kesearch_helper::getResultLinkConfiguration($this->row, $this->conf['resultLinkTarget'], $this->conf['resultLinkTargetFiles']);
 	}
 
 
