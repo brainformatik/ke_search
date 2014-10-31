@@ -331,7 +331,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 			'type' => 'page',
 			'uid' => $uid,
 			'params' => '',
-			'feGroupsPages' => '',
+			'feGroupsPages' => $feGroupsPages,
 			'debugOnly' => FALSE
 		);
 
