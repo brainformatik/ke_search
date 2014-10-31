@@ -38,7 +38,7 @@ class tx_kesearch_helper {
 	 * @since 14.10.14
 	 * @return array
 	 */
-	public function getExtConf() {
+	public static function getExtConf() {
 		$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search']);
 
 		// Set the "tagChar"
@@ -73,7 +73,7 @@ class tx_kesearch_helper {
 	 * @author Christian Bülter <buelter@kennziffer.com>
 	 * @since 14.10.14
 	 */
-	public function getExtConfPremium() {
+	public static function getExtConfPremium() {
 		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
 			$extConfPremium = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search_premium']);
 			if (!$extConfPremium['prePostTagChar']) $extConfPremium['prePostTagChar'] = '_';
@@ -100,7 +100,7 @@ class tx_kesearch_helper {
 	 * @since 17.10.14
 	 * @return array
 	 */
-	public function getCategories($uid, $table) {
+	public static function getCategories($uid, $table) {
 		$categoryData = array(
 			'uid_list' => array(),
 			'title_list' => array()
@@ -140,7 +140,7 @@ class tx_kesearch_helper {
 	 * @author Christian Bülter <buelter@kennziffer.com>
 	 * @since 17.10.14
 	 */
-	public function makeTags(&$tags, $categoryArray) {
+	public static function makeTags(&$tags, $categoryArray) {
 		if (is_array($categoryArray) && count($categoryArray)) {
 			$extConf = tx_kesearch_helper::getExtConf();
 
@@ -160,5 +160,4 @@ class tx_kesearch_helper {
 			}
 		}
 	}
-
 }
