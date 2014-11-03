@@ -337,7 +337,8 @@ class tx_kesearch_indexer_types_news extends tx_kesearch_indexer_types {
 	 * @return string
 	 */
 	private function addTagsFromNewsCategories($tags, $categoryData) {
-		return tx_kesearch_helper::makeTags($tags, $categoryData['title_list']);
+		tx_kesearch_helper::makeTags($tags, $categoryData['title_list']);
+		return $tags;
 	}
 }
 
