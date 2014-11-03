@@ -1,5 +1,7 @@
 ChangeLog
 
+Version 1.8.3
+
 Version 1.8.2
 * bugfix: fix tag generation for news catagories. fixes regression introduced in 1.8.0.
 
