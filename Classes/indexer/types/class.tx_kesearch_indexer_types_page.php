@@ -212,10 +212,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$inheritedFeGroups = array();
 		foreach ($rootline as $uid) {
 			if ($this->cachedPageRecords[0][$uid]['extendToSubpages'] && !empty($this->cachedPageRecords[0][$uid]['fe_group'])) {
-				$tempFeGroups = explode(',', $this->cachedPageRecords[0][$uid]['fe_group']);
-				foreach ($tempFeGroups as $group) {
-					$inheritedFeGroups = $this->addGroup($inheritedFeGroups, $group);
-				}
+				$inheritedFeGroups = explode(',', $this->cachedPageRecords[0][$uid]['fe_group']);
 			}
 
 		}
