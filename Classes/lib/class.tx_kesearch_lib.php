@@ -1411,16 +1411,25 @@ class tx_kesearch_lib extends tslib_pibase {
 
 			// preview image (instead of type icon)
 			$subContent = '';
-			if ($this->conf['showFilePreview']) {
+			$previewRendered = false;
+			if ($this->conf['showFilePreview'] && $type == 'file') {
 				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_TYPE_ICON###');
 				$imageHtml = $this->renderFilePreview($row);
 				$subContent = $this->cObj->substituteMarker($subContent,'###TYPE_ICON###', $imageHtml);
-				$filePreviewRendered = !empty($imageHtml);
+				$previewRendered = !empty($imageHtml);
+				unset($imageHtml);
+			}
+
+			if ($this->conf['showPageImages'] && $type == 'page') {
+				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_TYPE_ICON###');
+				$imageHtml = $this->renderPagePreviewImage($row);
+				$subContent = $this->cObj->substituteMarker($subContent,'###TYPE_ICON###', $imageHtml);
+				$previewRendered = !empty($imageHtml) || $previewRendered;
 				unset($imageHtml);
 			}
 
 			// type icon
-			if ($this->conf['showTypeIcon'] && (!$this->conf['showFilePreview'] || !$filePreviewRendered)) {
+			if ($this->conf['showTypeIcon'] && !$previewRendered) {
 				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_TYPE_ICON###');
 				$subContent = $this->cObj->substituteMarker($subContent,'###TYPE_ICON###', $this->renderTypeIcon($row['type']));
 			} 
@@ -1740,11 +1749,10 @@ class tx_kesearch_lib extends tslib_pibase {
 		list($type, $filetype) = explode(':', $row['type']);
 
 		if ($type == 'file' && in_array($filetype, $this->fileTypesWithPreviewPossible)) {
-
 			$imageConf = $this->conf['previewImage.'];
-			if (empty($imageConf['file.']['maxW'])) $imageConf['file.']['maxW'] = 150;
-			if (empty($imageConf['file.']['maxH'])) $imageConf['file.']['maxH'] = 150;
 
+			// if index record is of type "file" and contains an orig_uid, this is the reference
+			// to a FAL record. Otherwise we use the path directly.
 			if ($row['orig_uid']) {
 				$fileRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
 				$fileObject = $fileRepository->findByUid($row['orig_uid']);
@@ -1754,12 +1762,78 @@ class tx_kesearch_lib extends tslib_pibase {
 			} else {
 				$imageConf['file'] = $row['directory'] . rawurlencode($row['title']);
 			}
-
-			$html = $this->cObj->IMAGE($imageConf);
 		}
-		return $html;
+		return $this->renderPreviewImage($imageConf);
 	}
 
+	/**
+	 * renders the preview image of a page result
+	 *
+	 * @param array $row result row
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 5.11.14
+	 * @return string
+	 */
+	public function renderPagePreviewImage($row) {
+		list($type, $filetype) = explode(':', $row['type']);
+
+		if ($type == 'page') {
+			$imageConf = $this->conf['previewImage.'];
+			$fileObject = $this->getAttachedFileFromFAL($row['orig_uid'], 'pages', 'media');
+			if ($fileObject) {
+				$metadata = $fileObject->_getMetaData();
+				$imageConf['file'] = $fileObject->getPublicUrl();
+				$imageConf['altText'] = $metadata['alternative'];
+				return $this->renderPreviewImage($imageConf);
+			} else {
+				$imageConf['file'] = $row['directory'] . rawurlencode($row['title']);
+			}
+		}
+		return $this->renderPreviewImage($imageConf);
+	}
+
+	/*
+	 * get fal media file which is attached to a record
+	 * @param int $uid
+	 * @param string $tablenames
+	 * @return object $fileObject / false
+	 */
+	protected function getAttachedFileFromFAL($uid, $tablenames, $fieldname) {
+		$fields = 'sys_file_reference.uid_local as sys_file_uid';
+		$table = 'sys_file_reference, sys_file';
+		$where = 'tablenames = "' . $tablenames . '"';
+		$where .= ' AND fieldname = "' . $fieldname . '"';
+		$where .= ' AND uid_foreign = ' . intval($uid);
+		$where .= ' AND uid_local = sys_file.uid';
+		$where .= $this->cObj->enableFields('sys_file_reference');
+		$where .= $this->cObj->enableFields('sys_file');
+		$groupBy = '';
+		$orderBy = '';
+		$limit = 1;
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where, $groupBy, $orderBy, $limit);
+
+		if ($GLOBALS['TYPO3_DB']->sql_num_rows($res)) {
+			$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+			$fileRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
+			$fileObject = $fileRepository->findByUid($row['sys_file_uid']);
+			return $fileObject;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * renders a review image and sets the max. width and max. height if not 
+	 * defined yet.
+	 * 
+	 * @param array $imageConf
+	 * @return string
+	 */
+	public function renderPreviewImage($imageConf) {
+			if (empty($imageConf['file.']['maxW'])) $imageConf['file.']['maxW'] = 150;
+			if (empty($imageConf['file.']['maxH'])) $imageConf['file.']['maxH'] = 150;
+			return $this->cObj->IMAGE($imageConf);
+	}
 
 	/**
 	 * renders an image tag which will prepend the teaser if activated by user.

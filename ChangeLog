@@ -1,13 +1,14 @@
 ChangeLog
 
 Version 1.8.3
+* feature: Show images from pages (field "media" in page properties) in search result list. Activate this function in plugin configuration. Relies on FAL and therefore needs 6.X to work.
 
 Version 1.8.2
-* bugfix: fix tag generation for news catagories. fixes regression introduced in 1.8.0.
+* bugfix: Fix tag generation for news catagories. fixes regression introduced in 1.8.0.
 
 Version 1.8.1
-* task: move getResultLinkConfiguration to a static function in helper class, this makes it possible to call it from out of ke_search (needed for ke_search_premium).
-* bugfix (IMPORTANT): fix regression introduced in 1.7.2: fronted user group set in page properties should be taken to the corresponding index entry, otherwise protected pages will show up in the search results even if the user is not logged in.
+* task: Move getResultLinkConfiguration to a static function in helper class, this makes it possible to call it from out of ke_search (needed for ke_search_premium).
+* bugfix (IMPORTANT): Fix regression introduced in 1.7.2: fronted user group set in page properties should be taken to the corresponding index entry, otherwise protected pages will show up in the search results even if the user is not logged in.
 
 Version 1.8.0, October 2014
 * Thanks to swm medienproduktion for sponsoring this version.

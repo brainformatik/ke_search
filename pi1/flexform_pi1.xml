@@ -424,6 +424,16 @@
 						</TCEforms>
 					</showFilePreview>
 
+					<showPageImages>
+						<TCEforms>
+							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showPageImages</label>
+							<config>
+								<type>check</type>
+								<default>1</default>
+							</config>
+						</TCEforms>
+					</showPageImages>
+
 					<showTypeIcon>
 						<TCEforms>
 							<label>LLL:EXT:ke_search/pi1/locallang.xml:ff.showTypeIcon</label>
