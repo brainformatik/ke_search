@@ -1,6 +1,6 @@
 ChangeLog
 
-Version 1.8.3
+Version 1.8.3 TRUNK
 * feature: Show images from pages (field "media" in page properties) in search result list. Activate this function in plugin configuration. Relies on FAL and therefore needs 6.X to work.
 * bugfix: Don't combine groups of subpages with groups of parent pages. https://forge.typo3.org/issues/61966
 * bugfix: escpape search strings for sphinx search (ke_search_premium).
