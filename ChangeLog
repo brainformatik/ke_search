@@ -4,9 +4,11 @@ Version 1.8.3 TRUNK
 * feature: Show images from pages (field "media" in page properties) in search result list. Activate this function in plugin configuration. Relies on FAL and therefore needs 6.X to work.
 * bugfix: Don't combine groups of subpages with groups of parent pages. https://forge.typo3.org/issues/61966
 * bugfix: escpape search strings for sphinx search (ke_search_premium).
+* bugfix: fix setLimit call for ke_search_premium
+* bugfix: fix compatibility to TYPO3 6.1 (FAL _getMetaData function is not available).
 
 Version 1.8.2
-* bugfix: Fix tag generation for news catagories. fixes regression introduced in 1.8.0.
+* bugfix: Fix tag generation for news categories. fixes regression introduced in 1.8.0.
 
 Version 1.8.1
 * task: Move getResultLinkConfiguration to a static function in helper class, this makes it possible to call it from out of ke_search (needed for ke_search_premium).

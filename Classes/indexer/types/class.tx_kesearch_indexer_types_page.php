@@ -557,10 +557,18 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		// get metadata
 		if ($fileObject instanceof TYPO3\CMS\Core\Resource\FileReference) {
 			$orig_uid = $fileObject->getOriginalFile()->getUid();
-			$metadata = $fileObject->getOriginalFile()->_getMetaData();
+			if (TYPO3_VERSION_INTEGER >= 6002000) {
+				$metadata = $fileObject->getOriginalFile()->_getMetaData();
+			} else {
+				$metadata = array();
+			}
 		} else {
 			$orig_uid = $fileObject->getUid();
-			$metadata = $fileObject->_getMetaData();
+			if (TYPO3_VERSION_INTEGER >= 6002000) {
+				$metadata = $fileObject->_getMetaData();
+			} else {
+				$metadata = array();
+			}
 		}
 
 		// assign categories as tags

@@ -144,7 +144,7 @@ class tx_kesearch_db implements t3lib_Singleton {
 		$this->user_kesearchpremium->setSorting($this->getOrdering());
 
 		// set limit
-		$this->user_kesearchpremium->setLimit(0, intval($this->pObj->extConfPremium['sphinxLimit']));
+		$this->user_kesearchpremium->setLimit(0, intval($this->pObj->extConfPremium['sphinxLimit']), intval($this->pObj->extConfPremium['sphinxLimit']));
 
 		// generate query
 		$queryForSphinx = '';
