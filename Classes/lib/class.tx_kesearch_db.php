@@ -115,6 +115,19 @@ class tx_kesearch_db implements t3lib_Singleton {
 
 
 	/**
+	* Escpapes Query String for Sphinx, taken from SphinxApi.php
+	* @param string $string
+	* @return string
+	*/
+	function escapeString ( $string ) {
+		$from = array ( '\\', '(',')','|','-','!','@','~','"','&', '/', '^', '$', '=' );
+		$to   = array ( '\\\\', '\(','\)','\|','\-','\!','\@','\~','\"', '\&', '\/', '\^', '\$', '\=' );
+
+		return str_replace ( $from, $to, $string );
+	}
+
+
+	/**
 	 * get a limitted amount of search results for a requested page
 	 *
 	 * @return array Array containing a limitted (one page) amount of search results
@@ -135,7 +148,7 @@ class tx_kesearch_db implements t3lib_Singleton {
 
 		// generate query
 		$queryForSphinx = '';
-		if($this->pObj->wordsAgainst) $queryForSphinx .= ' @(title,content) ' . $this->pObj->wordsAgainst;
+		if($this->pObj->wordsAgainst) $queryForSphinx .= ' @(title,content) ' . $this->escapeString($this->pObj->wordsAgainst);
 		if(count($this->pObj->tagsAgainst)) {
 			foreach($this->pObj->tagsAgainst as $value) {
 				// in normal case only checkbox mode has spaces
