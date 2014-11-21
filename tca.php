@@ -484,7 +484,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 			)
 		),
 		'targetpid' => array (
-			'displayCond' => 'FIELD:type:!IN:page,tt_content,file,templavoila,comments',
+			'displayCond' => 'FIELD:type:!IN:page,tt_content,file,templavoila,comments,remote',
 			'exclude' => 0,
 			'label' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.targetpid',
 			'config' => array (

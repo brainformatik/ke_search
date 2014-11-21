@@ -7,6 +7,7 @@ Version 1.8.3 TRUNK
 * bugfix: fix setLimit call for ke_search_premium
 * bugfix: fix compatibility to TYPO3 6.1 (FAL _getMetaData function is not available).
 * bugfix: fix default value from no_fal to -1 in indexerconfig TCA.
+* task: remove field "targetpid" from configuration for "remote" indexer type (needed for ke_search_premium).
 
 Version 1.8.2
 * bugfix: Fix tag generation for news categories. fixes regression introduced in 1.8.0.
