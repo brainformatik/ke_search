@@ -775,7 +775,7 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 				),
 				'size' => 1,
 				'maxitems' => 1,
-				'default' => 'no_fal',
+				'default' => -1,
 				'foreign_table' => 'sys_file_storage',
 				'allowNonIdValues' => 1
 			)
