@@ -192,6 +192,15 @@ class tx_kesearch_helper {
 				$linkconf['fileTarget'] = $targetFiles;
 				break;
 
+			case 'external':
+				// render a link for external results (provided by ke_search_premium)
+				$linkconf['parameter'] = $resultRow['params'];
+				$linkconf['useCacheHash'] = false;
+				$linkconf['additionalParams'] = '';
+				$extConfPremium = tx_kesearch_helper::getExtConfPremium();
+				$linkconf['extTarget'] = $extConfPremium['apiExternalResultTarget'];
+				break;
+
 			default:
 				// render a link for page targets
 				// if params are filled, add them to the link generation process
