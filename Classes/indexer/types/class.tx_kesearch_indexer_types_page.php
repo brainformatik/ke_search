@@ -39,10 +39,32 @@ define('DONOTINDEX', -3);
  */
 class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
-	var $pids = 0;
-	var $pageRecords = array(); // this array contains all data of all pages
-	var $cachedPageRecords = array(); // this array contains all data of all pages, but additionally with all available languages
+	/**
+	 * this array contains all data of all pages in the default language
+	 *
+	 * @var array
+	 */
+	var $pageRecords = array();
+
+	/**
+	 * this array contains all data of all pages, but additionally with all available languages
+	 *
+	 * @var array
+	 */
+	var $cachedPageRecords = array(); //
+
+	/**
+	 * this array contains the system languages
+	 *
+	 * @var type
+	 */
 	var $sysLanguages = array();
+
+	/**
+	 * this array contains the definition of which content element types should be indexed
+	 *
+	 * @var array
+	 */
 	var $indexCTypes = array(
 	    'text',
 	    'textpic',
@@ -52,18 +74,71 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	    'header',
 	    'uploads'
 	);
+
+	/**
+	 * this array contains the definition of which file content element types should be indexed
+	 *
+	 * @var type
+	 */
 	var $fileCTypes = array('uploads');
-	var $counter = 0;
-	var $counterWithoutContent = 0;
-	var $fileCounter = 0;
-	var $whereClauseForCType = '';
-	// Name of indexed elements. Will be overwritten in content element indexer.
+
+	/**
+	 *
+	 * this array contains the definition of which page
+	 * types (field doktype in pages table) should be indexed.
+	 *
+	 * Standard = 1
+	 * Advanced = 2
+	 * External URL = 3
+	 * Shortcut = 4
+	 * Not in menu = 5
+	 * Backend User Section = 6
+	 * Mountpoint = 7
+	 * Spacer = 199
+	 * SysFolder = 254
+	 * Recycler = 255
+	 *
+	 * @var array
+	 */
+	var $indexDokTypes = array(1,2,5);
+
+	/*
+	 * Name of indexed elements. Will be overwritten in content element indexer.
+	 */
 	var $indexedElementsName = 'pages';
 
 	/**
 	 * @var \TYPO3\CMS\Core\Resource\FileRepository
 	 */
 	var $fileRepository;
+
+	/**
+	 * counter for how many pages we have indexed
+	 *
+	 * @var integer
+	 */
+	var $counter = 0;
+
+	/**
+	 * counter for how many pages without content we found
+	 *
+	 * @var integer
+	 */
+	var $counterWithoutContent = 0;
+
+	/**
+	 * counter for how many files we have indexed
+	 *
+	 * @var integer
+	 */
+	var $fileCounter = 0;
+
+	/**
+	 * sql query for content types
+	 *
+	 * @var string
+	 */
+	var $whereClauseForCType = '';
 
 	/**
 	 * Constructor of this object
@@ -101,6 +176,12 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		// add complete page record to list of pids in $indexPids
 		$this->pageRecords = $this->getPageRecords($indexPids);
 
+		// create an array of cached page records which contains pages in
+		// default and all other languages registered in the system
+		foreach ($this->pageRecords as $pageRecord) {
+			$this->addLocalizedPagesToCache($pageRecord);
+		}
+
 		// create a new list of allowed pids
 		$indexPids = array_keys($this->pageRecords);
 
@@ -120,7 +201,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
 		// show indexer content
 		$content .= '<p><b>Indexer "' . $this->indexerConfig['title'] . '": </b><br />'
-			. count($indexPids) . ' pages have been found for indexing.<br />' . "\n"
+			. count($indexPids) . ' pages in ' . count($this->sysLanguages) . ' languages have been found for indexing .<br />' . "\n"
 			. $this->counter . ' ' . $this->indexedElementsName . ' have been indexed (' . $this->counterWithoutContent .' more had no content).<br />' . "\n"
 			. $this->fileCounter . ' files have been indexed.<br />' . "\n"
 			. '</p>' . "\n";
@@ -136,9 +217,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	}
 
 	/**
-	 * get array with all pages
-	 * but remove all pages we don't want to have
-	 * additionally generates a cachedPageArray
+	 * get array with all pages which should be indexed
 	 *
 	 * @param array Array with all page cols
 	 */
@@ -147,14 +226,8 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$table = 'pages';
 		$where = 'uid IN (' . implode(',', $uids) . ')';
 
-		// index only pages of doktype standard, advanced and "not in menu"
-		// add also sysfolders (254) and shortlinks (4), we need this for the correct inheritage of
-		// frontend user groups
-		$where .= ' AND (doktype = 1 OR doktype = 2 OR doktype = 4 OR doktype = 5 OR doktype = 254) ';
-
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where);
 		while ($pageRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-			$this->addLocalizedPagesToCache($pageRow);
 			$pages[$pageRow['uid']] = $pageRow;
 		}
 		return $pages;
@@ -275,7 +348,10 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$where .= t3lib_BEfunc::BEenableFields($table);
 		$where .= t3lib_BEfunc::deleteClause($table);
 
-		// get frontend groups for this page
+		// Get frontend groups for this page, this group applies to all
+		// content elements of this pages. Individuel frontent groups
+		// set for the content elements will be ignored. Use the content
+		// element indexer if you need that feature!
 		$feGroupsPages = t3lib_div::uniqueList(implode(',', $this->getRecursiveFeGroups($uid)));
 
 		// get Tags for current page
@@ -319,7 +395,6 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 				}
 
 			}
-			$this->counter++;
 		} else {
 			$this->counterWithoutContent++;
 			return;
@@ -349,33 +424,57 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 
 		// store record in index table
 		if (count($pageContent)) {
-			foreach ($pageContent as $langKey => $content) {
-
-				// skip indexing of this page if it is set to no_search or hidden
-				if (!$this->cachedPageRecords[$langKey][$uid]['no_search'] &&
-					!$this->cachedPageRecords[$langKey][$uid]['hidden']) {
-
+			foreach ($pageContent as $language_uid => $content) {
+				if ($this->checkIfpageShouldBeIndexed($uid, $language_uid)) {
 					$this->pObj->storeInIndex(
-						$indexerConfig['storagepid'],                          // storage PID
-						$this->cachedPageRecords[$langKey][$uid]['title'],     // page title
-						$indexEntryDefaultValues['type'],                      // content type
-						$indexEntryDefaultValues['uid'],                       // target PID: where is the single view?
-						$content,                                              // indexed content, includes the title (linebreak after title)
-						$tags,                                                 // tags
-						$indexEntryDefaultValues['params'],                    // typolink params for singleview
-						$this->cachedPageRecords[$langKey][$uid]['abstract'],  // abstract
-						$langKey,                                              // language uid
-						$this->cachedPageRecords[$langKey][$uid]['starttime'], // starttime
-						$this->cachedPageRecords[$langKey][$uid]['endtime'],   // endtime
-						$indexEntryDefaultValues['feGroupsPages'],             // fe_group
-						$indexEntryDefaultValues['debugOnly'],                 // debug only?
-						$additionalFields                                      // additional fields added by hooks
+						$indexerConfig['storagepid'],                               // storage PID
+						$this->cachedPageRecords[$language_uid][$uid]['title'],     // page title
+						$indexEntryDefaultValues['type'],                           // content type
+						$indexEntryDefaultValues['uid'],                            // target PID: where is the single view?
+						$content,                                                   // indexed content, includes the title (linebreak after title)
+						$tags,                                                      // tags
+						$indexEntryDefaultValues['params'],                         // typolink params for singleview
+						$this->cachedPageRecords[$language_uid][$uid]['abstract'],  // abstract
+						$language_uid,                                              // language uid
+						$this->cachedPageRecords[$language_uid][$uid]['starttime'], // starttime
+						$this->cachedPageRecords[$language_uid][$uid]['endtime'],   // endtime
+						$indexEntryDefaultValues['feGroupsPages'],                  // fe_group
+						$indexEntryDefaultValues['debugOnly'],                      // debug only?
+						$additionalFields                                           // additional fields added by hooks
 					);
+					$this->counter++;
 				}
 			}
 		}
 
 		return;
+	}
+
+	/**
+	 * checks wether the given page should go to the index.
+	 * Checks the doktype and wethe the "hidden" or "no_index" flags
+	 * are set.
+	 *
+	 * @param integer $pageUid
+	 * @param integer $language_uid
+	 * @return boolean
+	 */
+	public function checkIfpageShouldBeIndexed($uid, $language_uid) {
+		$index = true;
+
+		if ($this->cachedPageRecords[$language_uid][$uid]['hidden']) {
+			$index = false;
+		}
+
+		if ($this->cachedPageRecords[$language_uid][$uid]['no_search']) {
+			$index = false;
+		}
+
+		if (!in_array($this->cachedPageRecords[$language_uid][$uid]['doktype'], $this->indexDokTypes)) {
+			$index = false;
+		}
+
+		return $index;
 	}
 
 	/**
