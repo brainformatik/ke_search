@@ -173,48 +173,58 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 * @return void
 	 */
 	public function addLocalizedPagesToCache($pageRow) {
+		// create entry in cachedPageRecods for default language
 		$this->cachedPageRecords[0][$pageRow['uid']] = $pageRow;
+
+		// create entry in cachedPageRecods for additional languages, skip default language 0
 		foreach ($this->sysLanguages as $sysLang) {
-			list($pageOverlay) = t3lib_BEfunc::getRecordsByField(
-					'pages_language_overlay', 'pid', $pageRow['uid'], 'AND sys_language_uid=' . intval($sysLang[1])
-			);
-			if ($pageOverlay) {
-				$this->cachedPageRecords[$sysLang[1]][$pageRow['uid']] = t3lib_div::array_merge(
-						$pageRow, $pageOverlay
+			if ($sysLang[1] > 0) {
+				list($pageOverlay) = t3lib_BEfunc::getRecordsByField(
+						'pages_language_overlay', 'pid', $pageRow['uid'], 'AND sys_language_uid=' . intval($sysLang[1])
 				);
+				if ($pageOverlay) {
+					$this->cachedPageRecords[$sysLang[1]][$pageRow['uid']] = t3lib_div::array_merge(
+							$pageRow, $pageOverlay
+					);
+				}
 			}
 		}
 	}
 
 	/**
 	 * creates a rootline and searches for valid feGroups
+	 * returns the fe_group restrictions for the given page
 	 *
-	 * @param integer $uid
+	 * @param integer $currentPageUid
 	 * @return array
 	 */
-	public function getRecursiveFeGroups($uid) {
-		$currentPageUid = $uid;
-		$tempRootline[] = $this->cachedPageRecords[0][$uid]['uid'];
-		while ($this->cachedPageRecords[0][$uid]['pid']) {
-			$uid = $this->cachedPageRecords[0][$uid]['pid'];
-			if (is_array($this->cachedPageRecords[0][$uid])) {
-				$tempRootline[] = $this->cachedPageRecords[0][$uid]['uid'];
+	public function getRecursiveFeGroups($currentPageUid) {
+
+		// get the rootline, start with the current page and go up
+		$pageUid = $currentPageUid;
+		$tempRootline = array(intval($this->cachedPageRecords[0][$currentPageUid]['pageUid']));
+		while ($this->cachedPageRecords[0][$pageUid]['pid'] > 0) {
+			$pageUid = intval($this->cachedPageRecords[0][$pageUid]['pid']);
+			if (is_array($this->cachedPageRecords[0][$pageUid])) {
+				$tempRootline[] = $pageUid;
 			}
 		}
-		krsort($tempRootline);
-		foreach ($tempRootline as $page) {
-			$rootline[] = $page;
-		}
 
+		// revert the ordering of the rootline so it starts with the
+		// page at the top of the tree
+		krsort($tempRootline);
+		$rootline = array();
+		foreach ($tempRootline as $pageUid) {
+			$rootline[] = $pageUid;
+		}
 
 		// since now we have a full rootline of the current page. 0 = level 0, 1 = level 1 and so on,
 		// we can fetch the inherited groups from pages above
 		$inheritedFeGroups = array();
-		foreach ($rootline as $uid) {
-			if ($this->cachedPageRecords[0][$uid]['extendToSubpages'] && !empty($this->cachedPageRecords[0][$uid]['fe_group'])) {
-				$inheritedFeGroups = explode(',', $this->cachedPageRecords[0][$uid]['fe_group']);
+		foreach ($rootline as $pageUid) {
+			if ($this->cachedPageRecords[0][$pageUid]['extendToSubpages'] && !empty($this->cachedPageRecords[0][$pageUid]['fe_group'])) {
+				$inheritedFeGroups = explode(',', $this->cachedPageRecords[0][$pageUid]['fe_group']);
 			}
-
 		}
 
 		// use the fe_groups restriction of the current page OR use the inherited groups, do not combine them
