@@ -152,12 +152,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		// frontend user groups
 		$where .= ' AND (doktype = 1 OR doktype = 2 OR doktype = 4 OR doktype = 5 OR doktype = 254) ';
 
-		// index only pages which are searchable
-		// index only page which are not hidden
-		$where .= ' AND no_search <> 1 AND hidden=0';
-
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where);
-
 		while ($pageRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 			$this->addLocalizedPagesToCache($pageRow);
 			$pages[$pageRow['uid']] = $pageRow;
@@ -355,22 +350,28 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		// store record in index table
 		if (count($pageContent)) {
 			foreach ($pageContent as $langKey => $content) {
-				$this->pObj->storeInIndex(
-					$indexerConfig['storagepid'],                          // storage PID
-					$this->cachedPageRecords[$langKey][$uid]['title'],     // page title
-					$indexEntryDefaultValues['type'],                      // content type
-					$indexEntryDefaultValues['uid'],                       // target PID: where is the single view?
-					$content,                                              // indexed content, includes the title (linebreak after title)
-					$tags,                                                 // tags
-					$indexEntryDefaultValues['params'],                    // typolink params for singleview
-					$this->cachedPageRecords[$langKey][$uid]['abstract'],  // abstract
-					$langKey,                                              // language uid
-					$this->cachedPageRecords[$langKey][$uid]['starttime'], // starttime
-					$this->cachedPageRecords[$langKey][$uid]['endtime'],   // endtime
-					$indexEntryDefaultValues['feGroupsPages'],             // fe_group
-					$indexEntryDefaultValues['debugOnly'],                 // debug only?
-					$additionalFields                                      // additional fields added by hooks
-				);
+
+				// skip indexing of this page if it is set to no_search or hidden
+				if (!$this->cachedPageRecords[$langKey][$uid]['no_search'] &&
+					!$this->cachedPageRecords[$langKey][$uid]['hidden']) {
+
+					$this->pObj->storeInIndex(
+						$indexerConfig['storagepid'],                          // storage PID
+						$this->cachedPageRecords[$langKey][$uid]['title'],     // page title
+						$indexEntryDefaultValues['type'],                      // content type
+						$indexEntryDefaultValues['uid'],                       // target PID: where is the single view?
+						$content,                                              // indexed content, includes the title (linebreak after title)
+						$tags,                                                 // tags
+						$indexEntryDefaultValues['params'],                    // typolink params for singleview
+						$this->cachedPageRecords[$langKey][$uid]['abstract'],  // abstract
+						$langKey,                                              // language uid
+						$this->cachedPageRecords[$langKey][$uid]['starttime'], // starttime
+						$this->cachedPageRecords[$langKey][$uid]['endtime'],   // endtime
+						$indexEntryDefaultValues['feGroupsPages'],             // fe_group
+						$indexEntryDefaultValues['debugOnly'],                 // debug only?
+						$additionalFields                                      // additional fields added by hooks
+					);
+				}
 			}
 		}
 
