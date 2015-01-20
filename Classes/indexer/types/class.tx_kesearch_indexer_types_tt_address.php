@@ -72,7 +72,6 @@ class tx_kesearch_indexer_types_tt_address extends tx_kesearch_indexer_types {
 		while ( ($addressRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) ) {
 			$abstract = '';
 			$content = '';
-			$targetPID = $this->indexerConfig['targetpid'];
 
 			// set title, use company if set, otherwise name
 			$title = !empty($addressRow['company']) ? $addressRow['company'] : (!empty($addressRow['name']) ? $addressRow['name'] : ($addressRow['first_name'] . ' ' . $addressRow['last_name']));
@@ -162,7 +161,7 @@ class tx_kesearch_indexer_types_tt_address extends tx_kesearch_indexer_types {
 				$indexerConfig['storagepid'],       // storage PID
 				$title,                             // page/record title
 				'tt_address',                       // content type
-				$targetPID,                         // target PID: where is the single view?
+                $indexerConfig['targetpid'],        // target PID: where is the single view?
 				$fullContent,                       // indexed content, includes the title (linebreak after title)
 				$tagContent,                        // tags
 				$params,                            // typolink params for singleview
