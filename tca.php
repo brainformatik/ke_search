@@ -801,4 +801,9 @@ if (version_compare(t3lib_extMgm::getExtensionVersion('news'), '3.0.0') >= 0) {
 	$TCA['tx_kesearch_indexerconfig']['columns']['index_extnews_category_selection']['config']['foreign_table'] = 'sys_category';
 	$TCA['tx_kesearch_indexerconfig']['columns']['index_extnews_category_selection']['config']['foreign_table_where'] = '';
 }
+
+// fallback for TYPO3 versions below 6 where FAL is not present
+if (TYPO3_VERSION_INTEGER < 6000000) {
+	$TCA['tx_kesearch_indexerconfig']['columns']['fal_storage']['config'] = array('type' => 'passthrough');
+}
 ?>

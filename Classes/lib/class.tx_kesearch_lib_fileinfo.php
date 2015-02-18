@@ -2,7 +2,7 @@
 /***************************************************************
 *  Copyright notice
 *
-*  (c) 2011 Stefan Froemken 
+*  (c) 2011 Stefan Froemken
 *  All rights reserved
 *
 *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -25,29 +25,35 @@
 /**
  * Plugin 'Faceted search - searchbox and filters' for the 'ke_search' extension.
  *
- * @author	Stefan Froemken 
+ * @author	Stefan Froemken
  * @package	TYPO3
  * @subpackage	tx_kesearch
  */
 class tx_kesearch_lib_fileinfo {
 
+	/**
+	 * File
+	 *
+	 * @var \TYPO3\CMS\Core\Resource\File
+	 */
+	protected $file = NULL;
+
+	/**
+	 * File info
+	 *
+	 * @var array
+	 */
 	protected $fileInfo = array();
-
-
-
-
 
 	/**
 	 * set a filename to get informations of
 	 *
-	 * @param string $file
+	 * @param string|\TYPO3\CMS\Core\Resource\File $file
 	 * @return boolean is valid file
 	 */
 	public function setFile($file) {
-		$this->fileInfo = array(); // reset previously infomations to have a cleaned object
 		return $this->setFileInformations($file);
 	}
-
 
 	/**
 	 * collect all fileinformations of given file and
@@ -57,6 +63,9 @@ class tx_kesearch_lib_fileinfo {
 	 * @return boolean is valid file?
 	 */
 	protected function setFileInformations($file) {
+		$this->fileInfo = array(); // reset previously information to have a cleaned object
+		$this->file = $file instanceof \TYPO3\CMS\Core\Resource\File ? $file : NULL;
+
 		if(is_string($file) && !empty($file)) {
 			$this->fileInfo = t3lib_div::split_fileref($file);
 			$this->fileInfo['mtime'] = filemtime($file);
@@ -72,14 +81,32 @@ class tx_kesearch_lib_fileinfo {
 			$this->fileInfo['is_readable'] = is_readable($file);
 			$this->fileInfo['is_uploaded'] = is_uploaded_file($file);
 			$this->fileInfo['is_writeable'] = is_writeable($file);
-
-			return true;
-		} else {
-			$this->fileInfo = array();
-			return false;
 		}
-	}
 
+		if ($file instanceof \TYPO3\CMS\Core\Resource\File) {
+			$pathInfo = \TYPO3\CMS\Core\Utility\PathUtility::pathinfo($file->getName());
+			$this->fileInfo = array(
+				'file' => $file->getName(),
+				'filebody' => $file->getNameWithoutExtension(),
+				'fileext' => $file->getExtension(),
+				'realFileext' => $pathInfo['extension'],
+				'atime' => $file->getCreationTime(),
+				'mtime' => $file->getModificationTime(),
+				'owner' => '',
+				'group' => '',
+				'size' => $file->getSize(),
+				'type' => 'file',
+				'perms' => '',
+				'is_dir' => FALSE,
+				'is_file' => ($file->getStorage()->getDriverType() === 'Local' ? is_file($file->getForLocalProcessing(FALSE)) : TRUE),
+				'is_link' => ($file->getStorage()->getDriverType() === 'Local' ? is_link($file->getForLocalProcessing(FALSE)) : FALSE),
+				'is_readable' => TRUE,
+				'is_uploaded' => FALSE,
+				'is_writeable' => FALSE,
+			);
+		}
+		return $this->fileInfo !== array();
+	}
 
 	/**
 	 * return relative to site root file path
@@ -87,7 +114,11 @@ class tx_kesearch_lib_fileinfo {
 	 * @return string Filepath (f.e. fileadmin/user_upload/)
 	 */
 	public function getRelativePath() {
-		return str_replace(PATH_site, '', $this->fileInfo['path']);
+		if ($this->file !== NULL) {
+			return $this->file->getPublicUrl();
+		} else {
+			return str_replace(PATH_site, '', $this->fileInfo['path']);
+		}
 	}
 
 	/**
@@ -96,19 +127,21 @@ class tx_kesearch_lib_fileinfo {
 	 * @return string Filepath (f.e. /var/www/fileadmin/)
 	 */
 	public function getPath() {
-		return $this->fileInfo['path'];
+		if ($this->file !== NULL) {
+			return $this->file->getForLocalProcessing(FALSE);
+		} else {
+			return $this->fileInfo['path'];
+		}
 	}
 
-
 	/**
-	 * return file anme
+	 * return file name
 	 *
 	 * @return string Filename (f.e. Bericht von Bernd.PDF)
 	 */
 	public function getName() {
 		return $this->fileInfo['file'];
 	}
-
 
 	/**
 	 * return file body
@@ -119,7 +152,6 @@ class tx_kesearch_lib_fileinfo {
 		return $this->fileInfo['filebody'];
 	}
 
-
 	/**
 	 * return file extension
 	 *
@@ -128,7 +160,6 @@ class tx_kesearch_lib_fileinfo {
 	public function getExtension() {
 		return $this->fileInfo['fileext'];
 	}
-
 
 	/**
 	 * return the real file extension
@@ -139,7 +170,6 @@ class tx_kesearch_lib_fileinfo {
 		return $this->fileInfo['realFileext'];
 	}
 
-
 	/**
 	 * return files modification time
 	 *
@@ -148,7 +178,6 @@ class tx_kesearch_lib_fileinfo {
 	public function getModificationTime() {
 		return $this->fileInfo['mtime'];
 	}
-
 
 	/**
 	 * return files last access time
@@ -159,7 +188,6 @@ class tx_kesearch_lib_fileinfo {
 		return $this->fileInfo['atime'];
 	}
 
-
 	/**
 	 * return files owner
 	 *
@@ -168,7 +196,6 @@ class tx_kesearch_lib_fileinfo {
 	public function getOwner() {
 		return $this->fileInfo['owner'];
 	}
-
 
 	/**
 	 * return files group
@@ -179,7 +206,6 @@ class tx_kesearch_lib_fileinfo {
 		return $this->fileInfo['group'];
 	}
 
-
 	/**
 	 * return filesize
 	 *
@@ -188,7 +214,6 @@ class tx_kesearch_lib_fileinfo {
 	public function getSize() {
 		return $this->fileInfo['size'];
 	}
-
 
 	/**
 	 * return filetype
@@ -199,7 +224,6 @@ class tx_kesearch_lib_fileinfo {
 		return $this->fileInfo['type'];
 	}
 
-
 	/**
 	 * return file permissions
 	 *
@@ -208,7 +232,6 @@ class tx_kesearch_lib_fileinfo {
 	public function getPermissions() {
 		return $this->fileInfo['perms'];
 	}
-
 
 	/**
 	 * return if file is a directory
@@ -219,7 +242,6 @@ class tx_kesearch_lib_fileinfo {
 		return $this->fileInfo['is_dir'];
 	}
 
-
 	/**
 	 * return if file is a file
 	 *
@@ -228,7 +250,6 @@ class tx_kesearch_lib_fileinfo {
 	public function getIsFile() {
 		return $this->fileInfo['is_file'];
 	}
-
 
 	/**
 	 * return if file is a (sym)link
@@ -239,7 +260,6 @@ class tx_kesearch_lib_fileinfo {
 		return $this->fileInfo['is_link'];
 	}
 
-
 	/**
 	 * return if file is readable
 	 *
@@ -248,7 +268,6 @@ class tx_kesearch_lib_fileinfo {
 	public function getIsReadable() {
 		return $this->fileInfo['is_readable'];
 	}
-
 
 	/**
 	 * return if file is uploaded
@@ -259,7 +278,6 @@ class tx_kesearch_lib_fileinfo {
 		return $this->fileInfo['is_uploaded'];
 	}
 
-
 	/**
 	 * return if file is writable
 	 *
@@ -268,7 +286,6 @@ class tx_kesearch_lib_fileinfo {
 	public function getIsWriteable() {
 		return $this->fileInfo['is_writeable'];
 	}
-
 
 	/**
 	 * return all fileinformations

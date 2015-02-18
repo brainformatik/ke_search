@@ -2,7 +2,7 @@
 /* * *************************************************************
  *  Copyright notice
  *
- *  (c) 2011 Stefan Froemken 
+ *  (c) 2011 Stefan Froemken
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -25,7 +25,7 @@
 /**
  * Plugin 'Faceted search' for the 'ke_search' extension.
  *
- * @author	Stefan Froemken 
+ * @author	Stefan Froemken
  * @author	Christian Bülter
  * @package	TYPO3
  * @subpackage	tx_kesearch
@@ -113,7 +113,7 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 		$counter = $this->extractContentAndSaveToIndex($files);
 
 		// show indexer content?
-		$content .= '<p><b>Indexer "' . $this->indexerConfig['title'] . '": </b><br />'
+		$content = '<p><b>Indexer "' . $this->indexerConfig['title'] . '": </b><br />'
 			. count($files) . ' files have been found for indexing.<br />' . "\n"
 			. $counter . ' files have been indexed.</p>' . "\n";
 
@@ -139,7 +139,7 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 				if (count($filesInFolder)) {
 					foreach ($filesInFolder as $file) {
 						if (\TYPO3\CMS\Core\Utility\GeneralUtility::inList($this->pObj->indexerConfig['fileext'], $file->getExtension())) {
-							$files[] = $file->getIdentifier();
+							$files[] = $file;
 						}
 					}
 				}
@@ -181,7 +181,7 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 	/**
 	 * get absolute directory paths of given path in array
 	 *
-	 * @param array $directory
+	 * @param array $directoryArray
 	 * @return array An Array containing the absolute directory paths
 	 */
 	public function getAbsoluteDirectoryPath(array $directoryArray) {
@@ -206,17 +206,18 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 	 */
 	public function extractContentAndSaveToIndex($files) {
 		$counter = 0;
-		if ($this->pObj->indexerConfig['fal_storage'] > 0) {
-			$storageConfiguration = $this->storage->getConfiguration();
-			$basepath = rtrim(PATH_site . $storageConfiguration['basePath'], '/');
-		} else {
-			$basepath = '';
-		}
-
 		if (is_array($files) && count($files)) {
 			foreach ($files as $file) {
-				if ($this->fileInfo->setFile($basepath . $file)) {
-					$content = $this->getFileContent($basepath . $file);
+				if ($this->fileInfo->setFile($file)) {
+
+					// get file content, check if we have a FAL resource or a simple
+					// string containing the path to the file
+					if ($file instanceof \TYPO3\CMS\Core\Resource\File) {
+						$content = $this->getFileContent($file->getForLocalProcessing(FALSE));
+					} else {
+						$content = $this->getFileContent($file);
+					}
+
 					if (!($content === false)) {
 						$this->storeToIndex($file, $content);
 						$counter++;
@@ -300,11 +301,9 @@ class tx_kesearch_indexer_types_file extends tx_kesearch_indexer_types {
 		tx_kesearch_helper::makeTags($tags, array('file'));
 
 		// get data from FAL
-		if ($this->pObj->indexerConfig['fal_storage'] > 0) {
-			$storageConfiguration = $this->storage->getConfiguration();
-			$fileObject = $this->storage->getFile($file);
-			$metadata = $fileObject->_getMetaData();
-			$orig_uid = $fileObject->getUid();
+		if ($file instanceof \TYPO3\CMS\Core\Resource\File) {
+			$metadata = $file->_getMetaData();
+			$orig_uid = $file->getUid();
 		} else {
 			$orig_uid = 0;
 		}
