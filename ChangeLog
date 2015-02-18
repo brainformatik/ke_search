@@ -9,6 +9,7 @@ Version 1.8.4
 * bugfix: fix compatibility with version 4.5: dont' render page preview images.
 * bugfix: File indexing (FAL enabled) only support public local storages. Thanks to Frans Saris. https://forge.typo3.org/issues/64861
 * bugfix: fix compatibility with version 4.5: remove relation to sys_file_storage in TCA for TYPO3 versions below 6.
+* bugfix: CLI not possible with TYPO3 6.2.x. Thanks to Ricky Bohse. https://forge.typo3.org/issues/64947
 
 Version 1.8.3 
 * feature: Show images from pages (field "media" in page properties) in search result list. Activate this function in plugin configuration. Relies on FAL and therefore needs 6.X to work.

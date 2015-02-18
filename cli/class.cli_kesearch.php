@@ -41,8 +41,12 @@ class tx_kesearch_cli extends t3lib_cli {
 	 */
     function tx_kesearch_cli () {
 
-        // Running parent class constructor
-        parent::t3lib_cli();
+		// Running parent class constructor
+		if (TYPO3_VERSION_INTEGER >= 6002000) {
+			parent::__construct();
+		} else {
+			parent::t3lib_cli();
+		}
 
         // Setting help texts:
         $this->cli_help['name'] = 'ke_search Command Line Interface';
