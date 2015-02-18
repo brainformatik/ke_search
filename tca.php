@@ -319,7 +319,11 @@ $TCA['tx_kesearch_index'] = array (
 					array('LLL:EXT:lang/locallang_general.xml:LGL.any_login', -2),
 					array('LLL:EXT:lang/locallang_general.xml:LGL.usergroups', '--div--')
 				),
-				'foreign_table' => 'fe_groups'
+				'foreign_table' => 'fe_groups',
+				'foreign_table_where' => 'ORDER BY fe_groups.title',
+				'size' => 6,
+				'minitems' => 0,
+				'maxitems' => 99999,
 			)
 		),
 		'targetpid' => array (
@@ -393,7 +397,8 @@ $TCA['tx_kesearch_index'] = array (
 			'config' => array (
 				'type' => 'select',
 				'items' => array (
-						array('Default', 0),
+					array('LLL:EXT:lang/locallang_general.xlf:LGL.allLanguages', -1),
+					array('LLL:EXT:lang/locallang_general.xlf:LGL.default_value', 0)
 				),
 				'foreign_table' => 'sys_language',
 				'foreign_table_where' => 'ORDER BY sys_language.uid',
