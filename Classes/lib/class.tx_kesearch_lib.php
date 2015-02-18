@@ -1420,7 +1420,7 @@ class tx_kesearch_lib extends tslib_pibase {
 				unset($imageHtml);
 			}
 
-			if ($this->conf['showPageImages'] && $type == 'page') {
+			if ($this->conf['showPageImages'] && $type == 'page' && TYPO3_VERSION_INTEGER >= 6000000) {
 				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_TYPE_ICON###');
 				$imageHtml = $this->renderPagePreviewImage($row);
 				$subContent = $this->cObj->substituteMarker($subContent,'###TYPE_ICON###', $imageHtml);
@@ -1767,7 +1767,8 @@ class tx_kesearch_lib extends tslib_pibase {
 	}
 
 	/**
-	 * renders the preview image of a page result
+	 * renders the preview image of a page result, needs FAL and is therefore
+	 * only available for TYPO3 versoin 6 or higher
 	 *
 	 * @param array $row result row
 	 * @author Christian Bülter <buelter@kennziffer.com>
@@ -1785,11 +1786,8 @@ class tx_kesearch_lib extends tslib_pibase {
 				$imageConf['file'] = $fileObject->getPublicUrl();
 				$imageConf['altText'] = $metadata['alternative'];
 				return $this->renderPreviewImage($imageConf);
-			} else {
-				$imageConf['file'] = $row['directory'] . rawurlencode($row['title']);
 			}
 		}
-		return $this->renderPreviewImage($imageConf);
 	}
 
 	/*
