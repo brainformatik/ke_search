@@ -1,5 +1,7 @@
 ChangeLog
 
+Version 1.8.5
+
 Version 1.8.4
 * bugfix: do not create language overlay for pages for language 0, that creates infinite loops while indexing. https://forge.typo3.org/issues/58427
 * bugfix: add hidden pages and pages with no_index flag to the cached pages array, otherwise "extend to subpages" flag has no effect on their subpages and fe_groups are not set.
