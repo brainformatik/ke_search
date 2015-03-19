@@ -1409,31 +1409,8 @@ class tx_kesearch_lib extends tslib_pibase {
 			}
 			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_TAGS###', $subContent, $recursive=1);
 
-			// preview image (instead of type icon)
-			$subContent = '';
-			$previewRendered = false;
-			if ($this->conf['showFilePreview'] && $type == 'file') {
-				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_TYPE_ICON###');
-				$imageHtml = $this->renderFilePreview($row);
-				$subContent = $this->cObj->substituteMarker($subContent,'###TYPE_ICON###', $imageHtml);
-				$previewRendered = !empty($imageHtml);
-				unset($imageHtml);
-			}
-
-			if ($this->conf['showPageImages'] && $type == 'page' && TYPO3_VERSION_INTEGER >= 6000000) {
-				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_TYPE_ICON###');
-				$imageHtml = $this->renderPagePreviewImage($row);
-				$subContent = $this->cObj->substituteMarker($subContent,'###TYPE_ICON###', $imageHtml);
-				$previewRendered = !empty($imageHtml) || $previewRendered;
-				unset($imageHtml);
-			}
-
-			// type icon
-			if ($this->conf['showTypeIcon'] && !$previewRendered) {
-				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_TYPE_ICON###');
-				$subContent = $this->cObj->substituteMarker($subContent,'###TYPE_ICON###', $this->renderTypeIcon($row['type']));
-			} 
-			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_TYPE_ICON###', $subContent, $recursive=1);
+			// preview image
+			$tempContent = $this->cObj->substituteSubpart ($tempContent, '###SUB_TYPE_ICON###', $this->renderPreviewImageOrTypeIcon($row), $recursive=1);
 
 			// add temp content to result list
 			$content .= $tempContent;
@@ -1459,6 +1436,52 @@ class tx_kesearch_lib extends tslib_pibase {
 	}
 
 
+	/**
+	 * renders a preview image in the result list or a icon which indicates
+	 * the type of the result (page, news, ...)
+	 *
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 19.03.15
+	 */
+	function renderPreviewImageOrTypeIcon($row) {
+
+			// preview image (instead of type icon)
+			$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_TYPE_ICON###');
+			list($type, $filetype) = explode(':', $row['type']);
+			switch ($type) {
+
+				case 'file':
+					if ($this->conf['showFilePreview']) {
+						$imageHtml = $this->renderFilePreview($row);
+					}
+					break;
+
+				case 'page':
+					if ($this->conf['showPageImages']) {
+						$imageHtml = $this->renderFALPreviewImage($row['orig_uid'], 'pages', 'media');
+					}
+					break;
+
+				case 'news':
+					if ($this->conf['showNewsImages']) {
+						$imageHtml = $this->renderFALPreviewImage($row['orig_uid'], 'tx_news_domain_model_news', 'fal_media');
+					}
+					break;
+
+				default:
+					$imageHtml = '';
+					break;
+			}
+			$subContent = $this->cObj->substituteMarker($subContent,'###TYPE_ICON###', $imageHtml);
+
+			// render type icon if no preview image is available (or preview is disabled)
+			if ($this->conf['showTypeIcon'] && empty($imageHtml)) {
+				$subContent = $this->cObj->getSubpart($this->templateCode,'###SUB_TYPE_ICON###');
+				$subContent = $this->cObj->substituteMarker($subContent,'###TYPE_ICON###', $this->renderTypeIcon($row['type']));
+			}
+
+			return $subContent;
+	}
 
 	/**
  	* Counts searchword and -phrase if ke_stats is installed
@@ -1747,8 +1770,7 @@ class tx_kesearch_lib extends tslib_pibase {
 	 */
 	public function renderFilePreview($row) {
 		list($type, $filetype) = explode(':', $row['type']);
-
-		if ($type == 'file' && in_array($filetype, $this->fileTypesWithPreviewPossible)) {
+		if (in_array($filetype, $this->fileTypesWithPreviewPossible)) {
 			$imageConf = $this->conf['previewImage.'];
 
 			// if index record is of type "file" and contains an orig_uid, this is the reference
@@ -1762,62 +1784,45 @@ class tx_kesearch_lib extends tslib_pibase {
 			} else {
 				$imageConf['file'] = $row['directory'] . rawurlencode($row['title']);
 			}
+			return $this->renderPreviewImage($imageConf);
 		}
-		return $this->renderPreviewImage($imageConf);
 	}
 
 	/**
-	 * renders the preview image of a page result, needs FAL and is therefore
-	 * only available for TYPO3 versoin 6 or higher
+	 * renders the preview image of a result which has an attached image,
+	 * needs FAL and is therefore only available for TYPO3 version 6 or higher.
+	 * Returns an empty string if no image could be rendered.
 	 *
-	 * @param array $row result row
+	 * @param integer $uid uid of referencing record
+	 * @param string $table table name of the original table
+	 * @param string $fieldname field which holds the FAL reference
 	 * @author Christian Bülter <buelter@kennziffer.com>
 	 * @since 5.11.14
 	 * @return string
 	 */
-	public function renderPagePreviewImage($row) {
-		list($type, $filetype) = explode(':', $row['type']);
+	public function renderFALPreviewImage($uid, $table='pages', $fieldname='media') {
+		$imageHtml = '';
 
-		if ($type == 'page') {
+		if (TYPO3_VERSION_INTEGER >= 6000000) {
 			$imageConf = $this->conf['previewImage.'];
-			$fileObject = $this->getAttachedFileFromFAL($row['orig_uid'], 'pages', 'media');
+			$fileRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
+			$fileObjects = $fileRepository->findByRelation($table, $fieldname, $uid);
+			if (count($fileObjects)) {
+				$fileObject = $fileObjects[0];
+			}
+
 			if ($fileObject) {
-				$metadata = $fileObject->_getMetaData();
+				$referenceProperties = $fileObject->getReferenceProperties();
+				$originalFileProperties = $fileObject->getOriginalFile()->getProperties();
+				$alternative = $referenceProperties['alternative'] ? $referenceProperties['alternative'] : $originalFileProperties['alternative'];
+
 				$imageConf['file'] = $fileObject->getPublicUrl();
-				$imageConf['altText'] = $metadata['alternative'];
-				return $this->renderPreviewImage($imageConf);
+				$imageConf['altText'] = $alternative;
+				$imageHtml = $this->renderPreviewImage($imageConf);
 			}
 		}
-	}
 
-	/*
-	 * get fal media file which is attached to a record
-	 * @param int $uid
-	 * @param string $tablenames
-	 * @return object $fileObject / false
-	 */
-	protected function getAttachedFileFromFAL($uid, $tablenames, $fieldname) {
-		$fields = 'sys_file_reference.uid_local as sys_file_uid';
-		$table = 'sys_file_reference, sys_file';
-		$where = 'tablenames = "' . $tablenames . '"';
-		$where .= ' AND fieldname = "' . $fieldname . '"';
-		$where .= ' AND uid_foreign = ' . intval($uid);
-		$where .= ' AND uid_local = sys_file.uid';
-		$where .= $this->cObj->enableFields('sys_file_reference');
-		$where .= $this->cObj->enableFields('sys_file');
-		$groupBy = '';
-		$orderBy = '';
-		$limit = 1;
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery($fields, $table, $where, $groupBy, $orderBy, $limit);
-
-		if ($GLOBALS['TYPO3_DB']->sql_num_rows($res)) {
-			$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
-			$fileRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
-			$fileObject = $fileRepository->findByUid($row['sys_file_uid']);
-			return $fileObject;
-		} else {
-			return false;
-		}
+		return $imageHtml;
 	}
 
 	/**
