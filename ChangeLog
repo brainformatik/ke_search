@@ -1,5 +1,7 @@
 ChangeLog
 
+Version 1.8.6
+
 Version 1.8.5, March 2015
 * feature: show preview images for results of ext:news. Thanks to designverign GmbH for sponsoring this feature.
 * feature: show alternative texts in preview images.
