@@ -1,6 +1,7 @@
 ChangeLog
 
 Version 1.9.1
+* task: fix position of message "searchword too short"
 
 Version 1.9.0
 * task: make ke_search compatible with TYPO3 version 7. Adjust class names and use namespaces.

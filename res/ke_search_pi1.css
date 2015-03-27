@@ -303,6 +303,9 @@ div.kesearchbox{
 #kesearch_results .result-list-item .result-title {
 	font-size:18px;
 }
+#kesearch_results {
+	clear:both;
+}
 #kesearch_results .result-list-item .result-teaser {
 	color:#707070;
 }
