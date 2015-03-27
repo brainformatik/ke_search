@@ -121,10 +121,11 @@ class tx_kesearch_lib_searchphrase {
 
 				// check for word length
 				if (TYPO3_VERSION_INTEGER >= 7000000) {
-					$searchWordLength = \TYPO3\CMS\Core\Charset\CharsetConverter::utf8_strlen($word);
+					$csconv = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Charset\\CharsetConverter');
 				} else {
-					$searchWordLength = t3lib_cs::utf8_strlen($word);
+					$csconv = t3lib_div::makeInstance('t3lib_cs');
 				}
+				$searchWordLength = $csconv->utf8_strlen($word);
 				if($searchWordLength < $this->pObj->extConf['searchWordLength']) {
 					$this->pObj->hasTooShortWords = true;
 					$this->showShortMessage = true;
