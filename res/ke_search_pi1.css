@@ -305,6 +305,7 @@ div.kesearchbox{
 }
 #kesearch_results {
 	clear:both;
+	margin-top:20px;
 }
 #kesearch_results .result-list-item .result-teaser {
 	color:#707070;

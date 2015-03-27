@@ -219,6 +219,7 @@ function hideSpinner() {
 	<div id="kesearch_num_results">###NUMBER_OF_RESULTS###</div>
 	<div id="kesearch_ordering">###ORDERING###</div>
 	<div id="kesearch_pagebrowser_top">###PAGEBROWSER_TOP###</div>
+	<div class="clearer"> </div>
 	<div id="kesearch_results">###MESSAGE###</div>
 	<div id="kesearch_updating_results">###SPINNER###<br /></div>
 	<div id="kesearch_pagebrowser_bottom">###PAGEBROWSER_BOTTOM###</div>
