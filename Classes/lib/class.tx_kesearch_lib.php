@@ -858,15 +858,18 @@ class tx_kesearch_lib extends tx_kesearch_pluginBase {
 				$isOptionInOptionArray = 0;
 
 				// check if current option (of searchresults) is in array of all possible options
-				foreach($options as $optionKey => $optionValue) {
-					if (TYPO3_VERSION_INTEGER >= 7000000) {
-						$isInArray = TYPO3\CMS\Core\Utility\GeneralUtility::inArray($options[$optionKey], $data['title']);
-					} else {
-						$isInArray = t3lib_div::inArray($options[$optionKey], $data['title']);
-					}
-					if(is_array($options[$optionKey]) && $isInArray) {
-						$isOptionInOptionArray = 1;
-						break;
+				$isOptionInOptionArray = 0;
+				if (is_array($options)) {
+					foreach($options as $optionKey => $optionValue) {
+						if (TYPO3_VERSION_INTEGER >= 7000000) {
+							$isInArray = TYPO3\CMS\Core\Utility\GeneralUtility::inArray($options[$optionKey], $data['title']);
+						} else {
+							$isInArray = t3lib_div::inArray($options[$optionKey], $data['title']);
+						}
+						if(is_array($options[$optionKey]) && $isInArray) {
+							$isOptionInOptionArray = 1;
+							break;
+						}
 					}
 				}
 
