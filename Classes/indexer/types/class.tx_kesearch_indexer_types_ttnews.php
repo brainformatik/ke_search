@@ -146,9 +146,10 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 				}
 
 				// compile the information which should go into the index
-				$title = strip_tags($newsRecord['title']);
+				$type     = 'tt_news';
+				$title    = strip_tags($newsRecord['title']);
 				$abstract = strip_tags($newsRecord['short']);
-				$content = strip_tags($newsRecord['bodytext']);
+				$content  = strip_tags($newsRecord['bodytext']);
 
 				// add keywords to content if not empty
 				if (!empty($newsRecord['keywords'])) {
@@ -158,11 +159,28 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 				// create content
 				$fullContent = $abstract . "\n" . $content;
 
-				// create params
-				$paramsSingleView = $this->getParamsForHrDateSingleView($newsRecord['datetime']);
-				$paramsSingleView['tx_ttnews']['tt_news'] = $newsRecord['uid'];
-				$params = '&' . http_build_query($paramsSingleView, NULL, '&');
-				$params = rawurldecode($params);
+				// create params and custom single view page:
+				// if it is a default news (type = 0), add params
+				// if it is an internal page (type = 1), put that into the "targetpid" field
+				// if it is an external url (type = 2), put that into the "params" field
+				//   or News type article or external url
+				if ($newsRecord['type'] == 1) {
+					$singleViewPage = $newsRecord['page'];
+					$params = '';
+				} else if ($newsRecord['type'] == 2) {
+					$type = 'external:tt_news';
+					$singleViewPage = '';
+					$params = $newsRecord['ext_url'];;
+				} else {
+					// get target page from category if set (first assigned category)
+					if (t3lib_extMgm::isLoaded('tt_news')) {
+						$singleViewPage = $this->getSingleViewPageFromCategories($newsRecord['uid']);
+					}
+					$paramsSingleView = $this->getParamsForHrDateSingleView($newsRecord['datetime']);
+					$paramsSingleView['tx_ttnews']['tt_news'] = $newsRecord['uid'];
+					$params = '&' . http_build_query($paramsSingleView, NULL, '&');
+					$params = rawurldecode($params);
+				}
 
 				// create tags
 				if ($this->indexerConfig['index_use_page_tags']) {
@@ -171,6 +189,7 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 					$tags = '';
 				}
 
+				// add additional fields
 				$additionalFields = array();
 
 				// crdate is always given, but can be overwritten
@@ -188,12 +207,10 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 				// make it possible to modify the indexerConfig via hook
 				$indexerConfig = $this->indexerConfig;
 
-				// get target page from category if set (first assigned category)
-				if (t3lib_extMgm::isLoaded('tt_news')) {
-					$singleViewPage = $this->getSingleViewPageFromCategories($newsRecord['uid']);
-					if ($singleViewPage) {
-						$indexerConfig['targetpid'] = $singleViewPage;
-					}
+				// overwrite default targetpid value from indexerconfig
+				// only if $singleViewPage is set
+				if ($singleViewPage) {
+					$indexerConfig['targetpid'] = $singleViewPage;
 				}
 
 				// hook for custom modifications of the indexed data, e. g. the tags
@@ -212,20 +229,20 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 
 				// ... and store them
 				$this->pObj->storeInIndex(
-					$indexerConfig['storagepid'], // storage PID
-					$title, // news title
-					'tt_news', // content type
-					$indexerConfig['targetpid'], // target PID: where is the single view?
-					$fullContent, // indexed content, includes the title (linebreak after title)
-					$tags, // tags
-					$params, // typolink params for singleview
-					$abstract, // abstract
+					$indexerConfig['storagepid'],    // storage PID
+					$title,                          // news title
+					$type,                           // content type
+					$indexerConfig['targetpid'],     // target PID: where is the single view?
+					$fullContent,                    // indexed content, includes the title (linebreak after title)
+					$tags,                           // tags
+					$params,                         // typolink params for singleview
+					$abstract,                       // abstract
 					$newsRecord['sys_language_uid'], // language uid
-					$newsRecord['starttime'], // starttime
-					$newsRecord['endtime'], // endtime
-					$newsRecord['fe_group'], // fe_group
-					false, // debug only?
-					$additionalFields    // additional fields added by hooks
+					$newsRecord['starttime'],        // starttime
+					$newsRecord['endtime'],          // endtime
+					$newsRecord['fe_group'],         // fe_group
+					false,                           // debug only?
+					$additionalFields                // additional fields added by hooks
 				);
 				$counter++;
 			}

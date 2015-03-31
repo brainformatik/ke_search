@@ -197,21 +197,20 @@ class tx_kesearch_helper {
 				break;
 
 			case 'external':
-				// render a link for external results (provided by ke_search_premium)
+				// render a link for external results (provided by eg. ke_search_premium or tt_news)
 				$linkconf['parameter'] = $resultRow['params'];
 				$linkconf['useCacheHash'] = false;
 				$linkconf['additionalParams'] = '';
 				$extConfPremium = tx_kesearch_helper::getExtConfPremium();
-				$linkconf['extTarget'] = $extConfPremium['apiExternalResultTarget'];
+				$linkconf['extTarget'] = $extConfPremium['apiExternalResultTarget'] ? $extConfPremium['apiExternalResultTarget'] : '_blank';
 				break;
 
 			default:
 				// render a link for page targets
 				// if params are filled, add them to the link generation process
 				if (!empty($resultRow['params'])) {
-					$additionalParams = $resultRow['params'];
+					$linkconf['additionalParams'] = $resultRow['params'];
 				}
-				$linkconf['additionalParams'] = $additionalParams;
 				$linkconf['parameter'] = $resultRow['targetpid'];
 				$linkconf['useCacheHash'] = true;
 				$linkconf['target'] = $targetDefault;
