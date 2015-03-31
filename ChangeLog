@@ -4,7 +4,7 @@ Version 1.9.1
 * task: fix position of message "searchword too short"
 * bugfix: check if array exists in checkbox rendering
 * task: do not call CharsetConverter function statically but instantiate the class first.
-* bugfix: create correct links to tt_news records of type "internal page" and "external link"
+* bugfix: create correct links to ext:tt_news and ext:news records of type "internal page" and "external link"
 
 Version 1.9.0
 * task: make ke_search compatible with TYPO3 version 7. Adjust class names and use namespaces.

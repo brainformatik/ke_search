@@ -107,10 +107,11 @@ class tx_kesearch_indexer_types_news extends tx_kesearch_indexer_types {
 				}
 
 				// compile the information which should go into the index:
-				// title, teaser, bodytext 
-				$title = strip_tags($newsRecord['title']);
+				// title, teaser, bodytext
+				$type     = 'news';
+				$title    = strip_tags($newsRecord['title']);
 				$abstract = strip_tags($newsRecord['teaser']);
-				$content = strip_tags($newsRecord['bodytext']);
+				$content  = strip_tags($newsRecord['bodytext']);
 
 				// add additional fields to the content:
 				// alternative_title, author, author_email, keywords
@@ -135,16 +136,37 @@ class tx_kesearch_indexer_types_news extends tx_kesearch_indexer_types {
 				}
 				$fullContent .= $content;
 
-				// compile params for single view, example:
-				// index.php?id=123&tx_news_pi1[news]=9&tx_news_pi1[controller]=News&tx_news_pi1[action]=detail
-				$paramsSingleView['tx_news_pi1']['news'] = $newsRecord['uid'];
-				$paramsSingleView['tx_news_pi1']['controller'] = 'News';
-				$paramsSingleView['tx_news_pi1']['action'] = 'detail';
-				$params = '&' . http_build_query($paramsSingleView, NULL, '&');
-				$params = rawurldecode($params);
+				// make it possible to modify the indexerConfig via hook
+				$indexerConfig = $this->indexerConfig;
+
+				// create params and custom single view page:
+				// if it is a default news (type = 0), add params
+				// if it is an internal page (type = 1), put that into the "targetpid" field
+				// if it is an external url (type = 2), put that into the "params" field
+				if ($newsRecord['type'] == 1) {
+					$indexerConfig['targetpid'] = $newsRecord['internalurl'];
+					$params = '';
+				} else if ($newsRecord['type'] == 2) {
+					$type = 'external:news';
+					$params = $newsRecord['externalurl'];
+				} else {
+					// overwrite the targetpid if there is a category assigned
+					// which has its own single view page
+					if ($categoryData['single_pid']) {
+						$indexerConfig['targetpid'] = $categoryData['single_pid'];
+					}
+
+					// create params for news single view, example:
+					// index.php?id=123&tx_news_pi1[news]=9&tx_news_pi1[controller]=News&tx_news_pi1[action]=detail
+					$paramsSingleView['tx_news_pi1']['news'] = $newsRecord['uid'];
+					$paramsSingleView['tx_news_pi1']['controller'] = 'News';
+					$paramsSingleView['tx_news_pi1']['action'] = 'detail';
+					$params = '&' . http_build_query($paramsSingleView, NULL, '&');
+					$params = rawurldecode($params);
+				}
 
 				// add tags from pages
-				if ($this->indexerConfig['index_use_page_tags']) {
+				if ($indexerConfig['index_use_page_tags']) {
 					$tags = $this->pageRecords[intval($newsRecord['pid'])]['tags'];
 				} else {
 					$tags = '';
@@ -158,15 +180,6 @@ class tx_kesearch_indexer_types_news extends tx_kesearch_indexer_types {
 
 				// add categories from from ext:news as tags
 				$tags = $this->addTagsFromNewsCategories($tags, $categoryData);
-
-				// make it possible to modify the indexerConfig via hook
-				$indexerConfig = $this->indexerConfig;
-
-				// overwrite the targetpid if there is a category assigned
-				// which has its own single view page
-				if ($categoryData['single_pid']) {
-					$indexerConfig['targetpid'] = $categoryData['single_pid'];
-				}
 
 				// set additional fields
 				$additionalFields = array();
@@ -204,7 +217,7 @@ class tx_kesearch_indexer_types_news extends tx_kesearch_indexer_types {
 				$this->pObj->storeInIndex(
 					$indexerConfig['storagepid'],	// storage PID
 					$title,                         // page title
-					'news',                       	// content type
+					$type,                       	// content type
 					$indexerConfig['targetpid'],    // target PID: where is the single view?
 					$fullContent,                   // indexed content, includes the title (linebreak after title)
 					$tags,                          // tags

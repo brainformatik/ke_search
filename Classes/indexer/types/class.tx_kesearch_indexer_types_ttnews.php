@@ -163,7 +163,6 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 				// if it is a default news (type = 0), add params
 				// if it is an internal page (type = 1), put that into the "targetpid" field
 				// if it is an external url (type = 2), put that into the "params" field
-				//   or News type article or external url
 				if ($newsRecord['type'] == 1) {
 					$singleViewPage = $newsRecord['page'];
 					$params = '';
