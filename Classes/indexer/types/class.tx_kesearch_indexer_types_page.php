@@ -270,13 +270,20 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	}
 
 	/**
-	 * creates a rootline and searches for valid feGroups
-	 * returns the fe_group restrictions for the given page
+	 * creates a rootline and searches for valid access restrictions
+	 * returns the access restrictions for the given page as an array:
+	 *
+	 *	$accessRestrictions = array(
+	 *		'hidden' => 0,
+	 *		'fe_group' => ',
+	 *		'starttime' => 0,
+	 *		'endtime' => 0
+	 *	);
 	 *
 	 * @param integer $currentPageUid
 	 * @return array
 	 */
-	public function getRecursiveFeGroups($currentPageUid) {
+	public function getInheritedAccessRestrictions($currentPageUid) {
 
 		// get the rootline, start with the current page and go up
 		$pageUid = $currentPageUid;
@@ -296,53 +303,40 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 			$rootline[] = $pageUid;
 		}
 
-		// since now we have a full rootline of the current page. 0 = level 0, 1 = level 1 and so on,
-		// we can fetch the inherited groups from pages above
-		$inheritedFeGroups = array();
+		// access restrictions:
+		// a) hidden field
+		// b) frontend groups
+		// c) publishing and expiration date
+		$inheritedAccessRestrictions = array(
+			'hidden' => 0,
+			'fe_group' => '',
+			'starttime' => 0,
+			'endtime' => 0
+		);
+
+		// collect inherited access restrictions
+		// since now we have a full rootline of the current page
+		// (0 = level 0, 1 = level 1 and so on),
+		// we can fetch the access restrictions from pages above
 		foreach ($rootline as $pageUid) {
-			if ($this->cachedPageRecords[0][$pageUid]['extendToSubpages'] && !empty($this->cachedPageRecords[0][$pageUid]['fe_group'])) {
-				$inheritedFeGroups = explode(',', $this->cachedPageRecords[0][$pageUid]['fe_group']);
+			if ($this->cachedPageRecords[0][$pageUid]['extendToSubpages']) {
+				$inheritedAccessRestrictions['hidden']    = $this->cachedPageRecords[0][$pageUid]['hidden'];
+				$inheritedAccessRestrictions['fe_group']  = $this->cachedPageRecords[0][$pageUid]['fe_group'];
+				$inheritedAccessRestrictions['starttime'] = $this->cachedPageRecords[0][$pageUid]['starttime'];
+				$inheritedAccessRestrictions['endtime']   = $this->cachedPageRecords[0][$pageUid]['endtime'];
 			}
 		}
 
-		// use the fe_groups restriction of the current page OR use the inherited groups, do not combine them
-		if ($this->cachedPageRecords[0][$currentPageUid]['fe_group']) {
-			$feGroups = explode(',', $this->cachedPageRecords[0][$currentPageUid]['fe_group']);
-		} else {
-			if ($inheritedFeGroups) {
-				foreach ($inheritedFeGroups as $group) {
-					$feGroups = $this->addGroup($inheritedFeGroups, $group);
-				}
-			} else {
-				$feGroups = array();
-			}
-		}
+		// use access restrictions of current page if set otherwise use
+		// inherited access restrictions
+		$accessRestrictions = array(
+			'hidden'    => $this->cachedPageRecords[0][$currentPageUid]['hidden'] ? $this->cachedPageRecords[0][$currentPageUid]['hidden'] : $inheritedAccessRestrictions['hidden'],
+			'fe_group'  => $this->cachedPageRecords[0][$currentPageUid]['fe_group'] ? $this->cachedPageRecords[0][$currentPageUid]['fe_group'] : $inheritedAccessRestrictions['fe_group'] ,
+			'starttime' => $this->cachedPageRecords[0][$currentPageUid]['starttime'] ? $this->cachedPageRecords[0][$currentPageUid]['starttime'] : $inheritedAccessRestrictions['starttime'],
+			'endtime'   => $this->cachedPageRecords[0][$currentPageUid]['endtime'] ? $this->cachedPageRecords[0][$currentPageUid]['endtime'] : $inheritedAccessRestrictions['endtime'],
+		);
 
-		return $feGroups;
-	}
-
-	/**
-	 * adds a frontend group to an array of groups. If the new group is a real
-	 * group, remove "hide at login" (-1) and "show for all" (-2) groups from the list.
-	 *
-	 * @param array $groupList
-	 * @param string $group
-	 * @return type
-	 * @author Christian Bülter <buelter@kennziffer.com>
-	 * @since 07.10.13
-	 */
-	public function addGroup($groupList, $group) {
-		$groupList[] = $group;
-
-		if (intval($group) > 0) {
-			foreach ($groupList as $key => $value) {
-				if ($value < 0) {
-					unset($groupList[$key]);
-				}
-			}
-		}
-
-		return $groupList;
+		return $accessRestrictions;
 	}
 
 	/**
@@ -363,19 +357,19 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 			$where .= t3lib_BEfunc::deleteClause($table);
 		}
 
-		// Get frontend groups for this page, this group applies to all
-		// content elements of this pages. Individuel frontent groups
+		// Get access restrictions for this page, this access restrictians apply to all
+		// content elements of this pages. Individuel access restrictions
 		// set for the content elements will be ignored. Use the content
 		// element indexer if you need that feature!
-		if (TYPO3_VERSION_INTEGER >= 7000000) {
-			$feGroupsPages = \TYPO3\CMS\Core\Utility\GeneralUtility::uniqueList(implode(',', $this->getRecursiveFeGroups($uid)));
-		} else {
-			$feGroupsPages = t3lib_div::uniqueList(implode(',', $this->getRecursiveFeGroups($uid)));
-		}
+		$pageAccessRestrictions = $this->getInheritedAccessRestrictions($uid);
 
 		// get Tags for current page
 		$tags = $this->pageRecords[intval($uid)]['tags'];
 
+		// Compile content for this page from individual content elements with
+		// respect to the language.
+		// While doing so, fetch also content from attached files and write
+		// their content directly to the index.
 		$ttContentRows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where);
 		$pageContent = array();
 		if (count($ttContentRows)) {
@@ -403,7 +397,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 				}
 
 				// index the files fond
-				$this->indexFiles($fileObjects, $ttContentRow, $feGroupsPages, $tags) . "\n";
+				$this->indexFiles($fileObjects, $ttContentRow, $pageAccessRestrictions['fe_group'], $tags) . "\n";
 
 				// add content from this content element to page content
 				// ONLY if this content element is not access protected
@@ -427,7 +421,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 			'type' => 'page',
 			'uid' => $uid,
 			'params' => '',
-			'feGroupsPages' => $feGroupsPages,
+			'feGroupsPages' => $pageAccessRestrictions['fe_group'],
 			'debugOnly' => FALSE
 		);
 
@@ -448,7 +442,23 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		// store record in index table
 		if (count($pageContent)) {
 			foreach ($pageContent as $language_uid => $content) {
-				if ($this->checkIfpageShouldBeIndexed($uid, $language_uid)) {
+				if (!$pageAccessRestrictions['hidden'] && $this->checkIfpageShouldBeIndexed($uid, $language_uid)) {
+
+					// overwrite access restrictions with language overlay values
+					$accessRestrictionsLanguageOverlay = $pageAccessRestrictions;
+					$pageAccessRestrictions['fe_group'] = $indexEntryDefaultValues['feGroupsPages'];
+					if ($language_uid > 0) {
+						if ($this->cachedPageRecords[$language_uid][$uid]['fe_group']) {
+							$accessRestrictionsLanguageOverlay['fe_group'] = $this->cachedPageRecords[$language_uid][$uid]['fe_group'];
+						}
+						if ($this->cachedPageRecords[$language_uid][$uid]['starttime']) {
+							$accessRestrictionsLanguageOverlay['starttime'] = $this->cachedPageRecords[$language_uid][$uid]['starttime'];
+						}
+						if ($this->cachedPageRecords[$language_uid][$uid]['endtime']) {
+							$accessRestrictionsLanguageOverlay['endtime'] = $this->cachedPageRecords[$language_uid][$uid]['endtime'];
+						}
+					}
+
 					$this->pObj->storeInIndex(
 						$indexerConfig['storagepid'],                               // storage PID
 						$this->cachedPageRecords[$language_uid][$uid]['title'],     // page title
@@ -459,9 +469,9 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 						$indexEntryDefaultValues['params'],                         // typolink params for singleview
 						$this->cachedPageRecords[$language_uid][$uid]['abstract'],  // abstract
 						$language_uid,                                              // language uid
-						$this->cachedPageRecords[$language_uid][$uid]['starttime'], // starttime
-						$this->cachedPageRecords[$language_uid][$uid]['endtime'],   // endtime
-						$indexEntryDefaultValues['feGroupsPages'],                  // fe_group
+						$accessRestrictionsLanguageOverlay['starttime'],            // starttime
+						$accessRestrictionsLanguageOverlay['endtime'],              // endtime
+						$accessRestrictionsLanguageOverlay['fe_group'],             // fe_group
 						$indexEntryDefaultValues['debugOnly'],                      // debug only?
 						$additionalFields                                           // additional fields added by hooks
 					);

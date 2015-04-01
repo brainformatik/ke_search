@@ -59,20 +59,23 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 		// get tags from page
 		$tags = $this->pageRecords[$uid]['tags'];
 
-		// get frontend groups for this page
-		if (TYPO3_VERSION_INTEGER >= 7000000) {
-			$feGroupsPages = TYPO3\CMS\Core\Utility\GeneralUtility::uniqueList(implode(',', $this->getRecursiveFeGroups($uid)));
-		} else {
-			$feGroupsPages = t3lib_div::uniqueList(implode(',', $this->getRecursiveFeGroups($uid)));
-		}
+		// Get access restrictions for this page
+		$pageAccessRestrictions = $this->getInheritedAccessRestrictions($uid);
 
 		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where);
 		if(count($rows)) {
 			foreach($rows as $row) {
-				// combine group access restrictons from page(s) and content element
-				$feGroups = $this->getCombinedFeGroupsForContentElement($feGroupsPages, $row['fe_group']);
 
-				// skip this content element if either the page or the content element is set to "hide at login"
+				// skip this content element if the page itself is hidden or a
+				// parent page with "extendToSubpages" set is hidden
+				if ($pageAccessRestrictions['hidden']) continue;
+				if ($row['sys_language_uid'] > 0 && $this->cachedPageRecords[$row['sys_language_uid']][$row['pid']]['hidden']) continue;
+
+				// combine group access restrictons from page(s) and content element
+				$feGroups = $this->getCombinedFeGroupsForContentElement($pageAccessRestrictions['fe_group'], $row['fe_group']);
+
+				// skip this content element if either the page or the content
+				// element is set to "hide at login"
 				// and the other one has a frontend group attached to it
 				if ($feGroups == DONOTINDEX) continue;
 
@@ -96,7 +99,35 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 				}
 
 				// index the files fond
-				$this->indexFiles($fileObjects, $row, $feGroupsPages, $tags) . "\n";
+				$this->indexFiles($fileObjects, $row, $pageAccessRestrictions['fe_group]'], $tags) . "\n";
+
+				// Combine starttime and endtime from page, page language overlay
+				// and content element.
+				// TODO:
+				// If current content element is a localized content
+				// element, fetch startdate and enddate from original conent
+				// element as the localized content element cannot have it's
+				// own start- end enddate
+				$starttime = $pageAccessRestrictions['starttime'];
+
+				if ($this->cachedPageRecords[$row['sys_language_uid']][$row['pid']]['starttime'] > $starttime) {
+					$starttime = $this->cachedPageRecords[$row['sys_language_uid']][$row['pid']]['starttime'];
+				}
+
+				if ($row['starttime'] > $starttime) {
+					$starttime = $row['starttime'];
+				}
+
+				$endtime = $pageAccessRestrictions['endtime'];
+
+				if ($endtime == 0 || ($this->cachedPageRecords[$row['sys_language_uid']][$row['pid']]['endtime'] && $this->cachedPageRecords[$row['sys_language_uid']][$row['pid']]['endtime'] < $endtime)) {
+					$endtime = $this->cachedPageRecords[$row['sys_language_uid']][$row['pid']]['endtime'];
+				}
+
+
+				if ($endtime == 0 || ($row['endtime'] && $row['endtime'] < $endtime)) {
+					$endtime = $row['endtime'];
+				}
 
 				// prepare additionalFields (to be added via hook)
 				$additionalFields = array();
@@ -125,24 +156,24 @@ class tx_kesearch_indexer_types_tt_content extends tx_kesearch_indexer_types_pag
 
 				// compile title from page title and content element title
 				// TODO: make changeable via hook
-				$title = $this->pageRecords[$uid]['title'];
+				$title = $this->cachedPageRecords[$row['sys_language_uid']][$row['pid']]['title'];
 				if ($row['header'] && $row['header_layout'] != 100) {
 					$title = $title . ' - ' . $row['header'];
 				}
 
 				// save record to index
 				$this->pObj->storeInIndex(
-					$indexerConfig['storagepid'],    	// storage PID
+					$indexerConfig['storagepid'],    	    // storage PID
 					$title,                             	// page title inkl. tt_content-title
-					'content',                        	// content type
+					'content',                        	    // content type
 					$row['pid'] . '#c' . $row['uid'],      	// target PID: where is the single view?
 					$content,                             	// indexed content, includes the title (linebreak after title)
 					$tags,                                	// tags
 					'',                                    	// typolink params for singleview
 					'',                                   	// abstract
 					$row['sys_language_uid'],              	// language uid
-					$row['starttime'],                     	// starttime
-					$row['endtime'],                       	// endtime
+					$starttime,                     	    // starttime
+					$endtime,                       	    // endtime
 					$feGroups,                             	// fe_group
 					false,                                 	// debug only?
 					$additionalFields                      	// additional fields added by hooks
