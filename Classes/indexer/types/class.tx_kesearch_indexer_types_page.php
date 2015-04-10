@@ -107,9 +107,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 */
 	var $indexedElementsName = 'pages';
 
-	/**
-	 * @var \TYPO3\CMS\Core\Resource\FileRepository
-	 */
+	/* @var $fileRepository \TYPO3\CMS\Core\Resource\FileRepository */
 	var $fileRepository;
 
 	/**
@@ -162,8 +160,10 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		// make file repository instance only if TYPO3 version is >= 6.0
 		if (TYPO3_VERSION_INTEGER >= 6000000) {
 			if (TYPO3_VERSION_INTEGER >= 6002000) {
+				/* @var $this->fileRepository \TYPO3\CMS\Core\Resource\FileRepository */
 				$this->fileRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
 			} else {
+				/* @var $this->fileRepository \TYPO3\CMS\Core\Resource\FileRepository */
 				$this->fileRepository = t3lib_div::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
 			}
 		}
@@ -623,16 +623,17 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 					// get file information and  file content (using external tools)
 					// write file data to the index as a seperate index entry
 					// count indexed files, add it to the indexer output
-					if ($fileIndexerObject->fileInfo->setFile($filePath)) {
+					if (!file_exists($filePath)) {
+						$this->addError('Could not index file ' . $filePath . ' (file does not exist).');
+					} else if ($fileIndexerObject->fileInfo->setFile($filePath)) {
 						if (($content = $fileIndexerObject->getFileContent($filePath))) {
 							$this->storeFileContentToIndex($fileObject, $content, $fileIndexerObject, $feGroups, $tags, $ttContentRow);
 							$this->fileCounter++;
 						} else {
 							$this->addError($fileIndexerObject->getErrors());
-							$this->addError('Could not index file ' . $filePath);
+							$this->addError('Could not index file ' . $filePath . '.');
 						}
 					}
-
 				}
 			}
 		}
@@ -670,22 +671,28 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	public function findLinkedFilesInRte($ttContentRow) {
 		$fileObjects = array();
 		// check if there are links to files in the rte text
-		if (TYPO3_VERSION_INTEGER >= 6000000) {
-			if (TYPO3_VERSION_INTEGER >= 6002000) {
-				/* @var $rteHtmlParser \TYPO3\CMS\Core\Html\RteHtmlParser */
-				$rteHtmlParser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Html\\RteHtmlParser');
-			} else {
-				/* @var $rteHtmlParser \TYPO3\CMS\Core\Html\RteHtmlParser */
-				$rteHtmlParser = t3lib_div::makeInstance('TYPO3\\CMS\\Core\\Html\\RteHtmlParser');
-			}
+		if (TYPO3_VERSION_INTEGER >= 6002000) {
+			/* @var $rteHtmlParser \TYPO3\CMS\Core\Html\RteHtmlParser */
+			$rteHtmlParser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Html\\RteHtmlParser');
+
 			$blockSplit = $rteHtmlParser->splitIntoBlock('link', $ttContentRow['bodytext'], 1);
 			foreach ($blockSplit as $k => $v) {
 				if ($k % 2) {
 					$tagCode = \TYPO3\CMS\Core\Utility\GeneralUtility::unQuoteFilenames(trim(substr($rteHtmlParser->getFirstTag($v), 0, -1)), TRUE);
 					$link_param = $tagCode[1];
+					//debug($link_param);
+
+					// Check for FAL link-handler keyword
 					list($linkHandlerKeyword, $linkHandlerValue) = explode(':', trim($link_param), 2);
-					if ($linkHandlerKeyword === 'file' && is_numeric($linkHandlerValue)) {
-						$fileObjects[] = $this->fileRepository->findByUid($linkHandlerValue);
+					if ($linkHandlerKeyword === 'file') {
+						try {
+							$fileOrFolderObject = \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance()->retrieveFileOrFolderObject(rawurldecode($linkHandlerValue));
+							if ($fileOrFolderObject instanceof \TYPO3\CMS\Core\Resource\FileInterface || $fileOrFolderObject instanceof \TYPO3\CMS\Core\Resource\Folder) {
+								$fileObjects[] = $fileOrFolderObject;
+							}
+						} catch (\TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException $resourceDoesNotExistException) {
+							$this->addError('Could not index file with FAL uid #' . $linkHandlerValue . ' (the indentifier inserted in the RTE is already gone).');
+						}
 					}
 				}
 			}
