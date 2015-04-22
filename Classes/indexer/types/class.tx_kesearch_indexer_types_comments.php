@@ -103,14 +103,14 @@ class tx_kesearch_indexer_types_comments extends tx_kesearch_indexer_types {
 				$indexerConfig = $this->indexerConfig;
 
 					// hook for custom modifications of the indexed data, e. g. the tags
-				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyNewsIndexEntry'])) {
-					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyNewsIndexEntry'] as $_classRef) {
+				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyCommentsIndexEntry'])) {
+					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyCommentsIndexEntry'] as $_classRef) {
 						if (TYPO3_VERSION_INTEGER >= 7000000) {
 							$_procObj = & TYPO3\CMS\Core\Utility\GeneralUtility::getUserObj($_classRef);
 						} else {
 							$_procObj = & t3lib_div::getUserObj($_classRef);
 						}
-						$_procObj->modifyNewsIndexEntry(
+						$_procObj->modifyCommentsIndexEntry(
 							$title,
 							$abstract,
 							$content,
