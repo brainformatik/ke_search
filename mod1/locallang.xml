@@ -17,6 +17,7 @@
 			<label index="not_allowed_remove_indexer_lock">You are not allowed to remove the indexer lock! This is for admins only!</label>
 			<label index="no_indexer_configurations">No indexer configurations have been found. Please create an indexer configuration record first!</label>
 			<label index="index_contains">The index currently contains</label>
+			<label index="last_indexing">Last indexing was done on</label>
 			<label index="records">records</label>
 			<label index="configurations_found">Indexer configurations have been found:</label>
 		</languageKey>
@@ -32,6 +33,7 @@
 			<label index="not_allowed_remove_indexer_lock">Sie haben nicht die Berechtigung, die Indexer-Sperre zu entfernen. Diese Funktion steht nur Admins zur Verfügung!</label>
 			<label index="no_indexer_configurations">Es wurden keine Indexer-Konfigurationen gefunden. Bitte erstellen Sie zuerst einen Datensatz vom Typ "Indexer-Konfiguration".</label>
 			<label index="index_contains">Der Index enthält derzeit</label>
+			<label index="last_indexing">Die letzte Indexierung fand statt am</label>
 			<label index="records">Einträge</label>
 			<label index="configurations_found">Die folgenden Indexer-Konfigurationen sind angelegt:</label>
 		</languageKey>

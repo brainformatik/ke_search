@@ -1,6 +1,7 @@
 ChangeLog
 
 Version 1.9.3
+* task: do some cleanup in backend module.
 
 Version 1.9.2
 * bugfix: fix naming for comments indexer hook.

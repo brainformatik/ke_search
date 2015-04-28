@@ -235,33 +235,8 @@ class  tx_kesearch_module1 extends tx_kesearch_module_baseclass {
 				// show information about indexer configurations and number of records
 				// if action "start indexing" is not selected
 				if ($do != 'startindexer') {
-					// show indexer names
-					if ($indexerConfigurations) {
-						$content .= '<p>' . $GLOBALS['LANG']->getLL('configurations_found') . '</p>';
-						$content .= '<ul>';
-						foreach ($indexerConfigurations as $indexerConfiguration) {
-							$content .=  '<li>' . $indexerConfiguration['title'] . '</li>';
-						}
-						$content .= '</ul>';
-					}
-
-					$numberOfRecords = $this->getNumberOfRecordsInIndex();
-					if ($numberOfRecords) {
-						$content .= '<p><i>' . $GLOBALS['LANG']->getLL('index_contains') . ' ' . $numberOfRecords . ' ' . $GLOBALS['LANG']->getLL('records') . ': ';
-
-						$results_per_type = $this->getNumberOfRecordsInIndexPerType();
-						$first = true;
-						foreach ($results_per_type as $type => $count) {
-							if (!$first) {
-								$content .= ', ';
-							}
-							$content .= $type . ' (' . $count . ')';
-							$first = false;
-						}
-						$content .= '.<br/>';
-						$content .= 'Last indexing was done on ' . $this->getLatestRecordDate() . '.';
-						$content .= '</i></p>';
-					}
+					$content .= $this->printIndexerConfigurations($indexerConfigurations);
+					$content .= $this->printNumberOfRecords();
 				}
 
 				// check for index process lock in registry
@@ -399,6 +374,57 @@ class  tx_kesearch_module1 extends tx_kesearch_module_baseclass {
 	}
 
 	/**
+	 * prints the indexer configurations available
+	 *
+	 * @param array $indexerConfigurations
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 28.04.15
+	 * @return string
+	 */
+	public function printIndexerConfigurations($indexerConfigurations) {
+		$content = '';
+		// show indexer names
+		if ($indexerConfigurations) {
+			$content .= '<p>' . $GLOBALS['LANG']->getLL('configurations_found') . '</p>';
+			$content .= '<ul>';
+			foreach ($indexerConfigurations as $indexerConfiguration) {
+				$content .=  '<li>' . $indexerConfiguration['title'] . '</li>';
+			}
+			$content .= '</ul>';
+		}
+
+		return $content;
+	}
+
+	/**
+	 * prints number of records in index
+	 *
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 28.04.15
+	 */
+	public function printNumberOfRecords() {
+		$content = '';
+		$numberOfRecords = $this->getNumberOfRecordsInIndex();
+		if ($numberOfRecords) {
+			$content .= '<p><i>' . $GLOBALS['LANG']->getLL('index_contains') . ' ' . $numberOfRecords . ' ' . $GLOBALS['LANG']->getLL('records') . ': ';
+
+			$results_per_type = $this->getNumberOfRecordsInIndexPerType();
+			$first = true;
+			foreach ($results_per_type as $type => $count) {
+				if (!$first) {
+					$content .= ', ';
+				}
+				$content .= $type . ' (' . $count . ')';
+				$first = false;
+			}
+			$content .= '.<br/>';
+			$content .= $GLOBALS['LANG']->getLL('last_indexing') . ' ' . $this->getLatestRecordDate() . '.';
+			$content .= '</i></p>';
+		}
+		return $content;
+	}
+
+	/**
 	 * returns number of records per type in an array
 	 *
 	 * @author Christian Bülter <buelter@kennziffer.com>
@@ -415,6 +441,13 @@ class  tx_kesearch_module1 extends tx_kesearch_module_baseclass {
 		return $results_per_type;
 	}
 
+	/**
+	 * returns the date of the lates record (formatted in a string)
+	 *
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 28.04.15
+	 * @return string
+	 */
 	public function getLatestRecordDate() {
 		$query = 'SELECT tstamp FROM tx_kesearch_index ORDER BY tstamp DESC LIMIT 1';
 		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
