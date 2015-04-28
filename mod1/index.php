@@ -247,7 +247,20 @@ class  tx_kesearch_module1 extends tx_kesearch_module_baseclass {
 
 					$numberOfRecords = $this->getNumberOfRecordsInIndex();
 					if ($numberOfRecords) {
-						$content .= '<p>' . $GLOBALS['LANG']->getLL('index_contains') . ' ' . $numberOfRecords . ' ' . $GLOBALS['LANG']->getLL('records') . '.</p>';
+						$content .= '<p><i>' . $GLOBALS['LANG']->getLL('index_contains') . ' ' . $numberOfRecords . ' ' . $GLOBALS['LANG']->getLL('records') . ': ';
+
+						$results_per_type = $this->getNumberOfRecordsInIndexPerType();
+						$first = true;
+						foreach ($results_per_type as $type => $count) {
+							if (!$first) {
+								$content .= ', ';
+							}
+							$content .= $type . ' (' . $count . ')';
+							$first = false;
+						}
+						$content .= '.<br/>';
+						$content .= 'Last indexing was done on ' . $this->getLatestRecordDate() . '.';
+						$content .= '</i></p>';
 					}
 				}
 
@@ -373,16 +386,40 @@ class  tx_kesearch_module1 extends tx_kesearch_module_baseclass {
 
 	/**
 	 * returns the number of records the index contains
+	 *
 	 * @author Christian Bülter <buelter@kennziffer.com>
 	 * @since 26.03.15
-	 *
 	 * @return integer
 	 */
 	public function getNumberOfRecordsInIndex() {
 		$query = 'SELECT COUNT(*) AS number_of_records FROM tx_kesearch_index';
 		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
-		$row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 		return $row['number_of_records'];
+	}
+
+	/**
+	 * returns number of records per type in an array
+	 *
+	 * @author Christian Bülter <buelter@kennziffer.com>
+	 * @since 28.04.15
+	 * @return array
+	 */
+	public function getNumberOfRecordsInIndexPerType() {
+		$query = 'SELECT type,COUNT(*) AS number_of_records FROM tx_kesearch_index GROUP BY type';
+		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+		$results_per_type = array();
+		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+			$results_per_type[$row['type']] = $row['number_of_records'];
+		}
+		return $results_per_type;
+	}
+
+	public function getLatestRecordDate() {
+		$query = 'SELECT tstamp FROM tx_kesearch_index ORDER BY tstamp DESC LIMIT 1';
+		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+		return date($GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'], $row['tstamp']) . ' ' . date('H:i', $row['tstamp']);
 	}
 
 	/*
@@ -419,11 +456,17 @@ class  tx_kesearch_module1 extends tx_kesearch_module_baseclass {
 						<tr>
 							<td class="infolabel">Complete table size: </td>
 							<td>'.$completeLength.'</td>
-						</tr>
-					</table>';
+						</tr>';
 			}
 		}
 
+		$results_per_type = $this->getNumberOfRecordsInIndexPerType();
+		if (count($results_per_type)) {
+			foreach ($results_per_type as $type => $count) {
+				$content .= '<tr><td>' . $type . '</td><td>' . $count . '</td></tr>';
+			}
+		}
+		$content .= '</table>';
 
 		return $content;
 	}

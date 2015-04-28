@@ -97,12 +97,17 @@ class tx_kesearch_indexer_types_comments extends tx_kesearch_indexer_types {
 					$tags = $this->pageRecords[intval($comment['pid'])]['tags'];
 				} else $tags = '';
 
-				$additionalFields = array();
+				// fill additional fields
+				$additionalFields = array(
+					'orig_uid' => $comment['uid'],
+					'orig_pid' => $comment['pid'],
+					'sortdate' => $comment['crdate']
+				);
 
-					// make it possible to modify the indexerConfig via hook
+				// make it possible to modify the indexerConfig via hook
 				$indexerConfig = $this->indexerConfig;
 
-					// hook for custom modifications of the indexed data, e. g. the tags
+				// hook for custom modifications of the indexed data, e. g. the tags
 				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyCommentsIndexEntry'])) {
 					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['modifyCommentsIndexEntry'] as $_classRef) {
 						if (TYPO3_VERSION_INTEGER >= 7000000) {

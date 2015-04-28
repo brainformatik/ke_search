@@ -2,6 +2,8 @@ ChangeLog
 
 Version 1.9.2
 * bugfix: fix naming for comments indexer hook.
+* bugfix: fix comments indexer, set orig_uid and orig_pid.
+* task: add information about number of records in index per type and last indexing time in backend module.
 
 Version 1.9.1
 * task: fix position of message "searchword too short"
