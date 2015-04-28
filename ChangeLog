@@ -1,5 +1,7 @@
 ChangeLog
 
+Version 1.9.3
+
 Version 1.9.2
 * bugfix: fix naming for comments indexer hook.
 * bugfix: fix comments indexer, set orig_uid and orig_pid.
