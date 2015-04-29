@@ -6,7 +6,6 @@ $TCA['tx_kesearch_filters'] = array (
 	'interface' => array (
 		'showRecordFieldList' => 'sys_language_uid,l10n_parent,l10n_diffsource,hidden,title,options,rendertype'
 	),
-	'feInterface' => $TCA['tx_kesearch_filters']['feInterface'],
 	'columns' => array (
 		'sys_language_uid' => array (
 			'exclude' => 1,
@@ -181,7 +180,6 @@ $TCA['tx_kesearch_filteroptions'] = array (
 	'interface' => array (
 		'showRecordFieldList' => 'sys_language_uid,l10n_parent,l10n_diffsource,hidden,title,tag'
 	),
-	'feInterface' => $TCA['tx_kesearch_filteroptions']['feInterface'],
 	'columns' => array (
 		'sys_language_uid' => array (
 			'exclude' => 1,
@@ -278,8 +276,6 @@ $TCA['tx_kesearch_index'] = array (
 	'interface' => array (
 		'showRecordFieldList' => 'targetpid,content,params,type,tags,abstract,title,language'
 	),
-	//'hideTable' => 1,
-	'feInterface' => $TCA['tx_kesearch_index']['feInterface'],
 	'columns' => array (
 		'starttime' => array (
 			'exclude' => 1,
@@ -459,7 +455,6 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 	'interface' => array (
 		'showRecordFieldList' => 'hidden,title,storagepid,startingpoints_recursive,single_pages,sysfolder,type,index_content_with_restrictions,index_passed_events,,index_news_category_mode,index_news_category_selection,directories,fileext,filteroption'
 	),
-	'feInterface' => $TCA['tx_kesearch_indexerconfig']['feInterface'],
 	'columns' => array (
 		'hidden' => array (
 			'exclude' => 1,

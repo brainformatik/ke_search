@@ -7,8 +7,8 @@
 	<data type="array">
 		<languageKey index="default" type="array">
 			<label index="mlang_tabs_tab">Faceted Search</label>
-			<label index="mlang_labels_tabdescr">Manually start the indexer process</label>
-			<label index="mlang_labels_tablabel">Indexer Management</label>
+			<label index="mlang_labels_tabdescr">Manage the search index, manually start the indexer process, see what content has been indexed, clear the the index.</label>
+			<label index="mlang_labels_tablabel">Faceted Search Management</label>
 		</languageKey>
 		<languageKey index="de" type="array">
 			<label index="mlang_tabs_tab">Facettierte Suche</label>

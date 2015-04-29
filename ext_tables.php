@@ -42,7 +42,7 @@ if (TYPO3_VERSION_INTEGER < 6001000) {
 	t3lib_div::loadTCA('tt_content');
 }
 
-t3lib_extMgm::addTCAcolumns('pages', $tempColumns, 1);
+t3lib_extMgm::addTCAcolumns('pages', $tempColumns);
 t3lib_extMgm::addToAllTCAtypes('pages', 'tx_kesearch_tags;;;;1-1-1');
 
 if (TYPO3_MODE == 'BE') {

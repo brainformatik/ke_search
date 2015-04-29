@@ -1953,7 +1953,12 @@ class tx_kesearch_lib extends tx_kesearch_pluginBase {
 	public function renderPreviewImage($imageConf) {
 			if (empty($imageConf['file.']['maxW'])) $imageConf['file.']['maxW'] = 150;
 			if (empty($imageConf['file.']['maxH'])) $imageConf['file.']['maxH'] = 150;
-			return $this->cObj->IMAGE($imageConf);
+ 			if (TYPO3_VERSION_INTEGER < 7000000) {
+				$rendered = $this->cObj->IMAGE($imageConf);
+			} else {
+				$rendered = $this->cObj->cObjGetSingle('IMAGE', $imageConf);
+			}
+			return $rendered;
 	}
 
 	/**
@@ -1988,7 +1993,13 @@ class tx_kesearch_lib extends tx_kesearch_pluginBase {
 			}
 		}
 
-		return $this->cObj->IMAGE($imageConf);
+		if (TYPO3_VERSION_INTEGER < 7000000) {
+			$rendered = $this->cObj->IMAGE($imageConf);
+		} else {
+			$rendered = $this->cObj->cObjGetSingle('IMAGE', $imageConf);
+		}
+
+		return $rendered;
 	}
 
 	/*
