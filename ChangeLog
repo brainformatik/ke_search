@@ -1,5 +1,7 @@
 ChangeLog
 
+Version 1.9.4
+
 Version 1.9.3
 * task: do some cleanup in backend module.
 * task: make backend module compatible with TYPO3 7.2.
