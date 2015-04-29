@@ -34,8 +34,11 @@ if (TYPO3_VERSION_INTEGER < 6002000) {
 	require_once(PATH_t3lib . 'class.t3lib_scbase.php');
 }
 
-$BE_USER->modAccess($MCONF,1);	// This checks permissions and exits if the users has no permission for entry.
-	// DEFAULT initialization of a module [END]
+if (TYPO3_VERSION_INTEGER < 7002000) {
+	$BE_USER->modAccess($MCONF,1);	// This checks permissions and exits if the users has no permission for entry.
+} else {
+	$GLOBALS['BE_USER']->modAccess($GLOBALS['MCONF'],1);	// This checks permissions and exits if the users has no permission for entry.
+}
 
 /**
  * Module 'Indexer' for the 'ke_search' extension.
