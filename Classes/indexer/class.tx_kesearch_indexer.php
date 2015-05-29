@@ -331,14 +331,31 @@ class tx_kesearch_indexer {
 
 
 	/**
-	 * Delete all index elements that are older than starting timestamp in temporary file
+	 * Delete all index elements that are older than starting timestamp in registry
 	 *
 	 * @return string content for BE
 	*/
 	function cleanUpIndex() {
+		$content = '';
 		$startMicrotime = microtime(true);
 		$table = 'tx_kesearch_index';
+
+		// select all index records older than the beginning of the indexing process
 		$where = 'tstamp < ' . $this->registry->get('tx_kesearch', 'startTimeOfIndexer');
+
+		// hook for cleanup
+		if(is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['cleanup'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['ke_search']['cleanup'] as $_classRef) {
+				if (TYPO3_VERSION_INTEGER >= 7000000) {
+					$_procObj = & TYPO3\CMS\Core\Utility\GeneralUtility::getUserObj($_classRef);
+				} else {
+					$_procObj = & t3lib_div::getUserObj($_classRef);
+				}
+				$content .= $_procObj->cleanup($where, $this);
+			}
+		}
+
+		// count and delete old index records
 		$count = $GLOBALS['TYPO3_DB']->exec_SELECTcountRows('*', $table, $where);
 		$GLOBALS['TYPO3_DB']->exec_DELETEquery($table, $where);
 
