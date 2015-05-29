@@ -1,5 +1,7 @@
 ChangeLog
 
+Version 1.10.1
+
 Version 1.10.0
 * Note: This version updates the database structure!
 * task: remove calls to deprecated image functions.
