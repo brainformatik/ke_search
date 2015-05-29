@@ -177,6 +177,7 @@ class tx_kesearch_indexer {
 		// process index cleanup
 		$content .= $this->cleanUpIndex();
 
+		// count index records
 		$count = $GLOBALS['TYPO3_DB']->exec_SELECTcountRows('*', 'tx_kesearch_index');
 		$content .= '<p><b>Index contains ' . $count . ' entries.</b></p>';
 
@@ -191,6 +192,9 @@ class tx_kesearch_indexer {
 			}
 		}
 
+		// create plaintext report
+		$plaintextReport = $this->createPlaintextReport($content);
+
 		// send notification in CLI mode
 		if ($mode == 'CLI') {
 			// send finishNotification
@@ -200,31 +204,6 @@ class tx_kesearch_indexer {
 				$isValidEmail = t3lib_div::validEmail($extConf['notificationRecipient']);
 			}
 			if ($extConf['finishNotification'] && $isValidEmail) {
-
-				// calculate and format indexing time
-				$indexingTime = time() - $this->startTime;
-				if ($indexingTime > 3600) {
-					// format hours
-					$indexingTime = $indexingTime / 3600;
-					$indexingTime = number_format($indexingTime, 2, ',', '.');
-					$indexingTime .= ' hours';
-				} else if ($indexingTime > 60) {
-					// format minutes
-					$indexingTime = $indexingTime / 60;
-					$indexingTime = number_format($indexingTime, 2, ',', '.');
-					$indexingTime .= ' minutes';
-				} else {
-					$indexingTime .= ' seconds';
-				}
-
-				// build message
-				$msg = 'Indexing process was finished:'."\n";
-				$msg .= "==============================\n\n";
-				$msg .= strip_tags($content);
-				$msg .= "\n\n".'Indexing process ran '.$indexingTime;
-
-				// build subject
-				$subject = $extConf['notificationSubject'];
 
 				// send the notification message
 				// use swiftmailer in 4.5 and above
@@ -238,20 +217,52 @@ class tx_kesearch_indexer {
 					}
 					$mail->setFrom(array($extConf['notificationSender']));
 					$mail->setTo(array($extConf['notificationRecipient']));
-					$mail->setSubject($subject);
-					$mail->setBody($msg);
+					$mail->setSubject($extConf['notificationSubject']);
+					$mail->setBody($plaintextReport);
 					$mail->send();
 				} else {
-					mail($extConf['notificationRecipient'], $subject, $msg);
+					mail($extConf['notificationRecipient'], $subject, $plaintextReport);
 				}
-
 			}
 		}
 
+		// log report to sys_log
+		$GLOBALS['BE_USER']->simplelog($plaintextReport, 'ke_search');
+
 		// verbose or quiet output? as set in function call!
-		if($verbose) return $content;
+		if ($verbose) return $content;
 	}
 
+	/**
+	 * create plaintext report from html content
+	 *
+	 * @param string $content
+	 * @return string
+	 */
+	public function createPlaintextReport($content) {
+		$report = 'ke_search indexing report' . "\n\n";
+		$report .= 'Finishing time: ' . date($GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'] . ', H:i') . "\n\n";
+		$report .= strip_tags($content);
+
+		// calculate and format indexing time
+		$indexingTime = time() - $this->startTime;
+		if ($indexingTime > 3600) {
+			// format hours
+			$indexingTime = $indexingTime / 3600;
+			$indexingTime = number_format($indexingTime, 2, ',', '.');
+			$indexingTime .= ' hours';
+		} else if ($indexingTime > 60) {
+			// format minutes
+			$indexingTime = $indexingTime / 60;
+			$indexingTime = number_format($indexingTime, 2, ',', '.');
+			$indexingTime .= ' minutes';
+		} else {
+			$indexingTime .= ' seconds';
+		}
+		$report .= "\n\n".'Indexing process ran '.$indexingTime;
+
+		return $report;
+	}
 
 	/**
 	 * prepare sql-statements for indexer
@@ -393,7 +404,7 @@ class tx_kesearch_indexer {
 			}
 		}
 
-		$content .= "\n".'<p><b>Index cleanup:</b><br />' . "\n";
+		$content .= '<p><b>Index cleanup:</b><br />' . "\n";
 		$content .= $count . ' entries deleted.<br />' . "\n";
 
 		// calculate duration of indexing process

@@ -89,6 +89,7 @@ class  tx_kesearch_module1 extends tx_kesearch_module_baseclass {
 				'3' => $GLOBALS['LANG']->getLL('function3'),
 				'4' => $GLOBALS['LANG']->getLL('function4'),
 				'5' => $GLOBALS['LANG']->getLL('function5'),
+				'6' => $GLOBALS['LANG']->getLL('function6'),
 			)
 		);
 		parent::menuConfig();
@@ -358,8 +359,29 @@ class  tx_kesearch_module1 extends tx_kesearch_module_baseclass {
 
 				break;
 
-
+			// last indexing report
+			case 6:
+				$content = $this->showLastIndexingReport();
+				$this->content .= $this->doc->section($GLOBALS['LANG']->getLL('function6'), $content, 0, 1);
+				break;
 		}
+	}
+
+	/**
+	 * shows report from sys_log
+	 *
+	 * @return string
+	 * @author Christian Bülter <christian.buelter@inmedias.de>
+	 * @since 29.05.15
+	 */
+	public function showLastIndexingReport() {
+		$logrow = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow ('*', 'sys_log', 'details LIKE "[ke_search]%"', '', 'tstamp DESC');
+		if ($logrow !== FALSE) {
+			$content = '<pre>' . $logrow['details'] . '</pre>';
+		} else {
+			$content = 'No report found.';
+		}
+		return $content;
 	}
 
 	/**

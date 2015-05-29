@@ -7,6 +7,7 @@ Version 1.10.0
 * task: add error message if sphinx reports a warning.
 * bugfix: checkIfFileWasIndexed not working correctly, https://forge.typo3.org/issues/67169, thanks to Stefan Terborg and Benjamin Schreiber.
 * feature: add new hook for cleanup process.
+* feature: log indexing report to sys_log and add an option to show the last indexing report in the backend module.
 
 Version 1.9.3
 * task: do some cleanup in backend module.
