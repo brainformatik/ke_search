@@ -641,7 +641,7 @@ class tx_kesearch_indexer {
 	 */
 	function checkIfFileWasIndexed($type, $hash) {
 		// Query DB if record already exists
-		$GLOBALS['TYPO3_DB']->sql_query( 'SELECT * FROM tx_kesearch_index WHERE ' . 'type = ' . $type . ' AND hash = ' . $hash . ' LIMIT 1');
+		$res = $GLOBALS['TYPO3_DB']->sql_query( 'SELECT * FROM tx_kesearch_index WHERE ' . 'type = ' . $type . ' AND hash = ' . $hash . ' LIMIT 1');
 		if ($GLOBALS['TYPO3_DB']->sql_num_rows($res)) {
 			if ($this->currentRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 				return true;

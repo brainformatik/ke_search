@@ -1,9 +1,11 @@
 ChangeLog
 
-Version 1.9.4
+Version 1.10.0
+* Note: This version updates the database structure!
 * task: remove calls to deprecated image functions.
 * task: remove deprecated feInterface usage.
 * task: add error message if sphinx reports a warning.
+* bugfix: checkIfFileWasIndexed not working correctly, https://forge.typo3.org/issues/67169, thanks to Stefan Terborg and Benjamin Schreiber.
 
 Version 1.9.3
 * task: do some cleanup in backend module.

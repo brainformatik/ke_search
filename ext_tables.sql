@@ -88,7 +88,7 @@ CREATE TABLE tx_kesearch_index (
 	title tinytext,
 	language int(11) DEFAULT '0' NOT NULL,
 	directory tinytext,
-	hash varchar(25) DEFAULT '' NOT NULL,
+	hash varchar(32) DEFAULT '' NOT NULL,
 
 	FULLTEXT INDEX tags (tags),
 	FULLTEXT INDEX title (title),
