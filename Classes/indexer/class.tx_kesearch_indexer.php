@@ -175,7 +175,6 @@ class tx_kesearch_indexer {
 		}
 
 		// process index cleanup
-		$content .= "\n".'<p><b>Index cleanup processed.</b></p>'."\n";
 		$content .= $this->cleanUpIndex();
 
 		$count = $GLOBALS['TYPO3_DB']->exec_SELECTcountRows('*', 'tx_kesearch_index');
@@ -341,7 +340,6 @@ class tx_kesearch_indexer {
 		$table = 'tx_kesearch_index';
 		$where = 'tstamp < ' . $this->registry->get('tx_kesearch', 'startTimeOfIndexer');
 		$count = $GLOBALS['TYPO3_DB']->exec_SELECTcountRows('*', $table, $where);
-		$content .= '<p>' . $count . ' entries deleted.</p>';
 		$GLOBALS['TYPO3_DB']->exec_DELETEquery($table, $where);
 
 		// check if Sphinx is enabled
@@ -378,9 +376,13 @@ class tx_kesearch_indexer {
 			}
 		}
 
+		$content .= "\n".'<p><b>Index cleanup:</b><br />' . "\n";
+		$content .= $count . ' entries deleted.<br />' . "\n";
+
 		// calculate duration of indexing process
 		$duration = ceil((microtime(true) - $startMicrotime) * 1000);
-		$content .= '<p><i>Cleanup process took ' . $duration . ' ms.</i></p>'."\n";
+		$content .= '<i>Cleanup process took ' . $duration . ' ms.</i></p>'."\n";
+
 		return $content;
 	}
 

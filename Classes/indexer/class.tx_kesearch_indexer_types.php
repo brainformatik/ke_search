@@ -252,7 +252,7 @@ class tx_kesearch_indexer_types {
 		$duration = ceil(($endMicrotime - $this->startMicrotime) * 1000);
 
 		// show sec or ms?
-		if ($duration > 10000) {
+		if ($duration > 1000) {
 			$duration /= 1000;
 			$duration = intval($duration);
 			return '<p><i>Indexing process for "' . $this->indexerConfig['title'] . '" took '.$duration.' s.</i> </p>'."\n\n";
