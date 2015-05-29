@@ -352,12 +352,21 @@ class tx_kesearch_indexer {
 				$found = preg_match_all('/exec|system/', ini_get('disable_functions'), $match);
 				if($found === 0) { // executables are allowed
 					$ret = system($this->extConfPremium['sphinxIndexerPath'] . ' --rotate ' . $this->extConfPremium['sphinxIndexerName']);
+					if (strpos($ret, 'WARNING') !== FALSE) {
+						$warning = strstr($ret, 'WARNING');
+						$content .= '<div class="error">SPHINX ' . $warning . '</div>';
+					}
 					$content .= $ret;
 				} elseif($found === 1) { // one executable is allowed
 					if($match[0] == 'system') {
 						$ret = system($this->extConfPremium['sphinxIndexerPath'] . ' --rotate ' . $this->extConfPremium['sphinxIndexerName']);
 					} else { // use exec
 						exec($this->extConfPremium['sphinxIndexerPath'] . ' --rotate ' . $this->extConfPremium['sphinxIndexerName'], $retArr);
+						foreach ($retArr as $retRow) {
+							if (strpos($retRow, 'WARNING') !== FALSE) {
+								$content .= '<div class="error">SPHINX ' . $retRow . '</div>';
+							}
+						}
 						$ret = implode(';', $retArr);
 					}
 					$content .= $ret;
