@@ -114,15 +114,14 @@ class tx_kesearch_indexer_filetypes_pdf extends tx_kesearch_indexer_types_file i
 				}
 				unlink($tempFileName);
 			}
-			else
-				return false;
+			else {
+				$this->addError('Content for file ' . $file . ' could not be extracted. Maybe it is encrypted?');
 
-			// check if content was found
-			if (strlen($content)) {
-				return $this->removeEndJunk($content);
+				// return empty string if no content was found
+				$content = '';
 			}
-			else
-				return false;
+
+			return $this->removeEndJunk($content);
 		}
 		else
 			return false;
