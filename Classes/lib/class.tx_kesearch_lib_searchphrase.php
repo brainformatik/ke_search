@@ -134,10 +134,6 @@ class tx_kesearch_lib_searchphrase {
 			}
 			foreach($searchParts as $key => $word) {
 				if($word != '|') {
-					// add + explicit to all search words to make the searchresults equal to sphinx search results
-					if($this->pObj->extConf['enableExplicitAnd']) {
-						$searchParts[$key] = '+' . ltrim($searchParts[$key], '+');
-					}
 
 					// enable part searching by default. But be careful: Enabling this slows down the search engine
 					if(!isset($this->pObj->extConf['enablePartSearch']) || $this->pObj->extConf['enablePartSearch']) {
@@ -146,6 +142,11 @@ class tx_kesearch_lib_searchphrase {
 						} else {
 							$searchParts[$key] = rtrim($searchParts[$key], '*') . '*';
 						}
+					}
+
+					// add + explicit to all search words to make the searchresults equal to sphinx search results
+					if($this->pObj->extConf['enableExplicitAnd']) {
+						$searchParts[$key] = '+' . ltrim($searchParts[$key], '+');
 					}
 				}
 
