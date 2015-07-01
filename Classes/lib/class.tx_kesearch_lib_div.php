@@ -90,22 +90,18 @@ class tx_kesearch_lib_div {
 
 
 	/**
-	* Use removeXSS function from t3lib_div if exists
-	* otherwise use removeXSS class included in this extension
-	*
-	* @param string value
-	* @return string XSS safe value
+	 * Use removeXSS function from t3lib_div / GeneralUtility
+	 * that function exists in the TYPO3 Core at least since version 4.5,
+	 * which is the minimum system requirement for ke_search currentliy (07 / 2015)
+	 * 
+	 * @param string value
+	 * @return string XSS safe value
 	*/
 	public function removeXSS($value) {
-		if (TYPO3_VERSION_INTEGER >= 7000000) {
-				$returnValue = TYPO3\CMS\Core\Utility\GeneralUtility::removeXSS($value);
+		if (TYPO3_VERSION_INTEGER >= 6002000) {
+			$returnValue = TYPO3\CMS\Core\Utility\GeneralUtility::removeXSS($value);
 		} else {
-			if(method_exists(t3lib_div, 'removeXSS')) {
-				$returnValue = t3lib_div::removeXSS($value);
-			} else {
-				require_once(t3lib_extMgm::extPath($this->extKey) . 'res/scripts/RemoveXSS.php');
-				$returnValue = RemoveXSS::process($value);
-			}
+			$returnValue = t3lib_div::removeXSS($value);
 		}
 		return $returnValue;
 	}

@@ -3,6 +3,7 @@ ChangeLog
 Version 1.10.1
 * task: Output error message if PDF file is encrypted but return empty content instead of false.
 * bugfix: InWord Search does not work with enableExplicitAnd on Sphinx. Thanks to Marc Bauer. https://forge.typo3.org/issues/67280
+* task: remove RemoveXSS.php from res/scripts since it is not needed anymore. https://forge.typo3.org/issues/67602
 
 Version 1.10.0
 * Note: This version updates the database structure!
