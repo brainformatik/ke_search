@@ -137,7 +137,15 @@ class tx_kesearch_lib extends tx_kesearch_pluginBase {
 
 		// set some default values (this part have to be after stdWrap!!!)
 		if(!$this->conf['resultPage']) $this->conf['resultPage'] = $GLOBALS['TSFE']->id;
-		if(!isset($this->piVars['page'])) $this->piVars['page'] = 1;
+        if(!isset($this->piVars['page'])) {
+            $this->piVars['page'] = 1;
+        } else {
+            if( $this->piVars['redirect'] === 0 ){
+                $this->piVars['redirect'] = 1;
+                $red_url = $this->pi_linkTP_keepPIvars_url();
+                \TYPO3\CMS\Core\Utility\HttpUtility::redirect($red_url);
+            }
+        }
 		if(!empty($this->conf['additionalPathForTypeIcons'])) {
 			$this->conf['additionalPathForTypeIcons'] = rtrim($this->conf['additionalPathForTypeIcons'], '/') . '/';
 		}
@@ -346,7 +354,7 @@ class tx_kesearch_lib extends tx_kesearch_pluginBase {
 			$searchboxFocusJS = '';
 			$searchboxBlurJS = '';
 		} else {
-			$this->swordValue = $this->pi_getLL('searchbox_default_value');
+			$this->swordValue = '';
 
 			// set javascript for resetting searchbox value
 			$searchboxFocusJS = 'searchboxFocus(this);';

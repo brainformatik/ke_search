@@ -201,6 +201,7 @@ function hideSpinner() {
 	<input id="resetFilters" type="hidden" name="tx_kesearch_pi1[resetFilters]" value="0" />
 	<input id="sortByField" type="hidden" name="tx_kesearch_pi1[sortByField]" value="###SORTBYFIELD###" />
 	<input id="sortByDir" type="hidden" name="tx_kesearch_pi1[sortByDir]" value="###SORTBYDIR###" />
+    <input id="redirect" type="hidden" name="tx_kesearch_pi1[redirect]" value="0" />
 
 	<div id="kesearch_filters">###FILTER###</div>
 
