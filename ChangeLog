@@ -6,6 +6,7 @@ Version 1.10.1
 * task: remove RemoveXSS.php from res/scripts since it is not needed anymore. https://forge.typo3.org/issues/67602
 * task: save page id with indexed files instead of hardcoded "1". https://forge.typo3.org/issues/68723, thanks to Stefan Franke.
 * task: remove calls to t3lib_extMgm for 7.4 compatibility.
+* bugfix: fix german label for backend module function 5.
 
 Version 1.10.0
 * Note: This version updates the database structure!
