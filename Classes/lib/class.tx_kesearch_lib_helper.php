@@ -46,7 +46,12 @@ class tx_kesearch_helper {
 		// so you we need to change the default char # against something else.
 		// MySQL has problems also with #
 		// but we wrap # with " and it works.
-		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
+		if (TYPO3_VERSION_INTEGER < 6002000) {
+			$keSearchPremiumIsLoaded = t3lib_extMgm::isLoaded('ke_search_premium');
+		} else {
+			$keSearchPremiumIsLoaded = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('ke_search_premium');
+		}
+		if ($keSearchPremiumIsLoaded) {
 			$extConfPremium = tx_kesearch_helper::getExtConfPremium();
 			$extConf['prePostTagChar'] = $extConfPremium['prePostTagChar'];
 		} else {
@@ -74,7 +79,12 @@ class tx_kesearch_helper {
 	 * @since 14.10.14
 	 */
 	public static function getExtConfPremium() {
-		if(t3lib_extMgm::isLoaded('ke_search_premium')) {
+		if (TYPO3_VERSION_INTEGER < 6002000) {
+			$keSearchPremiumIsLoaded = t3lib_extMgm::isLoaded('ke_search_premium');
+		} else {
+			$keSearchPremiumIsLoaded = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('ke_search_premium');
+		}
+		if ($keSearchPremiumIsLoaded) {
 			$extConfPremium = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_search_premium']);
 			if (!$extConfPremium['prePostTagChar']) $extConfPremium['prePostTagChar'] = '_';
 		} else {

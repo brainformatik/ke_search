@@ -147,7 +147,7 @@ class  tx_kesearch_module1 extends tx_kesearch_module_baseclass {
 			// add some css
 			$cssFile = 'res/backendModule.css';
 			if (TYPO3_VERSION_INTEGER >= 6002000) {
-				$this->doc->getPageRenderer()->addCssFile(t3lib_extMgm::extRelPath('ke_search') . $cssFile);
+				$this->doc->getPageRenderer()->addCssFile(TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('ke_search') . $cssFile);
 			} else {
 				$this->doc->inDocStyles = file_get_contents(t3lib_extMgm::extPath('ke_search') . $cssFile);
 			}
@@ -215,7 +215,7 @@ class  tx_kesearch_module1 extends tx_kesearch_module_baseclass {
 				// make indexer instance and init
 				if (TYPO3_VERSION_INTEGER >= 6002000) {
 					/* @var $indexer tx_kesearch_indexer */
-					$indexer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_kesearch_indexer');
+					$indexer = TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_kesearch_indexer');
 				} else {
 					$indexer = t3lib_div::makeInstance('tx_kesearch_indexer');
 				}
@@ -565,19 +565,6 @@ class  tx_kesearch_module1 extends tx_kesearch_module_baseclass {
 
 		while ($row=$GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 
-			// build type image path
-			switch($row['type']) {
-				case 'page':
-					$imagePath = t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_0.gif';
-					break;
-				case 'ke_yac':
-					$imagePath = t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_1.gif';
-					break;
-				default:
-					$imagePath = t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_2.gif';
-					break;
-			}
-
 			// build tag table
 			$tagTable = '<div class="tags" >';
 			$cols = 3;
@@ -596,7 +583,6 @@ class  tx_kesearch_module1 extends tx_kesearch_module_baseclass {
 			$timeformat = '%d.%m.%Y %H:%M';
 			$content .= '
 				<div class="summary">'
-				. '<img src="'.$imagePath.'" border="0" style="float:right;">'
 				. '<span class="title">'.$row['title'].'</span>'
 				. '<div class="clearer">&nbsp;</div>'
 				. $this->renderFurtherInformation('Type', $row['type'])

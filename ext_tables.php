@@ -4,8 +4,16 @@ if (!defined('TYPO3_MODE')) {
 	die('Access denied.');
 }
 
+if (TYPO3_VERSION_INTEGER < 6002000) {
+	$extPath = t3lib_extMgm::extPath('ke_search');
+	$extRelPath = t3lib_extMgm::extRelPath('ke_search');
+} else {
+	$extPath = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('ke_search');
+	$extRelPath = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('ke_search');
+}
+
 if (TYPO3_MODE == 'BE') {
-	require_once(t3lib_extMgm::extPath('ke_search') . 'Classes/lib/class.tx_kesearch_lib_items.php');
+	require_once($extPath . 'Classes/lib/class.tx_kesearch_lib_items.php');
 }
 
 $tempColumns = array(
@@ -25,7 +33,11 @@ $tempColumns = array(
 );
 
 // help file
-t3lib_extMgm::addLLrefForTCAdescr('tx_kesearch_filters', 'EXT:ke_search/locallang_csh.xml');
+if (TYPO3_VERSION_INTEGER < 6002000) {
+	t3lib_extMgm::addLLrefForTCAdescr('tx_kesearch_filters', 'EXT:ke_search/locallang_csh.xml');
+} else {
+	TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('tx_kesearch_filters', 'EXT:ke_search/locallang_csh.xml');
+}
 
 // Show FlexForm field in plugin configuration
 $TCA['tt_content']['types']['list']['subtypes_addlist'][$_EXTKEY . '_pi1'] = 'pi_flexform';
@@ -33,46 +45,82 @@ $TCA['tt_content']['types']['list']['subtypes_addlist'][$_EXTKEY . '_pi2'] = 'pi
 $TCA['tt_content']['types']['list']['subtypes_addlist'][$_EXTKEY . '_pi3'] = 'pi_flexform';
 
 // Configure FlexForm field
-t3lib_extMgm::addPiFlexFormValue($_EXTKEY . '_pi1', 'FILE:EXT:ke_search/pi1/flexform_pi1.xml');
-t3lib_extMgm::addPiFlexFormValue($_EXTKEY . '_pi2', 'FILE:EXT:ke_search/pi2/flexform_pi2.xml');
-t3lib_extMgm::addPiFlexFormValue($_EXTKEY . '_pi3', 'FILE:EXT:ke_search/pi3/flexform_pi3.xml');
+if (TYPO3_VERSION_INTEGER < 6002000) {
+	t3lib_extMgm::addPiFlexFormValue($_EXTKEY . '_pi1', 'FILE:EXT:ke_search/pi1/flexform_pi1.xml');
+	t3lib_extMgm::addPiFlexFormValue($_EXTKEY . '_pi2', 'FILE:EXT:ke_search/pi2/flexform_pi2.xml');
+	t3lib_extMgm::addPiFlexFormValue($_EXTKEY . '_pi3', 'FILE:EXT:ke_search/pi3/flexform_pi3.xml');
+} else {
+	TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue($_EXTKEY . '_pi1', 'FILE:EXT:ke_search/pi1/flexform_pi1.xml');
+	TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue($_EXTKEY . '_pi2', 'FILE:EXT:ke_search/pi2/flexform_pi2.xml');
+	TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue($_EXTKEY . '_pi3', 'FILE:EXT:ke_search/pi3/flexform_pi3.xml');
+}
 
 if (TYPO3_VERSION_INTEGER < 6001000) {
 	t3lib_div::loadTCA('pages');
 	t3lib_div::loadTCA('tt_content');
 }
 
-t3lib_extMgm::addTCAcolumns('pages', $tempColumns);
-t3lib_extMgm::addToAllTCAtypes('pages', 'tx_kesearch_tags;;;;1-1-1');
+if (TYPO3_VERSION_INTEGER < 6002000) {
+	t3lib_extMgm::addTCAcolumns('pages', $tempColumns);
+	t3lib_extMgm::addToAllTCAtypes('pages', 'tx_kesearch_tags;;;;1-1-1');
+} else {
+	TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('pages', $tempColumns);
+	TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('pages', 'tx_kesearch_tags;;;;1-1-1');
+}
 
 if (TYPO3_MODE == 'BE') {
-	t3lib_extMgm::addModulePath('web_txkesearchM1', t3lib_extMgm::extPath($_EXTKEY) . 'mod1/');
-	t3lib_extMgm::addModule('web', 'txkesearchM1', '', t3lib_extMgm::extPath($_EXTKEY) . 'mod1/');
+	if (TYPO3_VERSION_INTEGER < 6002000) {
+		t3lib_extMgm::addModulePath('web_txkesearchM1', $extPath . 'mod1/');
+		t3lib_extMgm::addModule('web', 'txkesearchM1', '', $extPath . 'mod1/');
+	} else {
+		TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addModulePath('web_txkesearchM1', $extPath . 'mod1/');
+		TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addModule('web', 'txkesearchM1', '', $extPath . 'mod1/');
+	}
 }
 
 $TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY . '_pi1'] = 'layout,select_key';
 $TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY . '_pi2'] = 'layout,select_key';
 $TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY . '_pi3'] = 'layout,select_key';
 
-t3lib_extMgm::addPlugin(array(
-    'LLL:EXT:ke_search/locallang_db.xml:tt_content.list_type_pi1',
-    $_EXTKEY . '_pi1',
-    t3lib_extMgm::extRelPath($_EXTKEY) . 'ext_icon.gif'), 'list_type'
-);
+if (TYPO3_VERSION_INTEGER < 6002000) {
+	t3lib_extMgm::addPlugin(array(
+		'LLL:EXT:ke_search/locallang_db.xml:tt_content.list_type_pi1',
+		$_EXTKEY . '_pi1',
+		$extRelPath . 'ext_icon.gif'), 'list_type'
+	);
 
-t3lib_extMgm::addPlugin(array(
-    'LLL:EXT:ke_search/locallang_db.xml:tt_content.list_type_pi2',
-    $_EXTKEY . '_pi2',
-    t3lib_extMgm::extRelPath($_EXTKEY) . 'ext_icon.gif'), 'list_type'
-);
+	t3lib_extMgm::addPlugin(array(
+		'LLL:EXT:ke_search/locallang_db.xml:tt_content.list_type_pi2',
+		$_EXTKEY . '_pi2',
+		$extRelPath . 'ext_icon.gif'), 'list_type'
+	);
 
-t3lib_extMgm::addPlugin(array(
-    'LLL:EXT:ke_search/locallang_db.xml:tt_content.list_type_pi3',
-    $_EXTKEY . '_pi3',
-    t3lib_extMgm::extRelPath($_EXTKEY) . 'ext_icon.gif'), 'list_type'
-);
+	t3lib_extMgm::addPlugin(array(
+		'LLL:EXT:ke_search/locallang_db.xml:tt_content.list_type_pi3',
+		$_EXTKEY . '_pi3',
+		$extRelPath . 'ext_icon.gif'), 'list_type'
+	);
+} else {
+	TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPlugin(array(
+		'LLL:EXT:ke_search/locallang_db.xml:tt_content.list_type_pi1',
+		$_EXTKEY . '_pi1',
+		$extRelPath . 'ext_icon.gif'), 'list_type'
+	);
 
-$TCA['tx_kesearch_filters'] = array(
+	TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPlugin(array(
+		'LLL:EXT:ke_search/locallang_db.xml:tt_content.list_type_pi2',
+		$_EXTKEY . '_pi2',
+		$extRelPath . 'ext_icon.gif'), 'list_type'
+	);
+
+	TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPlugin(array(
+		'LLL:EXT:ke_search/locallang_db.xml:tt_content.list_type_pi3',
+		$_EXTKEY . '_pi3',
+		$extRelPath . 'ext_icon.gif'), 'list_type'
+	);
+}
+
+$GLOBALS['TCA']['tx_kesearch_filters'] = array(
     'ctrl' => array(
 	'title' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filters',
 	'label' => 'title',
@@ -88,13 +136,13 @@ $TCA['tx_kesearch_filters'] = array(
 	'enablecolumns' => array(
 	    'disabled' => 'hidden',
 	),
-	'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY) . 'tca.php',
-	'iconfile' => t3lib_extMgm::extRelPath($_EXTKEY) . 'res/img/table_icons/icon_tx_kesearch_filters.gif',
+	'dynamicConfigFile' => $extPath . 'tca.php',
+	'iconfile' => $extRelPath . 'res/img/table_icons/icon_tx_kesearch_filters.gif',
 	'searchFields' => 'title'
     ),
 );
 
-$TCA['tx_kesearch_filteroptions'] = array(
+$GLOBALS['TCA']['tx_kesearch_filteroptions'] = array(
     'ctrl' => array(
 	'title' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_filteroptions',
 	'label' => 'title',
@@ -109,13 +157,13 @@ $TCA['tx_kesearch_filteroptions'] = array(
 	'enablecolumns' => array(
 	    'disabled' => 'hidden',
 	),
-	'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY) . 'tca.php',
-	'iconfile' => t3lib_extMgm::extRelPath($_EXTKEY) . 'res/img/table_icons/icon_tx_kesearch_filteroptions.gif',
+	'dynamicConfigFile' => $extPath . 'tca.php',
+	'iconfile' => $extRelPath . 'res/img/table_icons/icon_tx_kesearch_filteroptions.gif',
 	'searchFields' => 'title,tag'
     ),
 );
 
-$TCA['tx_kesearch_index'] = array(
+$GLOBALS['TCA']['tx_kesearch_index'] = array(
     'ctrl' => array(
 	'title' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_index',
 	'label' => 'title',
@@ -128,17 +176,23 @@ $TCA['tx_kesearch_index'] = array(
 	    'endtime' => 'endtime',
 	    'fe_group' => 'fe_group',
 	),
-	'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY) . 'tca.php',
-	'iconfile' => t3lib_extMgm::extRelPath($_EXTKEY) . 'res/img/table_icons/icon_tx_kesearch_index.gif',
+	'dynamicConfigFile' => $extPath . 'tca.php',
+	'iconfile' => $extRelPath . 'res/img/table_icons/icon_tx_kesearch_index.gif',
     ),
 );
 
 // class for displaying the category tree for tt_news in BE forms.
-if (t3lib_extMgm::isLoaded('tt_news')) {
-	include_once(t3lib_extMgm::extPath('tt_news') . 'lib/class.tx_ttnews_TCAform_selectTree.php');
+if (TYPO3_VERSION_INTEGER < 6002000) {
+	if (t3lib_extMgm::isLoaded('tt_news')) {
+		include_once(t3lib_extMgm::extPath('tt_news') . 'lib/class.tx_ttnews_TCAform_selectTree.php');
+	}
+} else {
+	if (TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('tt_news')) {
+		include_once(TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('tt_news') . 'lib/class.tx_ttnews_TCAform_selectTree.php');
+	}
 }
 
-$TCA['tx_kesearch_indexerconfig'] = array(
+$GLOBALS['TCA']['tx_kesearch_indexerconfig'] = array(
     'ctrl' => array(
 	'title' => 'LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig',
 	'label' => 'title',
@@ -150,15 +204,15 @@ $TCA['tx_kesearch_indexerconfig'] = array(
 	'enablecolumns' => array(
 	    'disabled' => 'hidden',
 	),
-	'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY) . 'tca.php',
-	'iconfile' => t3lib_extMgm::extRelPath($_EXTKEY) . 'res/img/table_icons/icon_tx_kesearch_indexerconfig.gif',
+	'dynamicConfigFile' => $extPath . 'tca.php',
+	'iconfile' => $extRelPath . 'res/img/table_icons/icon_tx_kesearch_indexerconfig.gif',
 	'searchFields' => 'title'
     ),
 );
 
 if (TYPO3_MODE == 'BE') {
-	$TBE_MODULES_EXT['xMOD_db_new_content_el']['addElClasses']['tx_kesearch_pi1_wizicon'] = t3lib_extMgm::extPath($_EXTKEY) . 'pi1/class.tx_kesearch_pi1_wizicon.php';
-	$TBE_MODULES_EXT['xMOD_db_new_content_el']['addElClasses']['tx_kesearch_pi2_wizicon'] = t3lib_extMgm::extPath($_EXTKEY) . 'pi2/class.tx_kesearch_pi2_wizicon.php';
-	$TBE_MODULES_EXT['xMOD_db_new_content_el']['addElClasses']['tx_kesearch_pi3_wizicon'] = t3lib_extMgm::extPath($_EXTKEY) . 'pi3/class.tx_kesearch_pi3_wizicon.php';
+	$TBE_MODULES_EXT['xMOD_db_new_content_el']['addElClasses']['tx_kesearch_pi1_wizicon'] = $extPath . 'pi1/class.tx_kesearch_pi1_wizicon.php';
+	$TBE_MODULES_EXT['xMOD_db_new_content_el']['addElClasses']['tx_kesearch_pi2_wizicon'] = $extPath . 'pi2/class.tx_kesearch_pi2_wizicon.php';
+	$TBE_MODULES_EXT['xMOD_db_new_content_el']['addElClasses']['tx_kesearch_pi3_wizicon'] = $extPath . 'pi3/class.tx_kesearch_pi3_wizicon.php';
 }
 ?>

@@ -143,10 +143,11 @@ class tx_kesearch_db extends tx_kesearch_db_baseclass {
 	 * @return array Array containing a limitted (one page) amount of search results
 	 */
 	public function getSearchResultBySphinx() {
-		require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');
 		if (TYPO3_VERSION_INTEGER >= 6002000) {
+			require_once(TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');
 			$this->user_kesearchpremium = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('user_kesearchpremium');
 		} else {
+			require_once(t3lib_extMgm::extPath('ke_search_premium') . 'class.user_kesearchpremium.php');
 			$this->user_kesearchpremium = t3lib_div::makeInstance('user_kesearchpremium');
 		}
 

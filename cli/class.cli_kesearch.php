@@ -28,11 +28,10 @@ if (!defined('TYPO3_cliMode'))  die('You cannot run this script directly!');
 // Include basis cli class
 if (TYPO3_VERSION_INTEGER < 6002000) {
 	require_once(PATH_t3lib . 'class.t3lib_cli.php');
+	require_once(t3lib_extMgm::extPath('ke_search') . 'Classes/indexer/class.tx_kesearch_indexer.php');
+} else {
+	require_once(TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('ke_search') . 'Classes/indexer/class.tx_kesearch_indexer.php');
 }
-
-// include indexer class
-require_once(t3lib_extMgm::extPath('ke_search') . 'Classes/indexer/class.tx_kesearch_indexer.php');
-
 
 class tx_kesearch_cli extends t3lib_cli {
 

@@ -56,7 +56,12 @@ class tx_kesearch_indexer_types_ke_yac extends tx_kesearch_indexer_types {
 		$where .= ' AND hidden=0 AND deleted=0 ';
 		// do not index passed events?
 		if ($this->indexerConfig['index_passed_events'] == 'no') {
-			if (t3lib_extMgm::isLoaded('ke_yac_products')) {
+			if (TYPO3_VERSION_INTEGER < 6002000) {
+				$keYacProductsIsLoaded = t3lib_extMgm::isLoaded('ke_yac_products');
+			} else {
+				$keYacProductsIsLoaded = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('ke_yac_products');
+			}
+			if ($keYacProductsIsLoaded) {
 				// special query if ke_yac_products loaded (VNR)
 				$where .= '
 					AND ((

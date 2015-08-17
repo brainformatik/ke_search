@@ -62,7 +62,12 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 
 		// init XAJAX?
 		if ($this->conf['renderMethod'] != 'static') {
-			if (!t3lib_extMgm::isLoaded('xajax')) return;
+			if (TYPO3_VERSION_INTEGER < 6002000) {
+				$xajaxIsLoaded = t3lib_extMgm::isLoaded('xajax');
+			} else {
+				$xajaxIsLoaded = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('xajax');
+			}
+			if (!$xajaxIsLoaded) return;
 			else $this->initXajax();
 		}
 
@@ -70,7 +75,11 @@ class tx_kesearch_pi2 extends tx_kesearch_lib {
 		if ($this->conf['spinnerImageFile']) {
 			$spinnerSrc = $this->conf['spinnerImageFile'];
 		} else {
-			$spinnerSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/spinner.gif';
+			if (TYPO3_VERSION_INTEGER < 6002000) {
+				$spinnerSrc = t3lib_extMgm::siteRelPath($this->extKey).'res/img/spinner.gif';
+			} else {
+				$spinnerSrc = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath($this->extKey).'res/img/spinner.gif';
+			}
 		}
 		$this->spinnerImageFilters = '<img id="kesearch_spinner_filters" src="'.$spinnerSrc.'" alt="'.$this->pi_getLL('loading').'" />';
 		$this->spinnerImageResults = '<img id="kesearch_spinner_results" src="'.$spinnerSrc.'" alt="'.$this->pi_getLL('loading').'" />';
