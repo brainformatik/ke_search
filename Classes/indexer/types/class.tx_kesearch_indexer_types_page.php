@@ -345,7 +345,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 	 */
 	public function getPageContent($uid) {
 		// get content elements for this page
-		$fields = 'uid, header, bodytext, CType, sys_language_uid, header_layout, fe_group';
+		$fields = 'uid, pid, header, bodytext, CType, sys_language_uid, header_layout, fe_group';
 		$table = 'tt_content';
 		$where = 'pid = ' . intval($uid);
 		$where .= ' AND (' . $this->whereClauseForCType . ')';
@@ -781,7 +781,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 			$storagePid,                             // storage PID
 			$title,                                  // file name
 			$type,                                   // content type
-			1,                                       // target PID: where is the single view?
+			$ttContentRow[pid],                      // target PID: where is the single view?
 			$content,                                // indexed content
 			$tags,                                   // tags
 			'',                                      // typolink params for singleview

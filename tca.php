@@ -1,6 +1,14 @@
 <?php
 if (!defined ('TYPO3_MODE')) 	die ('Access denied.');
 
+if (TYPO3_VERSION_INTEGER < 6002000) {
+	$extPath = t3lib_extMgm::extPath('ke_search');
+	$extRelPath = t3lib_extMgm::extRelPath('ke_search');
+} else {
+	$extPath = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('ke_search');
+	$extRelPath = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('ke_search');
+}
+
 $TCA['tx_kesearch_filters'] = array (
 	'ctrl' => $TCA['tx_kesearch_filters']['ctrl'],
 	'interface' => array (
@@ -503,19 +511,19 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 			'config' => array (
 				'type' => 'select',
 				'items' => array (
-					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.0', 'page', t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_0.gif'),
-					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.1', 'ke_yac', t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_1.gif'),
-					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.2', 'ttnews', t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_2.gif'),
-					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.3', 'dam', t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_3.gif'),
-					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.5', 'tt_address', t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_5.gif'),
-					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.6', 'tt_content', t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_6.gif'),
-					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.7', 'file', t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_7.gif'),
-					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.8', 't3s_content', t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_8.gif'),
-					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.9', 'templavoila', t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_9.gif'),
-					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.10', 'mmforum', t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_10.gif'),
-					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.11', 'comments', t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_11.gif'),
-					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.12', 'news', t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_12.gif'),
-					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.13', 'a21glossary', t3lib_extMgm::extRelPath('ke_search').'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_13.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.0', 'page',         $extRelPath . 'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_0.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.1', 'ke_yac',       $extRelPath . 'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_1.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.2', 'ttnews',       $extRelPath . 'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_2.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.3', 'dam',          $extRelPath . 'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_3.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.5', 'tt_address',   $extRelPath . 'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_5.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.6', 'tt_content',   $extRelPath . 'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_6.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.7', 'file',         $extRelPath . 'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_7.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.8', 't3s_content',  $extRelPath . 'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_8.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.9', 'templavoila',  $extRelPath . 'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_9.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.10', 'mmforum',     $extRelPath . 'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_10.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.11', 'comments',    $extRelPath . 'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_11.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.12', 'news',        $extRelPath . 'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_12.gif'),
+					array('LLL:EXT:ke_search/locallang_db.xml:tx_kesearch_indexerconfig.type.I.13', 'a21glossary', $extRelPath . 'res/img/types_backend/selicon_tx_kesearch_indexerconfig_type_13.gif'),
 				),
 				'itemsProcFunc' => 'tx_kesearch_lib_items->fillIndexerConfig',
 				'size' => 1,
@@ -792,7 +800,12 @@ $TCA['tx_kesearch_indexerconfig'] = array (
 
 // news version 3 features system categories instead of it's own
 // category system which was used in previous versions
-if (version_compare(t3lib_extMgm::getExtensionVersion('news'), '3.0.0') >= 0) {
+if (TYPO3_VERSION_INTEGER < 6002000) {
+	$ttnewsVersion = t3lib_extMgm::getExtensionVersion('news');
+} else {
+	$ttnewsVersion = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getExtensionVersion('news');
+}
+if (version_compare($ttnewsVersion, '3.0.0') >= 0) {
 	$TCA['tx_kesearch_indexerconfig']['columns']['index_extnews_category_selection']['config']['treeConfig']['parentField'] = 'parent';
 	$TCA['tx_kesearch_indexerconfig']['columns']['index_extnews_category_selection']['config']['foreign_table'] = 'sys_category';
 	$TCA['tx_kesearch_indexerconfig']['columns']['index_extnews_category_selection']['config']['foreign_table_where'] = '';

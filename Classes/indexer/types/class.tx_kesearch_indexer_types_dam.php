@@ -98,7 +98,12 @@ class tx_kesearch_indexer_types_dam extends tx_kesearch_indexer_types {
 
 				// get tags for this record
 				// needs extension ke_search_dam_tags
-				if (t3lib_extMgm::isLoaded('ke_search_dam_tags')) {
+				if (TYPO3_VERSION_INTEGER < 6002000) {
+					$keSearchDamTagsIsLoaded = t3lib_extMgm::isLoaded('ke_search_dam_tags');
+				} else {
+					$keSearchDamTagsIsLoaded = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('ke_search_dam_tags');
+				}
+				if ($keSearchDamTagsIsLoaded) {
 					if (TYPO3_VERSION_INTEGER >= 7000000) {
 						$damRecordTags = TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',',$damRecord['tx_kesearchdamtags_tags'], true);
 					} else {

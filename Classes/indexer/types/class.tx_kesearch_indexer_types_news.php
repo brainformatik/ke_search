@@ -265,7 +265,12 @@ class tx_kesearch_indexer_types_news extends tx_kesearch_indexer_types {
 
 		// news version 3 features system categories instead of it's own
 		// category system used in previous versions
-		if (version_compare(t3lib_extMgm::getExtensionVersion('news'), '3.0.0') >= 0) {
+		if (TYPO3_VERSION_INTEGER < 6002000) {
+			$ttnewsVersion = t3lib_extMgm::getExtensionVersion('news');
+		} else {
+			$ttnewsVersion = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getExtensionVersion('news');
+		}
+		if (version_compare($ttnewsVersion, '3.0.0') >= 0) {
 
 			$where = ' AND tx_news_domain_model_news.uid = ' . $newsRecord['uid'] .
 				' AND sys_category_record_mm.tablenames = "tx_news_domain_model_news"';

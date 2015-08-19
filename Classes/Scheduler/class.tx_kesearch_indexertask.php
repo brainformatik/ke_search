@@ -24,12 +24,13 @@
 ***************************************************************/
 
 
-// include indexer class
-require_once(t3lib_extMgm::extPath('ke_search') . 'Classes/indexer/class.tx_kesearch_indexer.php');
 
+// include indexer class and create a "baseclass" (only for backwards compatibility)
 if (TYPO3_VERSION_INTEGER >= 6002000) {
+	require_once(TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('ke_search') . 'Classes/indexer/class.tx_kesearch_indexer.php');
 	abstract class tx_kesearch_indexertask_baseclass extends \TYPO3\CMS\Scheduler\Task\AbstractTask { }
 } else {
+	require_once(t3lib_extMgm::extPath('ke_search') . 'Classes/indexer/class.tx_kesearch_indexer.php');
 	abstract class tx_kesearch_indexertask_baseclass extends tx_scheduler_Task { }
 }
 

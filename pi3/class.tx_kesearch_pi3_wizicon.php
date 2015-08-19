@@ -43,8 +43,14 @@ class tx_kesearch_pi3_wizicon {
 
 		$LL = $this->includeLocalLang();
 
+		if (TYPO3_VERSION_INTEGER < 6002000) {
+			$extRelPath = t3lib_extMgm::extRelPath('ke_search');
+		} else {
+			$extRelPath = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('ke_search');
+		}
+
 		$wizardItems['plugins_tx_kesearch_pi3'] = array(
-		    'icon' => t3lib_extMgm::extRelPath('ke_search') . 'pi3/ce_wiz.gif',
+		    'icon' => $extRelPath . 'pi3/ce_wiz.gif',
 		    'title' => $LANG->getLLL('pi_title', $LL),
 		    'description' => $LANG->getLLL('pi_plus_wiz_description', $LL),
 		    'params' => '&defVals[tt_content][CType]=list&defVals[tt_content][list_type]=ke_search_pi3'
@@ -59,7 +65,11 @@ class tx_kesearch_pi3_wizicon {
 	 * @return	The array with language labels
 	 */
 	function includeLocalLang() {
-		$llFile = t3lib_extMgm::extPath('ke_search') . 'pi3/locallang.xml';
+		if (TYPO3_VERSION_INTEGER < 6002000) {
+			$llFile = t3lib_extMgm::extPath('ke_search') . 'pi3/locallang.xml';
+		} else {
+			$llFile = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('ke_search') . 'pi3/locallang.xml';
+		}
 		if (TYPO3_VERSION_INTEGER >= 4006000) {
 			if (TYPO3_VERSION_INTEGER >= 7000000) {
 				$xmlParser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Localization\\Parser\\LocallangXmlParser');

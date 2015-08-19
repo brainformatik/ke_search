@@ -45,6 +45,7 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 	);
 	var $counter = 0;
 	var $whereClauseForCType = '';
+	var $templavoilaIsLoaded = FALSE;
 
 	// Name of indexed elements. Will be overwritten in content element indexer.
 	var $indexedElementsName = 'TemplaVoila records';
@@ -64,7 +65,12 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 	public function __construct($pObj) {
 		parent::__construct($pObj);
 
-		if(t3lib_extMgm::isLoaded('templavoila')) {
+		if (TYPO3_VERSION_INTEGER < 6002000) {
+			$this->templavoilaIsLoaded = t3lib_extMgm::isLoaded('templavoila');
+		} else {
+			$this->templavoilaIsLoaded = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('templavoila');
+		}
+		if ($this->templavoilaIsLoaded) {
 			if (TYPO3_VERSION_INTEGER >= 7000000) {
 				$enableFields = TYPO3\CMS\Backend\Utility\BackendUtility::BEenableFields('pages') . TYPO3\CMS\Backend\Utility\BackendUtility::deleteClause('pages');
 			} else {
@@ -131,8 +137,8 @@ class tx_kesearch_indexer_types_templavoila extends tx_kesearch_indexer_types {
 	 * @return string content which will be displayed in backend
 	 */
 	public function startIndexing() {
-		if(!t3lib_extMgm::isLoaded('templavoila')) {
-			return 'TemplaVoila was not installed';
+		if(!this->templavoilaIsLoaded) {
+			return 'TemplaVoila is not installed!';
 		}
 
 		// get all pages. Regardeless if they are shortcut, sysfolder or external link

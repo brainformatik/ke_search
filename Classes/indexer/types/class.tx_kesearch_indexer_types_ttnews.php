@@ -172,7 +172,12 @@ class tx_kesearch_indexer_types_ttnews extends tx_kesearch_indexer_types {
 					$params = $newsRecord['ext_url'];;
 				} else {
 					// get target page from category if set (first assigned category)
-					if (t3lib_extMgm::isLoaded('tt_news')) {
+					if (TYPO3_VERSION_INTEGER < 6002000) {
+						$ttnewsIsLoaded = t3lib_extMgm::isLoaded('tt_news');
+					} else {
+						$ttnewsIsLoaded = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('tt_news');
+					}
+					if ($ttnewsIsLoaded) {
 						$singleViewPage = $this->getSingleViewPageFromCategories($newsRecord['uid']);
 					}
 					$paramsSingleView = $this->getParamsForHrDateSingleView($newsRecord['datetime']);

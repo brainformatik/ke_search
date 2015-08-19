@@ -188,7 +188,11 @@ class tx_kesearch_lib extends tx_kesearch_pluginBase {
 		$this->filters->initialize($this);
 
 		// get html template
-		$this->templateFile = $this->conf['templateFile'] ? $this->conf['templateFile'] : t3lib_extMgm::siteRelPath($this->extKey).'res/template_pi1.tpl';
+		if (TYPO3_VERSION_INTEGER < 6002000) {
+			$this->templateFile = $this->conf['templateFile'] ? $this->conf['templateFile'] : t3lib_extMgm::siteRelPath($this->extKey) . 'res/template_pi1.tpl';
+		} else {
+			$this->templateFile = $this->conf['templateFile'] ? $this->conf['templateFile'] : TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath($this->extKey) . 'res/template_pi1.tpl';
+		}
 		$this->templateCode = $this->cObj->fileResource($this->templateFile);
 
 		// get first startingpoint
@@ -822,7 +826,11 @@ class tx_kesearch_lib extends tx_kesearch_pluginBase {
 		// bullet
 		unset($imageConf);
 		$bulletSrc = $filters[$filterUid]['expandbydefault'] ? 'list-head-expanded.gif' : 'list-head-closed.gif';
-		$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/'.$bulletSrc;
+		if (TYPO3_VERSION_INTEGER < 6002000) {
+			$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/'.$bulletSrc;
+		} else {
+			$imageConf['file'] = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath($this->extKey).'res/img/'.$bulletSrc;
+		}
 		$imageConf['params'] = 'class="bullet" id="bullet_filter_' . $filterUid . '" ';
 		$filterContent = $this->cObj->substituteMarker($filterContent,'###BULLET###', $this->cObj->IMAGE($imageConf));
 
@@ -940,7 +948,11 @@ class tx_kesearch_lib extends tx_kesearch_pluginBase {
 
 		// get bullet image
 		$bulletSrc = $filters[$filterUid]['expandbydefault'] ? 'list-head-expanded.gif' : 'list-head-closed.gif';
-		$bulletConf['file'] = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/' . $bulletSrc;
+		if (TYPO3_VERSION_INTEGER < 6002000) {
+			$bulletConf['file'] = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/' . $bulletSrc;
+		} else {
+			$bulletConf['file'] = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath($this->extKey) . 'res/img/' . $bulletSrc;
+		}
 		$bulletConf['params'] = 'class="bullet" id="bullet_filter_' . $filterUid . '" ';
 		$bulletImage = $this->cObj->IMAGE($bulletConf);
 
@@ -1104,12 +1116,10 @@ class tx_kesearch_lib extends tx_kesearch_pluginBase {
 	public function initXajax()	{
 		// Include xaJax
 		if(!class_exists('xajax')) {
-			// if t3lib_extMgm::extPath does not exist (as in TYPO3 6.0 Beta2),
-			// assume the default path
-			if (function_exists('t3lib_extMgm::extPath')) {
+			if (TYPO3_VERSION_INTEGER < 6002000) {
 				$path_to_xajax = t3lib_extMgm::extPath('xajax') . 'class.tx_xajax.php';
 			} else {
-				$path_to_xajax = 'typo3conf/ext/xajax/class.tx_xajax.php';
+				$path_to_xajax = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('xajax') . 'class.tx_xajax.php';
 			}
 			require_once($path_to_xajax);
 		}
@@ -1142,7 +1152,11 @@ class tx_kesearch_lib extends tx_kesearch_pluginBase {
 		$this->xajax->processRequests();
 
 		// Create javacript and add it to the normal output
-		$jsCode = $this->xajax->getJavascript(t3lib_extMgm::siteRelPath('xajax'));
+		if (TYPO3_VERSION_INTEGER < 6002000) {
+			$jsCode = $this->xajax->getJavascript(t3lib_extMgm::siteRelPath('xajax'));
+		} else {
+			$jsCode = $this->xajax->getJavascript(TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath('xajax'));
+		}
 		if (TYPO3_VERSION_INTEGER >= 6000000) {
 			$GLOBALS['TSFE']->getPageRenderer()->addHeaderData($jsCode);
 		} else {
@@ -1159,7 +1173,11 @@ class tx_kesearch_lib extends tx_kesearch_pluginBase {
 	 */
 	public function createHideSpinner() {
 		// generate onload image
-		$path = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/blank.gif';
+		if (TYPO3_VERSION_INTEGER < 6002000) {
+			$path = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/blank.gif';
+		} else {
+			$path = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath($this->extKey) . 'res/img/blank.gif';
+		}
 		if ($GLOBALS['TSFE']->id != $this->conf['resultPage']) {
 			$spinnerFunction = 'hideSpinnerFiltersOnly()';
 		} else $spinnerFunction = 'hideSpinner()';
@@ -1353,7 +1371,11 @@ class tx_kesearch_lib extends tx_kesearch_pluginBase {
 				$noResultsText = $this->pi_getLL('no_results_found');
 				// attention icon
 				unset($imageConf);
-				$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/attention.gif';
+				if (TYPO3_VERSION_INTEGER < 6002000) {
+					$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey).'res/img/attention.gif';
+				} else {
+					$imageConf['file'] = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath($this->extKey).'res/img/attention.gif';
+				}
 				$imageConf['altText'] = $this->pi_getLL('no_results_found');
 				$attentionImage=$this->cObj->IMAGE($imageConf);
 			}
@@ -1391,7 +1413,11 @@ class tx_kesearch_lib extends tx_kesearch_pluginBase {
 
 			// attention icon
 			unset($imageConf);
-			$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/attention.gif';
+			if (TYPO3_VERSION_INTEGER < 6002000) {
+				$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/attention.gif';
+			} else {
+				$imageConf['file'] = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath($this->extKey) . 'res/img/attention.gif';
+			}
 			$imageConf['altText'] = $this->pi_getLL('no_results_found');
 			$attentionImage=$this->cObj->IMAGE($imageConf);
 
@@ -1604,7 +1630,12 @@ class tx_kesearch_lib extends tx_kesearch_pluginBase {
 	public function countSearchWordWithKeStats($searchphrase='') {
 
 		$searchphrase = trim($searchphrase);
-		if (t3lib_extMgm::isLoaded('ke_stats') && !empty($searchphrase)) {
+		if (TYPO3_VERSION_INTEGER < 6002000) {
+			$keStatsIsLoaded = t3lib_extMgm::isLoaded('ke_stats');
+		} else {
+			$keStatsIsLoaded = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('ke_stats');
+		}
+		if ($keStatsIsLoaded && !empty($searchphrase)) {
 			if (TYPO3_VERSION_INTEGER >= 7000000) {
 				$keStatsObj = TYPO3\CMS\Core\Utility\GeneralUtility::getUserObj('EXT:ke_stats/pi1/class.tx_kestats_pi1.php:tx_kestats_pi1');
 			} else {
@@ -1993,11 +2024,19 @@ class tx_kesearch_lib extends tx_kesearch_pluginBase {
 
 		// fallback: default image
 		if(!is_file(PATH_site . $imageConf['file'])) {
-			$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/types/' . $name . '.gif';
+			if (TYPO3_VERSION_INTEGER < 6002000) {
+				$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/types/' . $name . '.gif';
+			} else {
+				$imageConf['file'] = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath($this->extKey) . 'res/img/types/' . $name . '.gif';
+			}
 
 			// fallback for file results: use default if no image for this file extension is available
 			if($type == 'file' && !is_file(PATH_site . $imageConf['file'])) {
-				$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/types/file.gif';
+				if (TYPO3_VERSION_INTEGER < 6002000) {
+					$imageConf['file'] = t3lib_extMgm::siteRelPath($this->extKey) . 'res/img/types/file.gif';
+				} else {
+					$imageConf['file'] = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath($this->extKey) . 'res/img/types/file.gif';
+				}
 			}
 		}
 
@@ -2196,7 +2235,11 @@ class tx_kesearch_lib extends tx_kesearch_pluginBase {
 		}
 
 		// define some additional markers
-		$markerArray['###SITE_REL_PATH###'] = t3lib_extMgm::siteRelPath($this->extKey);
+		if (TYPO3_VERSION_INTEGER < 6002000) {
+			$markerArray['###SITE_REL_PATH###'] = t3lib_extMgm::siteRelPath($this->extKey);
+		} else {
+			$markerArray['###SITE_REL_PATH###'] = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath($this->extKey);
+		}
 		$markerArray['###TARGET_URL###'] = $targetUrl;
 		$markerArray['###PREFIX_ID###'] = $this->prefixId;
 		$markerArray['###SEARCHBOX_DEFAULT_VALUE###'] = $this->pi_getLL('searchbox_default_value');

@@ -57,7 +57,12 @@ class tx_kesearch_pi3 extends tx_kesearch_lib {
 
 		// init XAJAX?
 		if ($this->conf['renderMethod'] != 'static') {
-			if (!t3lib_extMgm::isLoaded('xajax')) {
+			if (TYPO3_VERSION_INTEGER < 6002000) {
+				$xajaxIsLoaded = t3lib_extMgm::isLoaded('xajax');
+			} else {
+				$xajaxIsLoaded = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('xajax');
+			}
+			if (!$xajaxIsLoaded) {
 				return ('<span style="color: red;"><b>ke_search error:</b>"XAJAX" must be installed for this mode.</span>');
 			}
 			else $this->initXajax();

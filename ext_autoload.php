@@ -1,6 +1,7 @@
 <?php
 if (TYPO3_VERSION_INTEGER >= 6002000) {
-	$extensionPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('ke_search');
+	debug(TYPO3_VERSION_INTEGER);
+	$extensionPath = TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('ke_search');
 } else {
 	$extensionPath = t3lib_extMgm::extPath('ke_search');
 }
