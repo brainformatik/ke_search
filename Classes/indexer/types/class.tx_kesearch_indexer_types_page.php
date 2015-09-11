@@ -586,9 +586,13 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 		$feGroups = $this->getCombinedFeGroupsForContentElement($feGroupsPages, $ttContentRow['fe_group']);
 
 		if (count($fileObjects) && $feGroups != DONOTINDEX) {
-
 			// loop through files
 			foreach ($fileObjects as $fileObject) {
+
+				// do not index folders, only files
+				if (!$fileObject instanceof \TYPO3\CMS\Core\Resource\File) {
+					break;
+				}
 
 				if (TYPO3_VERSION_INTEGER >= 7000000) {
 					$isInList = \TYPO3\CMS\Core\Utility\GeneralUtility::inList($this->indexerConfig['fileext'], $fileObject->getExtension());
@@ -680,7 +684,6 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 				if ($k % 2) {
 					$tagCode = \TYPO3\CMS\Core\Utility\GeneralUtility::unQuoteFilenames(trim(substr($rteHtmlParser->getFirstTag($v), 0, -1)), TRUE);
 					$link_param = $tagCode[1];
-					//debug($link_param);
 
 					// Check for FAL link-handler keyword
 					list($linkHandlerKeyword, $linkHandlerValue) = explode(':', trim($link_param), 2);
