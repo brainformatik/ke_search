@@ -589,11 +589,6 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 			// loop through files
 			foreach ($fileObjects as $fileObject) {
 
-				// do not index folders, only files
-				if (!$fileObject instanceof \TYPO3\CMS\Core\Resource\File) {
-					break;
-				}
-
 				if (TYPO3_VERSION_INTEGER >= 7000000) {
 					$isInList = \TYPO3\CMS\Core\Utility\GeneralUtility::inList($this->indexerConfig['fileext'], $fileObject->getExtension());
 				} else {
@@ -690,7 +685,7 @@ class tx_kesearch_indexer_types_page extends tx_kesearch_indexer_types {
 					if ($linkHandlerKeyword === 'file') {
 						try {
 							$fileOrFolderObject = \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance()->retrieveFileOrFolderObject(rawurldecode($linkHandlerValue));
-							if ($fileOrFolderObject instanceof \TYPO3\CMS\Core\Resource\FileInterface || $fileOrFolderObject instanceof \TYPO3\CMS\Core\Resource\Folder) {
+							if ($fileOrFolderObject instanceof \TYPO3\CMS\Core\Resource\FileInterface) {
 								$fileObjects[] = $fileOrFolderObject;
 							}
 						} catch (\TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException $resourceDoesNotExistException) {
